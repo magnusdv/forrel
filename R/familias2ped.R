@@ -1,19 +1,19 @@
-#' Convert 'Familias' output to ped objects
+#' Convert `Familias` objects to `ped` format
 #'
 #' Familias is a widely used program for computations in forensic genetics. The
 #' function documented here converts pedigrees and marker data from Familias to
-#' `pedtools` format, thus enabling such data to be analysed with the `forrel`
-#' package. This may be of interest for specialized computations not implemented
-#' in Familias, e.g. conditional simulations.
+#' [pedtools::ped()] format, thus enabling such data to be analysed with
+#' `forrel`. This may be of interest for specialized computations not
+#' implemented in Familias, e.g. conditional simulations.
 #'
 #' The Familias program represents pedigrees and marker data in a way that
 #' differs from `pedtools` in several ways, mostly because of the latter's
-#' stricter definition of a *pedigree*. In `pedtools`, unlike Familias, a
-#' pedigree must be connected, and each member must have either 0 or 2 parents
-#' present in the pedigree. None of this is required by `FamiliasPedigree`
-#' objects. The conversion function `Familias2ped` takes care of all potential
-#' differences: It converts each FamiliasPedigree into a list of connected ped
-#' objects, adding missing parents where needed.
+#' stricter definition of a *pedigree*. In `pedtools` pedigrees must be
+#' connected, and each member must have either 0 or 2 parents present in the
+#' pedigree. None of this is required by `FamiliasPedigree` objects. The
+#' conversion function `Familias2ped` takes care of all potential differences:
+#' It converts each FamiliasPedigree into a list of connected ped objects,
+#' adding missing parents where needed.
 #'
 #' @param familiasped A [Familias::FamiliasPedigree()] object or a list of such.
 #' @param datamatrix A data frame with two columns per marker (one for each
@@ -27,35 +27,40 @@
 #' @examples
 #'
 #' \dontrun{
+#' # Example 1
+#' # =========
 #' library(Familias)
 #' library(pedtools)
 #' data(NorwegianFrequencies)
 #' TH01 = NorwegianFrequencies$TH01
 #' locus1 = FamiliasLocus(TH01)
 #' persons = c('mother', 'daughter', 'AF')
-#' ped1 = FamiliasPedigree(id=persons, dadid=c(NA, 'AF', NA), momid=c(NA, 'mother', NA),
-#'                          sex=c('female', 'female', 'male'))
+#' ped1 = FamiliasPedigree(id = persons,
+#'                         dadid = c(NA, 'AF', NA),
+#'                         momid = c(NA, 'mother', NA),
+#'                         sex = c('female', 'female', 'male'))
 #' datamatrix = data.frame(THO1.1=c(NA, 8, NA), THO1.2=c(NA,9.3, NA))
 #' rownames(datamatrix) = persons
 #' x = Familias2ped(ped1, datamatrix, locus1)
-#' plotPedList(list(x), new=TRUE, frametitles=c('H1'), available='shaded', marker = 1)
+#' plot(x, marker = 1)
 #'
-#' # Example
+#' # Example 2 TODO - test!
+#' # =========
 #' library(fam2r)
 #' data(F21)
 #' pedigrees = F21$pedigrees
 #' datamatrix = F21$datamatrix
 #' loci = F21$loci
+#'
 #' x = Familias2ped(pedigrees, datamatrix, loci)
-#' plotPedList(x, new=TRUE, frametitles=c('H1', 'H2'), available='shaded')
+#' plotPedList(x, new=TRUE, frametitles=c('H1', 'H2'))
 #'
 #' # Give dev.width explicitly to allow for long names
-#' plotPedList(x, new=TRUE, frametitles=c('H1', 'H2'), available='shaded',
-#'             dev.width=17)
+#' plotPedList(x, new = TRUE, frametitles = c('H1', 'H2'), dev.width = 17)
 #'
 #' # Numerical labels work better
-#' plotPedList(x, new=TRUE, id.labels='num', frametitles=c('H1', 'H2'),
-#'             available='shaded')
+#' plotPedList(x, new=TRUE, id.labels = 'num', frametitles = c('H1', 'H2'))
+#'
 #' }
 #'
 #' @export
