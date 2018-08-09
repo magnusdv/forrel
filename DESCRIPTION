@@ -1,0 +1,19 @@
+Package: forrel
+Type: Package
+Title: Relatedness Inference and Forensic Pedigree Analysis
+Version: 0.1.0
+Authors@R: person("Magnus Dehli", "Vigeland", email = "m.d.vigeland@medisin.uio.no", 
+                  role = c("aut", "cre"))
+Description: Forensic applications of pedigree analysis, including marker simulation,
+    relatedness inference and exclusion probailities. Data import from the Familias
+    software is fully supported.
+License: GPL-3
+Encoding: UTF-8
+LazyData: true
+Suggests: testthat
+RoxygenNote: 6.1.0
+Roxygen: list(markdown = TRUE)
+Imports: pedtools,
+    pedprobr,
+    maxLik,
+    glue
