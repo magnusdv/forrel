@@ -107,7 +107,7 @@ markerSim = function(x, N = 1, available = NULL, alleles = NULL, afreq = NULL, p
   }
 
   alleles = alleles(m)
-  afreq = afreq(m)
+  afreq = unname(afreq(m))
   mutmat = attr(m, "mutmat")
   Xchrom = is_Xmarker(m)
   nall = nAlleles(m)
@@ -365,7 +365,7 @@ markerSim = function(x, N = 1, available = NULL, alleles = NULL, afreq = NULL, p
   nall = ncol(mutmatrix)
   vapply(allele_vec,
        function(a) sample.int(nall, size = 1, prob = mutmatrix[a,]),
-       FUN.VALUE = 1)
+       FUN.VALUE = 1L)
 }
 
 .optimal.precomputation = function(target_int, Nsim, gridlist, Xchrom, SEX = NULL) {
@@ -516,7 +516,7 @@ simpleSim = function(x, N, alleles, afreq, available, Xchrom = FALSE,
 
   odd = seq_len(N) * 2 - 1
 
-  m[!x$LABELS %in% available, ] = 0
+  m[!x$LABELS %in% available, ] = 0L
   if (variableSNPfreqs) {
     attrib = attributes(marker(x, alleles = alleles, afreq = NULL,
                                chrom = NA, mutmat = mutmat))
@@ -558,7 +558,7 @@ simpleSim = function(x, N, alleles, afreq, available, Xchrom = FALSE,
   NONFOU = nonfounders(x, internal=T)
   mutations = !is.null(mutmat)
 
-  m = matrix(0, ncol = 2 * N, nrow = pedsize(x))
+  m = matrix(0L, ncol = 2 * N, nrow = pedsize(x))
   odd = seq_len(N) * 2 - 1
 
   if (!is.null(seed)) set.seed(seed)
@@ -592,7 +592,7 @@ simpleSim = function(x, N, alleles, afreq, available, Xchrom = FALSE,
   NONFOU = nonfounders(x, internal=T)
   mutations = !is.null(mutmat)
 
-  m = matrix(0, ncol = 2 * N, nrow = pedsize(x))
+  m = matrix(0L, ncol = 2 * N, nrow = pedsize(x))
   odd = seq_len(N) * 2 - 1
 
   if (!is.null(seed)) set.seed(seed)
