@@ -477,8 +477,8 @@ simpleSim = function(x, N, alleles, afreq, available, Xchrom = FALSE,
     }
     else {
       stopifnot(length(mutmat) == 2, setequal(names(mutmat), c("female", "male")))
-      mutmat$female = pedtools:::.checkMutationMatrix(mutmat$female, alleles, label = "female")
-      mutmat$male = pedtools:::.checkMutationMatrix(mutmat$male, alleles, label = "male")
+      mutmat$female = pedtools:::.checkMutationMatrix(mutmat$female, alleles)
+      mutmat$male = pedtools:::.checkMutationMatrix(mutmat$male, alleles)
     }
   }
 
