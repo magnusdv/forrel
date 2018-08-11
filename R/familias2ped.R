@@ -23,7 +23,7 @@
 #' @return A `ped` object, or a list of such.
 #' @author Magnus Dehli Vigeland, Thore Egeland
 #'
-#' @references Windows Familias is freely availabe from <http://familias.name>.
+#' @references Windows Familias is freely available from <http://familias.name>.
 #' @examples
 #'
 #' \dontrun{
@@ -77,11 +77,11 @@ Familias2ped = function(familiasped, datamatrix, loci) {
   id = familiasped$id
   findex = familiasped$findex
   mindex = familiasped$mindex
-  p = data.frame(id = id,
-                 fid = ifelse(findex > 0, id[findex], 0),
-                 mid = ifelse(mindex > 0, id[mindex], 0),
-                 sex = ifelse(familiasped$sex == "male", 1, 2),
-                 stringsAsFactors = FALSE)
+
+  p = data.frame(id = id, fid = 0, mid = 0, sex = 1, stringsAsFactors = FALSE)
+  p$fid[findex > 0] = id[findex]
+  p$mid[mindex > 0] = id[mindex]
+  p$sex[familiasped$sex == "female"] = 2
 
   fatherMissing = which(p$fid == 0 & p$mid != 0)
   motherMissing = which(p$fid != 0 & p$mid == 0)
@@ -106,10 +106,12 @@ Familias2ped = function(familiasped, datamatrix, loci) {
 
   # identify connected components and add famid column. Keep order unchanged!
   comps = connectedComponents(p$id, p$fid, p$mid)
-  famid = integer(nrow(p))
-  for (i in 1:length(comps)) famid[match(comps[[i]], p$id)] = i
+  if(length(comps) > 1) {
+    famid = integer(nrow(p))
+    for (i in 1:length(comps)) famid[match(comps[[i]], p$id)] = i
 
-  p = cbind(famid = famid, p)
+    p = cbind(famid = famid, p)
+  }
 
   ### Part2: datamatrix
 
