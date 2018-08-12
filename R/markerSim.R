@@ -57,7 +57,7 @@ markerSim = function(x, N = 1, available = NULL, alleles = NULL, afreq = NULL, p
 
   # if input is a list of ped objects: Apply markerSim recursively
   if (is.pedList(x))
-      return(lapply(x, function(xi) markerSim(xi, N = N, available = intersect(xi$LABELS, available),
+      return(lapply(x, function(xi) markerSim(xi, N = N, available = intersect(labels(xi), available),
           alleles = alleles, afreq = afreq, partialmarker = partialmarker,
           loop_breakers = loop_breakers, eliminate = eliminate, verbose = verbose)))
 
@@ -73,7 +73,7 @@ markerSim = function(x, N = 1, available = NULL, alleles = NULL, afreq = NULL, p
 
   if (!is.null(x$LOOP_BREAKERS))
     stop("`ped` objects with pre-broken loops are not allowed as input to `markerSim`")
-  if(is.null(available)) available = x$LABELS
+  if(is.null(available)) available = labels(x)
 
   ### Partial marker
   m = partialmarker
@@ -122,7 +122,7 @@ markerSim = function(x, N = 1, available = NULL, alleles = NULL, afreq = NULL, p
   allgenos = pedprobr::allGenotypes(nall)
 
 
-  gridlist = pedprobr::geno.grid.subset(x, m, x$LABELS, make.grid = F)
+  gridlist = pedprobr::geno.grid.subset(x, m, labels(x), make.grid = F)
 
 
   if (verbose) {
@@ -148,7 +148,7 @@ markerSim = function(x, N = 1, available = NULL, alleles = NULL, afreq = NULL, p
     for (id in (1:pedsize(x))[forcedTF]) {
       allelchars = alleles[m[id, ]]
       if (Xchrom) allelchars = allelchars[1]
-      cat(sprintf("Individual %s: %s\n", x$LABELS[id], paste(allelchars, collapse = "/")))
+      cat(sprintf("Individual %s: %s\n", labels(x)[id], paste(allelchars, collapse = "/")))
     }
   }
 
@@ -157,7 +157,7 @@ markerSim = function(x, N = 1, available = NULL, alleles = NULL, afreq = NULL, p
   morig = m
 
   if (loops <- x$UNBROKEN_LOOPS) {
-    orig_ids = x$LABELS
+    orig_ids = labels(x)
     x = breakLoops(setMarkers(x, m), loop_breakers = loop_breakers, verbose = verbose)
     m = x$markerdata[[1]]
     loop_breakers = x$LOOP_BREAKERS[, 1]
@@ -176,7 +176,7 @@ markerSim = function(x, N = 1, available = NULL, alleles = NULL, afreq = NULL, p
 
   # Individuals that are typed (or forced - see above). Simulations condition on these.
   typedTF = (morig[, 1] != 0 | morig[, 2] != 0)
-  typed = xorig$LABELS[typedTF]
+  typed = labels(xorig)[typedTF]
 
   # Target individuals: untyped individuals that we seek to simulate
   targets = .mysetdiff(available, typed)
@@ -230,7 +230,7 @@ markerSim = function(x, N = 1, available = NULL, alleles = NULL, afreq = NULL, p
   }
 
   if (verbose) {
-    .printLabels = function(v) if (length(v) > 0) toString(x$LABELS[v]) else "None"
+    .printLabels = function(v) if (length(v) > 0) toString(labels(x)[v]) else "None"
 
     print(glue::glue("\n
       Simulation strategy
@@ -278,7 +278,7 @@ markerSim = function(x, N = 1, available = NULL, alleles = NULL, afreq = NULL, p
         }))
         if (sum(probs) == 0) {
           print(partial)
-          stop2("\nIndividual ", x$LABELS[i], ": All genotype probabilities zero. Mendelian error?")
+          stop2("\nIndividual ", labels(x)[i], ": All genotype probabilities zero. Mendelian error?")
         }
         sample(gridi, size = 1, prob = probs)
       }))
@@ -338,7 +338,7 @@ markerSim = function(x, N = 1, available = NULL, alleles = NULL, afreq = NULL, p
   # removing genotypes for individuals that are i) originally untyped and ii) unavailable
   typedTF[forcedTF] = FALSE
 
-  unavailable = !(x$LABELS %in% available)
+  unavailable = !labels(x) %in% available
   markers[!typedTF & unavailable, ] = 0
   attrib = attributes(partialmarker)
   attrib$name = NA_character_
@@ -465,7 +465,7 @@ simpleSim = function(x, N, alleles, afreq, available, Xchrom = FALSE,
     afreq = rep(afreq, length = N)
 
   if (missing(available))
-    available = x$LABELS
+    available = labels(x)
 
   mutations = !is.null(mutmat)
   if (mutations) {
@@ -516,7 +516,7 @@ simpleSim = function(x, N, alleles, afreq, available, Xchrom = FALSE,
 
   odd = seq_len(N) * 2 - 1
 
-  m[!x$LABELS %in% available, ] = 0L
+  m[!labels(x) %in% available, ] = 0L
   if (variableSNPfreqs) {
     attrib = attributes(marker(x, alleles = alleles, afreq = NULL,
                                chrom = NA, mutmat = mutmat))
