@@ -29,7 +29,7 @@
 #' @references E. A. Thompson (2000). *Statistical Inferences from Genetic Data
 #'   on Pedigrees.* NSF-CBMS Regional Conference Series in Probability and
 #'   Statistics. Volume 6.
-#' @md
+#'
 #' @examples
 #' library(pedtools)
 #'
