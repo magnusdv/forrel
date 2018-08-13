@@ -2,7 +2,6 @@
 ^\.Rproj\.user$
 ^R/examineKinships.R$
 ^R/exclusionPower.R$
-^R/IBDestimate.R$
 ^R/LR.R$
 ^R/IBDtriangle.R$
 ^R/relationLR.R$
