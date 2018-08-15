@@ -166,8 +166,8 @@ markerSim = function(x, N = 1, available = NULL, alleles = NULL, afreq = NULL, p
 
   ngrid = lengths(gridlist)
   SEX = x$SEX
-  FID = x$FID
-  MID = x$MID
+  FIDX = x$FIDX
+  MIDX = x$MIDX
   FOU = founders(x, internal=T)
   NONFOU = nonfounders(x, internal=T)
 
@@ -219,7 +219,7 @@ markerSim = function(x, N = 1, available = NULL, alleles = NULL, afreq = NULL, p
     v = simple.nonfounders_int
     v.ordered = numeric()
     while (length(v) > 0) {
-      i = match(TRUE, (FID[v] %in% done) & (MID[v] %in% done))
+      i = match(TRUE, (FIDX[v] %in% done) & (MIDX[v] %in% done))
       if (is.na(i))
         stop2("Could not determine sensible order for gene dropping. Bug report to magnusdv@medisin.uio.no is appreciated!")
       v.ordered = c(v.ordered, v[i])
@@ -306,21 +306,21 @@ markerSim = function(x, N = 1, available = NULL, alleles = NULL, afreq = NULL, p
 
     for (id in simple.nonfounders_int) {
       if (!Xchrom) {
-        paternal = markers[FID[id], odd + .rand01(N)]
-        maternal = markers[MID[id], odd + .rand01(N)]
+        paternal = markers[FIDX[id], odd + .rand01(N)]
+        maternal = markers[MIDX[id], odd + .rand01(N)]
         if (mutations) {
           paternal = .mutate(paternal, mutmat$male)
           maternal = .mutate(maternal, mutmat$female)
         }
       } else {
-        maternal = markers[MID[id], odd + .rand01(N)]
+        maternal = markers[MIDX[id], odd + .rand01(N)]
         if (mutations)
           maternal = .mutate(maternal, mutmat$female)
 
         if (SEX[id] == 1)
           paternal = maternal  # if boy, only maternal
         else {
-          paternal = markers[FID[id], odd]  # if girl, fathers allele is forced
+          paternal = markers[FIDX[id], odd]  # if girl, fathers allele is forced
           if (mutations)
             paternal = .mutate(paternal, mutmat$male)
         }
@@ -551,8 +551,8 @@ simpleSim = function(x, N, alleles, afreq, available, Xchrom = FALSE,
 
 
 .genedrop_AUT = function(x, N, nall, afreq, mutmat, seed) {
-  FID = x$FID
-  MID = x$MID
+  FIDX = x$FIDX
+  MIDX = x$MIDX
   SEX = x$SEX
   FOU = founders(x, internal=T)
   NONFOU = nonfounders(x, internal=T)
@@ -572,8 +572,8 @@ simpleSim = function(x, N, alleles, afreq, available, Xchrom = FALSE,
 
   m[FOU, ] = fou_alleles
   for (id in NONFOU) {
-    paternal = m[FID[id], odd + .rand01(N)]
-    maternal = m[MID[id], odd + .rand01(N)]
+    paternal = m[FIDX[id], odd + .rand01(N)]
+    maternal = m[MIDX[id], odd + .rand01(N)]
     if (mutations) {
       paternal = .mutate(paternal, mutmat$male)
       maternal = .mutate(maternal, mutmat$female)
@@ -585,8 +585,8 @@ simpleSim = function(x, N, alleles, afreq, available, Xchrom = FALSE,
 }
 
 .genedrop_X = function(x, N, nall, afreq, mutmat, seed) {
-  FID = x$FID
-  MID = x$MID
+  FIDX = x$FIDX
+  MIDX = x$MIDX
   SEX = x$SEX
   FOU = founders(x, internal=T)
   NONFOU = nonfounders(x, internal=T)
@@ -604,7 +604,7 @@ simpleSim = function(x, N, alleles, afreq, available, Xchrom = FALSE,
       m[f, ] = sample.int(nall, size = 2 * N, replace = TRUE, prob = afreq)
   }
   for (id in NONFOU) {
-    maternal = m[MID[id], odd + .rand01(N)]
+    maternal = m[MIDX[id], odd + .rand01(N)]
     if (mutations)
       maternal = .mutate(maternal, mutmat$female)
 
@@ -612,7 +612,7 @@ simpleSim = function(x, N, alleles, afreq, available, Xchrom = FALSE,
       paternal = maternal  # if boy, only maternal
     }
     else {
-      paternal = m[FID[id], odd]  # if girl, fathers allele is forced
+      paternal = m[FIDX[id], odd]  # if girl, fathers allele is forced
       if (mutations)
         paternal = .mutate(paternal, mutmat$male)
     }
