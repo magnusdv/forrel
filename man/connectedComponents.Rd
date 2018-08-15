@@ -4,17 +4,17 @@
 \alias{connectedComponents}
 \title{Connected pedigree components}
 \usage{
-connectedComponents(ID, FID, MID)
+connectedComponents(id, fid, mid)
 }
 \arguments{
-\item{ID}{A vector of ID labels (character or numeric)}
+\item{id}{A vector of ID labels (character or numeric)}
 
-\item{FID}{The ID labels of the fathers (or \code{0} if missing)}
+\item{fid}{The ID labels of the fathers (or "0" if missing)}
 
-\item{MID}{The ID labels of the mothers (or \code{0} if missing)}
+\item{mid}{The ID labels of the mothers (or "0" if missing)}
 }
 \value{
-A list, where each element is a vector of ID labels constituting a
+A list, where each element is a subset of \code{id} constituting a
 connected pedigree
 }
 \description{

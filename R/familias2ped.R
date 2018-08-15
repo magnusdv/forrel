@@ -181,19 +181,19 @@ readFamiliasLoci = function(loci) {
 #' (which allows disconnected pedigrees) to `pedtools` (which requires pedigrees
 #' to be connected).
 #'
-#' @param ID A vector of ID labels (character or numeric)
-#' @param FID The ID labels of the fathers (or `0` if missing)
-#' @param MID The ID labels of the mothers (or `0` if missing)
+#' @param id A vector of ID labels (character or numeric)
+#' @param fid The ID labels of the fathers (or "0" if missing)
+#' @param mid The ID labels of the mothers (or "0" if missing)
 #'
-#' @return A list, where each element is a vector of ID labels constituting a
+#' @return A list, where each element is a subset of `id` constituting a
 #'   connected pedigree
 #' @export
-connectedComponents = function(ID, FID, MID) {
+connectedComponents = function(id, fid, mid) {
   # Placeholder for final components
   comps = list()
 
   # Starting point: List of all founders and trios
-  temp = lapply(seq_along(ID), function(i) .mysetdiff(c(ID[i], FID[i], MID[i]), 0))  # trios
+  temp = lapply(seq_along(id), function(i) .mysetdiff(c(id[i], fid[i], mid[i]), 0))  # trios
 
   while (length(temp) > 0) {
     # Check if first vector overlaps with any of the others
