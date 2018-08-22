@@ -21,7 +21,7 @@ the IBDtriangle.}
 \item{col_labels, cex_labels, pos, adj}{Parameters passed onto \code{\link[=text]{text()}} (if
 \code{labels} is non-NULL).}
 
-\item{\dots}{Plot arguments passed on to \code{IBDtriangle}.}
+\item{\dots}{Plot arguments passed on to \code{IBDtriangle()}.}
 }
 \description{
 Utility function for plotting points in the IBD triangle.
@@ -32,7 +32,7 @@ showInTriangle(k0=3/8, k2=1/8, label="3/4 siblings", pos=1)
 
 }
 \seealso{
-\code{\link[=IBDtriangle]{IBDtriangle()}}, \code{\link[=examineKinships]{examineKinships()}}
+#\code{\link[=examineKinships]{examineKinships()}}
 }
 \author{
 Magnus Dehli Vigeland

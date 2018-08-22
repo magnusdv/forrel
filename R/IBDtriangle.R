@@ -128,10 +128,11 @@ IBDtriangle = function(relationships = c("UN", "PO", "MZ", "S", "H,U,G", "FC",
 #' @param labels A character of same length as `k0`, or NULL.
 #' @param col_labels,cex_labels,pos,adj Parameters passed onto [text()] (if
 #'   `labels` is non-NULL).
-#' @param \dots Plot arguments passed on to `IBDtriangle`.
+#' @param \dots Plot arguments passed on to `IBDtriangle()`.
+#'
 #' @return NULL
 #' @author Magnus Dehli Vigeland
-#' @seealso [IBDtriangle()], [examineKinships()]
+#' @seealso #[examineKinships()]
 #'
 #' @examples
 #'
