@@ -1,6 +1,9 @@
 <!-- README.md is generated from README.Rmd. Please edit that file -->
-forrel
-======
+forrel <img src="man/figures/logo.png" align="right" height=140/>
+=================================================================
+
+Introduction
+------------
 
 The goal of `forrel` is to provide forensic pedigree computations and relatedness estimation from genetic marker data. Some of its functionality is derived from the retired `paramlink` package, but updated to comply with the `pedtools` package for handling pedigrees and marker data.
 
