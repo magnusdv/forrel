@@ -57,7 +57,7 @@ showInTriangle(est, labels = TRUE)
 
 ### Example 2: Unrelated singletons
 y = list(singleton(1), singleton(2))
-y = markerSim(y, N = 2000, alleles = 1:2, verbose = FALSE)
+y = markerSim(y, N = 200, alleles = 1:2, verbose = FALSE)
 
 IBDestimate(y, ids = 1:2)
 
