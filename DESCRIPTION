@@ -2,6 +2,7 @@ Package: forrel
 Type: Package
 Title: Relatedness Inference and Forensic Pedigree Analysis
 Version: 0.1.0
+Date: 2018-20-07
 Authors@R: person("Magnus Dehli", "Vigeland", email = "m.d.vigeland@medisin.uio.no", 
                   role = c("aut", "cre"))
 Description: Forensic applications of pedigree analysis, including marker simulation,
@@ -10,10 +11,12 @@ Description: Forensic applications of pedigree analysis, including marker simula
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
-Suggests: testthat
-RoxygenNote: 6.1.0
-Roxygen: list(markdown = TRUE)
-Imports: pedtools,
+Depends: R (>= 3.1.0)
+Imports: 
+    pedtools,
     pedprobr,
     maxLik,
     glue
+Suggests: testthat
+RoxygenNote: 6.1.0
+Roxygen: list(markdown = TRUE)
