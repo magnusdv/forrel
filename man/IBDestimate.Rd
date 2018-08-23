@@ -12,32 +12,35 @@ IBDestimate(x, ids, markers = NULL, start = c(0.99, 0.001),
 
 \item{ids}{Either a vector with two ID labels, or a data.frame/matrix with
 two columns, where each row contains the ID labels of two individuals. The
-entries are coercied to characters, and must match uniquely against the ID
+entries are coerced to characters, and must match uniquely against the ID
 labels of \code{x}.}
 
 \item{markers}{A numeric indicating which marker(s) to include. If NULL
 (default), all markers are used.}
 
-\item{start}{Numeric of length 2, indicating the initial value of $(\kappa_0,
-\kappa_2)$ in the optimisation (passed on to \code{maxLik}).}
+\item{start}{Numeric of length 2, indicating the initial value of
+\eqn{(\kappa_0, \kappa_2)}{(\kappa0, \kappa2)} in the optimisation (passed
+on to \code{maxLik}).}
 
 \item{tol}{A single numeric: the optimising tolerance value; passed on to
 \code{maxLik}).}
 }
 \value{
-A data.frame with 6 columns: ID1, ID2 (labels), N (#markers with no
-missing alleles), $\kappa_0$, $\kappa_1$, $\kappa_2$.
+A data.frame with 6 columns: \code{ID1}, \code{ID2}, \code{N} (#markers with no
+missing alleles), \code{k0}, \code{k1} and \code{k2}.
 }
 \description{
-Estimate the pairwise IBD coefficients $(\kappa_0, \kappa_1, \kappa_2)$ for
-specified pairs of pedigree members, using maximum likelihood methods.
-The optimization machinery is imported from the \code{maxLik} package.
+Estimate the pairwise IBD coefficients \eqn{(\kappa_0, \kappa_1,
+\kappa_2)}{(\kappa0, \kappa1, \kappa2)} for specified pairs of pedigree
+members, using maximum likelihood methods. The optimization machinery is
+imported from the \code{maxLik} package.
 }
 \details{
-This function optimises the log-likelihood function first described in (Thompson, 1975).
-Optimisation is done in the $(\kappa_0, \kappa_2)$-plane and restricted to the
-probability triangle defined by
-$\kappa_0 \ge 0, \kappa_2 \ge 0, \kappa_0 + \kappa_2 \le 1$.
+This function optimises the log-likelihood function first described in
+(Thompson, 1975). Optimisation is done in the \eqn{(\kappa_0,
+\kappa_2)}{(\kappa0, \kappa2)}-plane and restricted to the probability
+triangle defined by \deqn{\kappa_0 \ge 0, \kappa_2 \ge 0, \kappa_0 + \kappa_2
+\le 1.}{\kappa0 \ge 0, \kappa2 \ge 0, \kappa0 + \kappa2 \le 1.}
 }
 \examples{
 library(pedtools)
@@ -49,7 +52,8 @@ x = nuclearPed(children = c("sib1", "sib2"))
 x = markerSim(x, N = 200, alleles = 1:2, verbose = FALSE)
 
 # Estimate IBD coefficients (exact = (0.25, 0.5, 0.25))
-IBDestimate(x, ids = c("sib1", "sib2"))
+est = IBDestimate(x, ids = c("sib1", "sib2"))
+showInTriangle(est, labels = TRUE)
 
 ### Example 2: Unrelated singletons
 y = list(singleton(1), singleton(2))
@@ -60,12 +64,15 @@ IBDestimate(y, ids = 1:2)
 
 }
 \references{
-E. A. Thompson (2000). \emph{Statistical Inferences from Genetic Data
-on Pedigrees.} NSF-CBMS Regional Conference Series in Probability and
-Statistics. Volume 6.
+\itemize{
+\item E. A. Thompson (1975). \emph{The estimation of pairwise relationships.}
+Annals of Human Genetics 39.
+\item E. A. Thompson (2000). \emph{Statistical Inferences from Genetic Data on Pedigrees.}
+NSF-CBMS Regional Conference Series in Probability and Statistics. Volume 6.
+}
 }
 \seealso{
-\code{\link[maxLik:maxLik]{maxLik::maxLik()}} #\code{\link[=examineKinships]{examineKinships()}}, \code{\link[=IBDtriangle]{IBDtriangle()}}
+\code{\link[maxLik:maxLik]{maxLik::maxLik()}}, \code{\link[=showInTriangle]{showInTriangle()}}
 }
 \author{
 Magnus Dehli Vigeland

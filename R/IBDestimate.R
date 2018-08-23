@@ -1,34 +1,39 @@
 #' Relatedness estimation
 #'
-#' Estimate the pairwise IBD coefficients $(\kappa_0, \kappa_1, \kappa_2)$ for
-#' specified pairs of pedigree members, using maximum likelihood methods.
-#' The optimization machinery is imported from the `maxLik` package.
+#' Estimate the pairwise IBD coefficients \eqn{(\kappa_0, \kappa_1,
+#' \kappa_2)}{(\kappa0, \kappa1, \kappa2)} for specified pairs of pedigree
+#' members, using maximum likelihood methods. The optimization machinery is
+#' imported from the `maxLik` package.
 #'
-#' This function optimises the log-likelihood function first described in (Thompson, 1975).
-#' Optimisation is done in the $(\kappa_0, \kappa_2)$-plane and restricted to the
-#' probability triangle defined by
-#' $\kappa_0 \ge 0, \kappa_2 \ge 0, \kappa_0 + \kappa_2 \le 1$.
+#' This function optimises the log-likelihood function first described in
+#' (Thompson, 1975). Optimisation is done in the \eqn{(\kappa_0,
+#' \kappa_2)}{(\kappa0, \kappa2)}-plane and restricted to the probability
+#' triangle defined by \deqn{\kappa_0 \ge 0, \kappa_2 \ge 0, \kappa_0 + \kappa_2
+#' \le 1.}{\kappa0 \ge 0, \kappa2 \ge 0, \kappa0 + \kappa2 \le 1.}
 #'
 #' @param x A single `ped` object or a list of `ped` and/or `singleton` objects.
 #' @param ids Either a vector with two ID labels, or a data.frame/matrix with
 #'   two columns, where each row contains the ID labels of two individuals. The
-#'   entries are coercied to characters, and must match uniquely against the ID
+#'   entries are coerced to characters, and must match uniquely against the ID
 #'   labels of `x`.
 #' @param markers A numeric indicating which marker(s) to include. If NULL
 #'   (default), all markers are used.
-#' @param start Numeric of length 2, indicating the initial value of $(\kappa_0,
-#'   \kappa_2)$ in the optimisation (passed on to `maxLik`).
+#' @param start Numeric of length 2, indicating the initial value of
+#'   \eqn{(\kappa_0, \kappa_2)}{(\kappa0, \kappa2)} in the optimisation (passed
+#'   on to `maxLik`).
 #' @param tol A single numeric: the optimising tolerance value; passed on to
 #'   `maxLik`).
 #'
-#' @return A data.frame with 6 columns: ID1, ID2 (labels), N (#markers with no
-#'   missing alleles), $\kappa_0$, $\kappa_1$, $\kappa_2$.
+#' @return A data.frame with 6 columns: `ID1`, `ID2`, `N` (#markers with no
+#'   missing alleles), `k0`, `k1` and `k2`.
 #' @author Magnus Dehli Vigeland
-#' @seealso [maxLik::maxLik()] #[examineKinships()], [IBDtriangle()]
+#' @seealso [maxLik::maxLik()], [showInTriangle()]
 #'
-#' @references E. A. Thompson (2000). *Statistical Inferences from Genetic Data
-#'   on Pedigrees.* NSF-CBMS Regional Conference Series in Probability and
-#'   Statistics. Volume 6.
+#' @references
+#' * E. A. Thompson (1975). _The estimation of pairwise relationships._
+#'   Annals of Human Genetics 39.
+#' * E. A. Thompson (2000). _Statistical Inferences from Genetic Data on Pedigrees._
+#'   NSF-CBMS Regional Conference Series in Probability and Statistics. Volume 6.
 #'
 #' @examples
 #' library(pedtools)
@@ -40,7 +45,8 @@
 #' x = markerSim(x, N = 200, alleles = 1:2, verbose = FALSE)
 #'
 #' # Estimate IBD coefficients (exact = (0.25, 0.5, 0.25))
-#' IBDestimate(x, ids = c("sib1", "sib2"))
+#' est = IBDestimate(x, ids = c("sib1", "sib2"))
+#' showInTriangle(est, labels = TRUE)
 #'
 #' ### Example 2: Unrelated singletons
 #' y = list(singleton(1), singleton(2))
