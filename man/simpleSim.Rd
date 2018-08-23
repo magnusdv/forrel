@@ -51,7 +51,7 @@ library(pedtools)
 x = nuclearPed(1)
 simpleSim(x, N=3, afreq=c(0.5, 0.5))
 
-y = cousinsPed(1, child=TRUE)
+y = cousinPed(1, child=TRUE)
 simpleSim(y, N=3, alleles=LETTERS[1:10])
 
 }

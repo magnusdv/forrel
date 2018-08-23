@@ -23,8 +23,8 @@
 #' @seealso [IBDestimate()], [IBDtriangle()], [showInTriangle()]
 #'
 #' @examples
-#'
-#' x = cousinsPed(1)
+#' library(pedtools)
+#' x = cousinPed(1)
 #' x = simpleSim(x, 500, alleles=1:2)
 #' examineKinships(x)
 #'

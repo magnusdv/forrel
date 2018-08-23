@@ -18,7 +18,7 @@ test_that("Familias2ped() converts fullsib pedigree", {
   class(famped) = "FamiliasPedigree"
 
   ped = Familias2ped(famped, NULL, NULL)
-  expect_identical(ped, reorderPed(addChildren(fullSibMating(2),5,6,1,sex=2), famped$id))
+  expect_identical(ped, reorderPed(addChildren(fullSibMating(1),5,6,1,sex=2), famped$id))
 
 })
 
