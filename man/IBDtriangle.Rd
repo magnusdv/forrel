@@ -4,19 +4,14 @@
 \alias{IBDtriangle}
 \title{IBD triangle plot}
 \usage{
-IBDtriangle(relationships = c("UN", "PO", "MZ", "S", "H,U,G", "FC", "SC",
-  "DFC", "Q"), kinship.lines = numeric(), shading = "lightgray",
-  pch = 16, cex_points = 1.2, cex_text = 1, axes = FALSE,
-  xlim = c(0, 1), ylim = c(0, 1), kappas = TRUE, mar = c(3.1, 3.1,
-  1, 1))
+IBDtriangle(relationships = c("UN", "PO", "MZ", "S", "H,U,G", "FC"),
+  kinship.lines = numeric(), shading = "lightgray", pch = 16,
+  cex_points = 1.2, cex_text = 1, axes = FALSE, xlim = c(0, 1),
+  ylim = c(0, 1), kappas = TRUE, mar = c(3.1, 3.1, 1, 1))
 }
 \arguments{
 \item{relationships}{A character vector indicating relationships points to be
-included in the plot. By default all of the following are included:
-UN=unrelated; PO=parent/offspring; MZ=monozygotic twins; S=full siblings;
-H=half siblings; U=uncle/niece and similar; G=grandparent/grandchild;
-FC=first cousins; SC=second cousins; DFC=double first cousins; Q=quadruple
-first half cousins.}
+included in the plot. See Details for a list of valid entries.}
 
 \item{kinship.lines}{A numeric vector. (See Details.)}
 
@@ -34,7 +29,8 @@ relationship labels.}
 
 \item{xlim, ylim, mar}{Graphical parameters; see \code{\link[=par]{par()}}.}
 
-\item{kappas}{A logical: Include axis labels \eqn{\kappa_0} and \eqn{\kappa_2}?}
+\item{kappas}{A logical: Include axis labels \eqn{\kappa_0}{\kappa0} and
+\eqn{\kappa_2}{\kappa2}?}
 }
 \description{
 The IBD triangle is typically used to visualize the pairwise relatedness of
@@ -45,22 +41,37 @@ coefficients, and shading of the unattainable region.
 \details{
 For any pair of non-inbred individuals A and B, their genetic relationship
 can be summarized by the IBD coefficients \eqn{(\kappa_0, \kappa_1,
-\kappa_2)}, where \deqn{\kappa_i = P(A and B share i alleles IBD at random
-autosomal locus).} Since \eqn{\kappa_0+\kappa_1+\kappa_2=1}, any relationship
+\kappa_2)}{(\kappa0, \kappa1, \kappa2)}, where \deqn{\kappa_i = P(A and B share i alleles IBD at random
+autosomal locus).} Since \eqn{\kappa_0+\kappa_1+\kappa_2=1}{\kappa0 + \kappa1 + \kappa2=1}, any relationship
 corresponds to a point in the triangle in the \eqn{(\kappa_0,
-\kappa_2)}-plane defined by \eqn{\kappa_0 \ge 0, \kappa_2 \ge 0, \kappa_0 +
-\kappa_2 \le 1}. The choice of \eqn{\kappa_0} and \eqn{\kappa_2} as the axis
+\kappa_2)}{(\kappa0, \kappa2)}-plane defined by \eqn{\kappa_0 \ge 0, \kappa_2 \ge 0, \kappa_0 +
+\kappa_2 \le 1}{\kappa0 \ge 0, \kappa2 \ge 0, \kappa0 + \kappa2 \le 1}. The choice of
+\eqn{\kappa_0}{\kappa0} and \eqn{\kappa_2}{\kappa2} as the axis
 variables is done for reasons of symmetry and is not significant (other
 authors have used different views of the triangle).
 
 As shown in (Thompson, 1976) points in the subset of the triangle defined by
-\eqn{4\kappa_0\kappa_2 > \kappa_1^2} is unattainable for pairwise
+\eqn{4\kappa_0\kappa_2 > \kappa_1^2}{4*\kappa0*\kappa2 > \kappa1^2} is unattainable for pairwise
 relationships.  By default this region in shaded in a 'lightgray' color.
 
 The IBD coefficients are linearly related to the kinship coefficient
-\eqn{\phi} by the formula \deqn{\phi = 0.25\kappa_1 + 0.5\kappa_2.} By
+\eqn{\phi} by the formula
+\deqn{\phi = 0.25\kappa_1 + 0.5\kappa_2.}{\phi = 0.25*\kappa1 + 0.5*\kappa2.} By
 indicating values for \eqn{\phi} in the \code{kinship.lines} argument, the
 corresponding contour lines are shown as dashed lines in the triangle plot.
+
+The following abbreviations are valid entries in the \code{relationships} argument:
+\itemize{
+\item UN = unrelated
+\item PO = parent/offspring
+\item MZ = monozygotic twins
+\item S = full siblings
+\item H,U,G = half sibling/avuncular (\strong{u}ncle)/grandparent
+\item FC = first cousins
+\item SC = second cousins
+\item DFC = double first cousins
+\item Q = quadruple first half cousins
+}
 }
 \examples{
 
@@ -73,11 +84,11 @@ IBDtriangle(kinship=c(0.25, 0.125), shading=NULL, cex_text=0.8)
 E. A. Thompson (1975). \emph{The estimation of pairwise
 relationships.} Annals of Human Genetics 39.
 
-E. A. Thompson (1976). \emph{A restriction on the space of genetic relationships.}
-Annals of Human Genetics 40.
+E. A. Thompson (1976). \emph{A restriction on the space of genetic
+relationships.} Annals of Human Genetics 40.
 }
 \seealso{
-\code{\link[=examineKinships]{examineKinships()}}
+\code{\link[=IBDestimate]{IBDestimate()}}
 }
 \author{
 Magnus Dehli Vigeland
