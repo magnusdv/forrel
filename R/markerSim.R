@@ -9,9 +9,8 @@
 #'
 #' @param x a `ped` object
 #' @param N a positive integer: the number of markers to be simulated
-#' @param available a vector containing IDs of the available individuals, i.e.
-#'   those whose genotypes should be simulated. By default, all individuals are
-#'   included.
+#' @param ids a vector containing ID labels of those pedigree members whose
+#'   genotypes should be simulated. By default, all individuals are included.
 #' @param alleles a vector containing the alleles for the marker to be
 #'   simulation. If a single integer is given, this is interpreted as the number
 #'   of alleles, and the actual alleles as `1:alleles`. Must be NULL if
@@ -43,10 +42,10 @@
 #' markerSim(x, N = 1, alleles = 1:3)
 #' markerSim(x, N = 1, partialmarker = partial)
 #' markerSim(x, N = 1, partialmarker = partial)
-#' markerSim(x, N = 1, available = 4, partialmarker = partial)
+#' markerSim(x, N = 1, ids = 4, partialmarker = partial)
 #'
 #' @export
-markerSim = function(x, N = 1, available = NULL, alleles = NULL, afreq = NULL, partialmarker = NULL,
+markerSim = function(x, N = 1, ids = NULL, alleles = NULL, afreq = NULL, partialmarker = NULL,
   loop_breakers = NULL, eliminate = 0, seed = NULL, verbose = TRUE) {
 
   if (!is.ped(x) && !is.pedList(x))
@@ -57,7 +56,7 @@ markerSim = function(x, N = 1, available = NULL, alleles = NULL, afreq = NULL, p
 
   # if input is a list of ped objects: Apply markerSim recursively
   if (is.pedList(x))
-      return(lapply(x, function(xi) markerSim(xi, N = N, available = intersect(labels(xi), available),
+      return(lapply(x, function(xi) markerSim(xi, N = N, ids = intersect(labels(xi), ids),
           alleles = alleles, afreq = afreq, partialmarker = partialmarker,
           loop_breakers = loop_breakers, eliminate = eliminate, verbose = verbose)))
 
@@ -73,7 +72,7 @@ markerSim = function(x, N = 1, available = NULL, alleles = NULL, afreq = NULL, p
 
   if (!is.null(x$LOOP_BREAKERS))
     stop("`ped` objects with pre-broken loops are not allowed as input to `markerSim`")
-  if(is.null(available)) available = labels(x)
+  if(is.null(ids)) ids = labels(x)
 
   ### Partial marker
   m = partialmarker
@@ -115,7 +114,7 @@ markerSim = function(x, N = 1, available = NULL, alleles = NULL, afreq = NULL, p
 
   if (all(m == 0)) {
     return(simpleSim(x, N, alleles = alleles, afreq = afreq,
-                     available = available, Xchrom = Xchrom,
+                     ids = ids, Xchrom = Xchrom,
                      mutmat = mutmat, seed = seed, verbose = verbose))
   }
 
@@ -131,7 +130,7 @@ markerSim = function(x, N = 1, available = NULL, alleles = NULL, afreq = NULL, p
 
     print(glue::glue("
       Conditional simulation of {N} {locus} marker{plural_s}.
-      Target individuals: {toString(available)}
+      Target individuals: {toString(ids)}
       Conditioning on the following data:
       "))
     print(m)
@@ -179,7 +178,7 @@ markerSim = function(x, N = 1, available = NULL, alleles = NULL, afreq = NULL, p
   typed = labels(xorig)[typedTF]
 
   # Target individuals: untyped individuals that we seek to simulate
-  targets = .mysetdiff(available, typed)
+  targets = .mysetdiff(ids, typed)
   untyped_breakers = if (loops) .mysetdiff(loop_breakers, typed) else NULL
 
   # Method 2: Compute joint dist of some target individuals, brute force on the remaining
@@ -338,7 +337,7 @@ markerSim = function(x, N = 1, available = NULL, alleles = NULL, afreq = NULL, p
   # removing genotypes for individuals that are i) originally untyped and ii) unavailable
   typedTF[forcedTF] = FALSE
 
-  unavailable = !labels(x) %in% available
+  unavailable = !labels(x) %in% ids
   markers[!typedTF & unavailable, ] = 0
   attrib = attributes(partialmarker)
   attrib$name = NA_character_
@@ -413,8 +412,7 @@ markerSim = function(x, N = 1, available = NULL, alleles = NULL, afreq = NULL, p
 #' This simulation is done by distributing alleles randomly to all founders,
 #' followed by unconditional gene dropping down throughout the pedigree (i.e.
 #' for each non-founder a random allele is selected from each of the parents).
-#' Finally the genotypes of any individuals not included in `available` are
-#' removed.
+#' Finally the genotypes of any individuals not included in `ids` are removed.
 #'
 #' @param x a `ped` object
 #' @param N a positive integer: the number of markers to be simulated
@@ -422,8 +420,8 @@ markerSim = function(x, N = 1, available = NULL, alleles = NULL, afreq = NULL, p
 #'   are taken to be `seq_along(afreq)`.
 #' @param afreq a vector of length 2 containing the population frequencies for
 #'   the alleles. If missing, the alleles are assumed equifrequent.
-#' @param available a vector containing IDs of the available individuals, i.e.
-#'   those whose genotypes should be simulated.
+#' @param ids a vector containing ID labels of those pedigree members whose
+#'   genotypes should be simulated.
 #' @param Xchrom a logical: X linked markers or not?
 #' @param mutmat a mutation matrix, or a list of two such matrices named
 #'   'female' and 'male'. The matrix/matrices must be square, with the allele
@@ -446,7 +444,7 @@ markerSim = function(x, N = 1, available = NULL, alleles = NULL, afreq = NULL, p
 #'
 #' @importFrom utils head
 #' @export
-simpleSim = function(x, N, alleles, afreq, available, Xchrom = FALSE,
+simpleSim = function(x, N, alleles, afreq, ids, Xchrom = FALSE,
                    mutmat = NULL, seed = NULL, verbose = TRUE) {
   starttime = proc.time()
 
@@ -464,8 +462,8 @@ simpleSim = function(x, N, alleles, afreq, available, Xchrom = FALSE,
   if (variableSNPfreqs)
     afreq = rep(afreq, length = N)
 
-  if (missing(available))
-    available = labels(x)
+  if (missing(ids))
+    ids = labels(x)
 
   mutations = !is.null(mutmat)
   if (mutations) {
@@ -494,7 +492,7 @@ simpleSim = function(x, N, alleles, afreq, available, Xchrom = FALSE,
 
     print(glue::glue("
     Unconditional simulation of {N} {locus} marker{plural_s}.
-    Individuals: {toString(available)}
+    Individuals: {toString(ids)}
     "))
     if (variableSNPfreqs) {
       cat("Alleles:", toString(alleles), "\n")
@@ -516,7 +514,7 @@ simpleSim = function(x, N, alleles, afreq, available, Xchrom = FALSE,
 
   odd = seq_len(N) * 2 - 1
 
-  m[!labels(x) %in% available, ] = 0L
+  m[!labels(x) %in% ids, ] = 0L
   if (variableSNPfreqs) {
     attrib = attributes(marker(x, alleles = alleles, afreq = NULL,
                                chrom = NA, mutmat = mutmat))

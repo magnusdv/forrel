@@ -4,7 +4,7 @@
 \alias{markerSim}
 \title{Marker simulation}
 \usage{
-markerSim(x, N = 1, available = NULL, alleles = NULL, afreq = NULL,
+markerSim(x, N = 1, ids = NULL, alleles = NULL, afreq = NULL,
   partialmarker = NULL, loop_breakers = NULL, eliminate = 0,
   seed = NULL, verbose = TRUE)
 }
@@ -13,9 +13,8 @@ markerSim(x, N = 1, available = NULL, alleles = NULL, afreq = NULL,
 
 \item{N}{a positive integer: the number of markers to be simulated}
 
-\item{available}{a vector containing IDs of the available individuals, i.e.
-those whose genotypes should be simulated. By default, all individuals are
-included.}
+\item{ids}{a vector containing ID labels of those pedigree members whose
+genotypes should be simulated. By default, all individuals are included.}
 
 \item{alleles}{a vector containing the alleles for the marker to be
 simulation. If a single integer is given, this is interpreted as the number
@@ -61,7 +60,7 @@ partial = marker(x, '3' = 1, alleles = 1:3)
 markerSim(x, N = 1, alleles = 1:3)
 markerSim(x, N = 1, partialmarker = partial)
 markerSim(x, N = 1, partialmarker = partial)
-markerSim(x, N = 1, available = 4, partialmarker = partial)
+markerSim(x, N = 1, ids = 4, partialmarker = partial)
 
 }
 \references{
