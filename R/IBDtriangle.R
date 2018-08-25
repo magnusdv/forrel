@@ -42,22 +42,24 @@
 #' @param kinship.lines A numeric vector. (See Details.)
 #' @param shading The shading color for the unattainable region.
 #' @param pch Symbol used for the relationship points (see [par()]).
-#' @param cex_points A single numeric controlling the symbol size for the
+#' @param cex_points A number controlling the symbol size for the
 #'   relationship points.
-#' @param cex_text A single numeric controlling the font size for the
+#' @param cex_text A number controlling the font size for the
 #'   relationship labels.
 #' @param axes A logical: Draw surrounding axis box?
-#' @param kappas A logical: Include axis labels \eqn{\kappa_0}{\kappa0} and
-#'   \eqn{\kappa_2}{\kappa2}?
+#' @param xlab,ylab Axis labels
+#' @param cex_lab A number controlling the font size for the axis labels.
 #' @param xlim,ylim,mar Graphical parameters; see [par()].
 #'
 #' @return NULL
 #' @author Magnus Dehli Vigeland
 #' @seealso [IBDestimate()]
-#' @references E. A. Thompson (1975). _The estimation of pairwise
+#' @references
+#'
+#' * E. A. Thompson (1975). _The estimation of pairwise
 #'   relationships._ Annals of Human Genetics 39.
 #'
-#'   E. A. Thompson (1976). _A restriction on the space of genetic
+#' * E. A. Thompson (1976). _A restriction on the space of genetic
 #'   relationships._ Annals of Human Genetics 40.
 #'
 #' @examples
@@ -73,18 +75,17 @@
 IBDtriangle = function(relationships = c("UN", "PO", "MZ", "S", "H,U,G", "FC"),
                        kinship.lines = numeric(), shading = "lightgray",
                        pch = 16, cex_points = 1.2, cex_text = 1, axes = FALSE,
-                       xlim = c(0, 1), ylim = c(0, 1), kappas=TRUE,
-                       mar = c(3.1, 3.1, 1, 1)) {
+                       xlim = c(0, 1), ylim = c(0, 1),
+                       xlab = expression(kappa[0]), ylab = expression(kappa[2]),
+                       cex_lab = cex_text, mar = c(3.1, 3.1, 1, 1)) {
 
     xpd = all(c(xlim, ylim) == c(0,1,0,1))
     par(xpd = xpd, mar = mar, pty = "s")
 
     plot(NULL, xlim = xlim, ylim = ylim, axes = axes, ann = FALSE)
 
-    if(kappas) {
-        mtext(text = c(expression(italic(kappa[0])), expression(italic(kappa[2]))), side = 1:2,
-        line = c(1, 0.5), las = 1)
-    }
+    # Axis labels
+    mtext(text = c(xlab, ylab), side = 1:2, line = c(1, 0.5), las = 1, cex = cex_lab)
 
     # impossible region shading(do borders afterwards)
     kk0 = seq(0, 1, length = 501)

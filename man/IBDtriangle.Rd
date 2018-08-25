@@ -7,7 +7,9 @@
 IBDtriangle(relationships = c("UN", "PO", "MZ", "S", "H,U,G", "FC"),
   kinship.lines = numeric(), shading = "lightgray", pch = 16,
   cex_points = 1.2, cex_text = 1, axes = FALSE, xlim = c(0, 1),
-  ylim = c(0, 1), kappas = TRUE, mar = c(3.1, 3.1, 1, 1))
+  ylim = c(0, 1), xlab = expression(kappa[0]),
+  ylab = expression(kappa[2]), cex_lab = cex_text, mar = c(3.1, 3.1,
+  1, 1))
 }
 \arguments{
 \item{relationships}{A character vector indicating relationships points to be
@@ -19,18 +21,19 @@ included in the plot. See Details for a list of valid entries.}
 
 \item{pch}{Symbol used for the relationship points (see \code{\link[=par]{par()}}).}
 
-\item{cex_points}{A single numeric controlling the symbol size for the
+\item{cex_points}{A number controlling the symbol size for the
 relationship points.}
 
-\item{cex_text}{A single numeric controlling the font size for the
+\item{cex_text}{A number controlling the font size for the
 relationship labels.}
 
 \item{axes}{A logical: Draw surrounding axis box?}
 
 \item{xlim, ylim, mar}{Graphical parameters; see \code{\link[=par]{par()}}.}
 
-\item{kappas}{A logical: Include axis labels \eqn{\kappa_0}{\kappa0} and
-\eqn{\kappa_2}{\kappa2}?}
+\item{xlab, ylab}{Axis labels}
+
+\item{cex_lab}{A number controlling the font size for the axis labels.}
 }
 \description{
 The IBD triangle is typically used to visualize the pairwise relatedness of
@@ -81,11 +84,12 @@ IBDtriangle(kinship=c(0.25, 0.125), shading=NULL, cex_text=0.8)
 
 }
 \references{
-E. A. Thompson (1975). \emph{The estimation of pairwise
+\itemize{
+\item E. A. Thompson (1975). \emph{The estimation of pairwise
 relationships.} Annals of Human Genetics 39.
-
-E. A. Thompson (1976). \emph{A restriction on the space of genetic
+\item E. A. Thompson (1976). \emph{A restriction on the space of genetic
 relationships.} Annals of Human Genetics 40.
+}
 }
 \seealso{
 \code{\link[=IBDestimate]{IBDestimate()}}
