@@ -154,6 +154,9 @@ IBDtriangle = function(relationships = c("UN", "PO", "MZ", "S", "H,U,G", "FC"),
 showInTriangle = function(k0, k2=NULL, new=T, col="blue", cex=1, pch=4, lwd=2,
   labels=FALSE, col_labels=col, cex_labels=0.8, pos=1, adj=NULL, ...) {
 
+  if(is.matrix(k0))
+    k0 = as.data.frame(k0)
+
   if(is.data.frame(k0)) {
     if(!is.null(k2))
       stop2("When the first argument is a data.frame, `k2` must be NULL")
@@ -172,15 +175,19 @@ showInTriangle = function(k0, k2=NULL, new=T, col="blue", cex=1, pch=4, lwd=2,
       labels = paste(df$ID1, df$ID2, sep="-")
     }
   }
+  else {
+    if(is.null(k2)) stop2("`k2` is NULL")
+    if(length(k0) != length(k2)) stop2("Arguments `k0` and `k2` must have the same length")
+  }
+
+  if(is.character(labels) && length(labels) != length(k0))
+    stop2("When `labels` is a character, it must have the same length as `k0`")
 
   if(new)
     IBDtriangle(...)
 
+  points(k0, k2, col = col, pch = pch, lwd = lwd, cex = cex)
 
-  if(is.null(k0))
-    return()
-
-  points(k0, k2, col=col, pch=pch, lwd=lwd, cex=cex)
-  if(!is.null(labels))
-    text(k0, k2, labels=labels, col=col_labels, cex=cex_labels, pos=pos, adj=adj)
+  if(is.character(labels))
+    text(k0, k2, labels = labels, col = col_labels, cex = cex_labels, pos = pos, adj = adj)
 }
