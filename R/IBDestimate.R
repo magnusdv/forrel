@@ -66,9 +66,6 @@ IBDestimate = function(x, ids, markers=NULL, start = c(0.99,0.001), tol=1e-7) {
   if(is.null(markers))
       markers = seq_len(nMarkers(x[[1]]))
 
-  # TODO: delete this?
-  # SNPs = all(vapply(x[[1]]$markerdata[markers], nAlleles, FUN.VALUE=1)==2) #TODO simplify
-
   if(is.vector(ids) && length(ids)==2)
     ids = rbind(ids)
   if(is.data.frame(ids))
@@ -79,7 +76,8 @@ IBDestimate = function(x, ids, markers=NULL, start = c(0.99,0.001), tol=1e-7) {
   ids_df_list = lapply(seq_len(nrow(ids)), function(i) pedlistMembership(x, ids[i,]))
 
   # Optimize the above function in the triangle
-  constraints = list(ineqA=matrix(c(1,0,-1,0,1,-1),3,2), ineqB=c(0,0,1)) # probability triangle
+  constraints = list(ineqA = matrix(c(1,0,-1,0,1,-1), nrow = 3, ncol = 2), 
+                     ineqB = c(0,0,1))
 
   res = lapply(ids_df_list, function(ids_df) {
     A = IBDest_getAlleleData(x, ids_df, markers)

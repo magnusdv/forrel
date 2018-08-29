@@ -74,7 +74,7 @@ markerSim = function(x, N = 1, ids = NULL, alleles = NULL, afreq = NULL, partial
   likel_counter = 0
 
   if (!is.null(x$LOOP_BREAKERS))
-    stop("`ped` objects with pre-broken loops are not allowed as input to `markerSim`")
+    stop2("`ped` objects with pre-broken loops are not allowed as input to `markerSim()`")
   if(is.null(ids)) ids = labels(x)
 
   ### Partial marker
@@ -263,7 +263,7 @@ markerSim = function(x, N = 1, ids = NULL, alleles = NULL, afreq = NULL, partial
     })
     likel_counter = likel_counter + length(jointp)
     if (identical(sum(jointp), 0))
-      stop("When trying to pre-compute joint probabilities: All probabilities zero. Mendelian error?")
+      stop2("When trying to pre-compute joint probabilities: All probabilities zero. Mendelian error?")
 
     # fill the rows of the 'joint' individuals
     sample_rows = allgenos_row_grid[, suppressWarnings(sample.int(length(jointp), size = N,
@@ -471,7 +471,7 @@ simpleSim = function(x, N, alleles, afreq, ids, Xchrom = FALSE,
 
   if (missing(alleles)) {
     if (missing(afreq))
-      stop("Both 'alleles' and 'afreq' cannot be missing")
+      stop2("Arguments `alleles` and `afreq` cannot both be missing")
     alleles = seq_along(afreq)
   }
 
