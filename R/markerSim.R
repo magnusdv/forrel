@@ -44,21 +44,24 @@
 #' markerSim(x, N = 1, partialmarker = partial)
 #' markerSim(x, N = 1, ids = 4, partialmarker = partial)
 #'
+#' @importFrom stats rbinom
 #' @export
 markerSim = function(x, N = 1, ids = NULL, alleles = NULL, afreq = NULL, partialmarker = NULL,
   loop_breakers = NULL, eliminate = 0, seed = NULL, verbose = TRUE) {
 
   if (!is.ped(x) && !is.pedList(x))
-      stop("x must be either a 'ped' object, a 'singleton' object, or a list of such")
+    stop2("x must be either a `ped` object or a list of such")
 
   if (!is.null(seed))
-      set.seed(seed)
+    set.seed(seed)
 
   # if input is a list of ped objects: Apply markerSim recursively
   if (is.pedList(x))
-      return(lapply(x, function(xi) markerSim(xi, N = N, ids = intersect(labels(xi), ids),
-          alleles = alleles, afreq = afreq, partialmarker = partialmarker,
-          loop_breakers = loop_breakers, eliminate = eliminate, verbose = verbose)))
+    return(lapply(x, function(xi) markerSim(xi, N = N, ids = intersect(labels(xi), ids),
+                                            alleles = alleles, afreq = afreq,
+                                            partialmarker = partialmarker,
+                                            loop_breakers = loop_breakers,
+                                            eliminate = eliminate, verbose = verbose)))
 
   starttime = proc.time()
 
@@ -111,6 +114,10 @@ markerSim = function(x, N = 1, ids = NULL, alleles = NULL, afreq = NULL, partial
   Xchrom = is_Xmarker(m)
   nall = nAlleles(m)
   mutations = allowsMutations(m)
+
+  if(has_inbred_founders(x) && Xchrom)
+    stop2("X chromosomal simulations are not implemented for pedigrees with inbred founders")
+
 
   if (all(m == 0)) {
     return(simpleSim(x, N, alleles = alleles, afreq = afreq,
@@ -220,7 +227,7 @@ markerSim = function(x, N = 1, ids = NULL, alleles = NULL, afreq = NULL, partial
     while (length(v) > 0) {
       i = match(TRUE, (FIDX[v] %in% done) & (MIDX[v] %in% done))
       if (is.na(i))
-        stop2("Could not determine sensible order for gene dropping. Bug report to magnusdv@medisin.uio.no is appreciated!")
+        stop2("Could not determine sensible order for gene dropping.")
       v.ordered = c(v.ordered, v[i])
       done = c(done, v[i])
       v = v[-i]
@@ -291,14 +298,24 @@ markerSim = function(x, N = 1, ids = NULL, alleles = NULL, afreq = NULL, partial
     loopbr_int = internalID(x, x$LOOP_BREAKERS[, 1])  #integer(0) if no loops
     loopbr_dup_int = internalID(x, x$LOOP_BRREAKERS[, 2])
 
-    if (!Xchrom)
+    # HW sampling of founders
+    if (!Xchrom) {
       markers[simple.founders_int, ] = sample.int(nall, size = 2 * N * length(simple.founders_int),
-        replace = TRUE, prob = afreq)
+                                                  replace = TRUE, prob = afreq)
+    }
     else {
       for (f in simple.founders_int)
         markers[f, ] = switch(SEX[f],
           rep(sample.int(nall, size = N, replace = TRUE, prob = afreq), each = 2),
           sample.int(nall, size = 2 * N, replace = TRUE, prob = afreq))
+    }
+
+    # Founder inbreeding
+    fou_inb = founder_inbreeding(x)
+    fi = which(fou_inb > 0)
+    for(i in fi) {
+      copy = as.logical(rbinom(N, 1, prob = fou_inb[i]))
+      markers[simple.founders_int[i], odd[copy] + 1] = markers[simple.founders_int[i], odd[copy]]
     }
 
     markers[loopbr_dup_int, ] = markers[loopbr_int, ]  # Genotypes of the duplicated individuals. Some of these may be ungenotyped...save time by excluding these?
@@ -446,6 +463,10 @@ markerSim = function(x, N = 1, ids = NULL, alleles = NULL, afreq = NULL, partial
 #' @export
 simpleSim = function(x, N, alleles, afreq, ids, Xchrom = FALSE,
                    mutmat = NULL, seed = NULL, verbose = TRUE) {
+
+  if(has_inbred_founders(x) && Xchrom)
+    stop2("X chromosomal simulations are not implemented for pedigrees with inbred founders")
+
   starttime = proc.time()
 
   if (missing(alleles)) {
@@ -556,11 +577,13 @@ simpleSim = function(x, N, alleles, afreq, ids, Xchrom = FALSE,
   NONFOU = nonfounders(x, internal=T)
   mutations = !is.null(mutmat)
 
+  if (!is.null(seed)) set.seed(seed)
+
+  # Initialise the marker matrix
   m = matrix(0L, ncol = 2 * N, nrow = pedsize(x))
   odd = seq_len(N) * 2 - 1
 
-  if (!is.null(seed)) set.seed(seed)
-
+  # Sample alleles for the founders
   variableSNPfreqs = nall==2 && length(afreq) !=2
   if (variableSNPfreqs)
     fou_alleles = unlist(lapply(afreq, function(f)
@@ -569,6 +592,18 @@ simpleSim = function(x, N, alleles, afreq, ids, Xchrom = FALSE,
     fou_alleles = sample.int(nall, size = N*length(FOU)*2, replace = TRUE, prob = afreq)
 
   m[FOU, ] = fou_alleles
+
+  # Account for inbred founders
+  if(has_inbred_founders(x)) {
+    fou_inb = founder_inbreeding(x)
+    fi = which(fou_inb > 0)
+    for(i in fi) {
+      copy = as.logical(rbinom(N, 1, prob = fou_inb[i]))
+      m[FOU[i], odd[copy] + 1] = m[FOU[i], odd[copy]]
+    }
+  }
+
+  # Drop alleles down through the pedigree
   for (id in NONFOU) {
     paternal = m[FIDX[id], odd + .rand01(N)]
     maternal = m[MIDX[id], odd + .rand01(N)]
@@ -590,6 +625,7 @@ simpleSim = function(x, N, alleles, afreq, ids, Xchrom = FALSE,
   NONFOU = nonfounders(x, internal=T)
   mutations = !is.null(mutmat)
 
+  # Initialise the marker matrix
   m = matrix(0L, ncol = 2 * N, nrow = pedsize(x))
   odd = seq_len(N) * 2 - 1
 
