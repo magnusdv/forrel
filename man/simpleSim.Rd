@@ -4,7 +4,7 @@
 \alias{simpleSim}
 \title{Unconditional marker simulation}
 \usage{
-simpleSim(x, N, alleles, afreq, ids, Xchrom = FALSE, mutmat = NULL,
+simpleSim(x, N, alleles, afreq, ids, Xchrom = FALSE, mutmod = NULL,
   seed = NULL, verbose = TRUE)
 }
 \arguments{
@@ -23,10 +23,8 @@ genotypes should be simulated.}
 
 \item{Xchrom}{a logical: X linked markers or not?}
 
-\item{mutmat}{a mutation matrix, or a list of two such matrices named
-'female' and 'male'. The matrix/matrices must be square, with the allele
-labels as dimnames, and each row must sum to 1 (after rounding to 3
-decimals).}
+\item{mutmod}{a \code{\link[pedmut:mutationModel]{pedmut::mutationModel()}} object, i.e., list of mutation matrices named
+'female' and 'male'.}
 
 \item{seed}{NULL, or a numeric seed for the random number generator.}
 

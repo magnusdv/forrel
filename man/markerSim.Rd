@@ -5,8 +5,8 @@
 \title{Marker simulation}
 \usage{
 markerSim(x, N = 1, ids = NULL, alleles = NULL, afreq = NULL,
-  partialmarker = NULL, loop_breakers = NULL, eliminate = 0,
-  seed = NULL, verbose = TRUE)
+  mutmod = NULL, rate = NULL, partialmarker = NULL,
+  loop_breakers = NULL, eliminate = 0, seed = NULL, verbose = TRUE)
 }
 \arguments{
 \item{x}{a \code{ped} object}
@@ -23,6 +23,9 @@ of alleles, and the actual alleles as \code{1:alleles}. Must be NULL if
 
 \item{afreq}{a vector of length 2 containing the population frequencies for
 the marker alleles. Must be NULL if \code{partialmarker} is non-NULL.}
+
+\item{mutmod, rate}{Arguments specifying a mutation model, passed on to
+\code{\link[pedtools:marker]{pedtools::marker()}} (see there for explanations)}
 
 \item{partialmarker}{Either NULL (resulting in unconditional simulation), a
 marker object (on which the simulation should be conditioned) or the name

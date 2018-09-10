@@ -156,6 +156,7 @@ readFamiliasLoci = function(loci) {
     loci = list(loci)
 
   lapply(loci, function(a) {
+    als = a$alleles
     malemut = a$maleMutationMatrix
     femalemut = a$femaleMutationMatrix
 
@@ -163,12 +164,14 @@ readFamiliasLoci = function(loci) {
     if (all(diag(femalemut) == 1)) femalemut = NULL
 
     if (is.null(malemut) && is.null(femalemut))
-      mutmat = NULL
-    else
-      mutmat = list(male = malemut, female = femalemut)
+      mutmod = NULL
+    else {
+      mutmod = pedmut::mutationModel(female = femalemut, male = malemut)
+      pedmut::validateMutationModel(mutmod, names(als))
+    }
 
     list(name = a$locusname, alleles = names(a$alleles),
-         afreq = as.numeric(a$alleles), mutmat = mutmat)
+         afreq = as.numeric(a$alleles), mutmod = mutmod)
   })
 }
 

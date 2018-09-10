@@ -12,11 +12,12 @@ License: GPL-3
 Encoding: UTF-8
 LazyData: true
 Depends: R (>= 3.1.0)
-Imports: 
+Imports:
     pedtools,
     pedprobr,
     maxLik,
-    glue
+    glue,
+    pedmut
 Suggests: testthat
 RoxygenNote: 6.1.0
 Roxygen: list(markdown = TRUE)
