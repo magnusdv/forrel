@@ -11,9 +11,9 @@ Description: Forensic applications of pedigree analysis, including marker simula
 License: GPL-3
 Encoding: UTF-8
 LazyData: true
-Depends: R (>= 3.1.0)
+Depends: R (>= 3.1.0),
+    pedtools
 Imports:
-    pedtools,
     pedprobr,
     maxLik,
     glue,
