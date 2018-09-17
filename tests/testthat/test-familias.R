@@ -28,9 +28,9 @@ test_that("Familias2ped() converts singletons", {
   class(famped) = "FamiliasPedigree"
 
   ped = Familias2ped(famped, NULL, NULL)
-  expect_identical(ped, list('1' = singleton(3, famid=1),
-                             '2' = singleton(2, famid=2),
-                             '3' = singleton(1, sex=2, famid=3)))
+  expect_identical(ped, list('_comp1' = singleton(3, famid='_comp1'),
+                             '_comp2' = singleton(2, famid='_comp2'),
+                             '_comp3' = singleton(1, sex=2, famid='_comp3')))
 
 })
 

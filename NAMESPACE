@@ -3,7 +3,6 @@
 export(Familias2ped)
 export(IBDestimate)
 export(IBDtriangle)
-export(connectedComponents)
 export(markerSim)
 export(readFamiliasLoci)
 export(showInTriangle)

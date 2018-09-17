@@ -76,6 +76,7 @@ plotPedList(x, new=TRUE, id.labels = 'num', frametitles = c('H1', 'H2'))
 
 }
 
+
 }
 \references{
 Windows Familias is freely available from \url{http://familias.name}.

@@ -63,6 +63,7 @@
 #'
 #' }
 #'
+#'
 #' @export
 Familias2ped = function(familiasped, datamatrix, loci) {
 
@@ -104,15 +105,6 @@ Familias2ped = function(familiasped, datamatrix, loci) {
     p[motherMissing, "mid"] = newMothers
   }
 
-  # identify connected components and add famid column. Keep order unchanged!
-  comps = connectedComponents(p$id, p$fid, p$mid)
-  if(length(comps) > 1) {
-    famid = integer(nrow(p))
-    for (i in 1:length(comps)) famid[match(comps[[i]], p$id)] = i
-
-    p = cbind(famid = famid, p)
-  }
-
   ### Part2: datamatrix
 
   if (!is.null(datamatrix)) {
@@ -145,8 +137,6 @@ Familias2ped = function(familiasped, datamatrix, loci) {
 }
 
 
-
-
 #' @export
 #' @rdname Familias2ped
 readFamiliasLoci = function(loci) {
@@ -173,51 +163,4 @@ readFamiliasLoci = function(loci) {
     list(name = a$locusname, alleles = names(a$alleles),
          afreq = as.numeric(a$alleles), mutmod = mutmod)
   })
-}
-
-
-
-#' Connected pedigree components
-#'
-#' Compute the connected parts of a (possibly) disconnected pedigree. This is a
-#' necessary step when converting pedigree data from software like Familias
-#' (which allows disconnected pedigrees) to `pedtools` (which requires pedigrees
-#' to be connected).
-#'
-#' @param id A vector of ID labels (character or numeric)
-#' @param fid The ID labels of the fathers (or "0" if missing)
-#' @param mid The ID labels of the mothers (or "0" if missing)
-#'
-#' @return A list, where each element is a subset of `id` constituting a
-#'   connected pedigree
-#' @export
-connectedComponents = function(id, fid, mid) {
-  # Placeholder for final components
-  comps = list()
-
-  # Starting point: List of all founders and trios
-  temp = lapply(seq_along(id), function(i) .mysetdiff(c(id[i], fid[i], mid[i]), 0))  # trios
-
-  while (length(temp) > 0) {
-    # Check if first vector overlaps with any of the others
-    a = temp[[1]]
-    remov = numeric()
-    for (j in seq_along(temp)[-1]) {
-      if (any(match(a, temp[[j]], nomatch = 0) > 0)) {
-        a = unique.default(c(a, temp[[j]]))
-        remov = c(remov, j)
-      }
-    }
-
-    if (length(remov) > 0) {
-      # Remove any overlapping vectors, and insert the union as first element
-      temp[remov] = NULL
-      temp[[1]] = a
-    } else {
-      # If no overlaps, we have a maximal component. Move to comps and remove from temp.
-      comps = c(comps, list(sort.default(a)))
-      temp[[1]] = NULL
-    }
-  }
-  comps
 }
