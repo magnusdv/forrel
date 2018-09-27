@@ -49,3 +49,17 @@ test_that("Familias2ped() reverses pedlikCompare:::ped2Familias()", {
   if(is.ped(y)) # don't test if disconnected (it will fail)
     expect_identical(x, y)
 })
+
+test_that("readFamiliasLoci() works", {
+  loc = Familias::FamiliasLocus(frequencies = c(0.5, 0.5),
+                                MutationModel = "equal",
+                                MutationRate = 0.1)
+  m = readFamiliasLoci(loc)[[1]]
+  expect_identical(as.vector(m$mutmod$male),
+                             as.vector(loc$maleMutationMatrix))
+  expect_identical(dimnames(m$mutmod$male),
+                             dimnames(loc$maleMutationMatrix))
+
+
+})
+

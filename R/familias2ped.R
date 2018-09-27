@@ -137,8 +137,10 @@ Familias2ped = function(familiasped, datamatrix, loci) {
 }
 
 
-#' @export
+
 #' @rdname Familias2ped
+#' @importFrom pedmut mutationMatrix mutationModel validateMutationModel
+#' @export
 readFamiliasLoci = function(loci) {
   if (is.null(loci))
     return(NULL)
@@ -146,21 +148,29 @@ readFamiliasLoci = function(loci) {
     loci = list(loci)
 
   lapply(loci, function(a) {
-    als = a$alleles
+    als = names(a$alleles)
+    afreq = as.numeric(a$alleles)
+
     malemut = a$maleMutationMatrix
     femalemut = a$femaleMutationMatrix
 
-    if (all(diag(malemut) == 1)) malemut = NULL
-    if (all(diag(femalemut) == 1)) femalemut = NULL
+    if (all(diag(malemut) == 1))
+      malemut = NULL
+    else
+      malemut = mutationMatrix("custom", matrix = malemut)
+
+    if (all(diag(femalemut) == 1))
+      femalemut = NULL
+    else
+      femalemut = mutationMatrix("custom", matrix = femalemut)
 
     if (is.null(malemut) && is.null(femalemut))
       mutmod = NULL
     else {
-      mutmod = pedmut::mutationModel(female = femalemut, male = malemut)
-      pedmut::validateMutationModel(mutmod, names(als))
+      mutmod = mutationModel(list(female = femalemut, male = malemut))
+      validateMutationModel(mutmod, alleles = als)
     }
 
-    list(name = a$locusname, alleles = names(a$alleles),
-         afreq = as.numeric(a$alleles), mutmod = mutmod)
+    list(name = a$locusname, alleles = als, afreq = afreq, mutmod = mutmod)
   })
 }
