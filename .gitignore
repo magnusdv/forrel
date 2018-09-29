@@ -3,6 +3,5 @@
 .RData
 .Ruserdata
 R/examineKinships.R
-R/exclusionPower.R
 R/LR.R
 R/relationLR.R
