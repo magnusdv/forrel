@@ -1,7 +1,6 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
 ^R/examineKinships.R$
-^R/LR.R$
 ^R/relationLR.R$
 ^README\.Rmd$
 ^README-.*\.png$

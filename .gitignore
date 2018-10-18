@@ -3,5 +3,4 @@
 .RData
 .Ruserdata
 R/examineKinships.R
-R/LR.R
 R/relationLR.R

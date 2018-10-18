@@ -3,6 +3,7 @@
 export(Familias2ped)
 export(IBDestimate)
 export(IBDtriangle)
+export(LR)
 export(exclusionPower)
 export(markerSim)
 export(readFamiliasLoci)
