@@ -33,7 +33,7 @@ be analysed by using \code{\link[=Familias2ped]{Familias2ped()}} prior to callin
 }
 \examples{
 
-# Simulate genotypes for 5 tetraallelic markers for a pair of full sibs
+# Simulate genotypes for 5 tetra-allelic markers for a pair of full sibs
 set.seed(123)
 sibs = nuclearPed(children = c("A", "B"))
 sibs = simpleSim(sibs, N = 5, alleles = 1:4, ids = c("A", "B"))
