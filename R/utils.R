@@ -4,6 +4,14 @@ stop2 = function(...) {
   do.call(stop, a)
 }
 
+# Test that input is a single number, with optional range constraints
+is_number = function(x, minimum = NA, maximum = NA) {
+  isTRUE(length(x) == 1 &&
+           is.numeric(x) &&
+           (is.na(minimum) || x >= minimum) &&
+           (is.na(maximum) || x <= maximum))
+}
+
 pluralise = function(noun, n) {
   if(n==1) noun else sprintf("%ss", noun)
 }
