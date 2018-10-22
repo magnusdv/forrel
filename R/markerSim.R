@@ -69,19 +69,14 @@ markerSim = function(x, N = 1, ids = NULL, alleles = NULL, afreq = NULL,
 
   starttime = proc.time()
 
-  # Reorder if necessary
-  if(!has_parents_before_children(x)) {
-    if(verbose) cat("Note: Changing the internal order so that all parents precede their children.\n\n")
-    x = parents_before_children(x)
-  }
-
   likel_counter = 0
 
   if (!is.null(x$LOOP_BREAKERS))
     stop2("`ped` objects with pre-broken loops are not allowed as input to `markerSim()`")
-  if(is.null(ids)) ids = labels(x)
+  if(is.null(ids))
+    ids = labels(x)
 
-  ### Partial marker
+  ### Partial marker # TODO: Move this to after simpleSim call?
   m = partialmarker
   if(!is.null(m)) {
 
@@ -130,8 +125,17 @@ markerSim = function(x, N = 1, ids = NULL, alleles = NULL, afreq = NULL,
                      mutmod = mut, seed = seed, verbose = verbose))
   }
 
-  allgenos = pedprobr::allGenotypes(nall)
+  #########
+  # Reorder if necessary
+  reorder = !has_parents_before_children(x)
+  if(reorder) {
+    if(verbose) cat("Note: Changing the internal order so that all parents precede their children.\n\n")
+    ORIGINAL_ORDER = labels(x)
+    x = parents_before_children(setMarkers(x, m))
+    m = getMarkers(x, 1)
+  }
 
+  allgenos = pedprobr::allGenotypes(nall)
 
   gridlist = pedprobr::geno.grid.subset(x, m, labels(x), make.grid = F)
 
@@ -370,6 +374,12 @@ markerSim = function(x, N = 1, ids = NULL, alleles = NULL, afreq = NULL,
   })
   class(markerdata_list) = "markerdata"
   x = setMarkers(x, markerdata_list)
+
+  # If ped was reordered, revert to original
+  if(reorder) {
+    x = reorderPed(x, internalID(x, ORIGINAL_ORDER))
+  }
+
   if (verbose) {
     seconds = (proc.time() - starttime)[["elapsed"]]
     print(glue::glue("
@@ -379,6 +389,7 @@ markerSim = function(x, N = 1, ids = NULL, alleles = NULL, afreq = NULL,
       Total time used: {round(seconds, 2)} seconds
       \n"))
   }
+
   x
 }
 
@@ -500,8 +511,10 @@ simpleSim = function(x, N, alleles, afreq, ids, Xchrom = FALSE,
   }
 
   # Reorder if necessary
-  if(!has_parents_before_children(x)) {
+  reorder = !has_parents_before_children(x)
+  if(reorder) {
     if(verbose) cat("Note: Changing the internal order so that all parents precede their children.\n\n")
+    ORIGINAL_ORDER = labels(x)
     x = parents_before_children(x)
   }
 
@@ -555,6 +568,12 @@ simpleSim = function(x, N, alleles, afreq, ids, Xchrom = FALSE,
     })
   }
   x = setMarkers(x, structure(markerdata_list, class = "markerdata"))
+
+  # If ped was reordered, revert to original
+  if(reorder) {
+    x = reorderPed(x, internalID(x, ORIGINAL_ORDER))
+  }
+
   if (verbose) {
     seconds = (proc.time() - starttime)[["elapsed"]]
     print(glue::glue("
