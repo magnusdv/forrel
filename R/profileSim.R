@@ -1,21 +1,22 @@
 #' Simulation of DNA profiles
 #'
-#' Simulation of DNA profiles, given a list of marker loci. Some pedigree
+#' Simulation of DNA profiles for specified pedigree members. Some pedigree
 #' members may already be genotyped; in that case the simulation is conditional
-#' on these.
+#' on these. The main work of this function is done by [markerSim()] which does the is function is a
 #'
 #' @param x A `ped` object
-#' @param N The number of profiles to be simulated
+#' @param N The number of complete simulations to be performed
 #' @param ids A character (or coercible to character) with ID labels indicating
 #'   whose genotypes should be simulated
 #' @param conditions A list of marker objects, (or an integer vector indicating
 #'   markers attached to `x`). If these contain genotypes the simulations will
 #'   condition on these. Locus annotations (allele frequencies, mutationmodels
 #'   a.s.o.) are extracted from each marker.
+#' @param seed NULL, or a numeric seed for the random number generator
 #' @param ... Further arguments passed on to [markerSim()]
 #'
 #' @return A list of length `N`. Each element is a `ped` object with `K`
-#'   attached markers, where `K = length(condition)`.
+#'   attached markers, where `K = length(conditions)`.
 #'
 #' @examples
 #' # Example with two brothers, one of which is already genotyped with 2 markers.
@@ -28,11 +29,14 @@
 #' cond = list(m1, m2)
 #'
 #' # Simulate 3 profiles of B2 conditional on the above
-#' profileSim(x, N = 3, ids = "B2", condition = cond)
+#' profileSim(x, N = 3, ids = "B2", conditions = cond)
 #'
 #'
 #' @export
-profileSim = function(x, N = 1, ids = NULL, conditions = NULL, ...){
+profileSim = function(x, N = 1, ids = NULL, conditions = NULL, seed = NULL, ...){
+
+  if(!is.null(seed))
+    set.seed(seed)
 
   # Iterate over the loci, make N simulations of each.
   sims_markerwise = lapply(conditions, function(pm)

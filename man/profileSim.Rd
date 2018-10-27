@@ -4,12 +4,13 @@
 \alias{profileSim}
 \title{Simulation of DNA profiles}
 \usage{
-profileSim(x, N = 1, ids = NULL, conditions = NULL, ...)
+profileSim(x, N = 1, ids = NULL, conditions = NULL, seed = NULL,
+  ...)
 }
 \arguments{
 \item{x}{A \code{ped} object}
 
-\item{N}{The number of profiles to be simulated}
+\item{N}{The number of complete simulations to be performed}
 
 \item{ids}{A character (or coercible to character) with ID labels indicating
 whose genotypes should be simulated}
@@ -19,16 +20,18 @@ markers attached to \code{x}). If these contain genotypes the simulations will
 condition on these. Locus annotations (allele frequencies, mutationmodels
 a.s.o.) are extracted from each marker.}
 
+\item{seed}{NULL, or a numeric seed for the random number generator}
+
 \item{...}{Further arguments passed on to \code{\link[=markerSim]{markerSim()}}}
 }
 \value{
 A list of length \code{N}. Each element is a \code{ped} object with \code{K}
-attached markers, where \code{K = length(condition)}.
+attached markers, where \code{K = length(conditions)}.
 }
 \description{
-Simulation of DNA profiles, given a list of marker loci. Some pedigree
+Simulation of DNA profiles for specified pedigree members. Some pedigree
 members may already be genotyped; in that case the simulation is conditional
-on these.
+on these. The main work of this function is done by \code{\link[=markerSim]{markerSim()}} which does the is function is a
 }
 \examples{
 # Example with two brothers, one of which is already genotyped with 2 markers.
@@ -41,7 +44,7 @@ m2 = marker(x, B1 = 4, alleles = 1:4, afreq = c(.1,.2,.3,.4))#, chrom="X")
 cond = list(m1, m2)
 
 # Simulate 3 profiles of B2 conditional on the above
-profileSim(x, N = 3, ids = "B2", condition = cond)
+profileSim(x, N = 3, ids = "B2", conditions = cond)
 
 
 }
