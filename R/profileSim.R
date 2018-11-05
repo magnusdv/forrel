@@ -35,6 +35,14 @@
 #' @export
 profileSim = function(x, N = 1, ids = NULL, conditions = NULL, seed = NULL, ...){
 
+  if(is.pedList(x)) {
+    if(is.marker(conditions) || is.markerList(conditions))
+      stop2("When `x` is a list of pedigrees, `conditions` must be a vector of marker names/indices referring to attached markers")
+    res = lapply(x, function(comp)
+      profileSim(comp, N = N, ids = intersect(ids, labels(comp)), conditions = conditions, ...))
+    return(res)
+  }
+
   if(!is.null(seed))
     set.seed(seed)
 
