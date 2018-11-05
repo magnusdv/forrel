@@ -365,7 +365,7 @@ markerSim = function(x, N = 1, ids = NULL, alleles = NULL, afreq = NULL,
 
   unavailable = !labels(x) %in% ids
   markers[!typedTF & unavailable, ] = 0
-  attrib = attributes(partialmarker)
+  attrib = attributes(m)
   attrib$name = NA_character_
   markerdata_list = lapply(seq_len(N), function(k) {
     mk = markers[, c(2 * k - 1, 2 * k)]
