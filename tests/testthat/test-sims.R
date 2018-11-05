@@ -1,4 +1,4 @@
-context("simple simulation")
+context("Marker simulation")
 
 library(pedtools)
 
@@ -32,4 +32,17 @@ test_that("markerSim() works with explicit mutation args", {
   m = pedmut::mutationModel("custom", matrix = matrix(c(0,0,1,1), ncol=2, dimnames=list(1:2,1:2)))
   y = markerSim(x, N=1, alleles = 1:2, afreq = c(.99, .01), mutmod = m, verbose=F)
   expect_equal(genotype(y, 1, id=3), c("2", "2"))
+})
+
+test_that("profileSim() keeps marker names", {
+  x = nuclearPed(1)
+  m = marker(x)
+  x = setMarkers(x, list(m, m))
+  name(x, 1:2) = c("m1", "m2")
+
+  s = profileSim(x, N = 1, conditions = 1:2)
+  expect_identical(name(s[[1]], 1:2), c("m1", "m2"))
+
+  s2 = profileSim(x, N = 1, conditions = list(m, m))
+  expect_identical(name(s2[[1]], 1:2), rep(NA_character_, 2))
 })

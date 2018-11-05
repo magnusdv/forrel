@@ -35,6 +35,11 @@
 #' @export
 profileSim = function(x, N = 1, ids = NULL, conditions = NULL, seed = NULL, ...){
 
+  # Set seed once (instead of passing it to markerSim)
+  if(!is.null(seed))
+    set.seed(seed)
+
+  # If pedlist input: Recurse over component
   if(is.pedList(x)) {
     if(is.marker(conditions) || is.markerList(conditions))
       stop2("When `x` is a list of pedigrees, `conditions` must be a vector of marker names/indices referring to attached markers")
@@ -43,8 +48,22 @@ profileSim = function(x, N = 1, ids = NULL, conditions = NULL, seed = NULL, ...)
     return(res)
   }
 
-  if(!is.null(seed))
-    set.seed(seed)
+
+  # Ensure conditions is a list
+  if(is.marker(conditions))
+    conditions = list(conditions)
+  nCond = length(conditions)
+
+  # Marker names are lost in the sims - must be re-added
+  if (nCond > 0) {
+    if (is.markerList(conditions))
+      mnames = vapply(conditions, name, "")
+    else if (is.atomic(conditions))
+      mnames = name(x, conditions)
+    nonNAs = which(!is.na(mnames))
+  }
+  addNames = nCond > 0 && length(nonNAs) > 0
+
 
   # Iterate over the loci, make N simulations of each.
   sims_markerwise = lapply(conditions, function(pm)
@@ -54,7 +73,10 @@ profileSim = function(x, N = 1, ids = NULL, conditions = NULL, seed = NULL, ...)
   # Output: List of length N, each with length(conditions) markers
   sims = lapply(1:N, function(i) {
       mlist = lapply(sims_markerwise, function(y) y$markerdata[[i]])
-      setMarkers(x, mlist)
+      s = setMarkers(x, mlist)
+      if(addNames)
+        name(s, nonNAs) = mnames[nonNAs]
+      s
     })
 
   sims
