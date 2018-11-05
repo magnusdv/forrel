@@ -1,4 +1,4 @@
-context("simple simulation")
+context("Founder inbreeding")
 
 library(pedtools)
 
