@@ -2,7 +2,7 @@
 #'
 #' Simulation of DNA profiles for specified pedigree members. Some pedigree
 #' members may already be genotyped; in that case the simulation is conditional
-#' on these. The main work of this function is done by [markerSim()] which does the is function is a
+#' on these. The main work of this function is done by [markerSim()].
 #'
 #' @param x A `ped` object
 #' @param N The number of complete simulations to be performed

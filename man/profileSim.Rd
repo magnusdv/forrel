@@ -31,7 +31,7 @@ attached markers, where \code{K = length(conditions)}.
 \description{
 Simulation of DNA profiles for specified pedigree members. Some pedigree
 members may already be genotyped; in that case the simulation is conditional
-on these. The main work of this function is done by \code{\link[=markerSim]{markerSim()}} which does the is function is a
+on these. The main work of this function is done by \code{\link[=markerSim]{markerSim()}}.
 }
 \examples{
 # Example with two brothers, one of which is already genotyped with 2 markers.
