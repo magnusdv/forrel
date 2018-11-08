@@ -39,15 +39,19 @@ profileSim = function(x, N = 1, ids = NULL, conditions = NULL, seed = NULL, ...)
   if(!is.null(seed))
     set.seed(seed)
 
-  # If pedlist input: Recurse over component
+  # If pedlist input: Recurse over components
   if(is.pedList(x)) {
     if(is.marker(conditions) || is.markerList(conditions))
       stop2("When `x` is a list of pedigrees, `conditions` must be a vector of marker names/indices referring to attached markers")
-    res = lapply(x, function(comp)
-      profileSim(comp, N = N, ids = intersect(ids, labels(comp)), conditions = conditions, ...))
+
+    res_compwise = lapply(x, function(comp)
+      profileSim(comp, N = N, ids = if(!is.null(ids)) intersect(ids, labels(comp)),
+                 conditions = conditions, ...))
+
+    # Transpose: Collect j'th sim of each component.
+    res = lapply(1:N, function(j) lapply(res_compwise, `[[`, j))
     return(res)
   }
-
 
   # Ensure conditions is a list
   if(is.marker(conditions))

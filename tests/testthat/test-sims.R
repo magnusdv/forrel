@@ -46,3 +46,19 @@ test_that("profileSim() keeps marker names", {
   s2 = profileSim(x, N = 1, conditions = list(m, m))
   expect_identical(name(s2[[1]], 1:2), rep(NA_character_, 2))
 })
+
+test_that("profileSim() treats pedlists as expected", {
+  x = singleton(1)
+  x = setMarkers(x, marker(x, alleles = 1:5, name = "M"))
+  y = relabel(x, 2)
+  SEED = 777
+
+  sim_pedlist = profileSim(list(x, y), N = 3, cond = "M", seed = SEED)
+
+  set.seed(SEED)
+  sim_compwise = list(profileSim(x, N = 3, cond = "M"),
+                      profileSim(y, N = 3, cond = "M"))
+
+  # Check third sim
+  expect_identical(sim_pedlist[[3]], lapply(sim_compwise, `[[`, 3))
+})
