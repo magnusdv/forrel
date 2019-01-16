@@ -73,6 +73,9 @@ Familias2ped = function(familiasped, datamatrix, loci) {
         Familias2ped(p, datamatrix = datamatrix, loci = loci))
       return(res)
   }
+  else if(class(familiasped) != "FamiliasPedigree")
+    stop2("The first argument must be a `FamiliasPedigree` or a list of such")
+
 
   ### Part 1: pedigree
   id = familiasped$id
