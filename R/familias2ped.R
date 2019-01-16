@@ -121,7 +121,7 @@ Familias2ped = function(familiasped, datamatrix, loci) {
     allelematrix[is.na(allelematrix)] = "0"
 
     # add empty rows corresponding to new parents
-    addedParents = matrix("0", nrow = nFath + nMoth, ncol = ncol(allelematrix))
+    addedParents = matrix("0", nrow = nFath + nMoth, ncol = ncol(datamatrix))
     allelematrix = rbind(allelematrix, addedParents)
 
     p = cbind(p, allelematrix, stringsAsFactors = FALSE)
