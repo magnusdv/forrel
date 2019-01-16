@@ -5,8 +5,8 @@ test_that("connectedComponents() works", {
   w = w[sample(1:7), ]
   comps = connectedComponents(w$id, w$fid, w$mid)
   comps_sorted = comps[order(sapply(comps, '[[', 1))]
+  comps_sorted = lapply(comps_sorted, sort)
   expect_equal(comps_sorted, list(1:3, 4, 5, 6:7))
-
 })
 
 test_that("Familias2ped() converts fullsib pedigree", {
