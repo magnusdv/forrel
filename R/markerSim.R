@@ -132,7 +132,7 @@ markerSim = function(x, N = 1, ids = NULL, alleles = NULL, afreq = NULL,
     if(verbose) cat("Note: Changing the internal order so that all parents precede their children.\n\n")
     ORIGINAL_ORDER = labels(x)
     x = parents_before_children(setMarkers(x, m))
-    m = getMarkers(x, 1)
+    m = getMarkers(x, 1)[[1]]
   }
 
   allgenos = pedprobr::allGenotypes(nall)

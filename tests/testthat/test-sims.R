@@ -62,3 +62,11 @@ test_that("profileSim() treats pedlists as expected", {
   # Check third sim
   expect_identical(sim_pedlist[[3]], lapply(sim_compwise, `[[`, 3))
 })
+
+test_that("markerSim() works with peds in non-standard ordering", {
+x = reorderPed(nuclearPed(2), 4:1)
+m = marker(x, "3" = 1, "4" = 2) # parents must be 1:2
+
+y = markerSim(x, partialmarker = m, verbose = F)
+expect_identical(genotype(y, id = 1, marker = 1), c("1", "2"))
+})
