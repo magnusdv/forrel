@@ -320,7 +320,7 @@ markerSim = function(x, N = 1, ids = NULL, alleles = NULL, afreq = NULL,
     }
 
     # Founder inbreeding
-    fou_inb = founder_inbreeding(x)
+    fou_inb = founderInbreeding(x)
     fi = which(fou_inb > 0)
     for(i in fi) {
       copy = as.logical(rbinom(N, 1, prob = fou_inb[i]))
@@ -612,7 +612,7 @@ simpleSim = function(x, N, alleles, afreq, ids, Xchrom = FALSE,
 
   # Account for inbred founders
   if(has_inbred_founders(x)) {
-    fou_inb = founder_inbreeding(x)
+    fou_inb = founderInbreeding(x)
     fi = which(fou_inb > 0)
     for(i in fi) {
       copy = as.logical(rbinom(N, 1, prob = fou_inb[i]))
