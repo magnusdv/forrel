@@ -6,7 +6,7 @@
 \usage{
 IBDtriangle(relationships = c("UN", "PO", "MZ", "S", "H,U,G", "FC"),
   kinship.lines = numeric(), shading = "lightgray", pch = 16,
-  cex_points = 1.2, cex_text = 1, axes = FALSE, xlim = c(0, 1),
+  cex_points = 1.2, cex_text = 1.2, axes = FALSE, xlim = c(0, 1),
   ylim = c(0, 1), xlab = expression(kappa[0]),
   ylab = expression(kappa[2]), cex_lab = cex_text, mar = c(3.1, 3.1,
   1, 1))
