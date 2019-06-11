@@ -1,20 +1,32 @@
 context("Exclusion power")
 
-test_that("exclusion power works in paternity case", {
+quickPE = function(claim, true, ids, afreq)
+  exclusionPower(claim, true, ids, alleles=1:length(afreq), afreq = afreq, plot = F)
+
+test_that("PE works in paternity case", {
   claim = nuclearPed(1)
   true = list(singleton(1), singleton(3))
   ids = c(1,3)
-  als = c(.1, .9)
-  pe = exclusionPower(claim, true, ids, alleles=1:length(als), afreq = als)
+  afreq = c(.1, .9)
+  pe = quickPE(claim, true, ids, afreq)
   expect_equal(pe, sum(2 * als[1]^2 * als[2]^2))
 })
 
-test_that("exclusion power works in paternity case with extra singleton", {
+test_that("PE in pat. case with extra singleton in claim AND true ", {
   claim = list(nuclearPed(1), singleton(4))
   true = list(singleton(1), singleton(3), singleton(4))
-  ids = c(1,3,4)
-  als = c(.1, .9)
-  pe = exclusionPower(claim, true, ids, alleles=1:length(als), afreq = als)
+  ids = c(1, 3, 4)
+  afreq = c(.1, .9)
+  pe = quickPE(claim, true, ids, afreq)
+  expect_equal(pe, sum(2 * als[1]^2 * als[2]^2))
+})
+
+test_that("PE in pat. case with extra indiv: singleton (claim) / sib (true)", {
+  claim = list(nuclearPed(1), singleton(4))
+  true = list(singleton(1), singleton(3), singleton(4))
+  ids = c(1, 3, 4)
+  afreq = c(.1, .9)
+  pe = quickPE(claim, true, ids, afreq)
   expect_equal(pe, sum(2 * als[1]^2 * als[2]^2))
 })
 
