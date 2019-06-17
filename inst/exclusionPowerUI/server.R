@@ -57,4 +57,21 @@ shinyServer(function(input, output, session) {
       return(sprintf("Loaded frequency database with %d markers", ncol(frequencyDB())))
     }
   })
+
+  # load reference file(s)
+  references <- reactive({
+    if (is.null(input$referenceFiles))
+      return(NULL)
+
+    dfs <- lapply(input$referenceFiles$datapath, read.table)
+    return(do.call(rbind, dfs))
+  })
+
+  output$referenceSummary <- renderText({
+    if (is.null(references())) {
+      return("Hello world")
+    } else
+      # TODO: better communicate which were loaded
+      return(sprintf("Loaded data for %d persons.", length(unique(references()[,1])) - 1))
+  })
 })

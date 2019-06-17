@@ -48,6 +48,7 @@ shinyUI(fluidPage(
            fileInput('frequencyDbFile', 'Allele frequency database', width = '100%'),
            textOutput('frequencyDbSummary')),
     column(4,
-           fileInput('referenceFiles', 'Reference files', width = '100%'))
+           fileInput('referenceFiles', 'Reference files', width = '100%', multiple = TRUE),
+           textOutput('referenceSummary'))
   )
 ))
