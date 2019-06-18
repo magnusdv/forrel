@@ -8,6 +8,7 @@
 #
 
 library(shiny)
+library(forrel)
 
 pedigreeFromUI = function(pedigreeID, pedfile = NULL) {
   if (pedigreeID == 'nucPed-1s') {
@@ -69,7 +70,7 @@ shinyServer(function(input, output, session) {
 
   output$referenceSummary <- renderText({
     if (is.null(references())) {
-      return("Hello world")
+      return("Load one or more reference files.")
     } else
       # TODO: better communicate which were loaded
       return(sprintf("Loaded data for %d persons.", length(unique(references()[,1])) - 1))

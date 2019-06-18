@@ -23,32 +23,44 @@ shinyUI(fluidPage(
   fluidRow(
     column(12, titlePanel('Exclusion Power'))
   ),
-  fluidRow(
-    column(12, h3('Step 1. Choose pedigrees'))
-  ),
-  fluidRow(
-    column(6,
-           selectInput("pedClaim", "Claim pedigree", defaultPedigrees, width = '100%'),
-           HTML('<p class="text-center">- or -</p>'),
-           fileInput('pedClaimFile', ".ped file",  width = '100%'),
-           plotOutput('pedClaimPlot'),
-           checkboxGroupInput("ids", "Individuals available for genotyping")),
-    column(6,
-           selectInput("pedTrue", "True pedigree", defaultPedigrees, width = '100%'),
-           HTML('<p class="text-center">- or -</p>'),
-           fileInput('pedTrueFile', ".ped file",  width = '100%'),
-           plotOutput('pedTruePlot'))
-  ),
-  fluidRow(
-    column(12,
-           h3('Step 2. Provide available genetic data'))
-  ),
-  fluidRow(
-    column(4,
-           fileInput('frequencyDbFile', 'Allele frequency database', width = '100%'),
-           textOutput('frequencyDbSummary')),
-    column(4,
-           fileInput('referenceFiles', 'Reference files', width = '100%', multiple = TRUE),
-           textOutput('referenceSummary'))
+  sidebarLayout(
+    sidebarPanel(
+      verticalLayout(
+        p(strong('Save workspace')),
+        downloadButton('saveWorkspaceButton', 'Download'),
+        p(fileInput('loadWorkspace', 'Load workspace'))
+      )
+    ),
+    mainPanel(
+      fluidRow(
+        column(12, h3('Step 1. Choose pedigrees'))
+      ),
+      fluidRow(
+        column(6,
+               selectInput("pedClaim", "Claim pedigree", defaultPedigrees, width = '100%'),
+               HTML('<p class="text-center">- or -</p>'),
+               fileInput('pedClaimFile', ".ped file",  width = '100%'),
+               plotOutput('pedClaimPlot')),
+        column(6,
+               selectInput("pedTrue", "True pedigree", defaultPedigrees, width = '100%'),
+               HTML('<p class="text-center">- or -</p>'),
+               fileInput('pedTrueFile', ".ped file",  width = '100%'),
+               plotOutput('pedTruePlot'))
+      ),
+      fluidRow(
+        column(12,
+               h3('Step 2. Provide available genetic data'))
+      ),
+      fluidRow(
+        column(4,
+               fileInput('frequencyDbFile', 'Allele frequency database', width = '100%'),
+               textOutput('frequencyDbSummary')),
+        column(4,
+               fileInput('referenceFiles', 'Reference files', width = '100%', multiple = TRUE),
+               textOutput('referenceSummary')),
+        column(4,
+               checkboxGroupInput("ids", "Individuals available for genotyping"))
+      )
+    )
   )
 ))
