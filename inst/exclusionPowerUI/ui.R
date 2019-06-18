@@ -32,46 +32,40 @@ shinyUI(fluidPage(
       )
     ),
     mainPanel(
-      fluidRow(
-        column(12, h3('Step 1. Choose pedigrees'))
-      ),
-      fluidRow(
-        column(6,
-               selectInput("pedClaim", "Claim pedigree", defaultPedigrees, width = '100%'),
-               HTML('<p class="text-center">- or -</p>'),
-               fileInput('pedClaimFile', ".ped file",  width = '100%'),
-               plotOutput('pedClaimPlot')),
-        column(6,
-               selectInput("pedTrue", "True pedigree", defaultPedigrees, width = '100%'),
-               HTML('<p class="text-center">- or -</p>'),
-               fileInput('pedTrueFile', ".ped file",  width = '100%'),
-               plotOutput('pedTruePlot'))
-      ),
-      fluidRow(
-        column(12,
-               h3('Step 2. Provide available genetic data'))
-      ),
-      fluidRow(
-        column(4,
-               fileInput('frequencyDbFile', 'Allele frequency database', width = '100%'),
-               textOutput('frequencyDbSummary')),
-        column(4,
-               fileInput('referenceFiles', 'Reference files', width = '100%', multiple = TRUE),
-               textOutput('referenceSummary')),
-        column(4,
-               checkboxGroupInput("ids", "Individuals available for genotyping"))
-      ),
-      fluidRow(
-        column(12,
-               h3('Step 3. Results'))
-      ),
-      fluidRow(
-        column(12,
-               actionButton('computeButton', 'Compute exclusion power'))
-      ),
-      fluidRow(
-        column(12,
-               dataTableOutput('exclusionPowerResults'))
+      tabsetPanel(
+        tabPanel('Pedigrees',
+                 fluidRow(
+                   column(6,
+                          selectInput("pedClaim", "Claim pedigree", defaultPedigrees, width = '100%'),
+                          HTML('<p class="text-center">- or -</p>'),
+                          fileInput('pedClaimFile', ".ped file",  width = '100%'),
+                          plotOutput('pedClaimPlot')),
+                   column(6,
+                          selectInput("pedTrue", "True pedigree", defaultPedigrees, width = '100%'),
+                          HTML('<p class="text-center">- or -</p>'),
+                          fileInput('pedTrueFile', ".ped file",  width = '100%'),
+                          plotOutput('pedTruePlot'))
+                 )),
+        tabPanel('Genetic data',
+                 fluidRow(
+                   column(4,
+                          fileInput('frequencyDbFile', 'Allele frequency database', width = '100%'),
+                          textOutput('frequencyDbSummary')),
+                   column(4,
+                          fileInput('referenceFiles', 'Reference files', width = '100%', multiple = TRUE),
+                          textOutput('referenceSummary')),
+                   column(4,
+                          checkboxGroupInput("ids", "Individuals available for genotyping"))
+                 )),
+        tabPanel('Results',
+                 fluidRow(
+                   column(12,
+                          actionButton('computeButton', 'Compute exclusion power'))
+                 ),
+                 fluidRow(
+                   column(12,
+                          dataTableOutput('exclusionPowerResults'))
+                 ))
       )
     )
   )
