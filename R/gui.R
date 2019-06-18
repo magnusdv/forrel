@@ -4,6 +4,6 @@
 #'
 #' @export
 
-lauchGUI = function() {
+launchGUI = function() {
   shiny::runApp(system.file('exclusionPowerUI', package='forrel'))
 }
