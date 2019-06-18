@@ -16,7 +16,9 @@ pedigreeFromUI = function(pedigreeID, pedfile = NULL) {
   } else if (pedigreeID == 'nucPed-1d') {
     return (nuclearPed(1, sex = 2, father = "Father", mother = "Mother", children = c("Daughter")))
   } else if (pedigreeID == 'pedfile') {
-    if (is.null(pedfile)) return();
+    if (is.null(pedfile)) {
+      return()
+    }
 
     return(as.ped(read.table(pedfile$datapath)))
   } else if (pedigreeID == "unrelated") {
@@ -25,16 +27,23 @@ pedigreeFromUI = function(pedigreeID, pedfile = NULL) {
 }
 
 shinyServer(function(input, output, session) {
+
+  # obtain the claim pedigree
+  claimPedigree <- reactive({
+    pedigreeFromUI(input$pedClaim, pedfile = input$pedClaimFile)
+  })
+
+  # render the pedigree plot when the user chooses a Claim pedigree or updates
+  # individuals available for genotyping
+  output$pedClaimPlot <- renderPlot({
+    colors = ifelse(labels(claimPedigree()) %in% input$ids, 2, 1)
+    plot(claimPedigree(), col = colors)
+  })
+
   # update list of persons available for genotyping when the user chooses a pedigree
   observe({
-    pedigree = pedigreeFromUI(input$pedClaim, input$pedClaimFile)
-    if (!is.null(pedigree)) {
-      updateCheckboxGroupInput(session, "ids", choices = pedigree$ID)
-
-      # render the pedigree plot when the user chooses a Claim pedigree
-      output$pedClaimPlot <- renderPlot({
-        plot(pedigree)
-      })
+    if (!is.null(claimPedigree())) {
+      updateCheckboxGroupInput(session, "ids", choices = claimPedigree()$ID)
     }
 
     if (!is.null(input$pedClaimFile)) {
@@ -42,10 +51,15 @@ shinyServer(function(input, output, session) {
     }
   })
 
+  # obtain the true pedigree
+  truePedigree <- reactive({
+    pedigreeFromUI(input$pedTrue, pedfile = input$pedTrueFile)
+  })
+
   # render the pedigree plot when the user chooses a True pedigree
   output$pedTruePlot <- renderPlot({
-    pedigree = pedigreeFromUI(input$pedTrue, input$pedTrueFile)
-    plot(pedigree)
+    colors = ifelse(labels(truePedigree()) %in% input$ids, 2, 1)
+    plot(truePedigree(), col = colors)
   })
 
   # load frequency file
