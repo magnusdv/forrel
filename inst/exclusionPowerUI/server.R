@@ -96,11 +96,26 @@ shinyServer(function(input, output, session) {
 
     isolate({
       withProgress({
-        for (i in 1:10) {
-          incProgress(1/10)
-          Sys.sleep(0.5)
+        Nmarkers = ncol(frequencyDB())
+        markerNames = colnames(frequencyDB())
+        exclusionProbabilities = vector('numeric', Nmarkers)
+
+        for (i in 1:Nmarkers) {
+          marker = markerNames[i]
+          alleles = rownames(frequencyDB()[!is.na(frequencyDB()[marker]),])
+          frequencies = frequencyDB()[!is.na(frequencyDB()[marker]),marker]
+          EP = exclusionPower(ped_claim = claimPedigree(),
+                              ped_true = truePedigree(),
+                              ids = input$ids,
+                              alleles = alleles,
+                              afreq = frequencies,
+                              plot = FALSE)
+          exclusionProbabilities[i] = EP
+
+          incProgress(1/Nmarkers)
         }
-        data.frame("Marker" = c('M1', 'M2'), "Exclusion probability" = c(0.12, 0.21232))
+
+        data.frame("Marker" = markerNames, "Exclusion probability" = exclusionProbabilities)
       }, message = 'Calculating exclusion power of all markers...')
     })
   })
