@@ -89,4 +89,19 @@ shinyServer(function(input, output, session) {
       # TODO: better communicate which were loaded
       return(sprintf("Loaded data for %d persons.", length(unique(references()[,1])) - 1))
   })
+
+  # compute exclusion power
+  output$exclusionPowerResults <- renderDataTable({
+    if (input$computeButton < 1) return(NULL);
+
+    isolate({
+      withProgress({
+        for (i in 1:10) {
+          incProgress(1/10)
+          Sys.sleep(0.5)
+        }
+        data.frame("Marker" = c('M1', 'M2'), "Exclusion probability" = c(0.12, 0.21232))
+      }, message = 'Calculating exclusion power of all markers...')
+    })
+  })
 })

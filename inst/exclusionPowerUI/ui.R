@@ -60,6 +60,18 @@ shinyUI(fluidPage(
                textOutput('referenceSummary')),
         column(4,
                checkboxGroupInput("ids", "Individuals available for genotyping"))
+      ),
+      fluidRow(
+        column(12,
+               h3('Step 3. Results'))
+      ),
+      fluidRow(
+        column(12,
+               actionButton('computeButton', 'Compute exclusion power'))
+      ),
+      fluidRow(
+        column(12,
+               dataTableOutput('exclusionPowerResults'))
       )
     )
   )
