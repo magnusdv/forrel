@@ -31,7 +31,7 @@ advancedTableFileLoader <- function(input, output, session, id = 'namespace') {
         ),
         fluidRow(
           column(12,
-                 helpText('Select file, then adjust parameters until the table preview looks right.'))
+                 helpText('Select file, then adjust parameters until the table preview looks right. Table should contain one marker per column and one allele per row.'))
         ),
         fluidRow(
           column(4,
@@ -48,11 +48,16 @@ advancedTableFileLoader <- function(input, output, session, id = 'namespace') {
                  radioButtons(ns('dec'), 'Decimal separator', choices = c('. (Dot)' = '.', ', (Comma)' = ','))),
           column(4,
                  textInput(ns('na.strings'), 'NA strings', value = 'NA'),
-                 helpText('String used in place of a value when none applies.'))
+                 helpText('String used in place of a value when none applies.')),
+          column(4,
+                 p(strong('Transpose')),
+                 checkboxInput(ns('transpose'), 'Exchange rows and columns'))
         ),
         fluidRow(
           column(12,
-                 tableOutput(ns('tablePreview')))
+                 tableOutput(ns('tablePreview'))),
+          column(12,
+                 helpText('Only first rows are shown in table preview.'))
         )
       ),
       title = 'Load a table file',
@@ -68,17 +73,19 @@ advancedTableFileLoader <- function(input, output, session, id = 'namespace') {
     # don't do anything until the user chooses a file
     req(input$inputFile)
 
-    read.table(input$inputFile$datapath,
-               header = input$columnHeaders,
-               sep = input$sep,
-               quote = input$quote,
-               row.names = if (input$rowHeaders) 1 else NULL,
-               dec = input$dec,
-               na.strings = input$na.strings)
+    table = read.table(input$inputFile$datapath,
+                       header = input$columnHeaders,
+                       sep = input$sep,
+                       quote = input$quote,
+                       row.names = if (input$rowHeaders) 1 else NULL,
+                       dec = input$dec,
+                       na.strings = input$na.strings)
+
+    if (input$transpose) t(table) else table
   })
 
   # display file preview
-  output$tablePreview <- renderTable(head(dataframe()), rownames = TRUE)
+  output$tablePreview <- renderTable(head(dataframe()), rownames = TRUE, decimals = 4)
 
   # show modal when action link is clicked
   observeEvent(input$modalLink, {
