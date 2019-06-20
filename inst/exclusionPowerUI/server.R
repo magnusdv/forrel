@@ -45,9 +45,18 @@ shinyServer(function(input, output, session) {
     if (!is.null(claimPedigree())) {
       updateCheckboxGroupInput(session, "ids", choices = claimPedigree()$ID)
     }
+  })
+
+  # update selected entry in dropdowns when user uploads pedigree file
+  observe({
+    if (!is.null(input$pedTrueFile)) {
+      updateSelectInput(session, 'pedTrue', selected = 'pedfile')
+    }
+  })
+  observe({
 
     if (!is.null(input$pedClaimFile)) {
-      updateSelectInput(session, 'pedClaimFile', selected = 'pedfile')
+      updateSelectInput(session, 'pedClaim', selected = 'pedfile')
     }
   })
 
