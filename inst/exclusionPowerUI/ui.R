@@ -11,9 +11,6 @@ library(shiny)
 
 defaultPedigrees = c("Nuclear family (1 son)" = "nucPed-1s",
                      "Nuclear family (1 daughter)" = "nucPed-1d",
-                     "Nuclear family (2 sons)" = "nucPed-2s",
-                     "Nuclear family (2 daughters)" = "nucPed-2d",
-                     "Nuclear family (1 son, 1 daughter)" = "NucPed-1s-1d",
                      "Unrelated" = "unrelated",
                      "Custom (from .ped file)" = "pedfile")
 
@@ -49,11 +46,12 @@ shinyUI(fluidPage(
         tabPanel('Genetic data',
                  fluidRow(
                    column(4,
-                          fileInput('frequencyDbFile', 'Allele frequency database', width = '100%'),
-                          textOutput('frequencyDbSummary')),
+                          p(strong('Load frequency database file')),
+                          p(advancedTableFileLoaderInput('frequencyDbFile', 'Select file'))),
                    column(4,
-                          fileInput('referenceFiles', 'Reference files', width = '100%', multiple = TRUE),
-                          textOutput('referenceSummary')),
+                          p(strong('Load reference file(s)')),
+                          p(advancedTableFileLoaderInput('referenceFiles', 'Select file'))),
+                          # helpText('Loading multiple reference files is supported')),
                    column(4,
                           checkboxGroupInput("ids", "Individuals available for genotyping"))
                  )),
@@ -64,7 +62,7 @@ shinyUI(fluidPage(
                  ),
                  fluidRow(
                    column(12,
-                          dataTableOutput('exclusionPowerResults'))
+                          tableOutput('exclusionPowerResults'))
                  ))
       )
     )

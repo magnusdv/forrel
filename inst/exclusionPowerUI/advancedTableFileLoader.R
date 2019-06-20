@@ -30,6 +30,10 @@ advancedTableFileLoader <- function(input, output, session, id = 'namespace') {
                  fileInput(ns('inputFile'), 'File', width = '100%'))
         ),
         fluidRow(
+          column(12,
+                 helpText('Select file, then adjust parameters until the table preview looks right.'))
+        ),
+        fluidRow(
           column(4,
                  radioButtons(ns('sep'), 'Column separator', choices = c(', (Comma)' = ',', '; (Semicolon)' = ';', '<TAB>' = '\t', '<SPACE>' = ' '))),
           column(4,

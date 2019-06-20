@@ -5,3 +5,9 @@
 .tab-pane {
   padding-top: 10px;
 }
+
+/* needed for table previews of advancedTableFileLoader */
+.shiny-bound-output {
+  overflow: scroll;
+  width: 100%;
+}

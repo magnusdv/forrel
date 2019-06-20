@@ -63,35 +63,13 @@ shinyServer(function(input, output, session) {
   })
 
   # load frequency file
-  frequencyDB <- reactiveVal()
-  output$frequencyDbSummary <- renderText({
-    if (is.null(input$frequencyDbFile)) {
-      return("Load a frequency database file")
-    } else {
-      frequencyDB(read.table(input$frequencyDbFile$datapath))
-      return(sprintf("Loaded frequency database with %d markers", ncol(frequencyDB())))
-    }
-  })
+  frequencyDB = callModule(advancedTableFileLoader, 'frequencyDbFile', id = 'frequencyDbFile')
 
   # load reference file(s)
-  references <- reactive({
-    if (is.null(input$referenceFiles))
-      return(NULL)
-
-    dfs <- lapply(input$referenceFiles$datapath, read.table)
-    return(do.call(rbind, dfs))
-  })
-
-  output$referenceSummary <- renderText({
-    if (is.null(references())) {
-      return("Load one or more reference files.")
-    } else
-      # TODO: better communicate which were loaded
-      return(sprintf("Loaded data for %d persons.", length(unique(references()[,1])) - 1))
-  })
+  references <- callModule(advancedTableFileLoader, 'referenceFiles', id = 'referenceFiles')
 
   # compute exclusion power
-  output$exclusionPowerResults <- renderDataTable({
+  output$exclusionPowerResults <- renderTable({
     if (input$computeButton < 1) return(NULL);
 
     isolate({
@@ -118,5 +96,5 @@ shinyServer(function(input, output, session) {
         data.frame("Marker" = markerNames, "Exclusion probability" = exclusionProbabilities)
       }, message = 'Calculating exclusion power of all markers...')
     })
-  })
+  }, digits = 4)
 })
