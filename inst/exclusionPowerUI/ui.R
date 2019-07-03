@@ -23,9 +23,9 @@ shinyUI(fluidPage(
   sidebarLayout(
     sidebarPanel(
       verticalLayout(
-        p(strong('Claim pedigree')),
+        HTML('<h5 class="text-center">Claim pedigree</h5>'),
         plotOutput('pedClaimPlot'),
-        p(strong('True pedigree')),
+        HTML('<h5 class="text-center">True pedigree</h5>'),
         plotOutput('pedTruePlot'))
       ),
     mainPanel(

@@ -22,7 +22,7 @@ pedigreeFromUI = function(pedigreeID, pedfile = NULL) {
 
     return(as.ped(read.table(pedfile$datapath)))
   } else if (pedigreeID == "unrelated") {
-    return(list(singleton(id = 1), singleton(id = 3, sex = 2)))
+    return(list(pedtools::singleton(id = 1), pedtools::singleton(id = 2, sex = 2)))
     }
 }
 
@@ -36,8 +36,12 @@ shinyServer(function(input, output, session) {
   # render the pedigree plot when the user chooses a Claim pedigree or updates
   # individuals available for genotyping
   output$pedClaimPlot <- renderPlot({
-    colors = ifelse(labels(claimPedigree()) %in% input$ids, 2, 1)
-    plot(claimPedigree(), col = colors)
+    if (input$pedClaim != "unrelated") {
+      colors = ifelse(labels(claimPedigree()) %in% input$ids, 2, 1)
+      plot(claimPedigree(), col = colors)
+    } else {
+      pedtools::plotPedList(claimPedigree(), frames = FALSE)
+    }
   })
 
   # update list of persons available for genotyping when the user chooses a pedigree
@@ -67,8 +71,12 @@ shinyServer(function(input, output, session) {
 
   # render the pedigree plot when the user chooses a True pedigree
   output$pedTruePlot <- renderPlot({
-    colors = ifelse(labels(truePedigree()) %in% input$ids, 2, 1)
-    plot(truePedigree(), col = colors)
+    if (input$pedTrue != "unrelated") {
+      colors = ifelse(labels(truePedigree()) %in% input$ids, 2, 1)
+      plot(truePedigree(), col = colors)
+    } else {
+      pedtools::plotPedList(truePedigree(), frames = FALSE)
+    }
   })
 
   # load frequency file
