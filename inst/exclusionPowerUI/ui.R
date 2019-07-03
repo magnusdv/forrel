@@ -18,16 +18,16 @@ defaultPedigrees = c("Nuclear family (1 son)" = "nucPed-1s",
 shinyUI(fluidPage(
   includeCSS('styles.css'),
   fluidRow(
-    column(12, titlePanel('Exclusion Power'))
+    column(12, h3('Exclusion Power'))
   ),
   sidebarLayout(
     sidebarPanel(
       verticalLayout(
-        p(strong('Save workspace')),
-        downloadButton('saveWorkspaceButton', 'Download'),
-        p(fileInput('loadWorkspace', 'Load workspace'))
-      )
-    ),
+        p(strong('Claim pedigree')),
+        plotOutput('pedClaimPlot'),
+        p(strong('True pedigree')),
+        plotOutput('pedTruePlot'))
+      ),
     mainPanel(
       tabsetPanel(
         tabPanel('Pedigrees',
@@ -35,13 +35,11 @@ shinyUI(fluidPage(
                    column(6,
                           selectInput("pedClaim", "Claim pedigree", defaultPedigrees, width = '100%'),
                           HTML('<p class="text-center">- or -</p>'),
-                          fileInput('pedClaimFile', ".ped file",  width = '100%'),
-                          plotOutput('pedClaimPlot')),
+                          fileInput('pedClaimFile', ".ped file",  width = '100%')),
                    column(6,
                           selectInput("pedTrue", "True pedigree", defaultPedigrees, width = '100%'),
                           HTML('<p class="text-center">- or -</p>'),
-                          fileInput('pedTrueFile', ".ped file",  width = '100%'),
-                          plotOutput('pedTruePlot'))
+                          fileInput('pedTrueFile', ".ped file",  width = '100%'))
                  )),
         tabPanel('Genetic data',
                  fluidRow(
@@ -55,6 +53,21 @@ shinyUI(fluidPage(
                    column(4,
                           checkboxGroupInput("ids", "Individuals available for genotyping"))
                  )),
+        tabPanel('Settings',
+                 fluidRow(
+                   column(6,
+                          p(strong('Mutation model'))),
+                   column(6,
+                          p(strong('Sex-linked markers')))
+                 ),
+                 fluidRow(
+                   column(12, h4('Inbreeding parameters'))),
+                 fluidRow(
+                   column(6,
+                          p(strong('Claim pedigree'))),
+                   column(6,
+                          p(strong('True pedigree')))
+                 )),
         tabPanel('Results',
                  fluidRow(
                    column(12,
@@ -64,7 +77,16 @@ shinyUI(fluidPage(
                    column(12,
                           tableOutput('exclusionPowerResults'))
                  ))
-      )
+      ),
+      fluidRow(
+        column(8, p(" ")),
+        column(4,
+               wellPanel(
+                 p(strong('Save workspace')),
+                 downloadButton('saveWorkspaceButton', 'Download'),
+                 p(fileInput('loadWorkspace', 'Load workspace'))
+               ))
+        )
     )
   )
 ))
