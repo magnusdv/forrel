@@ -49,7 +49,6 @@ shinyUI(fluidPage(
                    column(4,
                           p(strong('Load reference file(s)')),
                           p(advancedTableFileLoaderInput('referenceFiles', 'Select file'))),
-                          # helpText('Loading multiple reference files is supported')),
                    column(4,
                           checkboxGroupInput("ids", "Individuals available for genotyping"))
                  )),

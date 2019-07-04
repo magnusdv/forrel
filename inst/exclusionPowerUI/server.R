@@ -10,7 +10,7 @@
 library(shiny)
 library(forrel)
 
-pedigreeFromUI = function(pedigreeID, pedfile = NULL) {
+pedigreeFromUI = function(pedigreeID, pedfile = NULL, ids = NULL) {
   if (pedigreeID == 'nucPed-1s') {
     return(nuclearPed(1, father = "Father", mother = "Mother", children = c("Son")))
   } else if (pedigreeID == 'nucPed-1d') {
@@ -22,15 +22,20 @@ pedigreeFromUI = function(pedigreeID, pedfile = NULL) {
 
     return(as.ped(read.table(pedfile$datapath)))
   } else if (pedigreeID == "unrelated") {
-    return(list(pedtools::singleton(id = 1), pedtools::singleton(id = 2, sex = 2)))
+    if (is.null(ids)) {
+      return(list(pedtools::singleton(id = 1), pedtools::singleton(id = 2, sex = 2)))
+    } else {
+      # build an unrelated pedigree with all the individuals available for genotyping
+      return(lapply(ids, pedtools::singleton))
     }
+  }
 }
 
 shinyServer(function(input, output, session) {
 
   # obtain the claim pedigree
   claimPedigree <- reactive({
-    pedigreeFromUI(input$pedClaim, pedfile = input$pedClaimFile)
+    pedigreeFromUI(input$pedClaim, pedfile = input$pedClaimFile, input$ids)
   })
 
   # render the pedigree plot when the user chooses a Claim pedigree or updates
@@ -57,8 +62,8 @@ shinyServer(function(input, output, session) {
       updateSelectInput(session, 'pedTrue', selected = 'pedfile')
     }
   })
-  observe({
 
+  observe({
     if (!is.null(input$pedClaimFile)) {
       updateSelectInput(session, 'pedClaim', selected = 'pedfile')
     }
@@ -66,7 +71,7 @@ shinyServer(function(input, output, session) {
 
   # obtain the true pedigree
   truePedigree <- reactive({
-    pedigreeFromUI(input$pedTrue, pedfile = input$pedTrueFile)
+    pedigreeFromUI(input$pedTrue, pedfile = input$pedTrueFile, input$ids)
   })
 
   # render the pedigree plot when the user chooses a True pedigree
@@ -95,13 +100,33 @@ shinyServer(function(input, output, session) {
         markerNames = colnames(frequencyDB())
         exclusionProbabilities = vector('numeric', Nmarkers)
 
+        # compute exclusion power
         for (i in 1:Nmarkers) {
-          marker = markerNames[i]
-          alleles = rownames(frequencyDB()[!is.na(frequencyDB()[marker]),])
-          frequencies = frequencyDB()[!is.na(frequencyDB()[marker]),marker]
+          markerName = markerNames[i]
+
+          alleles = rownames(frequencyDB()[!is.na(frequencyDB()[markerName]),])
+          frequencies = frequencyDB()[!is.na(frequencyDB()[markerName]),markerName]
+
+          # load relevant genotype data for this marker
+          ref = references()
+          knownGen = NULL
+          if (!is.null(ref)) {
+            # TODO: turn this into functional code
+            relevantRef = ref[grep(markerName, ref[,2]),]
+            if (nrow(relevantRef) > 0) {
+              knownGen = vector("list", nrow(relevantRef))
+              for (i in 1:nrow(relevantRef)) {
+                knownGen[[i]] = c(as.character(relevantRef[i,1]), relevantRef[i,3], relevantRef[i,4])
+              }
+            } else {
+              knownGen = NULL
+            }
+          }
+
           EP = exclusionPower(ped_claim = claimPedigree(),
                               ped_true = truePedigree(),
                               ids = input$ids,
+                              known_genotypes = knownGen,
                               alleles = alleles,
                               afreq = frequencies,
                               plot = FALSE)
@@ -110,6 +135,7 @@ shinyServer(function(input, output, session) {
           incProgress(1/Nmarkers)
         }
 
+        # TODO: consider building this row by row
         data.frame("Marker" = markerNames, "Exclusion probability" = exclusionProbabilities)
       }, message = 'Calculating exclusion power of all markers...')
     })
