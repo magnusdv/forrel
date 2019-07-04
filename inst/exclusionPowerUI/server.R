@@ -85,10 +85,13 @@ shinyServer(function(input, output, session) {
   })
 
   # load frequency file
-  frequencyDB = callModule(advancedTableFileLoader, 'frequencyDbFile', id = 'frequencyDbFile')
+  frequencyDB = callModule(advancedTableFileLoader, 'frequencyDbFile', id = 'frequencyDbFile',
+                           columnHeaders = TRUE,
+                           rowHeaders = TRUE)
 
   # load reference file(s)
-  references <- callModule(advancedTableFileLoader, 'referenceFiles', id = 'referenceFiles')
+  references <- callModule(advancedTableFileLoader, 'referenceFiles', id = 'referenceFiles',
+                           columnHeaders = TRUE)
 
   # compute exclusion power
   output$exclusionPowerResults <- renderTable({
