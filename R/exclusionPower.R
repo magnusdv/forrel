@@ -144,7 +144,7 @@ exclusionPower = function(ped_claim, ped_true, ids, markerindex = NULL,
     if(length(markerindex) != 1)
       stop2("Argument `markerindex` must have length 1: ", markerindex)
 
-    ped_claim = selectMarkers(ped_claim, markerindex) # Various checks performed here
+    ped_claim = lapply(ped_claim, function(x) selectMarkers(x, markerindex)) # Various checks performed here
 
     # Get number of alleles
     alleles = alleles(ped_claim[[1]], marker = 1)
@@ -198,7 +198,7 @@ exclusionPower = function(ped_claim, ped_true, ids, markerindex = NULL,
   # Plot
   if (isTRUE(plot) || plot == "plot_only") {
     plotPedList(list(ped_claim, ped_true),
-                new = T,
+                newdev = T,
                 frametitles = c("Claim", "True"),
                 shaded = original.ids,
                 marker = 1)
