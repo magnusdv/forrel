@@ -29,12 +29,17 @@
 #' @param plot either a logical or the character 'plot_only', controlling if a
 #'   plot should be produced. If 'plot_only', a plot is drawn, but no further
 #'   computations are done.
+#' @param verbose a logical.
+#'
 #' @return A single numeric value. If `plot='plot_only'`, the function returns
 #'   NULL after producing the plot.
+#'
 #' @author Magnus Dehli Vigeland
+#'
 #' @references T. Egeland, N. Pinto and M. D. Vigeland, *A general approach to
 #'   power calculation for relationship testing.* Forensic Science
 #'   International: Genetics 9 (2014): 186-190. DOI:10.1016/j.fsigen.2013.05.001
+#'
 #' @examples
 #'
 #' ############################################
@@ -126,116 +131,139 @@
 #' @export
 exclusionPower = function(ped_claim, ped_true, ids, markerindex = NULL,
                           alleles = NULL, afreq = NULL, known_genotypes = list(),
-                          Xchrom = FALSE, plot = TRUE) {
+                          Xchrom = FALSE, plot = TRUE, verbose = T) {
+
+  st = proc.time()
+
   if (is.ped(ped_claim))
     ped_claim = list(ped_claim)
   if (is.ped(ped_true))
     ped_true = list(ped_true)
 
-  ids_claim = lapply(ped_claim, function(x)
-    ids[ids %in% labels(x)]) #internalID?
-  ids_true = lapply(ped_true, function(x)
-    ids[ids %in% labels(x)])
+  if (!is.null(markerindex)) {
+    if(length(markerindex) != 1)
+      stop2("Argument `markerindex` must have length 1: ", markerindex)
 
-  N_claim = length(ped_claim)
-  N_true = length(ped_true)
-  N = N_claim + N_true
+    ped_claim = lapply(ped_claim, function(x) selectMarkers(x, markerindex)) # Various checks performed here
 
-  if (is.null(alleles)) {
-    # Use markerdata of ped_claim and ped_true.  NB: No compatibility testing is done!!
-    partial_claim = lapply(ped_claim, function(p)
-      p$markerdata[[markerindex]])
-    partial_true = lapply(ped_true, function(p)
-      p$markerdata[[markerindex]])
-  } else {
+    # Get number of alleles
+    alleles = alleles(ped_claim[[1]], marker = 1)
+  }
+  else {
+    # Locus attribs
     if (length(alleles) == 1)
       alleles = 1:alleles
-
     chrom = if (Xchrom) 23 else NA
 
-    partial_claim = lapply(1:N_claim, function(i) {
-      x = ped_claim[[i]]
-      m = marker(x,
-                 alleles = alleles,
-                 afreq = afreq,
-                 chrom = chrom)
+    # Create and attach marker data to each `claim` component
+    ped_claim = lapply(ped_claim, function(x) {
+      m = marker(x, alleles = alleles, afreq = afreq, chrom = chrom)
       for (tup in known_genotypes) {
         id = tup[1]
         if (id %in% labels(x))
           genotype(m, id) = tup[2:3]
       }
-      m
-    })
-    partial_true = lapply(1:N_true, function(i) {
-      x = ped_true[[i]]
-      m = marker(x,
-                 alleles = alleles,
-                 afreq = afreq,
-                 chrom = chrom)
-      for (tup in known_genotypes) {
-        id = tup[1]
-        if (id %in% labels(x))
-          genotype(m, id) = tup[2:3]
-      }
-      m
+      setMarkers(x, m)
     })
   }
 
+  # Remove typed individuals from `ids`.
+  # TODO: Improve speed, and fix needed for partially typed members
+  typed = unlist(lapply(ped_claim, typedMembers))
+  original.ids = ids # for plot!
+  ids = setdiff(ids, typed)
+  if(length(typed) > 0 && verbose)
+    cat("Removed already typed individuals from internal computations:", toString(typed), "\n")
+
+  # List `ids` indivs in each claim component, and check that all were found
+  ids_claim = lapply(ped_claim, function(x) ids[ids %in% labels(x)])
+
+  if(!all(ids %in% unlist(ids_claim)))
+    stop2("Individuals not found in `ped_claim`: ", setdiff(ids, unlist(ids_claim)))
+
+  # Check that all `ids` are in `true`
+  ids_true = lapply(ped_true, function(x) ids[ids %in% labels(x)])
+
+  if(!all(ids %in% unlist(ids_true)))
+    stop2("Individuals not found in `ped_true`: ", setdiff(ids, unlist(ids_true)))
+
+
+  # Transfer marker data to `true` peds
+  ped_true = transferMarkers(ped_claim, ped_true)
+
+  # Extract marker objects
+  partial_claim = lapply(ped_claim, function(p) getMarkers(p, 1)[[1]])
+  partial_true = lapply(ped_true, function(p) getMarkers(p, 1)[[1]])
+
+  # Plot
   if (isTRUE(plot) || plot == "plot_only") {
-    op = par(oma = c(0, 0, 3, 0), xpd = NA)
-    widths = ifelse(sapply(c(ped_claim, ped_true), is.singleton), 1, 2)
-    claim_ratio = sum(widths[1:N_claim]) / sum(widths)
-    layout(rbind(1:N), widths = widths)
-    has_genotypes = length(known_genotypes) > 0
-    for (i in 1:N) {
-      if (i <= N_claim) {
-        x = ped_claim[[i]]
-        avail = ids_claim[[i]]
-        mm = if (has_genotypes) partial_claim[[i]] else NULL
-      } else {
-        x = ped_true[[i - N_claim]]
-        avail = ids_true[[i - N_claim]]
-        mm = if (has_genotypes) partial_true[[i - N_claim]] else NULL
-      }
+    plotPedList(list(ped_claim, ped_true),
+                newdev = T,
+                frametitles = c("Claim", "True"),
+                shaded = original.ids,
+                marker = 1)
 
-      cols = ifelse(labels(x) %in% avail, 2, 1)
-      plot(x, marker = mm, col = cols, margin = c(2, 4, 2, 4), title = "")
-    }
-
-    mtext("Claim", outer = TRUE, at = claim_ratio / 2)
-    mtext("True", outer = TRUE, at = 0.5 + claim_ratio / 2)
-    rect(
-      grconvertX(0.02, from = "ndc"),
-      grconvertY(0.02, from = "ndc"),
-      grconvertX(claim_ratio - 0.02, from = "ndc"),
-      grconvertY(0.98, from = "ndc")
-    )
-    rect(
-      grconvertX(claim_ratio + 0.02, from = "ndc"),
-      grconvertY(0.02, from = "ndc"),
-      grconvertX(0.98, from = "ndc"),
-      grconvertY(0.98, from = "ndc")
-    )
-    par(op)
     if (plot == "plot_only")
       return()
   }
 
-  p.g = Reduce("%o%", lapply(which(lengths(ids_true) > 0), function(i)
-    oneMarkerDistribution(
-      ped_true[[i]],
-      ids = ids_true[[i]],
-      partialmarker = partial_true[[i]],
-      verbose = F
-    )))
-  I.g = Reduce("%o%", lapply(which(lengths(ids_claim) > 0), function(i)
+  ### Identify genotype combinations incompatible with "claim"
+
+  # Incompatible combinations in each component
+  I.g.list = lapply(seq_along(ped_claim), function(i) {
+    ids.i = ids_claim[[i]]
+    if(length(ids.i) == 0)
+      return(NULL)
+
     oneMarkerDistribution(
       ped_claim[[i]],
-      ids = ids_claim[[i]],
+      ids = ids.i,
       partialmarker = partial_claim[[i]],
-      verbose = F
-    ) == 0))
+      verbose = F,
+      eliminate = 0
+    ) == 0
+    })
+
+  # Remove NULLs
+  I.g.list = I.g.list[lengths(I.g.list) > 0]
+
+  # outer product OR
+  outerOR = function(x,y) outer(x, y, FUN = `|`)
+  I.g = Reduce(outerOR, I.g.list)
+
+  # If no incompatibilities, return 0
+  if(!any(I.g))
+    return(0)
+
+  # Extract the TRUE positions (= incompatible combinations)
+  # Columns are named with those `ids` with contribution in I.g.
+  incomp.grid = which(I.g, arr.ind = T, useNames = F)
+  colnames(incomp.grid) = ids
+
+  ### In the true ped: Sum probs of the incompat combinations
+  # Where are the contributing indivs
+  #ids0_true = lapply(ped_true, function(x) as.character(ids0[ids0 %in% labels(x)]))
+
+  p.g.list = lapply(seq_along(ped_true), function(i) {
+    ids.i = as.character(ids_true[[i]])
+    if(length(ids.i) == 0)
+      return(NULL)
+
+    grid.i = unique.matrix(incomp.grid[, ids.i, drop = F])
+
+    oneMarkerDistribution(
+      ped_true[[i]], ids.i,
+      partialmarker = partial_true[[i]],
+      grid.subset = grid.i,
+      verbose = F,
+      eliminate = 1
+    )
+  })
+
+  # Remove NULLs
+  p.g.list = p.g.list[lengths(p.g.list) > 0]
+
+  p.g = Reduce("%o%", p.g.list)
 
   sum(p.g * I.g)
 }
-

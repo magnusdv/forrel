@@ -110,12 +110,12 @@ markerSim = function(x, N = 1, ids = NULL, alleles = NULL, afreq = NULL,
 
   alleles = alleles(m)
   afreq = unname(afreq(m))
-  Xchrom = is_Xmarker(m)
+  Xchrom = isXmarker(m)
   nall = nAlleles(m)
   mutations = allowsMutations(m)
   mut = mutmod(m)
 
-  if(has_inbred_founders(x) && Xchrom)
+  if(hasInbredFounders(x) && Xchrom)
     stop2("X chromosomal simulations are not implemented for pedigrees with inbred founders")
 
 
@@ -127,17 +127,17 @@ markerSim = function(x, N = 1, ids = NULL, alleles = NULL, afreq = NULL,
 
   #########
   # Reorder if necessary
-  reorder = !has_parents_before_children(x)
+  reorder = !hasParentsBeforeChildren(x)
   if(reorder) {
     if(verbose) cat("Note: Changing the internal order so that all parents precede their children.\n\n")
     ORIGINAL_ORDER = labels(x)
-    x = parents_before_children(setMarkers(x, m))
+    x = parentsBeforeChildren(setMarkers(x, m))
     m = getMarkers(x, 1)[[1]]
   }
 
   allgenos = pedprobr::allGenotypes(nall)
 
-  gridlist = pedprobr::geno.grid.subset(x, m, labels(x), make.grid = F)
+  gridlist = pedprobr::genoCombinations(x, m, labels(x), make.grid = F)
 
 
   if (verbose) {
@@ -264,7 +264,7 @@ markerSim = function(x, N = 1, ids = NULL, alleles = NULL, afreq = NULL,
   odd = seq_len(N) * 2 - 1
 
   if (length(joint_int) > 0) {
-    allgenos_row_grid = t.default(pedprobr:::fast.grid(gridlist[joint_int]))  #Cartesian product. Each row contains 'init' row numbers of allgenos.
+    allgenos_row_grid = t.default(pedprobr:::fastGrid(gridlist[joint_int]))  #Cartesian product. Each row contains 'init' row numbers of allgenos.
     jointp = apply(allgenos_row_grid, 2, function(rownrs) {
       partial = m
       partial[joint_int, ] = allgenos[rownrs, ]
@@ -478,7 +478,7 @@ markerSim = function(x, N = 1, ids = NULL, alleles = NULL, afreq = NULL,
 simpleSim = function(x, N, alleles, afreq, ids, Xchrom = FALSE,
                    mutmod = NULL, seed = NULL, verbose = TRUE) {
 
-  if(has_inbred_founders(x) && Xchrom)
+  if(hasInbredFounders(x) && Xchrom)
     stop2("X chromosomal simulations are not implemented for pedigrees with inbred founders")
 
   starttime = proc.time()
@@ -511,11 +511,11 @@ simpleSim = function(x, N, alleles, afreq, ids, Xchrom = FALSE,
   }
 
   # Reorder if necessary
-  reorder = !has_parents_before_children(x)
+  reorder = !hasParentsBeforeChildren(x)
   if(reorder) {
     if(verbose) cat("Note: Changing the internal order so that all parents precede their children.\n\n")
     ORIGINAL_ORDER = labels(x)
-    x = parents_before_children(x)
+    x = parentsBeforeChildren(x)
   }
 
   if (verbose) {
@@ -611,7 +611,7 @@ simpleSim = function(x, N, alleles, afreq, ids, Xchrom = FALSE,
   m[FOU, ] = fou_alleles
 
   # Account for inbred founders
-  if(has_inbred_founders(x)) {
+  if(hasInbredFounders(x)) {
     fou_inb = founderInbreeding(x)
     fi = which(fou_inb > 0)
     for(i in fi) {

@@ -6,7 +6,7 @@
 \usage{
 exclusionPower(ped_claim, ped_true, ids, markerindex = NULL,
   alleles = NULL, afreq = NULL, known_genotypes = list(),
-  Xchrom = FALSE, plot = TRUE)
+  Xchrom = FALSE, plot = TRUE, verbose = T)
 }
 \arguments{
 \item{ped_claim}{a \code{ped} object, or a list of several ped and/or singleton
@@ -40,6 +40,8 @@ non-NULL.}
 \item{plot}{either a logical or the character 'plot_only', controlling if a
 plot should be produced. If 'plot_only', a plot is drawn, but no further
 computations are done.}
+
+\item{verbose}{a logical.}
 }
 \value{
 A single numeric value. If \code{plot='plot_only'}, the function returns
