@@ -115,9 +115,8 @@ shinyServer(function(input, output, session) {
           frequencies = frequencyDB()[!is.na(frequencyDB()[markerName]),markerName]
 
           # load relevant genotype data for this marker
-          ref = references()
-          knownGen = NULL
-          if (!is.null(ref)) {
+          if (isTruthy(references())) {
+            ref = references()
             # TODO: turn this into functional code
             relevantRef = ref[grep(markerName, ref[,2]),]
             if (nrow(relevantRef) > 0) {

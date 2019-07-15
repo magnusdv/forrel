@@ -132,17 +132,19 @@ advancedTableFileLoader <- function(input, output, session, id = 'namespace',
   # load file when one is chose or the options change
   dataframe <- reactive({
     # don't do anything until the user chooses a file
-    req(input$inputFile)
+    if (isTruthy(input$inputFile)) {
+      table = read.table(input$inputFile$datapath,
+                         header = input$columnHeaders,
+                         sep = input$sep,
+                         quote = input$quote,
+                         row.names = if (input$rowHeaders) 1 else NULL,
+                         dec = input$dec,
+                         na.strings = input$na.strings)
 
-    table = read.table(input$inputFile$datapath,
-                       header = input$columnHeaders,
-                       sep = input$sep,
-                       quote = input$quote,
-                       row.names = if (input$rowHeaders) 1 else NULL,
-                       dec = input$dec,
-                       na.strings = input$na.strings)
-
-    if (input$transpose) t(table) else table
+      if (input$transpose) t(table) else table
+    } else {
+      NULL
+    }
   })
 
   # display file preview
