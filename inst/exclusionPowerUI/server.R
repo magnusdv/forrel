@@ -93,13 +93,23 @@ shinyServer(function(input, output, session) {
                            columnHeaders = TRUE,
                            rowHeaders = TRUE)
 
+  # update list of sex-linked markers when a new reference file is loaded
+  # TODO:
+  # this will probably need to be changed if we support loading of allele
+  # denomination data from other sources such as pedigrees
+  observe({
+    if (isTruthy(frequencyDB())) {
+      updateCheckboxGroupInput(session, 'sexLinkedMarkers', choices = colnames(frequencyDB()))
+    }
+  })
+
   # load reference file(s)
   references <- callModule(advancedTableFileLoader, 'referenceFiles', id = 'referenceFiles',
                            columnHeaders = TRUE)
 
   # compute exclusion power
   output$exclusionPowerResults <- renderTable({
-    if (input$computeButton < 1) return(NULL);
+    if (input$computeButton < 1) return(NULL)
 
     isolate({
       withProgress({
@@ -115,6 +125,7 @@ shinyServer(function(input, output, session) {
           frequencies = frequencyDB()[!is.na(frequencyDB()[markerName]),markerName]
 
           # load relevant genotype data for this marker
+          knownGen = NULL
           if (isTruthy(references())) {
             ref = references()
             # TODO: turn this into functional code
@@ -135,6 +146,7 @@ shinyServer(function(input, output, session) {
                               known_genotypes = knownGen,
                               alleles = alleles,
                               afreq = frequencies,
+                              Xchrom = markerName %in% input$sexLinkedMarkers,
                               plot = FALSE)
           exclusionProbabilities[i] = EP
 

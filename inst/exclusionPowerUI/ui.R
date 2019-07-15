@@ -57,7 +57,7 @@ shinyUI(fluidPage(
                    column(6,
                           p(strong('Mutation model'))),
                    column(6,
-                          p(strong('Sex-linked markers')))
+                          checkboxGroupInput("sexLinkedMarkers", "Sex-linked markers"))
                  ),
                  fluidRow(
                    column(12, h4('Inbreeding parameters'))),
