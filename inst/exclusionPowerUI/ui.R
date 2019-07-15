@@ -45,10 +45,12 @@ shinyUI(fluidPage(
                  fluidRow(
                    column(4,
                           p(strong('Load frequency database file')),
-                          p(advancedTableFileLoaderInput('frequencyDbFile', 'Select file'))),
+                          p(advancedTableFileLoaderInput('frequencyDbFile', 'Select file')),
+                          uiOutput('frequencyDbDescription')),
                    column(4,
-                          p(strong('Load reference file(s)')),
-                          p(advancedTableFileLoaderInput('referenceFiles', 'Select file'))),
+                          p(strong('Load reference file')),
+                          p(advancedTableFileLoaderInput('referenceFile', 'Select file')),
+                          uiOutput('referenceFileDescription')),
                    column(4,
                           checkboxGroupInput("ids", "Individuals available for genotyping"))
                  )),

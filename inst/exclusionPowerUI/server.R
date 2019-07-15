@@ -93,6 +93,14 @@ shinyServer(function(input, output, session) {
                            columnHeaders = TRUE,
                            rowHeaders = TRUE)
 
+  output$frequencyDbDescription = renderUI({
+    if (!isTruthy(frequencyDB())) {
+      p('No frequency database loaded.')
+    } else {
+      p(sprintf('Allele frequency loaded for %d markers', ncol(frequencyDB())))
+    }
+  })
+
   # update list of sex-linked markers when a new reference file is loaded
   # TODO:
   # this will probably need to be changed if we support loading of allele
@@ -103,9 +111,17 @@ shinyServer(function(input, output, session) {
     }
   })
 
-  # load reference file(s)
-  references <- callModule(advancedTableFileLoader, 'referenceFiles', id = 'referenceFiles',
+  # load reference file
+  references <- callModule(advancedTableFileLoader, 'referenceFile', id = 'referenceFile',
                            columnHeaders = TRUE)
+
+  output$referenceFileDescription = renderUI({
+    if (!isTruthy(references())) {
+      p('No known genotype data loaded.')
+    } else {
+      p(sprintf('Known genotypes loaded for %s', paste(unique(references()[,1]), sep = ', ')))
+    }
+  })
 
   # compute exclusion power
   output$exclusionPowerResults <- renderTable({
