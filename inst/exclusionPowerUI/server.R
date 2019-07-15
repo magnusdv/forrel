@@ -1,41 +1,38 @@
-#
-# This is the server logic of a Shiny web application. You can run the
-# application by clicking 'Run App' above.
-#
-# Find out more about building applications with Shiny here:
-#
-#    http://shiny.rstudio.com/
-#
-
 library(shiny)
 library(forrel)
 
-unrelatedPedFromClaimPed = function(claimPed, ids) {
-  if (length(ids) == 0) return(list())
-
-  sexes = getSex(claimPed, ids)
-  tuples = cbind(ids, sexes)
-  return(apply(tuples, 1, function(row) {pedtools::singleton(row[1], sex = row[2])}))
-}
-
-pedigreeFromUI = function(pedigreeID, pedfile = NULL, ids = NULL, sids = NULL) {
-  if (pedigreeID == 'nucPed-1s') {
-    return(nuclearPed(1, father = "Father", mother = "Mother", children = c("Son")))
-  } else if (pedigreeID == 'nucPed-1d') {
-    return (nuclearPed(1, sex = 2, father = "Father", mother = "Mother", children = c("Daughter")))
-  } else if (pedigreeID == 'pedfile') {
-    if (is.null(pedfile)) {
-      return()
-    }
-    return(as.ped(read.table(pedfile$datapath)))
-  }
-}
+#' Server definition of the shiny application
+#'
+#' Evaluating this file should yield a shiny server definition object as
+#' returned by [shiny::shinyServer()].
+#'
+#' This file mostly contains an enumeration of outputs that are used by the
+#' `ui.R` file. Keep in mind that the order of definition of this enumeration is
+#' not important and that all output definitions are evaluated whenever an input
+#' they depend on changes per the principles of reactive programming. An
+#' important exception to this is the calculation of the exclusion power, which
+#' is triggered by a button in the last tab of the UI. This design decision is
+#' justified by the facts that the exclusion power cannot be calculated until
+#' all parameters are set and because it may take a long time to compute.
+#'
+#' In what follows are some comments explaining design decisions or
+#' non-idiomatic uses of shiny functions.
+#'
+#' @seealso [shiny::shinyServer()]
+#'
+#' @references For a gentle introduction to shiny see
+#'   http://shiny.rstudio.com/tutorial/
+#' @references For detailed API documentation see
+#'   http://shiny.rstudio.com/reference/shiny/
+#'
+#'
+#' @author Elias Hernandis <eliashernandis@gmail.com>
 
 shinyServer(function(input, output, session) {
 
   # obtain the claim pedigree
   claimPedigree <- reactive({
-    pedigreeFromUI(input$pedClaim, pedfile = input$pedClaimFile, input$ids)
+    pedigreeFromUI(input$pedClaim, pedfile = input$pedClaimFile)
   })
 
   # render the pedigree plot when the user chooses a Claim pedigree or updates
@@ -49,32 +46,12 @@ shinyServer(function(input, output, session) {
     }
   })
 
-  # update list of persons available for genotyping when the user chooses a pedigree
-  observe({
-    if (!is.null(claimPedigree())) {
-      updateCheckboxGroupInput(session, "ids", choices = claimPedigree()$ID)
-    }
-  })
-
-  # update selected entry in dropdowns when user uploads pedigree file
-  observe({
-    if (!is.null(input$pedTrueFile)) {
-      updateSelectInput(session, 'pedTrue', selected = 'pedfile')
-    }
-  })
-
-  observe({
-    if (!is.null(input$pedClaimFile)) {
-      updateSelectInput(session, 'pedClaim', selected = 'pedfile')
-    }
-  })
-
   # obtain the true pedigree
   truePedigree <- reactive({
     if (input$pedTrue == 'unrelated') {
       unrelatedPedFromClaimPed(claimPedigree(), input$ids)
     } else {
-      pedigreeFromUI(input$pedTrue, pedfile = input$pedTrueFile, input$ids)
+      pedigreeFromUI(input$pedTrue, pedfile = input$pedTrueFile)
     }
   })
 
@@ -88,11 +65,35 @@ shinyServer(function(input, output, session) {
     }
   })
 
+  # update list of persons available for genotyping when the user chooses a pedigree
+  observe({
+    if (!is.null(claimPedigree())) {
+      updateCheckboxGroupInput(session, "ids", choices = claimPedigree()$ID)
+    }
+  })
+
+  # choose "Custom .ped file" in the claim pedigree dropdown whenever the user
+  # selects a .ped file using the file input.
+  observe({
+    if (!is.null(input$pedClaimFile)) {
+      updateSelectInput(session, 'pedClaim', selected = 'pedfile')
+    }
+  })
+
+  # choose "Custom .ped file" in the true pedigree dropdown whenever the user
+  # selects a .ped file using the file input.
+  observe({
+    if (!is.null(input$pedTrueFile)) {
+      updateSelectInput(session, 'pedTrue', selected = 'pedfile')
+    }
+  })
+
   # load frequency file
   frequencyDB = callModule(advancedTableFileLoader, 'frequencyDbFile', id = 'frequencyDbFile',
                            columnHeaders = TRUE,
                            rowHeaders = TRUE)
 
+  # compose the description for the frequency file
   output$frequencyDbDescription = renderUI({
     if (!isTruthy(frequencyDB())) {
       p('No frequency database loaded.')
@@ -115,6 +116,7 @@ shinyServer(function(input, output, session) {
   references <- callModule(advancedTableFileLoader, 'referenceFile', id = 'referenceFile',
                            columnHeaders = TRUE)
 
+  # compose the description for the reference file
   output$referenceFileDescription = renderUI({
     if (!isTruthy(references())) {
       p('No known genotype data loaded.')

@@ -6,7 +6,10 @@
   padding-top: 10px;
 }
 
-/* needed for table previews of advancedTableFileLoader */
+/* Make tables look responsive by showing scrollbars if they are too big.
+ *
+ * needed for table previews of advancedTableFileLoader
+ */
 .shiny-bound-output {
   overflow: scroll;
   width: 100%;
