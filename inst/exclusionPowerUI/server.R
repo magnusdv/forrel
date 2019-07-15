@@ -10,7 +10,15 @@
 library(shiny)
 library(forrel)
 
-pedigreeFromUI = function(pedigreeID, pedfile = NULL, ids = NULL) {
+unrelatedPedFromClaimPed = function(claimPed, ids) {
+  if (length(ids) == 0) return(list())
+
+  sexes = getSex(claimPed, ids)
+  tuples = cbind(ids, sexes)
+  return(apply(tuples, 1, function(row) {pedtools::singleton(row[1], sex = row[2])}))
+}
+
+pedigreeFromUI = function(pedigreeID, pedfile = NULL, ids = NULL, sids = NULL) {
   if (pedigreeID == 'nucPed-1s') {
     return(nuclearPed(1, father = "Father", mother = "Mother", children = c("Son")))
   } else if (pedigreeID == 'nucPed-1d') {
@@ -19,15 +27,7 @@ pedigreeFromUI = function(pedigreeID, pedfile = NULL, ids = NULL) {
     if (is.null(pedfile)) {
       return()
     }
-
     return(as.ped(read.table(pedfile$datapath)))
-  } else if (pedigreeID == "unrelated") {
-    if (is.null(ids)) {
-      return(list(pedtools::singleton(id = 1), pedtools::singleton(id = 2, sex = 2)))
-    } else {
-      # build an unrelated pedigree with all the individuals available for genotyping
-      return(lapply(ids, pedtools::singleton))
-    }
   }
 }
 
@@ -71,7 +71,11 @@ shinyServer(function(input, output, session) {
 
   # obtain the true pedigree
   truePedigree <- reactive({
-    pedigreeFromUI(input$pedTrue, pedfile = input$pedTrueFile, input$ids)
+    if (input$pedTrue == 'unrelated') {
+      unrelatedPedFromClaimPed(claimPedigree(), input$ids)
+    } else {
+      pedigreeFromUI(input$pedTrue, pedfile = input$pedTrueFile, input$ids)
+    }
   })
 
   # render the pedigree plot when the user chooses a True pedigree
