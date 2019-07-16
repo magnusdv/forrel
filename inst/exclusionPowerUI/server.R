@@ -101,7 +101,7 @@ shinyServer(function(input, output, session) {
   computedClaimPed = reactive({
     ped = claimPedigree()
 
-    switch ('file', # input$frequencySource
+    switch (input$frequencySource,
       'file' = {
         if (isTruthy(frequencyDB())) {
           ped = attachAlleleFrequenciesToPedigree(ped, df = frequencyDB())
@@ -109,7 +109,7 @@ shinyServer(function(input, output, session) {
       }
     )
 
-    switch ('file', # input$referenceSource
+    switch (input$referenceSource,
       'file' = {
         if (isTruthy(references()) && isTruthy(frequencyDB())) {
           ped = attachGenotypeToPedigree(ped, df = references())

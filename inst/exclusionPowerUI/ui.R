@@ -59,12 +59,21 @@ shinyUI(fluidPage(
                    column(4,
                           p(strong('Load frequency database file')),
                           p(advancedTableFileLoaderInput('frequencyDbFile', 'Select file')),
+                          radioButtons('frequencySource',
+                                       'Use frequency data from',
+                                       choices = c('Frequency DB file' = 'file',
+                                                   'Pedigree file' = 'ped')),
 
                           # Help message describing the loaded frequency DB file
                           uiOutput('frequencyDbDescription')),
                    column(4,
                           p(strong('Load reference file')),
                           p(advancedTableFileLoaderInput('referenceFile', 'Select file')),
+                          radioButtons('referenceSource',
+                                       'Use known genotype data from',
+                                       choices = c('Do not use reference data' = 'none',
+                                                   'Reference file' = 'file',
+                                                   'Pedigree file' = 'ped')),
 
                           # Help message describing the loaded reference file
                           uiOutput('referenceFileDescription')),

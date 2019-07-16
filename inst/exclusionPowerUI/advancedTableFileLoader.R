@@ -118,7 +118,7 @@ advancedTableFileLoader <- function(input, output, session, id = 'namespace',
           column(12,
                  tableOutput(ns('tablePreview'))),
           column(12,
-                 helpText('Only first rows are shown in table preview.'))
+                 helpText('Only first rows are shown in table preview with two digits.'))
         )
       ),
       title = 'Load a table file',
