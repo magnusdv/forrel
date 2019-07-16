@@ -117,7 +117,6 @@ shinyServer(function(input, output, session) {
       }
     )
 
-    print(ped)
     ped
   })
 
@@ -154,40 +153,18 @@ shinyServer(function(input, output, session) {
 
     isolate({
       withProgress({
-        Nmarkers = ncol(frequencyDB())
-        markerNames = colnames(frequencyDB())
+        markerNames = getMarkerNames(computedClaimPed())
+        Nmarkers = length(markerNames)
         exclusionProbabilities = vector('numeric', Nmarkers)
 
         # compute exclusion power
         for (i in 1:Nmarkers) {
           markerName = markerNames[i]
 
-          alleles = rownames(frequencyDB()[!is.na(frequencyDB()[markerName]),])
-          frequencies = frequencyDB()[!is.na(frequencyDB()[markerName]),markerName]
-
-          # load relevant genotype data for this marker
-          knownGen = NULL
-          if (isTruthy(references())) {
-            ref = references()
-            # TODO: turn this into functional code
-            relevantRef = ref[grep(markerName, ref[,2]),]
-            if (nrow(relevantRef) > 0) {
-              knownGen = vector("list", nrow(relevantRef))
-              for (i in 1:nrow(relevantRef)) {
-                knownGen[[i]] = c(as.character(relevantRef[i,1]), relevantRef[i,3], relevantRef[i,4])
-              }
-            } else {
-              knownGen = NULL
-            }
-          }
-
-          EP = exclusionPower(ped_claim = claimPedigree(),
+          EP = exclusionPower(ped_claim = computedClaimPed(),
                               ped_true = truePedigree(),
                               ids = input$ids,
-                              known_genotypes = knownGen,
-                              alleles = alleles,
-                              afreq = frequencies,
-                              Xchrom = markerName %in% input$sexLinkedMarkers,
+                              markerindex = i,
                               plot = FALSE)
           exclusionProbabilities[i] = EP
 

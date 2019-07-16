@@ -86,10 +86,10 @@ attachAlleleFrequenciesToPedigree = function(ped, markers = NULL, df = NULL, ...
     index = res$index
 
     # attach allele denominations and frequency data to the marker
-    als = rownames(df[!is.na(df[markerName]),])
+    als = rownames(df[!is.na(df[markerName]), , drop = FALSE])
 
     # get frequency data
-    freqs = df[!is.na(df[markerName]),markerName]
+    freqs = df[!is.na(df[markerName]), markerName]
 
     attr(ped$markerdata[[index]], 'alleles') = als
     attr(ped$markerdata[[index]], 'afreq') = freqs
