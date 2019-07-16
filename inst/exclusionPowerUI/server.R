@@ -93,28 +93,33 @@ shinyServer(function(input, output, session) {
                            columnHeaders = TRUE,
                            rowHeaders = TRUE)
 
+  # load reference file
+  references <- callModule(advancedTableFileLoader, 'referenceFile', id = 'referenceFile',
+                           columnHeaders = TRUE)
+
+  # data provided thorugh tabular files is attached to the claim pedigree here
+  computedClaimPed = reactive({
+    ped = claimPedigree()
+
+    switch ('file', # input$frequencySource
+      'file' = {
+        if (isTruthy(frequencyDB())) {
+          ped = attachAlleleFrequenciesToPedigree(ped, df = frequencyDB())
+        }
+      }
+    )
+
+    ped
+  })
+
   # compose the description for the frequency file
   output$frequencyDbDescription = renderUI({
     if (!isTruthy(frequencyDB())) {
       p('No frequency database loaded.')
     } else {
-      p(sprintf('Allele frequency loaded for %d markers', ncol(frequencyDB())))
+      p(sprintf('Allele frequency loaded for %d markers', length(computedClaimPed()$markerdata)))
     }
   })
-
-  # update list of sex-linked markers when a new reference file is loaded
-  # TODO:
-  # this will probably need to be changed if we support loading of allele
-  # denomination data from other sources such as pedigrees
-  observe({
-    if (isTruthy(frequencyDB())) {
-      updateCheckboxGroupInput(session, 'sexLinkedMarkers', choices = colnames(frequencyDB()))
-    }
-  })
-
-  # load reference file
-  references <- callModule(advancedTableFileLoader, 'referenceFile', id = 'referenceFile',
-                           columnHeaders = TRUE)
 
   # compose the description for the reference file
   output$referenceFileDescription = renderUI({
@@ -122,6 +127,14 @@ shinyServer(function(input, output, session) {
       p('No known genotype data loaded.')
     } else {
       p(sprintf('Known genotypes loaded for %s', paste(unique(references()[,1]), sep = ', ')))
+    }
+  })
+
+
+  # update list of sex-linked markers when new allele denomination data becomes available
+  observe({
+    if (isTruthy(frequencyDB())) {
+      updateCheckboxGroupInput(session, 'sexLinkedMarkers', choices = getMarkerNames(computedClaimPed()))
     }
   })
 

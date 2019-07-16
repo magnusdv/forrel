@@ -139,7 +139,8 @@ advancedTableFileLoader <- function(input, output, session, id = 'namespace',
                          quote = input$quote,
                          row.names = if (input$rowHeaders) 1 else NULL,
                          dec = input$dec,
-                         na.strings = input$na.strings)
+                         na.strings = input$na.strings,
+                         stringsAsFactors = FALSE)
 
       if (input$transpose) t(table) else table
     } else {
