@@ -98,6 +98,27 @@ attachAlleleFrequenciesToPedigree = function(ped, markers = NULL, df = NULL, ...
   ped
 }
 
-attachGenotypeToPedigree = function(ped, datafile) {
-  return(ped)
+attachGenotypeToPedigree = function(ped, markers = NULL, df = NULL, ...) {
+  if (is.null(df)) {
+    df = read.table(...)
+  }
+
+  if (is.null(markers)) {
+    markers = unique(df[,2])
+  }
+
+  for (markerName in markers) {
+    # find df rows concerning markerName
+    relevant = df[df[,2] == markerName,]
+    for (person in relevant[,1]) {
+      alleles = c(relevant[relevant[,1] == person, 3],
+                  relevant[relevant[,1] == person, 4])
+      ped = setAlleles(ped,
+                       ids = person,
+                       markers = markerName,
+                       alleles = alleles)
+    }
+  }
+
+  ped
 }

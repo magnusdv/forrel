@@ -109,6 +109,15 @@ shinyServer(function(input, output, session) {
       }
     )
 
+    switch ('file', # input$referenceSource
+      'file' = {
+        if (isTruthy(references()) && isTruthy(frequencyDB())) {
+          ped = attachGenotypeToPedigree(ped, df = references())
+        }
+      }
+    )
+
+    print(ped)
     ped
   })
 
@@ -126,7 +135,8 @@ shinyServer(function(input, output, session) {
     if (!isTruthy(references())) {
       p('No known genotype data loaded.')
     } else {
-      p(sprintf('Known genotypes loaded for %s', paste(unique(references()[,1]), sep = ', ')))
+      p(sprintf('Known genotypes loaded for %s',
+                paste(unique(references()[,1]), collapse = ', ')))
     }
   })
 
