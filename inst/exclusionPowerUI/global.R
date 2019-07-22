@@ -2,6 +2,8 @@ source('defaultPedigreeDefinitions.R')
 
 source('advancedTableFileLoader.R')
 
+source('tabularDataPreview.R')
+
 source('importAdapters/generic-import-adapter.R')
 
 getMarkerNames = function(ped) {

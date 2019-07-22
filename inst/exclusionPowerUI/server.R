@@ -145,6 +145,16 @@ shinyServer(function(input, output, session) {
     }
   })
 
+  callModule(tabularDataPreview, 'frequencies',
+             id = 'frequencies',
+             df = frequencyDB(),
+             title = 'Frequency data used for calculation')
+
+  callModule(tabularDataPreview, 'references',
+             id = 'references',
+             df = references(),
+             title = 'Reference data used for calculation')
+
   # compute exclusion power
   output$exclusionPowerResults <- renderTable({
     if (input$computeButton < 1) return(NULL)

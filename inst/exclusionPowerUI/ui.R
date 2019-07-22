@@ -65,7 +65,8 @@ shinyUI(fluidPage(
                                                    'Pedigree file' = 'ped')),
 
                           # Help message describing the loaded frequency DB file
-                          uiOutput('frequencyDbDescription')),
+                          uiOutput('frequencyDbDescription'),
+                          tabularDataPreviewInput('frequencies')),
                    column(4,
                           p(strong('Load reference file')),
                           p(advancedTableFileLoaderInput('referenceFile', 'Select file')),
@@ -76,7 +77,8 @@ shinyUI(fluidPage(
                                                    'Pedigree file' = 'ped')),
 
                           # Help message describing the loaded reference file
-                          uiOutput('referenceFileDescription')),
+                          uiOutput('referenceFileDescription'),
+                          tabularDataPreviewInput('references')),
                    column(4,
                           checkboxGroupInput("ids", "Individuals available for genotyping"))
                  )),
