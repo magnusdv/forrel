@@ -39,10 +39,9 @@ shinyServer(function(input, output, session) {
   # individuals available for genotyping
   output$pedClaimPlot <- renderPlot({
     if (input$pedClaim != "unrelated") {
-      colors = ifelse(labels(claimPedigree()) %in% input$ids, 2, 1)
-      plot(claimPedigree(), col = colors)
+      plot(claimPedigree(), shaded = input$ids)
     } else {
-      pedtools::plotPedList(claimPedigree(), frames = FALSE)
+      pedtools::plotPedList(claimPedigree(), frames = FALSE, shaded = input$ids)
     }
   })
 
@@ -58,10 +57,10 @@ shinyServer(function(input, output, session) {
   # render the pedigree plot when the user chooses a True pedigree
   output$pedTruePlot <- renderPlot({
     if (input$pedTrue != "unrelated") {
-      colors = ifelse(labels(truePedigree()) %in% input$ids, 2, 1)
-      plot(truePedigree(), col = colors)
+      plot(truePedigree(), shaded = input$ids)
     } else {
-      pedtools::plotPedList(truePedigree(), frames = FALSE)
+      colors = ifelse(labels(truePedigree()) %in% input$ids, 2, 1)
+      pedtools::plotPedList(truePedigree(), frames = FALSE, shaded = input$ids)
     }
   })
 
