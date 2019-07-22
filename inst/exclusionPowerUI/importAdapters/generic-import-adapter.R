@@ -47,6 +47,7 @@ getOrAttachMarker = function(ped, markerName) {
 #' @param ped a `ped` object
 #' @param markers a list of markers to process
 #' @param df a dataframe to read data from, defaults to NULL
+#' @param Xchrom a list of marker names that are on the X chromosome
 #' @param ... optional parameters to be passed to [utils::read.table()]. At
 #'   least one of `file` or `text` is required if df is NULL.
 #'
@@ -71,7 +72,7 @@ getOrAttachMarker = function(ped, markerName) {
 #' # read only some markers (leaving existing ones untouched)
 #' ped = attachAlleleFrequenciesToPedigree(ped, markers = c('M1'), df = df)
 
-attachAlleleFrequenciesToPedigree = function(ped, markers = NULL, df = NULL, ...) {
+attachAlleleFrequenciesToPedigree = function(ped, markers = NULL, df = NULL, Xchrom = NULL, ...) {
   if (is.null(df)) {
     df = read.table(...)
   }
@@ -93,6 +94,10 @@ attachAlleleFrequenciesToPedigree = function(ped, markers = NULL, df = NULL, ...
 
     attr(ped$markerdata[[index]], 'alleles') = als
     attr(ped$markerdata[[index]], 'afreq') = freqs
+
+    if (markerName %in% Xchrom) {
+      attr(ped$markerdata[[index]], 'chrom') = 23
+    }
   }
 
   ped

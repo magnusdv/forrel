@@ -97,6 +97,13 @@ shinyServer(function(input, output, session) {
   references <- callModule(advancedTableFileLoader, 'referenceFile', id = 'referenceFile',
                            columnHeaders = TRUE)
 
+  # update list of sex-linked markers when new allele denomination data becomes available
+  observe({
+    updateCheckboxGroupInput(session, 'sexLinkedMarkers',
+                             choices = getMarkerNames(computedClaimPed()),
+                             selected = input$sexLinkedMarkers)
+  })
+
   # data provided thorugh tabular files is attached to the claim pedigree here
   computedClaimPed = reactive({
     ped = claimPedigree()
@@ -104,7 +111,7 @@ shinyServer(function(input, output, session) {
     switch (input$frequencySource,
       'file' = {
         if (isTruthy(frequencyDB())) {
-          ped = attachAlleleFrequenciesToPedigree(ped, df = frequencyDB())
+          ped = attachAlleleFrequenciesToPedigree(ped, df = frequencyDB(), Xchrom = input$sexLinkedMarkers)
         }
       }
     )
@@ -136,14 +143,6 @@ shinyServer(function(input, output, session) {
     } else {
       p(sprintf('Known genotypes loaded for %s',
                 paste(unique(references()[,1]), collapse = ', ')))
-    }
-  })
-
-
-  # update list of sex-linked markers when new allele denomination data becomes available
-  observe({
-    if (isTruthy(frequencyDB())) {
-      updateCheckboxGroupInput(session, 'sexLinkedMarkers', choices = getMarkerNames(computedClaimPed()))
     }
   })
 
