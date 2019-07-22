@@ -67,7 +67,7 @@ shinyServer(function(input, output, session) {
   # update list of persons available for genotyping when the user chooses a pedigree
   observe({
     if (!is.null(claimPedigree())) {
-      updateCheckboxGroupInput(session, "ids", choices = claimPedigree()$ID)
+      updateCheckboxGroupInput(session, "ids", choices = getMembers(claimPedigree()))
     }
   })
 

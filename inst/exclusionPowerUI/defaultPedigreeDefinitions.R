@@ -61,3 +61,16 @@ pedigreeFromUI = function(pedigreeID, pedfile = NULL) {
     return(readPed(pedfile$datapath, allele_sep = '/'))
   }
 }
+
+getMembers = function(ped) {
+  if (is.ped(ped)) {
+    ped$ID
+  } else if (is.pedList(ped)) {
+    l = c()
+    for (component in ped) {
+      l = c(component$ID, l)
+    }
+
+    l
+  }
+}
