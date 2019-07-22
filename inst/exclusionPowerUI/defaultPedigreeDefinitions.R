@@ -58,6 +58,6 @@ pedigreeFromUI = function(pedigreeID, pedfile = NULL) {
     if (is.null(pedfile)) {
       return()
     }
-    return(as.ped(read.table(pedfile$datapath)))
+    return(readPed(pedfile$datapath))
   }
 }
