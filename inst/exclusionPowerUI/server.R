@@ -1,5 +1,5 @@
 library(shiny)
-library(forrel)
+
 
 #' Server definition of the shiny application
 #'
@@ -187,7 +187,7 @@ shinyServer(function(input, output, session) {
         markerNames = getMarkerNames(computedClaimPed())
         Nmarkers = length(markerNames)
         exclusionProbabilities = vector('numeric', Nmarkers)
-
+        options(warn = -1)
         # compute exclusion power
         for (i in 1:Nmarkers) {
           markerName = markerNames[i]

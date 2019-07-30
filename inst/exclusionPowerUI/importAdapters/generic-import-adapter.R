@@ -74,7 +74,7 @@ getOrAttachMarker = function(ped, markerName) {
 
 attachAlleleFrequenciesToPedigree = function(ped, markers = NULL, df = NULL, Xchrom = NULL, ...) {
   if (is.pedList(ped)) {
-    return(sapply(ped, function(x) {
+    return(lapply(ped, function(x) {
       attachAlleleFrequenciesToPedigree(x, markers, df, Xchrom, ...)
     }))
   }
