@@ -30,14 +30,6 @@ shinyUI(fluidPage(
     column(12, h3('Exclusion Power'))
   ),
   sidebarLayout(
-    ### Pedigree plots, visible across all tabs
-    sidebarPanel(
-      verticalLayout(
-        HTML('<h5 class="text-center">Claim pedigree</h5>'),
-        plotOutput('pedClaimPlot'),
-        HTML('<h5 class="text-center">True pedigree</h5>'),
-        plotOutput('pedTruePlot'))
-      ),
     mainPanel(
       tabsetPanel(
         ### Pedigree data
@@ -110,18 +102,26 @@ shinyUI(fluidPage(
                    column(12,
                           tableOutput('exclusionPowerResults'))
                  ))
-      ),
+      )
 
-      ### Save/restore workspace (visible across all tabs)
-      fluidRow(
-        column(8, p(" ")),
-        column(4,
-               wellPanel(
-                 p(strong('Save workspace')),
-                 downloadButton('saveWorkspaceButton', 'Download'),
-                 p(fileInput('loadWorkspace', 'Load workspace'))
-               ))
-        )
+      # ### Save/restore workspace (visible across all tabs)
+      # fluidRow(
+      #   column(8, p(" ")),
+      #   column(4,
+      #          wellPanel(
+      #            p(strong('Save workspace')),
+      #            downloadButton('saveWorkspaceButton', 'Download'),
+      #            p(fileInput('loadWorkspace', 'Load workspace'))
+      #          ))
+      #   )
+    ),
+    ### Pedigree plots, visible across all tabs
+    sidebarPanel(
+      verticalLayout(
+        HTML('<h5 class="text-center">Claim pedigree</h5>'),
+        plotOutput('pedClaimPlot'),
+        HTML('<h5 class="text-center">True pedigree</h5>'),
+        plotOutput('pedTruePlot'))
     )
   )
 ))

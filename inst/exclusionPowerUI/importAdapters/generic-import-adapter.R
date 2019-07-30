@@ -73,6 +73,12 @@ getOrAttachMarker = function(ped, markerName) {
 #' ped = attachAlleleFrequenciesToPedigree(ped, markers = c('M1'), df = df)
 
 attachAlleleFrequenciesToPedigree = function(ped, markers = NULL, df = NULL, Xchrom = NULL, ...) {
+  if (is.pedList(ped)) {
+    return(sapply(ped, function(x) {
+      attachAlleleFrequenciesToPedigree(x, markers, df, Xchrom, ...)
+    }))
+  }
+
   if (is.null(df)) {
     df = read.table(...)
   }

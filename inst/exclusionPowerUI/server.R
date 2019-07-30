@@ -35,13 +35,29 @@ shinyServer(function(input, output, session) {
     pedigreeFromUI(input$pedClaim, pedfile = input$pedClaimFile)
   })
 
+  pedPlotColors = reactive({
+    list(red = input$ids)
+  })
+
+  pedPlotShaded = reactive({
+    unique(references()[,1])
+  })
+
   # render the pedigree plot when the user chooses a Claim pedigree or updates
   # individuals available for genotyping
   output$pedClaimPlot <- renderPlot({
-    if (input$pedClaim != "unrelated") {
-      plot(claimPedigree(), shaded = input$ids)
+    if (!is.pedList(claimPedigree())) {
+      plot(claimPedigree(),
+           col = list(red = intersect(input$ids, labels(claimPedigree()))),
+           shaded = intersect(pedPlotShaded(), labels(claimPedigree())))
     } else {
-      pedtools::plotPedList(claimPedigree(), frames = FALSE, shaded = input$ids)
+      plot.arg.list = lapply(claimPedigree(), function(x) {
+        list(x = x,
+             col = list(red = intersect(input$ids, labels(x))),
+             shaded = intersect(pedPlotShaded(), labels(x)))
+      })
+      pedtools::plotPedList(plot.arg.list,
+                            frames = FALSE)
     }
   })
 
@@ -56,11 +72,18 @@ shinyServer(function(input, output, session) {
 
   # render the pedigree plot when the user chooses a True pedigree
   output$pedTruePlot <- renderPlot({
-    if (input$pedTrue != "unrelated") {
-      plot(truePedigree(), shaded = input$ids)
+    if (!is.pedList(truePedigree())) {
+      plot(truePedigree(),
+           col = list(red = intersect(input$ids, labels(truePedigree()))),
+           shaded = intersect(pedPlotShaded(), labels(truePedigree())))
     } else {
-      colors = ifelse(labels(truePedigree()) %in% input$ids, 2, 1)
-      pedtools::plotPedList(truePedigree(), frames = FALSE, shaded = input$ids)
+      plot.arg.list = lapply(truePedigree(), function(x) {
+        list(x = x,
+             col = list(red = intersect(input$ids, labels(x))),
+             shaded = intersect(pedPlotShaded(), labels(x)))
+      })
+      pedtools::plotPedList(plot.arg.list,
+                            frames = FALSE)
     }
   })
 
