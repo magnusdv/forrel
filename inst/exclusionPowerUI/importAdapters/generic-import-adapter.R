@@ -110,6 +110,12 @@ attachAlleleFrequenciesToPedigree = function(ped, markers = NULL, df = NULL, Xch
 }
 
 attachGenotypeToPedigree = function(ped, markers = NULL, df = NULL, ...) {
+  if (is.pedList(ped)) {
+    return(lapply(ped, function(x) {
+      attachGenotypeToPedigree(x, markers, df, ...)
+    }))
+  }
+
   if (is.null(df)) {
     df = read.table(...)
   }
@@ -122,12 +128,14 @@ attachGenotypeToPedigree = function(ped, markers = NULL, df = NULL, ...) {
     # find df rows concerning markerName
     relevant = df[df[,2] == markerName,]
     for (person in relevant[,1]) {
-      alleles = c(relevant[relevant[,1] == person, 3],
-                  relevant[relevant[,1] == person, 4])
-      ped = setAlleles(ped,
-                       ids = person,
-                       markers = markerName,
-                       alleles = alleles)
+      if (person %in% labels(ped)) {
+        alleles = c(relevant[relevant[,1] == person, 3],
+                    relevant[relevant[,1] == person, 4])
+        ped = setAlleles(ped,
+                         ids = person,
+                         markers = markerName,
+                         alleles = alleles)
+      }
     }
   }
 

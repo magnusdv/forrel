@@ -58,7 +58,8 @@ shinyUI(fluidPage(
 
                           # Help message describing the loaded frequency DB file
                           uiOutput('frequencyDbDescription'),
-                          tabularDataPreviewInput('frequencies')),
+                          tabularDataPreviewInput('frequencies',
+                                                  label = 'View loaded frequency data')),
                    column(4,
                           p(strong('Load reference file')),
                           p(advancedTableFileLoaderInput('referenceFile', 'Select file')),
@@ -70,9 +71,10 @@ shinyUI(fluidPage(
 
                           # Help message describing the loaded reference file
                           uiOutput('referenceFileDescription'),
-                          tabularDataPreviewInput('references')),
+                          tabularDataPreviewInput('references',
+                                                  label = 'View loaded reference data')),
                    column(4,
-                          checkboxGroupInput("ids", "Individuals available for genotyping"))
+                          checkboxGroupInput('ids', 'Individuals available for genotyping'))
                  )),
 
         ### Settings: mutation model, inbreeding parameters and sex-linked markers

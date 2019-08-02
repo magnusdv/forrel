@@ -35,10 +35,6 @@ shinyServer(function(input, output, session) {
     pedigreeFromUI(input$pedClaim, pedfile = input$pedClaimFile)
   })
 
-  pedPlotColors = reactive({
-    list(red = input$ids)
-  })
-
   pedPlotShaded = reactive({
     unique(references()[,1])
   })
