@@ -7,6 +7,7 @@ source('advancedTableFileLoader.R')
 source('tabularDataPreview.R')
 
 source('importAdapters/generic-import-adapter.R')
+source('importAdapters/familias-import-adapter.R')
 
 getMarkerNames = function(ped) {
   if (is.pedList(ped)) {

@@ -129,7 +129,16 @@ shinyServer(function(input, output, session) {
     switch (input$frequencySource,
       'file' = {
         if (isTruthy(frequencyDB())) {
-          ped = attachAlleleFrequenciesToPedigree(ped, df = frequencyDB(), Xchrom = input$sexLinkedMarkers)
+          ped = attachAlleleFrequenciesToPedigree(ped,
+                                                  df = frequencyDB(),
+                                                  Xchrom = input$sexLinkedMarkers)
+        }
+      },
+      'fam' = {
+        if (isTruthy(input$familiasReferenceFile)) {
+          ped = attachAlleleFrequenciesToPedigree.familias(ped,
+                                                           input$familiasReferenceFile$datapath,
+                                                           Xchrom = input$sexLinkedMarkers)
         }
       }
     )

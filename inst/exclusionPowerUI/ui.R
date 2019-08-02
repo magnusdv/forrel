@@ -49,11 +49,16 @@ shinyUI(fluidPage(
         tabPanel('Genetic data',
                  fluidRow(
                    column(4,
-                          p(strong('Load frequency database file')),
-                          p(advancedTableFileLoaderInput('frequencyDbFile', 'Select file')),
+                          wellPanel(
+                            p(strong('Load frequency database file')),
+                            p(advancedTableFileLoaderInput('frequencyDbFile', 'Select file')),
+                            HTML('<p class="text-center">- or -</p>'),
+                            fileInput('familiasReferenceFile', 'Load Familias DNA data')
+                          ),
                           radioButtons('frequencySource',
                                        'Use frequency data from',
-                                       choices = c('Frequency DB file' = 'file')),
+                                       choices = c('Frequency DB file' = 'file',
+                                                   'Familias DNA data' = 'fam')),
                                                    #'Pedigree file' = 'ped')),
 
                           # Help message describing the loaded frequency DB file
