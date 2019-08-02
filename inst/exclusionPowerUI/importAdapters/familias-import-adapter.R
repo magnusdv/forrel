@@ -1,4 +1,23 @@
-attachAlleleFrequenciesToPedigree.familias = function(ped, path, markers = NULL, Xchrom = NULL, ...) {
+#' Attach allele denomination and frequency data to a pedigree from Familias output
+#'
+#' Data is read from the output of Familias.
+#'
+#' If there are markers already in the pedigree, they are updated with new
+#' frequency data if a matching marker is found in the provided dataset. If
+#' there are duplicate markers in the given pedigree, this function will fail.
+#'
+#' @param ped a `ped` object
+#' @param path filepath to the Familias output
+#' @param markers a list of markers to process
+#' @param Xchrom a list of marker names that are on the X chromosome
+#'
+#' @return the `ped` object with attached genetic data
+#'
+#' @author Elias Hernandis <eliashernandis@gmail.com>
+#'
+#' @seealso [pedtools::readPed()]
+
+attachAlleleFrequenciesToPedigree.familias = function(ped, path, markers = NULL, Xchrom = NULL) {
   if (is.pedList(ped)) {
     return(lapply(ped, function(x) {
       attachAlleleFrequenciesToPedigree.familias(x, path, markers, Xchrom, ...)
@@ -58,11 +77,6 @@ attachGenotypeToPedigree.familias = function(ped, markers = NULL, df = NULL, ...
 
   if (is.null(df)) {
     df = read.table(...)
-  }
-
-  if (is.null(markers)) {
-    headers = colnames(df)[2:ncol(df)]
-    print(headers)
   }
 
   ped
