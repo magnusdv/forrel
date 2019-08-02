@@ -151,11 +151,7 @@ shinyServer(function(input, output, session) {
 
   # compose the description for the frequency file
   output$frequencyDbDescription = renderUI({
-    if (!isTruthy(frequencyDB())) {
-      p('No frequency database loaded.')
-    } else {
-      p(sprintf('Allele frequency loaded for %d markers', length(computedClaimPed()$markerdata)))
-    }
+    p(sprintf('Allele frequency loaded for %d markers', length(getMarkerNames(computedClaimPed()))))
   })
 
   # compose the description for the reference file
@@ -168,10 +164,12 @@ shinyServer(function(input, output, session) {
     }
   })
 
-  callModule(tabularDataPreview, 'frequencies',
-             id = 'frequencies',
-             df = frequencyDB(),
-             title = 'Frequency data used for calculation')
+  observe({
+    callModule(tabularDataPreview, 'frequencies',
+               id = 'frequencies',
+               df = getTabularFrequencyDb(computedClaimPed()),
+               title = 'Frequency data used for calculation')
+  })
 
   callModule(tabularDataPreview, 'references',
              id = 'references',

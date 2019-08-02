@@ -24,7 +24,7 @@ tabularDataPreview = function(input, output, session, id = 'namespace', title = 
       ))
   }
 
-  output$tablePreview = renderTable(df)
+  output$tablePreview = renderTable(df, rownames = TRUE, decimals = 6)
 
   # show modal when action link is clicked
   observeEvent(input$modalLink, {
