@@ -17,7 +17,7 @@ whose genotypes should be simulated}
 
 \item{conditions}{A list of marker objects, (or an integer vector indicating
 markers attached to \code{x}). If these contain genotypes the simulations will
-condition on these. Locus annotations (allele frequencies, mutationmodels
+condition on these. Locus attributes (allele frequencies, mutation models
 a.s.o.) are extracted from each marker.}
 
 \item{seed}{NULL, or a numeric seed for the random number generator}

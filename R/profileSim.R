@@ -10,7 +10,7 @@
 #'   whose genotypes should be simulated
 #' @param conditions A list of marker objects, (or an integer vector indicating
 #'   markers attached to `x`). If these contain genotypes the simulations will
-#'   condition on these. Locus annotations (allele frequencies, mutationmodels
+#'   condition on these. Locus attributes (allele frequencies, mutation models
 #'   a.s.o.) are extracted from each marker.
 #' @param seed NULL, or a numeric seed for the random number generator
 #' @param ... Further arguments passed on to [markerSim()]

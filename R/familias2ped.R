@@ -130,13 +130,13 @@ Familias2ped = function(familiasped, datamatrix, loci) {
     p = cbind(p, allelematrix, stringsAsFactors = FALSE)
   }
 
-  ### Part 3: marker annotations
+  ### Part 3: marker attributes
 
-  annotations = readFamiliasLoci(loci)
+  locusAttributes = readFamiliasLoci(loci)
 
   ### Create ped object
 
-  pedtools::as.ped(p, locus_annotations = annotations)
+  pedtools::as.ped(p, locusAttributes = locusAttributes)
 }
 
 
