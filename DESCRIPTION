@@ -2,7 +2,6 @@ Package: forrel
 Type: Package
 Title: Relatedness Inference and Forensic Pedigree Analysis
 Version: 0.1.0
-Date: 2018-20-07
 Authors@R: person("Magnus Dehli", "Vigeland", email = "m.d.vigeland@medisin.uio.no", 
                   role = c("aut", "cre"))
 Description: Forensic applications of pedigree analysis, including marker simulation,
