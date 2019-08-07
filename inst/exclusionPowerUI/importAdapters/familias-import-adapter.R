@@ -20,7 +20,7 @@
 attachAlleleFrequenciesToPedigree.familias = function(ped, path, markers = NULL, Xchrom = NULL) {
   if (is.pedList(ped)) {
     return(lapply(ped, function(x) {
-      attachAlleleFrequenciesToPedigree.familias(x, path, markers, Xchrom, ...)
+      attachAlleleFrequenciesToPedigree.familias(x, path, markers, Xchrom)
     }))
   }
 
@@ -79,5 +79,12 @@ attachGenotypeToPedigree.familias = function(ped, markers = NULL, df = NULL, ...
     df = read.table(...)
   }
 
-  ped
+  if (ncol(df) %% 2 != 0) {
+    stop("Invalid dataframe. Expected an even number of allele columns.")
+  }
+
+
+  ids = intersect(rownames(df), labels(ped))
+
+  setAlleles(ped, ids = ids, markers = markers, df[rownames(df) %in% ids, ])
 }
