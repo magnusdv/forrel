@@ -82,6 +82,22 @@ getTabularFrequencyDb = function(ped) {
   as.data.frame(df[2:ncol(df)], row.names = as.vector(df[[1]], mode = 'character'))
 }
 
+isGenotyped = function(ped, id) {
+  any(!is.na(getAlleles(ped, ids = c(id))))
+}
+
+getGenotypedIds = function(ped) {
+  if (is.pedList(ped)) {
+    g = c()
+    for (x in ped) {
+      g = c(g, getGenotypedIds(x))
+    }
+
+    return(g)
+  }
+
+  labels(ped)[as.vector(lapply(labels(ped), function(id) { isGenotyped(ped, id) }), mode = 'logical')]
+}
 
 
 source('defaultPedigreeDefinitions.R')

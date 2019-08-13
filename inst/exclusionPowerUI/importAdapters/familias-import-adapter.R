@@ -68,23 +68,30 @@ attachAlleleFrequenciesToPedigree.familias = function(ped, path, markers = NULL,
   ped
 }
 
-attachGenotypeToPedigree.familias = function(ped, markers = NULL, df = NULL, ...) {
+attachGenotypeToPedigree.familias = function(ped, path) {
   if (is.pedList(ped)) {
     return(lapply(ped, function(x) {
-      attachGenotypeToPedigree.familias(x, markers, df, ...)
+      attachGenotypeToPedigree.familias(x, path)
     }))
   }
 
-  if (is.null(df)) {
-    df = read.table(...)
-  }
+  df = read.table(path,
+                  sep = '\t',
+                  header = T,
+                  row.names = 1,
+                  stringsAsFactors = F,
+                  as.is = T,
+                  check.names = F)
 
-  if (ncol(df) %% 2 != 0) {
-    stop("Invalid dataframe. Expected an even number of allele columns.")
+  juan = function(strList) {
+    lapply(strList, function(s) { substr(s, 1, nchar(s) - 2) })
   }
-
 
   ids = intersect(rownames(df), labels(ped))
+  markers = intersect(juan(colnames(df)[c(T, F)]), getMarkerNames(ped))
 
-  setAlleles(ped, ids = ids, markers = markers, df[rownames(df) %in% ids, ])
+  setAlleles(ped,
+             ids = ids,
+             markers = markers,
+             alleles = df[rownames(df) %in% ids, juan(colnames(df)) %in% markers])
 }

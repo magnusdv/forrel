@@ -58,7 +58,7 @@ pedigreeFromUI = function(pedigreeID, pedfile = NULL) {
     if (is.null(pedfile)) {
       return()
     }
-    return(readPed(pedfile$datapath, allele_sep = '/'))
+    return(readPed(pedfile$datapath, sep = '/'))
   }
 }
 

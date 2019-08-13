@@ -53,7 +53,7 @@ shinyUI(fluidPage(
                             p(strong('Load frequency database file')),
                             p(advancedTableFileLoaderInput('frequencyDbFile', 'Select file')),
                             HTML('<p class="text-center">- or -</p>'),
-                            fileInput('familiasReferenceFile', 'Load Familias DNA data')
+                            fileInput('familiasFrequencyFile', 'Load Familias DNA data')
                           ),
                           radioButtons('frequencySource',
                                        'Use frequency data from',
@@ -66,12 +66,17 @@ shinyUI(fluidPage(
                           tabularDataPreviewInput('frequencies',
                                                   label = 'View loaded frequency data')),
                    column(4,
-                          p(strong('Load reference file')),
-                          p(advancedTableFileLoaderInput('referenceFile', 'Select file')),
+                          wellPanel(
+                            p(strong('Load reference file')),
+                            p(advancedTableFileLoaderInput('referenceFile', 'Select file')),
+                            HTML('<p class="text-center">- or -</p>'),
+                            fileInput('familiasRefereceFile', 'Load Familias case data')
+                          ),
                           radioButtons('referenceSource',
                                        'Use known genotype data from',
                                        choices = c('Do not use reference data' = 'none',
-                                                   'Reference file' = 'file')),
+                                                   'Reference file' = 'file',
+                                                   'Familias case data' = 'fam')),
                                                    #'Pedigree file' = 'ped')),
 
                           # Help message describing the loaded reference file

@@ -35,51 +35,12 @@ shinyServer(function(input, output, session) {
     pedigreeFromUI(input$pedClaim, pedfile = input$pedClaimFile)
   })
 
-  pedPlotShaded = reactive({
-    unique(references()[,1])
-  })
-
-  # render the pedigree plot when the user chooses a Claim pedigree or updates
-  # individuals available for genotyping
-  output$pedClaimPlot <- renderPlot({
-    if (!is.pedList(claimPedigree())) {
-      plot(claimPedigree(),
-           col = list(red = intersect(input$ids, labels(claimPedigree()))),
-           shaded = intersect(pedPlotShaded(), labels(claimPedigree())))
-    } else {
-      plot.arg.list = lapply(claimPedigree(), function(x) {
-        list(x = x,
-             col = list(red = intersect(input$ids, labels(x))),
-             shaded = intersect(pedPlotShaded(), labels(x)))
-      })
-      pedtools::plotPedList(plot.arg.list,
-                            frames = FALSE)
-    }
-  })
-
   # obtain the true pedigree
   truePedigree <- reactive({
     if (input$pedTrue == 'unrelated') {
       unrelatedPedFromClaimPed(claimPedigree(), input$ids)
     } else {
       pedigreeFromUI(input$pedTrue, pedfile = input$pedTrueFile)
-    }
-  })
-
-  # render the pedigree plot when the user chooses a True pedigree
-  output$pedTruePlot <- renderPlot({
-    if (!is.pedList(truePedigree())) {
-      plot(truePedigree(),
-           col = list(red = intersect(input$ids, labels(truePedigree()))),
-           shaded = intersect(pedPlotShaded(), labels(truePedigree())))
-    } else {
-      plot.arg.list = lapply(truePedigree(), function(x) {
-        list(x = x,
-             col = list(red = intersect(input$ids, labels(x))),
-             shaded = intersect(pedPlotShaded(), labels(x)))
-      })
-      pedtools::plotPedList(plot.arg.list,
-                            frames = FALSE)
     }
   })
 
@@ -135,18 +96,63 @@ shinyServer(function(input, output, session) {
         }
       },
       'fam' = {
-        if (isTruthy(input$familiasReferenceFile)) {
+        if (isTruthy(input$familiasFrequencyFile)) {
           ped = attachAlleleFrequenciesToPedigree.familias(ped,
-                                                           input$familiasReferenceFile$datapath,
+                                                           input$familiasFrequencyFile$datapath,
                                                            Xchrom = input$sexLinkedMarkers)
         }
       }
     )
 
+    # render the pedigree plot when the user chooses a Claim pedigree or updates
+    # individuals available for genotyping
+    output$pedClaimPlot <- renderPlot({
+      shadedAll = getGenotypedIds(computedClaimPed())
+
+      if (!is.pedList(computedClaimPed())) {
+        plot(computedClaimPed(),
+             col = list(red = intersect(input$ids, labels(computedClaimPed()))),
+             shaded = shadedAll)
+      } else {
+        plot.arg.list = lapply(computedClaimPed(), function(x) {
+          list(x = x,
+               col = list(red = intersect(input$ids, labels(x))),
+               shaded = intersect(shadedAll, labels(x)))
+        })
+        pedtools::plotPedList(plot.arg.list,
+                              frames = FALSE)
+      }
+    })
+
+    # render the pedigree plot when the user chooses a True pedigree
+    output$pedTruePlot <- renderPlot({
+      shadedAll = getGenotypedIds(computedClaimPed())
+
+      if (!is.pedList(truePedigree())) {
+        plot(truePedigree(),
+             col = list(red = intersect(input$ids, labels(truePedigree()))),
+             shaded = intersect(shadedAll, labels(truePedigree())))
+      } else {
+        plot.arg.list = lapply(truePedigree(), function(x) {
+          list(x = x,
+               col = list(red = intersect(input$ids, labels(x))),
+               shaded = intersect(shadedAll, labels(x)))
+        })
+        pedtools::plotPedList(plot.arg.list,
+                              frames = FALSE)
+      }
+    })
+
     switch (input$referenceSource,
       'file' = {
-        if (isTruthy(references()) && isTruthy(frequencyDB())) {
+        if (isTruthy(references())) {
           ped = attachGenotypeToPedigree(ped, df = references())
+        }
+      },
+      'fam' = {
+        if (isTruthy(input$familiasRefereceFile)) {
+          ped = attachGenotypeToPedigree.familias(ped,
+                                                  input$familiasRefereceFile$datapath)
         }
       }
     )
@@ -161,11 +167,13 @@ shinyServer(function(input, output, session) {
 
   # compose the description for the reference file
   output$referenceFileDescription = renderUI({
-    if (!isTruthy(references())) {
+    genotypedIds = getGenotypedIds(computedClaimPed())
+
+    if (length(genotypedIds) == 0) {
       p('No known genotype data loaded.')
     } else {
       p(sprintf('Known genotypes loaded for %s',
-                paste(unique(references()[,1]), collapse = ', ')))
+                paste(genotypedIds, collapse = ', ')))
     }
   })
 
