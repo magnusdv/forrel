@@ -89,20 +89,11 @@ shinyUI(fluidPage(
 
         ### Settings: mutation model, inbreeding parameters and sex-linked markers
         tabPanel('Settings',
+                 p(strong('Marker settings')),
                  fluidRow(
-                   # column(6,
-                   #        p(strong('Mutation model'))),
-                   column(6,
-                          checkboxGroupInput("sexLinkedMarkers", "Sex-linked markers"))
+                   column(12,
+                          markerSettingsTable('markerSettings', pedToMarkerSettingsState(NULL)))
                  )),
-                 # fluidRow(
-                 #   column(12, h4('Inbreeding parameters'))),
-                 # fluidRow(
-                 #   column(6,
-                 #          p(strong('Claim pedigree'))),
-                 #   column(6,
-                 #          p(strong('True pedigree')))
-                 # )),
 
         ### Results: exclusion power calculation
         tabPanel('Results',

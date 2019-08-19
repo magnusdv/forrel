@@ -13,7 +13,6 @@
 #' @param ped a `ped` object
 #' @param markers a list of markers to process
 #' @param df a dataframe to read data from, defaults to NULL
-#' @param Xchrom a list of marker names that are on the X chromosome
 #' @param ... optional parameters to be passed to [utils::read.table()]. At
 #'   least one of `file` or `text` is required if df is NULL.
 #'
@@ -38,7 +37,7 @@
 #' # read only some markers (leaving existing ones untouched)
 #' ped = attachAlleleFrequenciesToPedigree(ped, markers = c('M1'), df = df)
 
-attachAlleleFrequenciesToPedigree = function(ped, markers = NULL, df = NULL, Xchrom = NULL, ...) {
+attachAlleleFrequenciesToPedigree = function(ped, markers = NULL, df = NULL, ...) {
   if (is.pedList(ped)) {
     return(lapply(ped, function(x) {
       attachAlleleFrequenciesToPedigree(x, markers, df, Xchrom, ...)
@@ -66,10 +65,6 @@ attachAlleleFrequenciesToPedigree = function(ped, markers = NULL, df = NULL, Xch
 
     attr(ped$markerdata[[index]], 'alleles') = als
     attr(ped$markerdata[[index]], 'afreq') = freqs
-
-    if (markerName %in% Xchrom) {
-      attr(ped$markerdata[[index]], 'chrom') = 23
-    }
   }
 
   ped
@@ -103,6 +98,18 @@ attachGenotypeToPedigree = function(ped, markers = NULL, df = NULL, ...) {
                          alleles = alleles)
       }
     }
+  }
+
+  ped
+}
+
+attachLocusAttributesToPedigree = function(ped, markerSettings) {
+  if (!is.data.frame(markerSettings)) return(ped);
+
+  for (i in 1:nrow(markerSettings)) {
+    ped = setLocusAttributes(ped,
+                             markers = c(markerSettings[i, 1]),
+                             locusAttributes = list(chrom = markerSettings[i, 3]))
   }
 
   ped

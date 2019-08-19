@@ -1,6 +1,5 @@
 library(shiny)
 
-
 #' Server definition of the shiny application
 #'
 #' Evaluating this file should yield a shiny server definition object as
@@ -76,11 +75,8 @@ shinyServer(function(input, output, session) {
   references <- callModule(advancedTableFileLoader, 'referenceFile', id = 'referenceFile',
                            columnHeaders = TRUE)
 
-  # update list of sex-linked markers when new allele denomination data becomes available
-  observe({
-    updateCheckboxGroupInput(session, 'sexLinkedMarkers',
-                             choices = getMarkerNames(computedClaimPed()),
-                             selected = input$sexLinkedMarkers)
+  markerSettings = reactive({
+    jsonlite::fromJSON(input$markerSettings)
   })
 
   # data provided thorugh tabular files is attached to the claim pedigree here
@@ -91,57 +87,16 @@ shinyServer(function(input, output, session) {
       'file' = {
         if (isTruthy(frequencyDB())) {
           ped = attachAlleleFrequenciesToPedigree(ped,
-                                                  df = frequencyDB(),
-                                                  Xchrom = input$sexLinkedMarkers)
+                                                  df = frequencyDB())
         }
       },
       'fam' = {
         if (isTruthy(input$familiasFrequencyFile)) {
           ped = attachAlleleFrequenciesToPedigree.familias(ped,
-                                                           input$familiasFrequencyFile$datapath,
-                                                           Xchrom = input$sexLinkedMarkers)
+                                                           input$familiasFrequencyFile$datapath)
         }
       }
     )
-
-    # render the pedigree plot when the user chooses a Claim pedigree or updates
-    # individuals available for genotyping
-    output$pedClaimPlot <- renderPlot({
-      shadedAll = getGenotypedIds(computedClaimPed())
-
-      if (!is.pedList(computedClaimPed())) {
-        plot(computedClaimPed(),
-             col = list(red = intersect(input$ids, labels(computedClaimPed()))),
-             shaded = shadedAll)
-      } else {
-        plot.arg.list = lapply(computedClaimPed(), function(x) {
-          list(x = x,
-               col = list(red = intersect(input$ids, labels(x))),
-               shaded = intersect(shadedAll, labels(x)))
-        })
-        pedtools::plotPedList(plot.arg.list,
-                              frames = FALSE)
-      }
-    })
-
-    # render the pedigree plot when the user chooses a True pedigree
-    output$pedTruePlot <- renderPlot({
-      shadedAll = getGenotypedIds(computedClaimPed())
-
-      if (!is.pedList(truePedigree())) {
-        plot(truePedigree(),
-             col = list(red = intersect(input$ids, labels(truePedigree()))),
-             shaded = intersect(shadedAll, labels(truePedigree())))
-      } else {
-        plot.arg.list = lapply(truePedigree(), function(x) {
-          list(x = x,
-               col = list(red = intersect(input$ids, labels(x))),
-               shaded = intersect(shadedAll, labels(x)))
-        })
-        pedtools::plotPedList(plot.arg.list,
-                              frames = FALSE)
-      }
-    })
 
     switch (input$referenceSource,
       'file' = {
@@ -157,7 +112,48 @@ shinyServer(function(input, output, session) {
       }
     )
 
+    ped = attachLocusAttributesToPedigree(ped, markerSettings())
+
     ped
+  })
+
+  # render the pedigree plot when the user chooses a Claim pedigree or updates
+  # individuals available for genotyping
+  output$pedClaimPlot <- renderPlot({
+    shadedAll = getGenotypedIds(computedClaimPed())
+
+    if (!is.pedList(computedClaimPed())) {
+      plot(computedClaimPed(),
+           col = list(red = intersect(input$ids, labels(computedClaimPed()))),
+           shaded = shadedAll)
+    } else {
+      plot.arg.list = lapply(computedClaimPed(), function(x) {
+        list(x = x,
+             col = list(red = intersect(input$ids, labels(x))),
+             shaded = intersect(shadedAll, labels(x)))
+      })
+      pedtools::plotPedList(plot.arg.list,
+                            frames = FALSE)
+    }
+  })
+
+  # render the pedigree plot when the user chooses a True pedigree
+  output$pedTruePlot <- renderPlot({
+    shadedAll = getGenotypedIds(computedClaimPed())
+
+    if (!is.pedList(truePedigree())) {
+      plot(truePedigree(),
+           col = list(red = intersect(input$ids, labels(truePedigree()))),
+           shaded = intersect(shadedAll, labels(truePedigree())))
+    } else {
+      plot.arg.list = lapply(truePedigree(), function(x) {
+        list(x = x,
+             col = list(red = intersect(input$ids, labels(x))),
+             shaded = intersect(shadedAll, labels(x)))
+      })
+      pedtools::plotPedList(plot.arg.list,
+                            frames = FALSE)
+    }
   })
 
   # compose the description for the frequency file
@@ -189,6 +185,11 @@ shinyServer(function(input, output, session) {
              df = references(),
              title = 'Reference data used for calculation')
 
+  # update list of sex-linked markers when new allele denomination data becomes available
+  observe({
+    updateMarkerSettingsTable(session, 'markerSettings', computedClaimPed())
+  })
+
   # compute exclusion power
   output$exclusionPowerResults <- renderTable({
     if (input$computeButton < 1) return(NULL)
@@ -198,16 +199,22 @@ shinyServer(function(input, output, session) {
         markerNames = getMarkerNames(computedClaimPed())
         Nmarkers = length(markerNames)
         exclusionProbabilities = vector('numeric', Nmarkers)
+
+        # TODO: remove this when the implementation of exclusionPower stops throwing warnings
         options(warn = -1)
         # compute exclusion power
         for (i in 1:Nmarkers) {
           markerName = markerNames[i]
 
-          EP = exclusionPower(ped_claim = computedClaimPed(),
-                              ped_true = truePedigree(),
-                              ids = input$ids,
-                              markerindex = i,
-                              plot = FALSE)
+          EP = 0
+          if (markerName %in% getIncludedMarkers(markerSettings())) {
+            EP = exclusionPower(ped_claim = computedClaimPed(),
+                                ped_true = truePedigree(),
+                                ids = input$ids,
+                                markerindex = i,
+                                plot = FALSE)
+          }
+
           exclusionProbabilities[i] = EP
 
           incProgress(1/Nmarkers)

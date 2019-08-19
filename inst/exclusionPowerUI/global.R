@@ -101,8 +101,9 @@ getGenotypedIds = function(ped) {
 
 
 source('defaultPedigreeDefinitions.R')
-source('advancedTableFileLoader.R')
-source('tabularDataPreview.R')
+source('uiModules/advancedTableFileLoader.R')
+source('uiModules/tabularDataPreview.R')
+source('uiModules/markerSettingsTable.R')
 
 source('importAdapters/generic-import-adapter.R')
 source('importAdapters/familias-import-adapter.R')
