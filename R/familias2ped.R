@@ -26,23 +26,25 @@
 #' @references Windows Familias is freely available from <http://familias.name>.
 #' @examples
 #'
-#' \dontrun{
-#' # Example 1
-#' # =========
-#' library(Familias)
-#' library(pedtools)
-#' data(NorwegianFrequencies)
-#' TH01 = NorwegianFrequencies$TH01
-#' locus1 = FamiliasLocus(TH01)
-#' persons = c('mother', 'daughter', 'AF')
-#' ped1 = FamiliasPedigree(id = persons,
-#'                         dadid = c(NA, 'AF', NA),
-#'                         momid = c(NA, 'mother', NA),
-#'                         sex = c('female', 'female', 'male'))
-#' datamatrix = data.frame(THO1.1=c(NA, 8, NA), THO1.2=c(NA,9.3, NA))
-#' rownames(datamatrix) = persons
-#' x = Familias2ped(ped1, datamatrix, locus1)
-#' plot(x, marker = 1)
+#' ### Example 1 ###
+#'
+#' if (requireNamespace("Familias", quietly = TRUE)) {
+#'   data(NorwegianFrequencies, package = "Familias")
+#'   TH01 = Familias::FamiliasLocus(NorwegianFrequencies$TH01, name = "TH01")
+#'
+#'   ped = Familias::FamiliasPedigree(
+#'     id = c('mother', 'daughter', 'AF'),
+#'     dadid = c(NA, 'AF', NA),
+#'     momid = c(NA, 'mother', NA),
+#'     sex   = c('female', 'female', 'male'))
+#'
+#'   datamatrix = data.frame(
+#'     TH01.1 = c(NA, 8, NA),
+#'     TH01.2 = c(NA, 9.3, NA),
+#'     row.names = ped$id)
+#'
+#'   Familias2ped(ped, datamatrix, loci = TH01)
+#' }
 #'
 #' # Example 2 TODO - test!
 #' # =========

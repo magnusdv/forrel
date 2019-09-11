@@ -37,47 +37,6 @@ conversion function \code{Familias2ped} takes care of all potential differences:
 It converts each FamiliasPedigree into a list of connected ped objects,
 adding missing parents where needed.
 }
-\examples{
-
-\dontrun{
-# Example 1
-# =========
-library(Familias)
-library(pedtools)
-data(NorwegianFrequencies)
-TH01 = NorwegianFrequencies$TH01
-locus1 = FamiliasLocus(TH01)
-persons = c('mother', 'daughter', 'AF')
-ped1 = FamiliasPedigree(id = persons,
-                        dadid = c(NA, 'AF', NA),
-                        momid = c(NA, 'mother', NA),
-                        sex = c('female', 'female', 'male'))
-datamatrix = data.frame(THO1.1=c(NA, 8, NA), THO1.2=c(NA,9.3, NA))
-rownames(datamatrix) = persons
-x = Familias2ped(ped1, datamatrix, locus1)
-plot(x, marker = 1)
-
-# Example 2 TODO - test!
-# =========
-library(fam2r)
-data(F21)
-pedigrees = F21$pedigrees
-datamatrix = F21$datamatrix
-loci = F21$loci
-
-x = Familias2ped(pedigrees, datamatrix, loci)
-plotPedList(x, new=TRUE, frametitles=c('H1', 'H2'))
-
-# Give dev.width explicitly to allow for long names
-plotPedList(x, new = TRUE, frametitles = c('H1', 'H2'), dev.width = 17)
-
-# Numerical labels work better
-plotPedList(x, new=TRUE, id.labels = 'num', frametitles = c('H1', 'H2'))
-
-}
-
-
-}
 \references{
 Windows Familias is freely available from \url{http://familias.name}.
 }
