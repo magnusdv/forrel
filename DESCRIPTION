@@ -17,6 +17,8 @@ Imports:
     maxLik,
     glue,
     pedmut
-Suggests: testthat
+Suggests: testthat,
+    pedlikCompare,
+    Familias
 RoxygenNote: 6.1.1
 Roxygen: list(markdown = TRUE)
