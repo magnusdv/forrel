@@ -45,7 +45,7 @@ test_that("Familias2ped() converts a single singleton", {
   ped = Familias2ped(famped, datamatrix, NULL)
 
   true = singleton(1)
-  true = addMarkers(true, marker(true, `1` = c("A", "B")))
+  true = addMarkers(true, marker(true, name = "m1", `1` = c("A", "B")))
 
   expect_identical(ped, true)
 })
@@ -55,9 +55,18 @@ test_that("Familias2ped() reverses pedlikCompare:::ped2Familias()", {
   p2f = pedlikCompare:::ped2Familias
   f2p = function(x) Familias2ped(x$pedigree, datamatrix = x$datamatrix, loci = x$loci)
 
+  x = nuclearPed(1)
+  x = markerSim(x, N=1, alleles=1:2, verbose=F)
+  name(x, 1) = "m1"
+
+  y = f2p(p2f(x)) # convert back and forth
+  expect_identical(x, y)
+
+
   # Random ped with 3 founders and 12 matings; simulate 2 markers
-  x = randomPed(12,3)
+  x = randomPed(12, 3, seed = 123)
   x = markerSim(x, N=2, alleles=1:3, afreq=c(0.1, 0.4, 0.5), verbose=F)
+  name(x, 1:2) = paste0("m", 1:2)
 
   # convert back and forth
   y = f2p(p2f(x))
