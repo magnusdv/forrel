@@ -57,7 +57,7 @@ Familias2ped = function(familiasped, datamatrix, loci, matchLoci = FALSE) {
   ### If first argument is a list of FamiliasPedigrees, convert one at a time.
   if (is.list(familiasped) && class(familiasped[[1]]) == "FamiliasPedigree") {
       res = lapply(familiasped, function(p)
-        Familias2ped(p, datamatrix = datamatrix, loci = loci))
+        Familias2ped(p, datamatrix = datamatrix, loci = loci, matchLoci = matchLoci))
       return(res)
   }
   else if(class(familiasped) != "FamiliasPedigree")
@@ -103,6 +103,7 @@ Familias2ped = function(familiasped, datamatrix, loci, matchLoci = FALSE) {
     if(matchLoci && is.null(colnames(datamatrix)))
         stop2("`datamatrix` must have column names")
     if(!matchLoci && length(loci) > 0) {
+
       if(NC != 2 * length(loci))
         stop2("When `matchLoci is FALSE, the number of columns in `datamatrix` must be `2*length(loci)`")
       colnames(datamatrix) = rep(NA, NC)
