@@ -46,26 +46,6 @@
 #'   Familias2ped(ped, datamatrix, loci = TH01)
 #' }
 #'
-#' # Example 2 TODO - test!
-#' # =========
-#' library(fam2r)
-#' data(F21)
-#' pedigrees = F21$pedigrees
-#' datamatrix = F21$datamatrix
-#' loci = F21$loci
-#'
-#' x = Familias2ped(pedigrees, datamatrix, loci)
-#' plotPedList(x, new=TRUE, frametitles=c('H1', 'H2'))
-#'
-#' # Give dev.width explicitly to allow for long names
-#' plotPedList(x, new = TRUE, frametitles = c('H1', 'H2'), dev.width = 17)
-#'
-#' # Numerical labels work better
-#' plotPedList(x, new=TRUE, id.labels = 'num', frametitles = c('H1', 'H2'))
-#'
-#' }
-#'
-#'
 #' @export
 Familias2ped = function(familiasped, datamatrix, loci) {
 
@@ -113,27 +93,30 @@ Familias2ped = function(familiasped, datamatrix, loci) {
   ### Part2: datamatrix
 
   if (!is.null(datamatrix)) {
+    if(is.null(colnames(datamatrix)))
+      stop2("`datamatrix` must have column names")
+
     # sort datamatrix according to ped order
     id_idx = match(familiasped$id, rownames(datamatrix))
     if (anyNA(id_idx))
       stop2("ID label not found among the datamatrix rownames: ", setdiff(familiasped$id, rownames(datamatrix)))
     datamatrix = datamatrix[id_idx, , drop = FALSE]
 
-    # convert from factor to character
-    allelematrix = sapply(datamatrix, as.character)
+    # convert from factor/numeric to character
+    if(is.data.frame(datamatrix))
+      datamatrix[] = lapply(datamatrix, as.character)
 
     # replace NA with 0
-    allelematrix[is.na(allelematrix)] = "0"
+    datamatrix[is.na(datamatrix)] = "0"
 
     # add empty rows corresponding to new parents
     addedParents = matrix("0", nrow = nFath + nMoth, ncol = ncol(datamatrix))
-    allelematrix = rbind(allelematrix, addedParents)
+    allelematrix = rbind(datamatrix, addedParents)
 
-    p = cbind(p, allelematrix, stringsAsFactors = FALSE)
+    p = cbind(p, allelematrix, stringsAsFactors = FALSE, deparse.level = 1)
   }
 
   ### Part 3: marker attributes
-
   locusAttributes = readFamiliasLoci(loci)
 
   ### Create ped object

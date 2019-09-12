@@ -37,6 +37,29 @@ conversion function \code{Familias2ped} takes care of all potential differences:
 It converts each FamiliasPedigree into a list of connected ped objects,
 adding missing parents where needed.
 }
+\examples{
+
+### Example 1 ###
+
+if (requireNamespace("Familias", quietly = TRUE)) {
+  data(NorwegianFrequencies, package = "Familias")
+  TH01 = Familias::FamiliasLocus(NorwegianFrequencies$TH01, name = "TH01")
+
+  ped = Familias::FamiliasPedigree(
+    id = c('mother', 'daughter', 'AF'),
+    dadid = c(NA, 'AF', NA),
+    momid = c(NA, 'mother', NA),
+    sex   = c('female', 'female', 'male'))
+
+  datamatrix = data.frame(
+    TH01.1 = c(NA, 8, NA),
+    TH01.2 = c(NA, 9.3, NA),
+    row.names = ped$id)
+
+  Familias2ped(ped, datamatrix, loci = TH01)
+}
+
+}
 \references{
 Windows Familias is freely available from \url{http://familias.name}.
 }
