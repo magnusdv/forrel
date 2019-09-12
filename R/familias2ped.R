@@ -19,7 +19,12 @@
 #' @param datamatrix A data frame with two columns per marker (one for each
 #'   allele) and one row per individual.
 #' @param loci A [Familias::FamiliasLocus()] object or a list of such.
-#'
+#' @param matchLoci A logical. If TRUE, the column names of `datamatrix` must be
+#'   found either within `names(loci)` or within the `name` entries of `loci`.
+#'   The column names of `datamatrix` are assumed to come in pairs with
+#'   suffixes ".1" and ".2", e.g. "TH01.1", "TH01.2", etc.
+#'   If FALSE (the default) it is assumed that the `loci` correspond to the (pairs
+#'   of) columns in `datamatrix` sequentially.
 #' @return A `ped` object, or a list of such.
 #' @author Magnus Dehli Vigeland, Thore Egeland
 #'
@@ -43,11 +48,11 @@
 #'     TH01.2 = c(NA, 9.3, NA),
 #'     row.names = ped$id)
 #'
-#'   Familias2ped(ped, datamatrix, loci = TH01)
+#'   Familias2ped(ped, datamatrix, loci = list(TH01))
 #' }
 #'
 #' @export
-Familias2ped = function(familiasped, datamatrix, loci) {
+Familias2ped = function(familiasped, datamatrix, loci, matchLoci = FALSE) {
 
   ### If first argument is a list of FamiliasPedigrees, convert one at a time.
   if (is.list(familiasped) && class(familiasped[[1]]) == "FamiliasPedigree") {
@@ -93,8 +98,15 @@ Familias2ped = function(familiasped, datamatrix, loci) {
   ### Part2: datamatrix
 
   if (!is.null(datamatrix)) {
-    if(is.null(colnames(datamatrix)))
-      stop2("`datamatrix` must have column names")
+    NC = ncol(datamatrix)
+
+    if(matchLoci && is.null(colnames(datamatrix)))
+        stop2("`datamatrix` must have column names")
+    if(!matchLoci && length(loci) > 0) {
+      if(NC != 2 * length(loci))
+        stop2("When `matchLoci is FALSE, the number of columns in `datamatrix` must be `2*length(loci)`")
+      colnames(datamatrix) = rep(NA, NC)
+    }
 
     # sort datamatrix according to ped order
     id_idx = match(familiasped$id, rownames(datamatrix))
@@ -110,10 +122,10 @@ Familias2ped = function(familiasped, datamatrix, loci) {
     datamatrix[is.na(datamatrix)] = "0"
 
     # add empty rows corresponding to new parents
-    addedParents = matrix("0", nrow = nFath + nMoth, ncol = ncol(datamatrix))
+    addedParents = matrix("0", nrow = nFath + nMoth, ncol = NC)
     allelematrix = rbind(datamatrix, addedParents)
 
-    p = cbind(p, allelematrix, stringsAsFactors = FALSE, deparse.level = 1)
+    p = cbind(p, allelematrix, stringsAsFactors = FALSE)
   }
 
   ### Part 3: marker attributes

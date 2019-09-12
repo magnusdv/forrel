@@ -32,8 +32,8 @@ test_that("Familias2ped() converts a list of singletons", {
                               '_comp2' = singleton(2, famid='_comp2'),
                               '_comp3' = singleton(1, sex=2, famid='_comp3')))
 
-  #datamatrix = data.frame(m1.1 = c(1,"A",NA), m1.2 = c(1,"B",1), row.names = 1:3)
-  #ped = Familias2ped(famped, datamatrix, NULL)
+  datamatrix = data.frame(m1.1 = c(1,"A",NA), m1.2 = c(1,"B",1), row.names = 1:3)
+  expect_error(Familias2ped(famped, datamatrix, NULL), NA)
 })
 
 test_that("Familias2ped() converts a single singleton", {
@@ -88,3 +88,29 @@ test_that("readFamiliasLoci() works", {
 
 })
 
+test_that("Complete Familias2ped example", {
+  data(NorwegianFrequencies, package = "Familias")
+  loci = lapply(NorwegianFrequencies[1:2], Familias::FamiliasLocus)
+
+  ped = Familias::FamiliasPedigree(
+    id = c('mother', 'daughter', 'AF'),
+    dadid = c(NA, 'AF', NA),
+    momid = c(NA, 'mother', NA),
+    sex   = c('female', 'female', 'male'))
+
+  datamatrix = data.frame(
+    TH01.1 = c(NA, 8, NA),
+    TH01.2 = c(NA, 9.3, NA),
+    row.names = ped$id)
+
+  expect_identical(Familias2ped(ped, datamatrix, loci[2]),
+                   Familias2ped(ped, datamatrix, loci, matchLoci = T))
+
+  datamatrix2 = cbind(datamatrix,
+                     D3S1358.1 = c(10, 11, 12),
+                     D3S1358.2 = c(12, 11, 10))
+
+  expect_identical(Familias2ped(ped, datamatrix2, loci, matchLoci = T),
+                   Familias2ped(ped, datamatrix2, loci[2:1], matchLoci = T))
+
+})

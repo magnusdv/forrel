@@ -5,7 +5,7 @@
 \alias{readFamiliasLoci}
 \title{Convert \code{Familias} objects to \code{ped} format}
 \usage{
-Familias2ped(familiasped, datamatrix, loci)
+Familias2ped(familiasped, datamatrix, loci, matchLoci = FALSE)
 
 readFamiliasLoci(loci)
 }
@@ -16,6 +16,13 @@ readFamiliasLoci(loci)
 allele) and one row per individual.}
 
 \item{loci}{A \code{\link[Familias:FamiliasLocus]{Familias::FamiliasLocus()}} object or a list of such.}
+
+\item{matchLoci}{A logical. If TRUE, the column names of \code{datamatrix} must be
+found either within \code{names(loci)} or within the \code{name} entries of \code{loci}.
+The column names of \code{datamatrix} are assumed to come in pairs with
+suffixes ".1" and ".2", e.g. "TH01.1", "TH01.2", etc.
+If FALSE (the default) it is assumed that the \code{loci} correspond to the (pairs
+of) columns in \code{datamatrix} sequentially.}
 }
 \value{
 A \code{ped} object, or a list of such.
@@ -56,7 +63,7 @@ if (requireNamespace("Familias", quietly = TRUE)) {
     TH01.2 = c(NA, 9.3, NA),
     row.names = ped$id)
 
-  Familias2ped(ped, datamatrix, loci = TH01)
+  Familias2ped(ped, datamatrix, loci = list(TH01))
 }
 
 }
