@@ -114,3 +114,28 @@ test_that("Complete Familias2ped example", {
                    Familias2ped(ped, datamatrix2, loci[2:1], matchLoci = T))
 
 })
+
+test_that("Another complete Familias example", {
+
+  # Familias pedigree which gave bug in Familias2ped
+  ped1 = Familias::FamiliasPedigree(id = c("AF", "CH"), dadid = c(NA, "AF"),
+                                    momid = c(NA,NA), sex = c("male", "male"))
+  pedigrees = list(ped1)
+
+  locus1 = Familias::FamiliasLocus(frequencies=c(0.1, 0.9), name="S", allelenames=c("1","2"))
+  loci = list(locus1)
+
+  datamatrix = data.frame(locus1.1 = c("1","2"), locus1.2 = c("2","2"))
+  rownames(datamatrix) = ped1$id
+
+  # Convert
+  x = Familias2ped(pedigrees, datamatrix, loci)
+  x1 = x[[1]]
+
+  # Should equal this:
+  y = nuclearPed(fa = "AF", mo = "added_1", child = "CH")
+  y = setMarkers(y, marker(y, AF = 1:2, CH = 2, name = "S", afreq = c(`1`=.1, `2`=.9)))
+  y = reorderPed(y, c(1,3,2))
+
+  expect_identical(x1, y)
+})

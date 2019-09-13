@@ -98,6 +98,10 @@ Familias2ped = function(familiasped, datamatrix, loci, matchLoci = FALSE) {
   ### Part2: datamatrix
 
   if (!is.null(datamatrix)) {
+
+    # Matrices are safer to manipulate
+    datamatrix = as.matrix(datamatrix)
+
     NC = ncol(datamatrix)
 
     if(matchLoci && is.null(colnames(datamatrix)))
@@ -106,18 +110,15 @@ Familias2ped = function(familiasped, datamatrix, loci, matchLoci = FALSE) {
 
       if(NC != 2 * length(loci))
         stop2("When `matchLoci is FALSE, the number of columns in `datamatrix` must be `2*length(loci)`")
-      colnames(datamatrix) = rep(NA, NC)
+      colnames(datamatrix) = rep(NA, NC) # needed to avoid wrong names in cbind later!
     }
 
-    # sort datamatrix according to ped order
+    # extract and sort relevant part of datamatrix
     id_idx = match(familiasped$id, rownames(datamatrix))
     if (anyNA(id_idx))
-      stop2("ID label not found among the datamatrix rownames: ", setdiff(familiasped$id, rownames(datamatrix)))
+      stop2("ID label not found among the datamatrix rownames: ",
+            setdiff(familiasped$id, rownames(datamatrix)))
     datamatrix = datamatrix[id_idx, , drop = FALSE]
-
-    # convert from factor/numeric to character
-    if(is.data.frame(datamatrix))
-      datamatrix[] = lapply(datamatrix, as.character)
 
     # replace NA with 0
     datamatrix[is.na(datamatrix)] = "0"
