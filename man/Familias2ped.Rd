@@ -41,7 +41,7 @@ stricter definition of a \emph{pedigree}. In \code{pedtools} pedigrees must be
 connected, and each member must have either 0 or 2 parents present in the
 pedigree. None of this is required by \code{FamiliasPedigree} objects. The
 conversion function \code{Familias2ped} takes care of all potential differences:
-It converts each FamiliasPedigree into a list of connected ped objects,
+It converts each Familias pedigree into a list of connected \code{ped} objects,
 adding missing parents where needed.
 }
 \examples{

@@ -18,7 +18,7 @@
 #'
 #' As shown in (Thompson, 1976) points in the subset of the triangle defined by
 #' \eqn{4\kappa_0\kappa_2 > \kappa_1^2}{4*\kappa0*\kappa2 > \kappa1^2} is unattainable for pairwise
-#' relationships.  By default this region in shaded in a 'lightgray' color.
+#' relationships.  By default this region in shaded in a 'lightgray' colour.
 #'
 #' The IBD coefficients are linearly related to the kinship coefficient
 #' \eqn{\phi} by the formula
@@ -40,7 +40,7 @@
 #' @param relationships A character vector indicating relationships points to be
 #'   included in the plot. See Details for a list of valid entries.
 #' @param kinship.lines A numeric vector. (See Details.)
-#' @param shading The shading color for the unattainable region.
+#' @param shading The shading colour for the unattainable region.
 #' @param pch Symbol used for the relationship points (see [par()]).
 #' @param cex_points A number controlling the symbol size for the
 #'   relationship points.
@@ -130,7 +130,7 @@ IBDtriangle = function(relationships = c("UN", "PO", "MZ", "S", "H,U,G", "FC"),
 #' Utility function for plotting points in the IBD triangle.
 #'
 #' @param k0,k2 Numerical vectors giving coordinates for points to be plotted in
-#'   the IBDtriangle. Alternatively, `k0` may be a data.frame containing columns
+#'   the IBD triangle. Alternatively, `k0` may be a data.frame containing columns
 #'   named `k0` and `k2`.
 #' @param new Logical indicating if a new IBDtriangle should be drawn.
 #' @param col,cex,pch,lwd Parameters passed onto [points()].

@@ -1,24 +1,26 @@
 #' Likelihood ratios of pedigree hypotheses
 #'
 #' This function computes likelihood ratios for a given a list of pedigrees
-#' (ped/singletons objects), one of which is the 'reference', with genotype data
-#' from the same set of markers. Data exported from the 'Familias' software can
-#' be analysed by using [Familias2ped()] prior to calling this function.
+#' (`ped` and/or `singleton` objects), with genotype data from the same set of
+#' markers. Data exported from the 'Familias' software can be analysed by using
+#' [Familias2ped()] prior to calling this function.
 #'
-#' @param x A list of pedigrees. Each pedigree is either a single ped/singleton
-#'   object, or a list of such objects.
-#' @param ref A single integer, indicating the index of the reference pedigree.
-#'   This is used in the denominator of each LR.
+#' @param x A list of pedigree alternatives. Each alternative should be either a
+#'   single `ped` object or a list of such.
+#' @param ref A single integer, indicating the index (in the list `x`) of the
+#'   reference alternative. This is used in the denominator of each LR.
 #' @param markers A vector of integers, indexing which markers should be
 #'   included. If NULL (the default) all markers are used.
 #'
-#' @return
-#' A list with entries
+#' @return A list with entries
 #'
-#' * `LR` : Likelihood ratios
-#' * `LRperMarker` : Likelihood ratios for each marker
-#' * `likelihoodsPerSystem` : Likelihoods for each marker
-#' * `time` user system and elapsed time
+#'   * `LR` : Likelihood ratios
+#'
+#'   * `LRperMarker` : Likelihood ratios for each marker
+#'
+#'   * `likelihoodsPerSystem` : Likelihoods for each marker
+#'
+#'   * `time` user system and elapsed time
 #'
 #' @author Magnus Dehli Vigeland and Thore Egeland
 #'

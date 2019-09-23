@@ -17,7 +17,7 @@ included in the plot. See Details for a list of valid entries.}
 
 \item{kinship.lines}{A numeric vector. (See Details.)}
 
-\item{shading}{The shading color for the unattainable region.}
+\item{shading}{The shading colour for the unattainable region.}
 
 \item{pch}{Symbol used for the relationship points (see \code{\link[=par]{par()}}).}
 
@@ -55,7 +55,7 @@ authors have used different views of the triangle).
 
 As shown in (Thompson, 1976) points in the subset of the triangle defined by
 \eqn{4\kappa_0\kappa_2 > \kappa_1^2}{4*\kappa0*\kappa2 > \kappa1^2} is unattainable for pairwise
-relationships.  By default this region in shaded in a 'lightgray' color.
+relationships.  By default this region in shaded in a 'lightgray' colour.
 
 The IBD coefficients are linearly related to the kinship coefficient
 \eqn{\phi} by the formula

@@ -1,14 +1,18 @@
 Package: forrel
 Type: Package
-Title: Relatedness Inference and Forensic Pedigree Analysis
+Title: Forensic Pedigree Analysis and Relatedness Inference
 Version: 0.1.0
 Authors@R: person("Magnus Dehli", "Vigeland", email = "m.d.vigeland@medisin.uio.no", 
-                  role = c("aut", "cre"))
+                  role = c("aut", "cre"), comment = c(ORCID = "0000-0002-9134-4962"))
 Description: Forensic applications of pedigree analysis, including marker simulation,
-    relatedness inference and exclusion probailities. Data import from the Familias
-    software is fully supported.
+    relatedness inference and exclusion probabilities. The package supports data 
+    import from the Familias software (Egeland et al. (2000) 
+    <doi:https://doi.org/10.1016/S0379-0738(00)00147-X>).  Data import from the Familias
+    software is fully supported. The computation of exclusion powers is based on Egeland 
+    et al. (2014) <doi:10.1016/j.fsigen.2013.05.001>.
 License: GPL-3
 Encoding: UTF-8
+Language: en-GB
 LazyData: true
 Depends: R (>= 3.1.0),
     pedtools

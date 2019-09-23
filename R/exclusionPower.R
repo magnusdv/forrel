@@ -6,12 +6,11 @@
 #' This function computes the 'Power of exclusion', as defined and discussed in
 #' (Egeland et al., 2014).
 #'
-#' @param ped_claim a `ped` object, or a list of several ped and/or singleton
-#'   objects, describing the claimed relationship. If a list, the sets of ID
-#'   labels must be disjoint, that is, all ID labels must be unique.
-#' @param ped_true a `ped` object, or a list of several ped and/or singleton
-#'   objects, describing the true relationship. ID labels must be consistent
-#'   with `ped_claim`.
+#' @param ped_claim a `ped` object, or a list of several such objects,
+#'   describing the claimed relationship. If a list, the sets of ID labels must
+#'   be disjoint, that is, all ID labels must be unique.
+#' @param ped_true a `ped` object, or a list of several such objects, describing
+#'   the true relationship. ID labels must be consistent with `ped_claim`.
 #' @param ids individuals available for genotyping.
 #' @param markerindex NULL, or a single numeric indicating the index of a marker
 #'   of `ped_claim` from which `alleles`, `afreq` and `known_genotypes` will be
@@ -36,9 +35,9 @@
 #'
 #' @author Magnus Dehli Vigeland
 #'
-#' @references T. Egeland, N. Pinto and M. D. Vigeland, *A general approach to
+#' @references T. Egeland, N. Pinto and M.D. Vigeland, *A general approach to
 #'   power calculation for relationship testing.* Forensic Science
-#'   International: Genetics 9 (2014): 186-190. DOI:10.1016/j.fsigen.2013.05.001
+#'   International: Genetics 9 (2014): 186-190. doi:10.1016/j.fsigen.2013.05.001
 #'
 #' @examples
 #'

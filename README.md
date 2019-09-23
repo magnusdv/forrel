@@ -17,7 +17,7 @@ The most important analyses currently supported by forrel are:
 Installation
 ------------
 
-To get the lastest version, install from GitHub as follows:
+To get the latest version, install from GitHub as follows:
 
 ``` r
  # First install devtools if needed

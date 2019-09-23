@@ -9,13 +9,12 @@ exclusionPower(ped_claim, ped_true, ids, markerindex = NULL,
   Xchrom = FALSE, plot = TRUE, verbose = T)
 }
 \arguments{
-\item{ped_claim}{a \code{ped} object, or a list of several ped and/or singleton
-objects, describing the claimed relationship. If a list, the sets of ID
-labels must be disjoint, that is, all ID labels must be unique.}
+\item{ped_claim}{a \code{ped} object, or a list of several such objects,
+describing the claimed relationship. If a list, the sets of ID labels must
+be disjoint, that is, all ID labels must be unique.}
 
-\item{ped_true}{a \code{ped} object, or a list of several ped and/or singleton
-objects, describing the true relationship. ID labels must be consistent
-with \code{ped_claim}.}
+\item{ped_true}{a \code{ped} object, or a list of several such objects, describing
+the true relationship. ID labels must be consistent with \code{ped_claim}.}
 
 \item{ids}{individuals available for genotyping.}
 
@@ -144,9 +143,9 @@ stopifnot(round(c(PE7,PE8), 5) == c(0.07617, 0.03457))
 
 }
 \references{
-T. Egeland, N. Pinto and M. D. Vigeland, \emph{A general approach to
+T. Egeland, N. Pinto and M.D. Vigeland, \emph{A general approach to
 power calculation for relationship testing.} Forensic Science
-International: Genetics 9 (2014): 186-190. DOI:10.1016/j.fsigen.2013.05.001
+International: Genetics 9 (2014): 186-190. doi:10.1016/j.fsigen.2013.05.001
 }
 \author{
 Magnus Dehli Vigeland

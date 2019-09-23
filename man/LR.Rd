@@ -7,11 +7,11 @@
 LR(x, ref, markers)
 }
 \arguments{
-\item{x}{A list of pedigrees. Each pedigree is either a single ped/singleton
-object, or a list of such objects.}
+\item{x}{A list of pedigree alternatives. Each alternative should be either a
+single \code{ped} object or a list of such.}
 
-\item{ref}{A single integer, indicating the index of the reference pedigree.
-This is used in the denominator of each LR.}
+\item{ref}{A single integer, indicating the index (in the list \code{x}) of the
+reference alternative. This is used in the denominator of each LR.}
 
 \item{markers}{A vector of integers, indexing which markers should be
 included. If NULL (the default) all markers are used.}
@@ -27,9 +27,9 @@ A list with entries
 }
 \description{
 This function computes likelihood ratios for a given a list of pedigrees
-(ped/singletons objects), one of which is the 'reference', with genotype data
-from the same set of markers. Data exported from the 'Familias' software can
-be analysed by using \code{\link[=Familias2ped]{Familias2ped()}} prior to calling this function.
+(\code{ped} and/or \code{singleton} objects), with genotype data from the same set of
+markers. Data exported from the 'Familias' software can be analysed by using
+\code{\link[=Familias2ped]{Familias2ped()}} prior to calling this function.
 }
 \examples{
 

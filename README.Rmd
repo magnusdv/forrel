@@ -27,7 +27,7 @@ The most important analyses currently supported by forrel are:
 * Conversion of `Familias` objects to `pedtools::ped` objects
 
 ## Installation
-To get the lastest version, install from GitHub as follows:
+To get the latest version, install from GitHub as follows:
 
 ```{r, eval = FALSE}
  # First install devtools if needed

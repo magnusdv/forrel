@@ -2,5 +2,6 @@
 .Rhistory
 .RData
 .Ruserdata
+notes-private
 R/examineKinships.R
 R/relationLR.R

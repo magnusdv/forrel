@@ -10,7 +10,7 @@ showInTriangle(k0, k2 = NULL, new = T, col = "blue", cex = 1,
 }
 \arguments{
 \item{k0, k2}{Numerical vectors giving coordinates for points to be plotted in
-the IBDtriangle. Alternatively, \code{k0} may be a data.frame containing columns
+the IBD triangle. Alternatively, \code{k0} may be a data.frame containing columns
 named \code{k0} and \code{k2}.}
 
 \item{new}{Logical indicating if a new IBDtriangle should be drawn.}

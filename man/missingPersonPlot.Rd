@@ -28,7 +28,7 @@ missingPersonPlot(reference, missing, id.labels = labels(reference),
 \item{shaded}{A vector of ID labels indicating who should appear with shaded
 symbols. By default, all typed members.}
 
-\item{POI.col}{The plot color of POI. Default: red}
+\item{POI.col}{The plot colour of POI. Default: red}
 
 \item{POI.shaded}{A logical: If TRUE (default), the POI is plotted with a
 shaded symbol}
@@ -68,7 +68,7 @@ computing the likelihood ratio of the following hypotheses:
 }
 
 The goal of this function is to illustrate the above hypotheses, using
-labels, colors and shading to visualise the different aspects of the situation.
+labels, colours and shading to visualise the different aspects of the situation.
 
 This function cannot handle cases with more complicated hypotheses (e.g.
 multiple missing persons, or where H2 specifies a different relationship).

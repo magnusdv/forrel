@@ -21,7 +21,7 @@
 #' * H2: POI is unrelated to the family
 #'
 #' The goal of this function is to illustrate the above hypotheses, using
-#' labels, colors and shading to visualise the different aspects of the situation.
+#' labels, colours and shading to visualise the different aspects of the situation.
 #'
 #' This function cannot handle cases with more complicated hypotheses (e.g.
 #' multiple missing persons, or where H2 specifies a different relationship).
@@ -38,7 +38,7 @@
 #' @param marker Optional vector of marker indices to be included in the plot
 #' @param shaded A vector of ID labels indicating who should appear with shaded
 #'   symbols. By default, all typed members.
-#' @param POI.col The plot color of POI. Default: red
+#' @param POI.col The plot colour of POI. Default: red
 #' @param POI.shaded A logical: If TRUE (default), the POI is plotted with a
 #'   shaded symbol
 #' @param POI.height A numeric controlling the vertical placement of the POI
@@ -105,7 +105,7 @@ missingPersonPlot = function(reference, missing, id.labels = labels(reference),
   else
     labs = c(mp_label, id.labels[id.labels != missing])
 
-  # Color MP = POI red
+  # Colour MP = POI red
   col1 = list(red = missing)
 
   # Shading
