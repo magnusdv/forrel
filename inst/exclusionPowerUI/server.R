@@ -173,6 +173,7 @@ shinyServer(function(input, output, session) {
     }
   })
 
+  # update the frequency table preview when new frequencies are loaded
   observe({
     callModule(tabularDataPreview, 'frequencies',
                id = 'frequencies',
@@ -180,6 +181,7 @@ shinyServer(function(input, output, session) {
                title = 'Frequency data used for calculation')
   })
 
+  # show the reference data preview
   callModule(tabularDataPreview, 'references',
              id = 'references',
              df = references(),

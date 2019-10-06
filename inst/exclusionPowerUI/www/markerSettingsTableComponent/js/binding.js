@@ -1,7 +1,8 @@
 let binding = new Shiny.InputBinding();
 
+const mutModels = ['None'];
+
 const buildMutationModelSelect = function(marker) {
-  const mutModels = ['None'];
   let ret = '<select class="mutationModel-select">';
   mutModels.forEach(function(model) {
     if (model == marker.mutationModel)

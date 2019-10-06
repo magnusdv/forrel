@@ -34,6 +34,10 @@ getOrAttachMarker = function(ped, markerName) {
   }
 }
 
+#' Get the names of the markers in a pedigree as a list of strings
+#'
+#' @param ped a `ped` object, or a list of such
+#' @return a list of marker names as strings
 getMarkerNames = function(ped) {
   if (is.pedList(ped)) {
     return(getMarkerNames(ped[[1]]))
@@ -42,6 +46,11 @@ getMarkerNames = function(ped) {
   as.vector(lapply(ped$markerdata, function(item) attr(item, 'name')), mode = 'character')
 }
 
+#' Returns the union over all markers in a pedigree of the possible alleles on
+#' each marker.
+#'
+#' @param ped a `ped` object or a list of such
+#' @return a list of strings
 allAlleles = function(ped) {
   if (is.pedList(ped)) {
     return(allAlleles(ped[[1]]))
@@ -55,6 +64,14 @@ allAlleles = function(ped) {
   sort(list)
 }
 
+#' Extracts allele frequencies and denominations from a pedigree and returns
+#' them in a matrix-like format, where there is one column per marker and one
+#' row per allele. Alleles which do not occur on a marker have frequency 0 or
+#' NA.
+#'
+#' @param ped a `ped` object, or a list of such. If this parameter is a list,
+#'   the data is extracted from the first pedigree only.
+#' @return a [data.frame] with one marker per column and one allele per row.
 getTabularFrequencyDb = function(ped) {
   if (is.pedList(ped)) {
     return(getTabularFrequencyDb(ped[[1]]))
@@ -82,10 +99,21 @@ getTabularFrequencyDb = function(ped) {
   as.data.frame(df[2:ncol(df)], row.names = as.vector(df[[1]], mode = 'character'))
 }
 
+#' Returns true if any of the markers in pedigree is defined for the given ID.
+#'
+#' @param ped a `ped` object
+#' @param id a string identifying a member of the pedigree
+#' @return TRUE if the individual is genotyped, FALSE otherwise.
 isGenotyped = function(ped, id) {
   any(!is.na(getAlleles(ped, ids = c(id))))
 }
 
+#' Returns a list of the individuals in the given pedigree that are genotyped as
+#' defined by the function [isGenotyped()], i.e. the list of individuals for
+#' which the function [isGenotyped()] returns TRUE.
+#'
+#' @param ped a `ped` object, or a list of such.
+#' @return a list of ids (strings) of the genotyped individuals.
 getGenotypedIds = function(ped) {
   if (is.pedList(ped)) {
     g = c()
