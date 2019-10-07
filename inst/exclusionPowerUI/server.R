@@ -88,12 +88,16 @@ shinyServer(function(input, output, session) {
         if (isTruthy(frequencyDB())) {
           ped = attachAlleleFrequenciesToPedigree(ped,
                                                   df = frequencyDB())
+          print("triggered from frequency source")
+          updateMarkerSettingsTable(session, 'markerSettings', ped)
         }
       },
       'fam' = {
         if (isTruthy(input$familiasFrequencyFile)) {
           ped = attachAlleleFrequenciesToPedigree.familias(ped,
                                                            input$familiasFrequencyFile$datapath)
+          print("triggered from familias source")
+          updateMarkerSettingsTable(session, 'markerSettings', ped)
         }
       }
     )
@@ -112,7 +116,7 @@ shinyServer(function(input, output, session) {
       }
     )
 
-    ped = attachLocusAttributesToPedigree(ped, markerSettings())
+    #ped = attachLocusAttributesToPedigree(ped, markerSettings())
 
     ped
   })
@@ -188,9 +192,9 @@ shinyServer(function(input, output, session) {
              title = 'Reference data used for calculation')
 
   # update list of sex-linked markers when new allele denomination data becomes available
-  observe({
-    updateMarkerSettingsTable(session, 'markerSettings', computedClaimPed())
-  })
+  # observe({
+  #   updateMarkerSettingsTable(session, 'markerSettings', computedClaimPed())
+  # })
 
   # compute exclusion power
   output$exclusionPowerResults <- renderTable({

@@ -92,7 +92,7 @@ shinyUI(fluidPage(
                  p(strong('Marker settings')),
                  fluidRow(
                    column(12,
-                          markerSettingsTable('markerSettings', pedToMarkerSettingsState(NULL)))
+                          markerSettingsTable('markerSettings'))
                  )),
 
         ### Results: exclusion power calculation

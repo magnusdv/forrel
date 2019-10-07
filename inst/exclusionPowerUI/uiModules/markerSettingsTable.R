@@ -57,6 +57,7 @@ markerSettingsTable = function(inputId) {
 # send an input message to the client-side widget with new marker data when the
 # user updates another part of the input.
 updateMarkerSettingsTable = function(session, inputId, ped) {
+  print("updating")
   session$sendInputMessage(inputId, pedToMarkerSettingsState(ped))
 }
 
