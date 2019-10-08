@@ -13,7 +13,7 @@ is_number = function(x, minimum = NA, maximum = NA) {
 }
 
 pluralise = function(noun, n) {
-  if(n==1) noun else sprintf("%ss", noun)
+  if(n == 1) noun else sprintf("%ss", noun)
 }
 
 .mysetdiff = function(x, y) {

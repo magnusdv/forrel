@@ -43,7 +43,7 @@ computations are done.}
 \item{verbose}{a logical.}
 }
 \value{
-A single numeric value. If \code{plot='plot_only'}, the function returns
+A single numeric value. If \code{plot = "plot_only"}, the function returns
 NULL after producing the plot.
 }
 \description{
@@ -86,7 +86,7 @@ PE2 = exclusionPower(claim, true, ids = ids, alleles = als, afreq = afreq,
 PE3 = exclusionPower(claim, true, ids = ids, alleles = als, afreq = afreq,
                      Xchrom = TRUE)
 
-stopifnot(PE1==0.125, PE2==0.25, PE3==0.25)
+stopifnot(PE1 == 0.125, PE2 == 0.25, PE3 == 0.25)
 
 ############################################
 ### Example from Egeland et al. (2012):
@@ -111,7 +111,7 @@ PE3 = exclusionPower(ped_claim = mother_daughter, ped_true = sisters, ids = c(2,
 
 # Tetra-allelic marker with one major allele:
 PE4 = exclusionPower(ped_claim = mother_daughter, ped_true = sisters, ids = c(2, 3),
-                     alleles = 4, afreq=c(0.7, 0.1, 0.1, 0.1))
+                     alleles = 4, afreq = c(0.7, 0.1, 0.1, 0.1))
 
 stopifnot(round(c(PE1,PE2,PE3,PE4), 5) == c(0.03125, 0.00405, 0.08203, 0.03090))
 

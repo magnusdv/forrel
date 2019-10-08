@@ -21,11 +21,11 @@ included in the plot. See Details for a list of valid entries.}
 
 \item{pch}{Symbol used for the relationship points (see \code{\link[=par]{par()}}).}
 
-\item{cex_points}{A number controlling the symbol size for the
-relationship points.}
+\item{cex_points}{A number controlling the symbol size for the relationship
+points.}
 
-\item{cex_text}{A number controlling the font size for the
-relationship labels.}
+\item{cex_text}{A number controlling the font size for the relationship
+labels.}
 
 \item{axes}{A logical: Draw surrounding axis box?}
 
@@ -37,33 +37,37 @@ relationship labels.}
 }
 \description{
 The IBD triangle is typically used to visualize the pairwise relatedness of
-non-inbred individuals.  Various annotations are available, including points
+non-inbred individuals. Various annotations are available, including points
 marking the most common relationships, contour lines for the kinship
 coefficients, and shading of the unattainable region.
 }
 \details{
 For any pair of non-inbred individuals A and B, their genetic relationship
 can be summarized by the IBD coefficients \eqn{(\kappa_0, \kappa_1,
-\kappa_2)}{(\kappa0, \kappa1, \kappa2)}, where \deqn{\kappa_i = P(A and B share i alleles IBD at random
-autosomal locus).} Since \eqn{\kappa_0+\kappa_1+\kappa_2=1}{\kappa0 + \kappa1 + \kappa2=1}, any relationship
+\kappa_2)}{(\kappa0, \kappa1, \kappa2)}, where \deqn{\kappa_i = P(A and B
+share i alleles IBD at random autosomal locus).} Since \eqn{\kappa_0 +
+\kappa_1 + \kappa_2 = 1}{\kappa0 + \kappa1 + \kappa2 = 1}, any relationship
 corresponds to a point in the triangle in the \eqn{(\kappa_0,
-\kappa_2)}{(\kappa0, \kappa2)}-plane defined by \eqn{\kappa_0 \ge 0, \kappa_2 \ge 0, \kappa_0 +
-\kappa_2 \le 1}{\kappa0 \ge 0, \kappa2 \ge 0, \kappa0 + \kappa2 \le 1}. The choice of
-\eqn{\kappa_0}{\kappa0} and \eqn{\kappa_2}{\kappa2} as the axis
-variables is done for reasons of symmetry and is not significant (other
-authors have used different views of the triangle).
+\kappa_2)}{(\kappa0, \kappa2)}-plane defined by \eqn{\kappa_0 \ge 0, \kappa_2
+\ge 0, \kappa_0 + \kappa_2 \le 1}{\kappa0 \ge 0, \kappa2 \ge 0, \kappa0 +
+\kappa2 \le 1}. The choice of \eqn{\kappa_0}{\kappa0} and
+\eqn{\kappa_2}{\kappa2} as the axis variables is done for reasons of symmetry
+and is not significant (other authors have used different views of the
+triangle).
 
 As shown in (Thompson, 1976) points in the subset of the triangle defined by
-\eqn{4\kappa_0\kappa_2 > \kappa_1^2}{4*\kappa0*\kappa2 > \kappa1^2} is unattainable for pairwise
-relationships.  By default this region in shaded in a 'lightgray' colour.
+\eqn{4\kappa_0\kappa_2 > \kappa_1^2}{4*\kappa0*\kappa2 > \kappa1^2} is
+unattainable for pairwise relationships. By default this region in shaded in
+a 'lightgray' colour.
 
 The IBD coefficients are linearly related to the kinship coefficient
-\eqn{\phi} by the formula
-\deqn{\phi = 0.25\kappa_1 + 0.5\kappa_2.}{\phi = 0.25*\kappa1 + 0.5*\kappa2.} By
-indicating values for \eqn{\phi} in the \code{kinship.lines} argument, the
-corresponding contour lines are shown as dashed lines in the triangle plot.
+\eqn{\phi} by the formula \deqn{\phi = 0.25\kappa_1 + 0.5\kappa_2.}{\phi =
+0.25*\kappa1 + 0.5*\kappa2.} By indicating values for \eqn{\phi} in the
+\code{kinship.lines} argument, the corresponding contour lines are shown as dashed
+lines in the triangle plot.
 
-The following abbreviations are valid entries in the \code{relationships} argument:
+The following abbreviations are valid entries in the \code{relationships}
+argument:
 \itemize{
 \item UN = unrelated
 \item PO = parent/offspring
@@ -80,13 +84,13 @@ The following abbreviations are valid entries in the \code{relationships} argume
 
 IBDtriangle()
 
-IBDtriangle(kinship=c(0.25, 0.125), shading=NULL, cex_text=0.8)
+IBDtriangle(kinship = c(0.25, 0.125), shading = NULL, cex_text = 0.8)
 
 }
 \references{
 \itemize{
-\item E. A. Thompson (1975). \emph{The estimation of pairwise
-relationships.} Annals of Human Genetics 39.
+\item E. A. Thompson (1975). \emph{The estimation of pairwise relationships.} Annals
+of Human Genetics 39.
 \item E. A. Thompson (1976). \emph{A restriction on the space of genetic
 relationships.} Annals of Human Genetics 40.
 }

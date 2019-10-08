@@ -46,7 +46,7 @@ unrel = list(singleton("A"), singleton("B"))
 unrel = transferMarkers(sibs, unrel)
 
 # Compute LR with 'unrelated' as reference
-LR(list(sibs, halfsibs, unrel), ref=3)
+LR(list(sibs, halfsibs, unrel), ref = 3)
 
 }
 \author{

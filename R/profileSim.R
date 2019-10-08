@@ -23,7 +23,7 @@
 #' x = nuclearPed(children = c("B1", "B2"))
 #'
 #' m1 = marker(x, B1 = 1:2, alleles = 1:3, afreq = c(.2, .3, .5))
-#' m2 = marker(x, B1 = 4, alleles = 1:4, afreq = c(.1,.2,.3,.4))#, chrom="X")
+#' m2 = marker(x, B1 = 4, alleles = 1:4, afreq = c(.1,.2,.3,.4))#, chrom = "X")
 #'
 #' # These contain the profile of B1
 #' cond = list(m1, m2)
@@ -71,7 +71,7 @@ profileSim = function(x, N = 1, ids = NULL, conditions = NULL, seed = NULL, ...)
 
   # Iterate over the loci, make N simulations of each.
   sims_markerwise = lapply(conditions, function(pm)
-      markerSim(x, N = N, ids = ids, partialmarker = pm, verbose=F, ...))
+      markerSim(x, N = N, ids = ids, partialmarker = pm, verbose = F, ...))
 
   # Transpose: Extract i'th marker from each sim above.
   # Output: List of length N, each with length(conditions) markers

@@ -39,7 +39,7 @@
 #' unrel = transferMarkers(sibs, unrel)
 #'
 #' # Compute LR with 'unrelated' as reference
-#' LR(list(sibs, halfsibs, unrel), ref=3)
+#' LR(list(sibs, halfsibs, unrel), ref = 3)
 #'
 #' @export
 LR = function(x, ref, markers) {
@@ -59,7 +59,7 @@ LR = function(x, ref, markers) {
       return(lapply(a, breaklp))
     if(is.singleton(a))
       return(a)
-    breakLoops(a, verbose=F)
+    breakLoops(a, verbose = F)
   }
 
   x_loopfree = lapply(x, breaklp)

@@ -156,7 +156,7 @@ readFam = function(famfile) {
   nLoc = as.integer(x[db.line])
   checkInt(nLoc, "number of loci")
 
-  has.info = x[db.line + 1] =="#TRUE#"
+  has.info = x[db.line + 1] == "#TRUE#"
   if(has.info)
     message("Database info: ", x[db.line + 2])
 
@@ -229,7 +229,7 @@ readFam = function(famfile) {
     }
 
     # Initalise data matrix
-    dmn = list(id[seq_len(nid)], paste(rep(loc.names, each=2), 1:2, sep="."))
+    dmn = list(id[seq_len(nid)], paste(rep(loc.names, each = 2), 1:2, sep = "."))
     datamatrix = matrix(NA_character_, nrow = nid, ncol = 2*nLoc, dimnames = dmn)
 
     # Fill in observed alleles

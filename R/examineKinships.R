@@ -25,7 +25,7 @@
 #' @examples
 #' library(pedtools)
 #' x = cousinPed(1)
-#' x = simpleSim(x, 500, alleles=1:2)
+#' x = simpleSim(x, 500, alleles = 1:2)
 #' examineKinships(x)
 #'
 #' # Pretend we didn't know the brothers (3 and 6) were related
@@ -37,7 +37,8 @@
 #' examineKinships(list(x1, x2))
 #'
 #'
-examineKinships = function(x, who = "all", interfam = c("founders", "none", "all"), makeplot = T, pch=4, ...) {
+examineKinships = function(x, who = "all", interfam = c("founders", "none", "all"),
+                           makeplot = T, pch = 4, ...) {
 
     pedList = is.pedList(x)
 
@@ -64,11 +65,11 @@ examineKinships = function(x, who = "all", interfam = c("founders", "none", "all
             plot(x, av = T, cex = 0.8, title = "", margins = c(marg, 1, marg, 1))
         }
         else if (is.pedList(x))
-            cat("Warning: Automatic plotting is not implemented when 'x' is a list of ped objects. Use plotPedList().\n")
+            warnings("Automatic plotting is not implemented when 'x' is a list of ped objects. Use plotPedList().")
 
         IBDtriangle(relationships = c("UN", "PO", "MZ", "S", "H,U,G", "FC", "SC"))
-        legend("topright", title=" According to pedigree:", title.adj=0, pch=pch, lwd=2, lty=NA,
-            legend=group_txt[use_groups], col=group_col[use_groups])
+        legend("topright", title = " According to pedigree:", title.adj = 0, pch = pch,
+               lwd = 2, lty = NA, legend = group_txt[use_groups], col = group_col[use_groups])
     }
 
     P = CO = S = G = U = D = NULL
@@ -77,12 +78,12 @@ examineKinships = function(x, who = "all", interfam = c("founders", "none", "all
     if ("parents" %in% use_groups) {
         P = related.pairs(x, "parents", available = T)
         p = IBDestimate(x, P)
-        showInTriangle(p$k0, p$k2, new=F, col=group_col["parents"], pch=pch, ...)
+        showInTriangle(p$k0, p$k2, new = F, col = group_col["parents"], pch = pch, ...)
     }
     if ("siblings" %in% use_groups) {
         S = rbind(related.pairs(x, "siblings", half = F, available = T))
         s = IBDestimate(x, S)
-        showInTriangle(s$k0, s$k2, new=F, col=group_col["siblings"], pch=pch, ...)
+        showInTriangle(s$k0, s$k2, new = F, col = group_col["siblings"], pch = pch, ...)
     }
     if ("cousins" %in% use_groups) {
         CO = rbind(related.pairs(x, "cousins", half = F, available = T),
@@ -90,27 +91,27 @@ examineKinships = function(x, who = "all", interfam = c("founders", "none", "all
                    related.pairs(x, "nephews_nieces", half = T, available = T),
                    related.pairs(x, "nephews_nieces", removal = 2, half = F, available = T))
         co = IBDestimate(x, CO)
-        showInTriangle(co$k0, co$k2, new=F, col=group_col["cousins"], pch=pch, ...)
+        showInTriangle(co$k0, co$k2, new = F, col = group_col["cousins"], pch = pch, ...)
     }
     if ("hugs" %in% use_groups) {
         G = rbind(related.pairs(x, "siblings", half = T, available = T),
                   related.pairs(x, "grandparents", available = T),
                   related.pairs(x, "nephews_nieces", half = F, available = T))
         g = IBDestimate(x, G)
-        showInTriangle(g$k0, g$k2, new=F, col=group_col["hugs"], pch=pch, ...)
+        showInTriangle(g$k0, g$k2, new = F, col = group_col["hugs"], pch = pch, ...)
     }
     if ("unrelated" %in% use_groups) {
         interfam = match.arg(interfam)
         U = rbind(related.pairs(x, "unrelated", available = T, interfam = interfam))
         u = IBDestimate(x, U)
-        showInTriangle(u$k0, u$k2, new=F, col=group_col["unrelated"], pch=pch, ...)
+        showInTriangle(u$k0, u$k2, new = F, col = group_col["unrelated"], pch = pch, ...)
     }
     if ("other" %in% use_groups) {
         rest = t(combn(x$available, 2))
         taken = rbind(P, U, S, G, CO)
         D = rest[!(rest[, 1] * 1000 + rest[, 2]) %in% (taken[, 1] * 1000 + taken[, 2]), , drop = F]
         d = IBDestimate(x, D)
-        showInTriangle(d$k0, d$k2, new=F, col=group_col["other"], pch=pch, ...)
+        showInTriangle(d$k0, d$k2, new = F, col = group_col["other"], pch = pch, ...)
     }
     res = list(parents = p, siblings = s, halfsibs_uncles_grandparents = g,
         cousins = co, other = d, unrelated = u)
@@ -119,7 +120,7 @@ examineKinships = function(x, who = "all", interfam = c("founders", "none", "all
 }
 
 .IBDsuspects = function(x, radius) {
-    # x output from examineKinships, radius=tolerated distance
+    # x output from examineKinships, radius = tolerated distance
 
     extract_distant = function(df, x0, y0, rad) {
         if (is.null(df))

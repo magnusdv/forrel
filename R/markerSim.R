@@ -183,8 +183,8 @@ markerSim = function(x, N = 1, ids = NULL, alleles = NULL, afreq = NULL,
   SEX = x$SEX
   FIDX = x$FIDX
   MIDX = x$MIDX
-  FOU = founders(x, internal=T)
-  NONFOU = nonfounders(x, internal=T)
+  FOU = founders(x, internal = T)
+  NONFOU = nonfounders(x, internal = T)
 
   ##### Determine simulation strategy #### Note: Using original x and m in this section (i.e.
   ##### before loop breaking)
@@ -254,7 +254,7 @@ markerSim = function(x, N = 1, ids = NULL, alleles = NULL, afreq = NULL,
       Brute force conditional simulation: {.printLabels(bruteforce_int)}
       Hardy-Weinberg sampling (founders): {.printLabels(simple.founders_int)}
       Simple gene dropping: {.printLabels(simple.nonfounders_int)}
-      Required likelihood computations:  {min(method2$calls, method3$calls)}
+      Required likelihood computations: {min(method2$calls, method3$calls)}
       \n"))
   }
 
@@ -264,7 +264,7 @@ markerSim = function(x, N = 1, ids = NULL, alleles = NULL, afreq = NULL,
   odd = seq_len(N) * 2 - 1
 
   if (length(joint_int) > 0) {
-    allgenos_row_grid = t.default(pedprobr:::fastGrid(gridlist[joint_int]))  #Cartesian product. Each row contains 'init' row numbers of allgenos.
+    allgenos_row_grid = t.default(pedprobr:::fastGrid(gridlist[joint_int])) # Cartesian product. Each row contains 'init' row numbers of allgenos.
     jointp = apply(allgenos_row_grid, 2, function(rownrs) {
       partial = m
       partial[joint_int, ] = allgenos[rownrs, ]
@@ -304,7 +304,7 @@ markerSim = function(x, N = 1, ids = NULL, alleles = NULL, afreq = NULL,
   }
 
   if (length(simpledrop) > 0) {
-    loopbr_int = internalID(x, x$LOOP_BREAKERS[, 1])  #integer(0) if no loops
+    loopbr_int = internalID(x, x$LOOP_BREAKERS[, 1])  # integer(0) if no loops
     loopbr_dup_int = internalID(x, x$LOOP_BRREAKERS[, 2])
 
     # HW sampling of founders
@@ -590,8 +590,8 @@ simpleSim = function(x, N, alleles, afreq, ids, Xchrom = FALSE,
   FIDX = x$FIDX
   MIDX = x$MIDX
   SEX = x$SEX
-  FOU = founders(x, internal=T)
-  NONFOU = nonfounders(x, internal=T)
+  FOU = founders(x, internal = T)
+  NONFOU = nonfounders(x, internal = T)
   mutations = !is.null(mutmod)
 
   if (!is.null(seed)) set.seed(seed)
@@ -601,7 +601,7 @@ simpleSim = function(x, N, alleles, afreq, ids, Xchrom = FALSE,
   odd = seq_len(N) * 2 - 1
 
   # Sample alleles for the founders
-  variableSNPfreqs = nall==2 && length(afreq) !=2
+  variableSNPfreqs = nall==2 && length(afreq) != 2
   if (variableSNPfreqs)
     fou_alleles = unlist(lapply(afreq, function(f)
       sample.int(2, length(FOU)*2, replace = TRUE, prob = c(f, 1 - f))))
@@ -638,8 +638,8 @@ simpleSim = function(x, N, alleles, afreq, ids, Xchrom = FALSE,
   FIDX = x$FIDX
   MIDX = x$MIDX
   SEX = x$SEX
-  FOU = founders(x, internal=T)
-  NONFOU = nonfounders(x, internal=T)
+  FOU = founders(x, internal = T)
+  NONFOU = nonfounders(x, internal = T)
   mutations = !is.null(mutmod)
 
   # Initialise the marker matrix

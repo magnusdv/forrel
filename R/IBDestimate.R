@@ -57,16 +57,17 @@
 #'
 #' @importFrom maxLik maxLik
 #' @export
-IBDestimate = function(x, ids, markers=NULL, start = c(0.99,0.001), tol=1e-7) {
+IBDestimate = function(x, ids, markers=NULL, start = c(0.99,0.001), tol = 1e-7) {
   single_ped = is.ped(x)
-  if(single_ped) x = list(x)
+  if(single_ped)
+    x = list(x)
   if(!is.pedList(x))
     stop2("The first argument must be a `ped` object or a list of such")
 
   if(is.null(markers))
       markers = seq_len(nMarkers(x[[1]]))
 
-  if(is.vector(ids) && length(ids)==2)
+  if(is.vector(ids) && length(ids) == 2)
     ids = rbind(ids)
   if(is.data.frame(ids))
     ids = as.matrix(ids)
@@ -76,7 +77,7 @@ IBDestimate = function(x, ids, markers=NULL, start = c(0.99,0.001), tol=1e-7) {
   ids_df_list = lapply(seq_len(nrow(ids)), function(i) pedlistMembership(x, ids[i,]))
 
   # Optimize the above function in the triangle
-  constraints = list(ineqA = matrix(c(1,0,-1,0,1,-1), nrow = 3, ncol = 2), 
+  constraints = list(ineqA = matrix(c(1,0,-1,0,1,-1), nrow = 3, ncol = 2),
                      ineqB = c(0,0,1))
 
   res = lapply(ids_df_list, function(ids_df) {
@@ -90,7 +91,7 @@ IBDestimate = function(x, ids, markers=NULL, start = c(0.99,0.001), tol=1e-7) {
     loglik_FUN = function(k) sum(log(.IBDlikelihood(k,a,b,cc,d,pa,pb,pc,pd)))
 
     # Optimise
-    ML = maxLik(loglik_FUN, start=start, constraints=constraints, tol=tol)
+    ML = maxLik(loglik_FUN, start = start, constraints = constraints, tol = tol)
     est = ML$estimate
     data.frame(ID1 = ids_df$id[1],
                ID2 = ids_df$id[2],
@@ -98,7 +99,7 @@ IBDestimate = function(x, ids, markers=NULL, start = c(0.99,0.001), tol=1e-7) {
                k0 = est[1],
                k1 = 1 - sum(est),
                k2 = est[2],
-               stringsAsFactors=FALSE)
+               stringsAsFactors = F)
   })
 
   do.call(rbind, res)
@@ -108,23 +109,23 @@ IBDestimate = function(x, ids, markers=NULL, start = c(0.99,0.001), tol=1e-7) {
 pedlistMembership = function(pedl, ids) {
     ped_match = vapply(pedl,
                        function(p) ids %in% labels(p),
-                       FUN.VALUE=logical(length(ids)))
+                       FUN.VALUE = logical(length(ids)))
 
-    # Convert to matrix if length(ids==1)
-    ped_match = rbind(ped_match, deparse.level=0)
+    # Convert to matrix if length(ids == 1)
+    ped_match = rbind(ped_match, deparse.level = 0)
 
     if(any(nomatch <- rowSums(ped_match) == 0))
       stop2("IDs not found in pedigrees: ", ids[nomatch])
-    if(any(multimatch <- rowSums(ped_match) >1 ))
+    if(any(multimatch <- rowSums(ped_match) > 1))
       stop2("IDs matching multiple pedigrees: ", ids[multimatch])
 
     pednr = apply(ped_match, 1, which)
 
-    data.frame(pednr=pednr, id = ids, stringsAsFactors=FALSE)
+    data.frame(pednr = pednr, id = ids, stringsAsFactors = F)
 }
 
 
-IBDest_getAlleleData = function(x, ped_id_df, markers=NULL) {
+IBDest_getAlleleData = function(x, ped_id_df, markers = NULL) {
   stopifnot(is.pedList(x), is.data.frame(ped_id_df))
   pednr1 = ped_id_df$pednr[1]
   pednr2 = ped_id_df$pednr[2]
@@ -173,14 +174,14 @@ IBDest_getAlleleData = function(x, ped_id_df, markers=NULL) {
   # pa, pb, pc, pd: numeric vectors with frequencies of the above alleles.
   #
   # Note that all input vectors (except k) have the same length = #markers.
-  homoz1 = a==b
-  homoz2 = cc==d
-  mac = a==cc
-  mbc = b==cc
-  mad = a==d
-  mbd = b==d
-  g1.fr = 2^(!homoz1)*pa*pb
-  g2.fr = 2^(!homoz2)*pc*pd
+  homoz1 = a == b
+  homoz2 = cc == d
+  mac = a == cc
+  mbc = b == cc
+  mad = a == d
+  mbd = b == d
+  g1.fr = 2^(!homoz1) * pa * pb
+  g2.fr = 2^(!homoz2) * pc * pd
 
   # Prob(g1, g2 | unrelated)
   UN = g1.fr * g2.fr
@@ -192,5 +193,5 @@ IBDest_getAlleleData = function(x, ped_id_df, markers=NULL) {
   MZ = g1.fr * ((mac & mbd) | (mad & mbc))
 
   # return likelihoods (Thompson)
-  k[1]*UN + (1-k[1]-k[2])*PO + k[2]*MZ
+  k[1] * UN + (1-k[1]-k[2]) * PO + k[2] * MZ
 }
