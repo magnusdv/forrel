@@ -7,10 +7,10 @@ Authors@R: person("Magnus Dehli", "Vigeland", email = "m.d.vigeland@medisin.uio.
 Description: Forensic applications of pedigree analysis, including marker simulation,
     relatedness inference and exclusion probabilities. The package supports data 
     import from the Familias software (Egeland et al. (2000) 
-    <doi:https://doi.org/10.1016/S0379-0738(00)00147-X>).  Data import from the Familias
-    software is fully supported. The computation of exclusion powers is based on Egeland 
-    et al. (2014) <doi:10.1016/j.fsigen.2013.05.001>.
+    <doi:https://doi.org/10.1016/S0379-0738(00)00147-X>). The computation of exclusion
+    powers is based on Egeland et al. (2014) <doi:10.1016/j.fsigen.2013.05.001>.
 License: GPL-3
+URL: https://github.com/magnusdv/forrel
 Encoding: UTF-8
 Language: en-GB
 LazyData: true
