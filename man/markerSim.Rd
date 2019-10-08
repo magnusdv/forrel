@@ -44,7 +44,7 @@ time if \code{partialmarker} is non-NULL and the number of alleles is large.}
 \item{verbose}{a logical.}
 }
 \value{
-a \code{ped} object equal to \code{x} except its \code{markerdata} entry, which
+a \code{ped} object equal to \code{x} except its \code{MARKERS} entry, which
 consists of the \code{N} simulated markers.
 }
 \description{

@@ -49,7 +49,7 @@ LR = function(x, ref, markers) {
   y = if(is.ped(x[[1]])) x[[1]] else x[[1]][[1]]
   if(missing(markers))
     markers = seq_len(nMarkers(y))
-  markernames = sapply(y$markerdata[markers], attr, "name")
+  markernames = sapply(y$MARKERS[markers], attr, "name")
   NAnames = is.na(markernames)
   if(any(NAnames)) markernames[NAnames] = paste0("M", which(NAnames))
 

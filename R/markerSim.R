@@ -30,7 +30,7 @@
 #'   time if `partialmarker` is non-NULL and the number of alleles is large.
 #' @param seed NULL, or a numeric seed for the random number generator.
 #' @param verbose a logical.
-#' @return a `ped` object equal to `x` except its `markerdata` entry, which
+#' @return a `ped` object equal to `x` except its `MARKERS` entry, which
 #'   consists of the `N` simulated markers.
 #' @author Magnus Dehli Vigeland
 #' @seealso [simpleSim()], [pedtools::ped()]
@@ -174,7 +174,7 @@ markerSim = function(x, N = 1, ids = NULL, alleles = NULL, afreq = NULL,
   if (loops <- x$UNBROKEN_LOOPS) {
     orig_ids = labels(x)
     x = breakLoops(setMarkers(x, m), loop_breakers = loop_breakers, verbose = verbose)
-    m = x$markerdata[[1]]
+    m = x$MARKERS[[1]]
     loop_breakers = x$LOOP_BREAKERS[, 1]
     gridlist = gridlist[sort.int(match(c(orig_ids, loop_breakers), orig_ids))]
   }
@@ -372,7 +372,7 @@ markerSim = function(x, N = 1, ids = NULL, alleles = NULL, afreq = NULL,
     attributes(mk) = attrib
     mk
   })
-  class(markerdata_list) = "markerdata"
+  class(markerdata_list) = "MARKERS"
   x = setMarkers(x, markerdata_list)
 
   # If ped was reordered, revert to original
@@ -460,7 +460,7 @@ markerSim = function(x, N = 1, ids = NULL, alleles = NULL, afreq = NULL,
 #'   'female' and 'male'.
 #' @param seed NULL, or a numeric seed for the random number generator.
 #' @param verbose a logical.
-#' @return a `ped` object equal to `x` in all respects except its `markerdata`
+#' @return a `ped` object equal to `x` in all respects except its `MARKERS`
 #'   entry, which consists of the `N` simulated markers.
 #' @author Magnus Dehli Vigeland
 #' @seealso [markerSim()]
@@ -468,10 +468,10 @@ markerSim = function(x, N = 1, ids = NULL, alleles = NULL, afreq = NULL,
 #' @examples
 #' library(pedtools)
 #' x = nuclearPed(1)
-#' simpleSim(x, N=3, afreq=c(0.5, 0.5))
+#' simpleSim(x, N = 3, afreq = c(0.5, 0.5))
 #'
-#' y = cousinPed(1, child=TRUE)
-#' simpleSim(y, N=3, alleles=LETTERS[1:10])
+#' y = cousinPed(1, child = TRUE)
+#' simpleSim(y, N = 3, alleles = LETTERS[1:10])
 #'
 #' @importFrom utils head
 #' @export
@@ -567,7 +567,7 @@ simpleSim = function(x, N, alleles, afreq, ids, Xchrom = FALSE,
         mk
     })
   }
-  x = setMarkers(x, structure(markerdata_list, class = "markerdata"))
+  x = setMarkers(x, structure(markerdata_list, class = "MARKERS"))
 
   # If ped was reordered, revert to original
   if(reorder) {

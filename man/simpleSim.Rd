@@ -31,7 +31,7 @@ genotypes should be simulated.}
 \item{verbose}{a logical.}
 }
 \value{
-a \code{ped} object equal to \code{x} in all respects except its \code{markerdata}
+a \code{ped} object equal to \code{x} in all respects except its \code{MARKERS}
 entry, which consists of the \code{N} simulated markers.
 }
 \description{
@@ -46,10 +46,10 @@ Finally the genotypes of any individuals not included in \code{ids} are removed.
 \examples{
 library(pedtools)
 x = nuclearPed(1)
-simpleSim(x, N=3, afreq=c(0.5, 0.5))
+simpleSim(x, N = 3, afreq = c(0.5, 0.5))
 
-y = cousinPed(1, child=TRUE)
-simpleSim(y, N=3, alleles=LETTERS[1:10])
+y = cousinPed(1, child = TRUE)
+simpleSim(y, N = 3, alleles = LETTERS[1:10])
 
 }
 \seealso{

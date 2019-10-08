@@ -76,7 +76,7 @@ profileSim = function(x, N = 1, ids = NULL, conditions = NULL, seed = NULL, ...)
   # Transpose: Extract i'th marker from each sim above.
   # Output: List of length N, each with length(conditions) markers
   sims = lapply(1:N, function(i) {
-      mlist = lapply(sims_markerwise, function(y) y$markerdata[[i]])
+      mlist = lapply(sims_markerwise, function(y) y$MARKERS[[i]])
       s = setMarkers(x, mlist)
       if(addNames)
         name(s, nonNAs) = mnames[nonNAs]

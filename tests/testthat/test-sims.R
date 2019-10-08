@@ -7,7 +7,7 @@ test_that("simpleSim() runs in trivial example", {
   y = simpleSim(x, N=1, alleles=1:2, verbose=F)
   expect_is(y, "ped")
   expect_equal(nMarkers(y), 1)
-  expect_true(all(y$markerdata[[1]] > 0))
+  expect_true(all(y$MARKERS[[1]] > 0))
 })
 
 test_that("markerSim() runs in simple example", {
@@ -17,7 +17,7 @@ test_that("markerSim() runs in simple example", {
   expect_is(y, "ped")
   expect_equal(nMarkers(y), 1)
   expect_equal(genotype(y, 1, id=3), c("1", "1"))
-  expect_true(all(y$markerdata[[1]] > 0))
+  expect_true(all(y$MARKERS[[1]] > 0))
 })
 
 test_that("markerSim() works with partial with mutations", {

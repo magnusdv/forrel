@@ -139,30 +139,31 @@ IBDest_getAlleleData = function(x, ped_id_df, markers=NULL) {
 
   if(pednr1 == pednr2) {
     ped = x[[pednr1]]
-    A = vapply(ped$markerdata[markers], function(m) {
+    A = vapply(ped$MARKERS[markers], function(m) {
       als = c(m[id1_int,], m[id2_int,])
       frq = rep_len(NA_real_, length(als))
       frq[als > 0] = attr(m, 'afreq')[als] # works, since 0's in als are ignored when indexing
       c(als, frq)
-    }, FUN.VALUE=numeric(8))
+    }, FUN.VALUE = numeric(8))
   }
   else {
     ped1 = x[[pednr1]]
     ped2 = x[[pednr2]]
     A = vapply(markers, function(i) {
-      m1 = ped1$markerdata[[i]]
-      m2 = ped2$markerdata[[i]]
+      m1 = ped1$MARKERS[[i]]
+      m2 = ped2$MARKERS[[i]]
       als = c(m1[id1_int,], m2[id2_int,])
       frq = rep_len(NA_real_, length(als))
       frq[als > 0] = attr(m1, 'afreq')[als] # works, since 0's in als are ignored when indexing
       c(als, frq)
-    }, FUN.VALUE=numeric(8))
+    }, FUN.VALUE = numeric(8))
   }
+
   return(A)
 }
 
 
-.IBDlikelihood = function(k,a,b,cc,d,pa,pb,pc,pd) {
+.IBDlikelihood = function(k, a, b, cc, d, pa, pb, pc, pd) {
   ### Vectorized function for computing kappa likelihoods, given genotypes for two related individuals
   # k: numeric of length 2 = (kappa0, kappa2)
   # a: vector of positive integers (allele 1 of individual 1)
