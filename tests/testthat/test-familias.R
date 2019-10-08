@@ -51,7 +51,8 @@ test_that("Familias2ped() converts a single singleton", {
 })
 
 test_that("Familias2ped() reverses pedlikCompare:::ped2Familias()", {
-
+  skip_on_cran()
+  skip_if_not_installed("Familias")
   p2f = pedlikCompare:::ped2Familias
   f2p = function(x) Familias2ped(x$pedigree, datamatrix = x$datamatrix, loci = x$loci)
 
@@ -76,6 +77,8 @@ test_that("Familias2ped() reverses pedlikCompare:::ped2Familias()", {
 })
 
 test_that("readFamiliasLoci() works", {
+  skip_on_cran()
+  skip_if_not_installed("Familias")
   loc = Familias::FamiliasLocus(frequencies = c(0.5, 0.5),
                                 MutationModel = "equal",
                                 MutationRate = 0.1)
@@ -89,6 +92,8 @@ test_that("readFamiliasLoci() works", {
 })
 
 test_that("Complete Familias2ped example", {
+  skip_on_cran()
+  skip_if_not_installed("Familias")
   data(NorwegianFrequencies, package = "Familias")
   loci = lapply(NorwegianFrequencies[1:2], Familias::FamiliasLocus)
 
@@ -116,7 +121,8 @@ test_that("Complete Familias2ped example", {
 })
 
 test_that("Another complete Familias example", {
-
+  skip_on_cran()
+  skip_if_not_installed("Familias")
   # Familias pedigree which gave bug in Familias2ped
   ped1 = Familias::FamiliasPedigree(id = c("AF", "CH"), dadid = c(NA, "AF"),
                                     momid = c(NA,NA), sex = c("male", "male"))

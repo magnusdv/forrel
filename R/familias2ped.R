@@ -33,23 +33,23 @@
 #'
 #' ### Example 1 ###
 #'
-#' if (requireNamespace("Familias", quietly = TRUE)) {
-#'   data(NorwegianFrequencies, package = "Familias")
-#'   TH01 = Familias::FamiliasLocus(NorwegianFrequencies$TH01, name = "TH01")
+#' #if (requireNamespace("Familias", quietly = TRUE)) {
+#' #  data(NorwegianFrequencies, package = "Familias")
+#' #  TH01 = Familias::FamiliasLocus(NorwegianFrequencies$TH01, name = "TH01")
 #'
-#'   ped = Familias::FamiliasPedigree(
-#'     id = c('mother', 'daughter', 'AF'),
-#'     dadid = c(NA, 'AF', NA),
-#'     momid = c(NA, 'mother', NA),
-#'     sex   = c('female', 'female', 'male'))
-#'
-#'   datamatrix = data.frame(
-#'     TH01.1 = c(NA, 8, NA),
-#'     TH01.2 = c(NA, 9.3, NA),
-#'     row.names = ped$id)
-#'
-#'   Familias2ped(ped, datamatrix, loci = list(TH01))
-#' }
+#' # ped = Familias::FamiliasPedigree(
+#' #    id = c('mother', 'daughter', 'AF'),
+#' #    dadid = c(NA, 'AF', NA),
+#' #    momid = c(NA, 'mother', NA),
+#' #    sex   = c('female', 'female', 'male'))
+#' #
+#' #  datamatrix = data.frame(
+#' #    TH01.1 = c(NA, 8, NA),
+#' #    TH01.2 = c(NA, 9.3, NA),
+#' #    row.names = ped$id)
+#' #
+#' #  Familias2ped(ped, datamatrix, loci = list(TH01))
+#' #}
 #'
 #' @export
 Familias2ped = function(familiasped, datamatrix, loci, matchLoci = FALSE) {
@@ -80,8 +80,8 @@ Familias2ped = function(familiasped, datamatrix, loci, matchLoci = FALSE) {
   nFath = length(fatherMissing)
   nMoth = length(motherMissing)
 
-  newFathers = paste("added", seq(1, length.out=nFath), sep="_")
-  newMothers = paste("added", seq(nFath + 1, length.out=nMoth), sep="_")
+  newFathers = paste("added", seq(1, length.out = nFath), sep = "_")
+  newMothers = paste("added", seq(nFath + 1, length.out = nMoth), sep = "_")
 
   # add new fathers
   if (nFath > 0) {

@@ -22,7 +22,6 @@ Imports:
     glue,
     pedmut
 Suggests: testthat,
-    pedlikCompare,
-    Familias
+    pedlikCompare
 RoxygenNote: 6.1.1
 Roxygen: list(markdown = TRUE)
