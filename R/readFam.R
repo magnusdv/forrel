@@ -13,6 +13,7 @@
 #'   If the .fam file describes pedigree data, the output is a `ped` object or a
 #'   list of such.
 #'
+#' @importFrom pedmut mutationMatrix
 #' @export
 readFam = function(famfile) {
   if(!endsWith(famfile, ".fam"))
@@ -40,6 +41,7 @@ readFam = function(famfile) {
   nid.line = if(x[4] != "") 4 else 5
   nid = as.integer(x[nid.line]) # Number of persons involved in pedigrees (but excluding "extras")
   checkInt(nid, nid.line, "number of individuals")
+  message("\nNumber of individuals (excluding 'extras'): ", nid)
 
   # Initialise id & sex
   id = character(nid)
@@ -57,6 +59,7 @@ readFam = function(famfile) {
     nmi = as.integer(x[id.line + 5])
     checkInt(nmi, id.line + 5,
              sprintf('number of genotypes for "%s"', id[i]))
+    message(sprintf("  Individual '%s': Genotypes for %d markers read", id[i], nmi))
 
     a1.lines = seq(id.line + 6, by = 3, length = nmi)
     a1.idx = as.integer(x[a1.lines]) + 1
@@ -101,6 +104,7 @@ readFam = function(famfile) {
     # Initialise list of final pedigrees
   nPed = as.integer(x[rel.line])
   checkInt(nPed, "number of pedigrees")
+  message("\nNumber of pedigrees: ", nPed)
 
   # If no more pedigree info, finish pedigree part
   if(nPed == 0) {
@@ -139,6 +143,9 @@ readFam = function(famfile) {
         rel.line = rel.line + 2
       }
 
+      # Print summary
+      message(sprintf(" Pedigree '%s': %d extra females, %d extra males", ped.name, nFem.i, nMal.i))
+
       # Convert to data frame in ped format and insert in list
       pedigrees[[ped.idx]] = asFamiliasPedigree(id.i, fidx.i, midx.i, sex.i)
       names(pedigrees)[ped.idx] = ped.name
@@ -150,7 +157,9 @@ readFam = function(famfile) {
 
   has.probs = x[ped.line] == "#TRUE#"
   if(has.probs)
-    stop("This file includes precomputed probabilities; this is not supported yet.")
+    stop("\nThis file includes precomputed probabilities; this is not supported yet.")
+
+  ### Database ###
 
   db.line = ped.line + 1
   nLoc = as.integer(x[db.line])
@@ -158,7 +167,11 @@ readFam = function(famfile) {
 
   has.info = x[db.line + 1] == "#TRUE#"
   if(has.info)
-    message("Database info: ", x[db.line + 2])
+    message("\nDatabase: ", x[db.line + 2])
+  else
+    message("")
+
+  message("Number of loci: ", nLoc)
 
   loci = vector("list", nLoc)
   loc.line = db.line + 2 + has.info
@@ -195,18 +208,45 @@ readFam = function(famfile) {
     frqs = as.numeric(x[als.lines + 1])
     names(frqs) = als
 
-    models = c("equal", "prop", "stepwise", "custom")
-    if(any(c(mutrate.fem, mutrate.mal) > 0) && mutWarn) {
-      warning("Mutation models are not supported yet; ignoring these", call. = F)
+    # Mutation models
+    models = c("equal", "proportional", "stepwise", "custom")
+    maleMod = models[model.idx.mal]
+    if(maleMod %in% models[1:3]) {
+      maleMutMat = mutationMatrix(model = maleMod, alleles = als, afreq = frqs,
+                                  rate = mutrate.mal, rate2 = mutrate2.mal)
+    }
+    else {
+      maleMutMat = NULL
+    }
+
+    femaleMod = models[model.idx.fem]
+    if(femaleMod %in% models[1:3]) {
+      femaleMutMat = mutationMatrix(model = femaleMod, alleles = als, afreq = frqs,
+                                  rate = mutrate.fem, rate2 = mutrate2.fem)
+    }
+    else {
+      femaleMutMat = NULL
+    }
+    if((model.idx.mal > 3 || model.idx.fem > 3) && mutWarn) {
+      warning("*** Custom mutation models are not supported yet; ignoring these ***",
+              immediate. = T, noBreaks. = T, call. = F)
       mutWarn = F
     }
 
+    # Print locus summary
+    if(maleMod == femaleMod && mutrate.fem == mutrate.mal)
+      mut_txt = sprintf("model = %s, rate = %.2g (unisex)", maleMod, mutrate.mal)
+    else
+      mut_txt = sprintf("male model = %s, male rate = %.2g, female model = %s, female rate = %.2g",
+                         maleMod, mutrate.mal, femaleMod, mutrate.fem)
+    message(sprintf("  %s: %d alleles, %s", loc.name, length(frqs), mut_txt))
+
     # Collect locus info
     loci[[i]] = list(locusname = loc.name, alleles = frqs,
-                     femaleMutationType = models[model.idx.fem],
-                     femaleMutationMatrix = NULL,
-                     maleMutationType = models[model.idx.mal],
-                     maleMutationMatrix = NULL)
+                     femaleMutationType = femaleMod,
+                     femaleMutationMatrix = femaleMutMat,
+                     maleMutationType = maleMod,
+                     maleMutationMatrix = maleMutMat)
 
     # Goto next locus
     loc.line = loc.line + 13 + 2*nAll
@@ -214,8 +254,9 @@ readFam = function(famfile) {
 
   ### datamatrix ###
   has.data = nid > 0 && any(lengths(sapply(datalist, '[[', "mark.idx")))
-  if(!has.data)
+  if(!has.data) {
     datamatrix = NULL
+  }
   else {
     loc.names = vapply(loci, function(ll) ll$locusname, FUN.VALUE = "")
 
@@ -240,11 +281,14 @@ readFam = function(famfile) {
     }
   }
 
-  if(is.null(pedigrees))
+  if(is.null(pedigrees)) {
+    message("\nReturning database only.\n")
     readFamiliasLoci(loci = loci)
-  else
+  }
+  else {
+    message("\nReturning pedigrees with attached database.\n")
     Familias2ped(familiasped = pedigrees, datamatrix = datamatrix, loci = loci)
-
+  }
 }
 
 
