@@ -46,7 +46,7 @@ shinyUI(fluidPage(
                  )),
 
         ### Genetic data: frequencies, known genotypes and individuals available for genotyping
-        tabPanel('Genetic data',
+        tabPanel('Database',
                  fluidRow(
                    column(4,
                           wellPanel(
@@ -88,7 +88,7 @@ shinyUI(fluidPage(
                  )),
 
         ### Settings: mutation model, inbreeding parameters and sex-linked markers
-        tabPanel('Settings',
+        tabPanel('Parameters',
                  p(strong('Marker settings')),
                  fluidRow(
                    column(12,

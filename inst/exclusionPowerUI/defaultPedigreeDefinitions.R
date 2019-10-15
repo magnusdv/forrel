@@ -2,10 +2,11 @@
 # list values correspond to those supported by the [pedigreeFromUI()] function.
 # Therefore, to add other default pedigrees to the list, you need to add them in
 # that function in addition to here.
-defaultPedigrees = c("Nuclear family (1 son)" = "nucPed-1s",
+defaultPedigrees = c("None"                        = "none",
+                     "Nuclear family (1 son)"      = "nucPed-1s",
                      "Nuclear family (1 daughter)" = "nucPed-1d",
-                     "Unrelated" = "unrelated",
-                     "Custom (from .ped file)" = "pedfile")
+                     "Unrelated"                   = "unrelated",
+                     "Custom (from .ped file)"     = "pedfile")
 
 
 #' Create an unrelated true pedigree with the individuals available from
@@ -59,6 +60,8 @@ pedigreeFromUI = function(pedigreeID, pedfile = NULL) {
       return()
     }
     return(readPed(pedfile$datapath, sep = '/'))
+  } else {
+    return(NULL)
   }
 }
 

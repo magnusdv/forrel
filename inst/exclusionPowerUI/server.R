@@ -83,6 +83,8 @@ shinyServer(function(input, output, session) {
   computedClaimPed = reactive({
     ped = claimPedigree()
 
+    if (is.null(ped)) return(NULL)
+
     switch (input$frequencySource,
       'file' = {
         if (isTruthy(frequencyDB())) {
@@ -124,16 +126,22 @@ shinyServer(function(input, output, session) {
   # render the pedigree plot when the user chooses a Claim pedigree or updates
   # individuals available for genotyping
   output$pedClaimPlot <- renderPlot({
-    shadedAll = getGenotypedIds(computedClaimPed())
+    if (is.null(computedClaimPed())) return(NULL);
+
+    # IDs from any pedigree that should be red
+    redAll = input$ids
+
+    # IDs from any pedigree that should be shaded
+    shadedAll = union(getGenotypedIds(computedClaimPed()), redAll)
 
     if (!is.pedList(computedClaimPed())) {
       plot(computedClaimPed(),
-           col = list(red = intersect(input$ids, labels(computedClaimPed()))),
+           col = list(red = intersect(redAll, labels(computedClaimPed()))),
            shaded = shadedAll)
     } else {
       plot.arg.list = lapply(computedClaimPed(), function(x) {
         list(x = x,
-             col = list(red = intersect(input$ids, labels(x))),
+             col = list(red = intersect(redAll, labels(x))),
              shaded = intersect(shadedAll, labels(x)))
       })
       pedtools::plotPedList(plot.arg.list,
@@ -143,16 +151,22 @@ shinyServer(function(input, output, session) {
 
   # render the pedigree plot when the user chooses a True pedigree
   output$pedTruePlot <- renderPlot({
-    shadedAll = getGenotypedIds(computedClaimPed())
+    if (is.null(truePedigree()) || is.null(computedClaimPedigree())) return(NULL);
+
+    # IDs from any pedigree that should be red
+    redAll = input$ids
+
+    # IDs from any pedigree that should be shaded
+    shadedAll = union(getGenotypedIds(computedClaimPed()), redAll)
 
     if (!is.pedList(truePedigree())) {
       plot(truePedigree(),
-           col = list(red = intersect(input$ids, labels(truePedigree()))),
+           col = list(red = intersect(redAll, labels(truePedigree()))),
            shaded = intersect(shadedAll, labels(truePedigree())))
     } else {
       plot.arg.list = lapply(truePedigree(), function(x) {
         list(x = x,
-             col = list(red = intersect(input$ids, labels(x))),
+             col = list(red = intersect(redAll, labels(x))),
              shaded = intersect(shadedAll, labels(x)))
       })
       pedtools::plotPedList(plot.arg.list,
