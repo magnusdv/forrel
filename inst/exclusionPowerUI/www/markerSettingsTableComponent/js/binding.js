@@ -21,16 +21,42 @@ const buildCheckbox = function(klass, selected) {
     return '<input type="checkbox" class="' + klass + '">';
 };
 
-const buildRow = function(marker) {
-  let sexLinked;
-  if (marker.chrom == '23')
-    sexLinked = '1';
-  else
-    sexLinked = '0';
+const buildRadioButtons = function(klass, options, selected) {
 
+  return options.map(function(opt) {
+    selectedAttr = '';
+    if (selected == opt.value) selectAttr = ' selected ';
+    return '<label class="radio-inline">' +
+           '<input type="radio" ' + selectedAttr +
+                   'name="' + opt.name + '" ' +
+                   'value="' + opt.value + '" ' +
+                   'class="' + klass + '">' +
+                   opt.label + '</label>';
+  }).join(' ');
+};
+
+const sexLinkedRadioOptionsForMarker = function(markerName) {
+  return [
+    {
+      name: markerName + '-radio',
+      value: '1',
+      label: 'Autosomal'
+    },
+    {
+      name: markerName + '-radio',
+      value: '23',
+      label: 'X'
+    }
+  ];
+};
+
+const buildRow = function(marker) {
+  let sexLinkedSelected = (marker.chrom == '23') ? '23' : '1';
   return '<tr data-marker="' + marker.markerName + '">' +
     '<td>' + marker.markerName + '</td>' +
-    '<td>' + buildCheckbox('sexLinked-checkbox', marker.chrom == '23') + '</td>' +
+    '<td>' + buildRadioButtons('sexLinked-radio',
+                               sexLinkedRadioOptionsForMarker(marker.markerName),
+                               sexLinkedSelected) + '</td>' +
     '<td>' + buildMutationModelSelect(marker) + '</td>' +
     '<td>' + buildCheckbox('includeInCalculation-checkbox', marker.includeInCalculation == '1') + '</td>' +
     '</tr>';
@@ -73,13 +99,7 @@ $.extend(binding, {
     $(el).find('tbody tr').each(function callback(_, row) {
       let markerName = $(row).data('marker');
       let includeInCalculation = $(row).find('input.includeInCalculation-checkbox')[0].checked;
-      let chrom = $(row).find('input.sexLinked-checkbox')[0].checked;
-
-      // translate to pedtools chromosome index
-      if (chrom)
-        chrom = 23;
-      else
-        chrom = 'NA';
+      let chrom = $(row).find('.sexLinked-radio:checked').val();
 
       let mutationModel = $(row).find('select.mutationModel-select').val();
 
