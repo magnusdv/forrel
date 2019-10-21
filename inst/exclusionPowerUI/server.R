@@ -1,5 +1,10 @@
 library(shiny)
 
+markerSettingsFields = list(STlabel('Marker'),
+                            STradio('Sex-linked?', c('1' = 'Autosomal', '23' = 'X chromosome')),
+                            STdropdown('Mutation model', c('none' = 'None')),
+                            STcheckbox('Include in calculation?'))
+
 #' Server definition of the shiny application
 #'
 #' Evaluating this file should yield a shiny server definition object as
@@ -75,9 +80,9 @@ shinyServer(function(input, output, session) {
   references <- callModule(advancedTableFileLoader, 'referenceFile', id = 'referenceFile',
                            columnHeaders = TRUE)
 
-  markerSettings = reactive({
-    jsonlite::fromJSON(input$markerSettings)
-  })
+  markerSettings = callModule(settingsTable, 'markerSettingsTable',
+                              id = 'markerSettingsTable',
+                              fields = markerSettingsFields)
 
   # data provided thorugh tabular files is attached to the claim pedigree here
   computedClaimPed = reactive({
@@ -90,16 +95,12 @@ shinyServer(function(input, output, session) {
         if (isTruthy(frequencyDB())) {
           ped = attachAlleleFrequenciesToPedigree(ped,
                                                   df = frequencyDB())
-          print("triggered from frequency source")
-          updateMarkerSettingsTable(session, 'markerSettings', ped)
         }
       },
       'fam' = {
         if (isTruthy(input$familiasFrequencyFile)) {
           ped = attachAlleleFrequenciesToPedigree.familias(ped,
                                                            input$familiasFrequencyFile$datapath)
-          print("triggered from familias source")
-          updateMarkerSettingsTable(session, 'markerSettings', ped)
         }
       }
     )
@@ -118,7 +119,19 @@ shinyServer(function(input, output, session) {
       }
     )
 
-    #ped = attachLocusAttributesToPedigree(ped, markerSettings())
+    includedMarkers = getMarkerNames(ped)
+
+    mSets = markerSettings()
+    if (is.data.frame(mSets)) {
+      ped = attachMarkerSettingsToPed(ped, mSets)
+
+      includedMarkers = mSets[mSets[, "Include in calculation?"] == TRUE, "Marker"]
+    }
+
+    updateSettingsTableInput(session,
+                             'markerSettingsTable',
+                             fields = markerSettingsFields,
+                             data = locusAnnotationsToDataFrame(ped, includedMarkers))
 
     ped
   })
@@ -151,7 +164,7 @@ shinyServer(function(input, output, session) {
 
   # render the pedigree plot when the user chooses a True pedigree
   output$pedTruePlot <- renderPlot({
-    if (is.null(truePedigree()) || is.null(computedClaimPedigree())) return(NULL);
+    if (is.null(truePedigree()) || is.null(computedClaimPed())) return(NULL);
 
     # IDs from any pedigree that should be red
     redAll = input$ids
@@ -205,10 +218,6 @@ shinyServer(function(input, output, session) {
              df = references(),
              title = 'Reference data used for calculation')
 
-  # update list of sex-linked markers when new allele denomination data becomes available
-  # observe({
-  #   updateMarkerSettingsTable(session, 'markerSettings', computedClaimPed())
-  # })
 
   # compute exclusion power
   output$exclusionPowerResults <- renderTable({
@@ -219,6 +228,10 @@ shinyServer(function(input, output, session) {
         markerNames = getMarkerNames(computedClaimPed())
         Nmarkers = length(markerNames)
         exclusionProbabilities = vector('numeric', Nmarkers)
+        includedMarkers = getMarkerNames(computedClaimPed())
+        if (is.data.frame(markerSettings())) {
+          includedMarkers = markerSettings()[markerSettings()[,"Include in calculation?"] == TRUE, "Marker"]
+        }
 
         # TODO: remove this when the implementation of exclusionPower stops throwing warnings
         options(warn = -1)
@@ -226,8 +239,8 @@ shinyServer(function(input, output, session) {
         for (i in 1:Nmarkers) {
           markerName = markerNames[i]
 
-          EP = 0
-          if (markerName %in% getIncludedMarkers(markerSettings())) {
+          EP = 1
+          if (markerName %in% includedMarkers) {
             EP = exclusionPower(ped_claim = computedClaimPed(),
                                 ped_true = truePedigree(),
                                 ids = input$ids,

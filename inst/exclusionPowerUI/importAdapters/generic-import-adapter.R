@@ -102,15 +102,3 @@ attachGenotypeToPedigree = function(ped, markers = NULL, df = NULL, ...) {
 
   ped
 }
-
-attachLocusAttributesToPedigree = function(ped, markerSettings) {
-  if (!is.data.frame(markerSettings)) return(ped);
-
-  for (i in 1:nrow(markerSettings)) {
-    ped = setLocusAttributes(ped,
-                             markers = c(markerSettings[i, 1]),
-                             locusAttributes = list(chrom = markerSettings[i, 3]))
-  }
-
-  ped
-}

@@ -127,11 +127,41 @@ getGenotypedIds = function(ped) {
   labels(ped)[as.vector(lapply(labels(ped), function(id) { isGenotyped(ped, id) }), mode = 'logical')]
 }
 
+locusAnnotationsToDataFrame = function(ped, includedMarkers) {
+  if (is.pedList(ped))
+    return(locusAnnotationsToDataFrame(ped[[1]], includedMarkers))
+
+  lapply(ped$markerdata, function(m) {
+    list('Marker' = attr(m, 'name'),
+         'Include in calculation?' = attr(m, 'name') %in% includedMarkers,
+         'Sex-linked?' = if (!is.na(attr(m, 'chrom')) && 23 == attr(m, 'chrom')) '23' else '1',
+         'Mutation model' = 'none')
+  })
+}
+
+attachMarkerSettingsToPed = function(ped, settingsTable) {
+  if (is.pedList(ped)) {
+    return(lapply(ped, function(x) {
+      attachMarkerSettingsToPed(x, settingsTable)
+    }))
+  }
+
+  if (!is.data.frame(settingsTable))
+    return(ped)
+
+  for (i in 1:nrow(settingsTable)) {
+    ped = setLocusAttributes(ped,
+                             markers = c(settingsTable[i, "Marker"]),
+                             locusAttributes = list(chrom = settingsTable[i, "Sex-linked?"]))
+  }
+
+  ped
+}
 
 source('defaultPedigreeDefinitions.R')
 source('uiModules/advancedTableFileLoader.R')
 source('uiModules/tabularDataPreview.R')
-source('uiModules/markerSettingsTable.R')
+source('uiModules/settings-table.R')
 
 source('importAdapters/generic-import-adapter.R')
 source('importAdapters/familias-import-adapter.R')
