@@ -5,6 +5,8 @@
 #' `Familias` package.
 #'
 #' @param famfile Path to a ".fam" file
+#' @param useDVI A logical; if TRUE, the DVI section of the fam file is used to
+#'   extract pedigrees and genotypes.
 #'
 #' @return If the .fam file only contains a database, the output is a list of
 #'   information (name, alleles, frequencies) about each locus. This list can be
@@ -13,9 +15,13 @@
 #'   If the .fam file describes pedigree data, the output is a `ped` object or a
 #'   list of such.
 #'
+#'   If `useDVI = TRUE`, then the families described under `Reference Families`
+#'   are parsed and converted to `ped` objects. Each family generally describes
+#'   multiple pedigrees, so the output gets another layer in this case.
+#'
 #' @importFrom pedmut mutationMatrix
 #' @export
-readFam = function(famfile) {
+readFam = function(famfile, useDVI = F) {
   if(!endsWith(famfile, ".fam"))
     stop("Input file must end with '.fam'", call. = F)
 
@@ -101,7 +107,7 @@ readFam = function(famfile) {
     rel.line = rel.line + 2
   }
 
-    # Initialise list of final pedigrees
+  # Initialise list of final pedigrees
   nPed = as.integer(x[rel.line])
   checkInt(nPed, "number of pedigrees")
   message("\nNumber of pedigrees: ", nPed)
@@ -146,7 +152,7 @@ readFam = function(famfile) {
       # Print summary
       message(sprintf(" Pedigree '%s': %d extra females, %d extra males", ped.name, nFem.i, nMal.i))
 
-      # Convert to data frame in ped format and insert in list
+      # Convert to familiaspedigree and insert in list
       pedigrees[[ped.idx]] = asFamiliasPedigree(id.i, fidx.i, midx.i, sex.i)
       names(pedigrees)[ped.idx] = ped.name
 
@@ -252,6 +258,39 @@ readFam = function(famfile) {
     loc.line = loc.line + 13 + 2*nAll
   }
 
+  ###########
+  ### DVI ###
+  ###########
+
+  if(useDVI) {
+    message("\n*** Reading DVI section ***")
+    dvi.start = match("[DVI]", raw)
+    if(is.na(dvi.start))
+      stop("Expected keyword '[DVI]' not found")
+    dvi.lines = raw[dvi.start:length(raw)]
+    dvi.families = readDVI(dvi.lines)
+
+    message("Returning the following families:")
+    famnames = names(dvi.families)
+    for(i in seq_along(dvi.families)) {
+      fam = dvi.families[[i]]
+      message(sprintf("%s: %d pedigrees", famnames[i], length(fam$pedigrees)))
+      for(nm in names(fam$pedigrees))
+        message("  ", nm)
+    }
+
+    res = lapply(dvi.families, function(fam) {
+      Familias2ped(familiasped = fam$pedigrees, datamatrix = fam$datamatrix,
+                   loci = loci, matchLoci = T)
+    })
+
+    return(res)
+  }
+
+  ##################
+  ### If not DVI ###
+  ##################
+
   ### datamatrix ###
   has.data = nid > 0 && any(lengths(sapply(datalist, '[[', "mark.idx")))
   if(!has.data) {
@@ -280,14 +319,13 @@ readFam = function(famfile) {
       datamatrix[, 2*i]     = als.i[dm.a2.idx[, i]]
     }
   }
-
-  if(is.null(pedigrees)) {
-    message("\nReturning database only.\n")
-    readFamiliasLoci(loci = loci)
-  }
-  else {
+  if(!is.null(pedigrees)) {
     message("\nReturning pedigrees with attached database.\n")
     Familias2ped(familiasped = pedigrees, datamatrix = datamatrix, loci = loci)
+  }
+  else {
+    message("\nReturning database only.\n")
+    readFamiliasLoci(loci = loci)
   }
 }
 
@@ -306,4 +344,127 @@ asFamiliasPedigree = function(id, findex, mindex, sex) {
   class(x) = "FamiliasPedigree"
 
   x
+}
+
+#########################################
+### Utilities for parsing DVI section ###
+#########################################
+
+readDVI = function(rawlines) {
+  r = rawlines
+  if(r[1] != "[DVI]")
+    stop("I excepted the first line to be '[DVI]', but got '", r[1], "'")
+
+  ### Parse raw lines into nested list named `dvi`
+  dvi = list()
+  ivec = character()
+
+  # number of brackets on each line
+  brackets = as.integer(regexpr("[^[]", r)) - 1
+
+  # pre-split lines
+  splits = strsplit(r, "= ")
+
+  # Populate `dvi` list
+  for(i in seq_along(r)) {
+    line = r[i]
+    if(line == "")
+      next
+    br = brackets[i]
+
+    if(br == 0) {
+      dvi[[ivec]] = c(dvi[[ivec]], list(splits[[i]]))
+    }
+    else {
+      name = gsub("[][]", "", line)
+      ivec = c(ivec[seq_len(br - 1)], name)
+      dvi[[ivec]] = list()
+    }
+  }
+
+  family_list = dvi$DVI$`Reference Families`[-1] # remove 'nFamilies'
+  names(family_list) = sapply(family_list, function(fam) fam[[1]][2])
+
+  lapply(family_list, parseFamily)
+}
+
+
+# Convert a "DVI Family" into a list of `datamatrix` and `pedigrees`
+parseFamily = function(x) {
+
+  persons_list = x$Persons
+  if(persons_list[[c(1,1)]] == "nPersons")
+    persons_list[[1]] = NULL # remove 'nPersons' entry
+
+  ### pedigrees
+
+  # collext id and sex of each person
+  id = sapply(persons_list, function(p) p[[1]][2])
+  sex = sapply(persons_list, function(p) p[[2]][2])
+  sex[sex == "Male"] = 1
+  sex[sex == "Female"] = 2
+  sex = as.integer(sex)
+
+  # build pedigrees defined for the family
+  ped_list = x$Pedigrees[-1] # remove "nPedigrees"
+  names(ped_list) = sapply(ped_list, function(pd) pd[[1]][2])
+
+  pedigrees = lapply(ped_list, function(pd) {
+    this.id = as.character(id)
+    this.sex = sex
+
+    tags = sapply(pd, '[', 1)
+    vals = sapply(pd, '[', 2)
+
+    # Data frame of parent-child pairs
+    parent.tags = which(tags == "Parent")
+    po = data.frame(parent = vals[parent.tags], child = vals[parent.tags + 1],
+                    stringsAsFactors = F)
+
+    # Add extra individuals if needed (e.g. "Missing person")
+    if(length(extras <- setdiff(po$child, id))) {
+      this.id = c(this.id, extras)
+      this.sex = c(this.sex, rep(0L, length(extras)))
+    }
+
+    # Create and populate fidx and midx
+    this.fidx = this.midx = integer(length(this.id))
+
+    parent.idx = match(po$parent, this.id)
+    par.is.male = this.sex[parent.idx] == 1
+
+    child.idx = match(po$child, this.id)
+    this.fidx[child.idx[par.is.male]] = parent.idx[par.is.male]
+    this.midx[child.idx[!par.is.male]] = parent.idx[!par.is.male]
+
+    # Return
+    asFamiliasPedigree(this.id, this.fidx, this.midx, this.sex)
+  })
+
+  ### datamatrix
+  vecs = lapply(persons_list, function(p) dnaData2vec(p$`DNA data`))
+  allnames = unique(unlist(lapply(vecs, names)))
+  datamatrix = do.call(rbind, lapply(vecs, function(v) v[match(allnames, names(v))]))
+  rownames(datamatrix) = id[rownames(datamatrix)]
+
+  ### return
+  list(pedigrees = pedigrees, datamatrix = datamatrix)
+}
+
+
+# DNA data for single person --> named vector
+dnaData2vec = function(x) {
+  dat = do.call(rbind, x)
+  val = dat[, 2]
+
+  idx = which(dat[,1] == "SystemName")
+  nLoc = length(idx)
+  if(nLoc == 0)
+    return()
+
+  res = character(2 * nLoc)
+  res[2*(1:nLoc) - 1] = val[idx + 1]
+  res[2*(1:nLoc)] = val[idx + 2]
+  names(res) = paste(rep(val[idx], each = 2), 1:2, sep = ".")
+  res
 }

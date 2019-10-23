@@ -72,7 +72,7 @@ Familias2ped = function(familiasped, datamatrix, loci, matchLoci = FALSE) {
   p = data.frame(id = id, fid = 0, mid = 0, sex = 1, stringsAsFactors = FALSE)
   p$fid[findex > 0] = id[findex]
   p$mid[mindex > 0] = id[mindex]
-  p$sex[familiasped$sex == "female"] = 2
+  p$sex[tolower(familiasped$sex) == "female"] = 2
 
   fatherMissing = which(p$fid == 0 & p$mid != 0)
   motherMissing = which(p$fid != 0 & p$mid == 0)
@@ -113,7 +113,15 @@ Familias2ped = function(familiasped, datamatrix, loci, matchLoci = FALSE) {
       colnames(datamatrix) = rep(NA, NC) # needed to avoid wrong names in cbind later!
     }
 
-    # extract and sort relevant part of datamatrix
+    # add rows for missing individuals
+    miss = setdiff(familiasped$id, rownames(datamatrix))
+    if(length(miss)) {
+      empty = matrix("0", nrow = length(miss), ncol = NC,
+                     dimnames = list(miss, NULL))
+      datamatrix = rbind(datamatrix, empty)
+    }
+
+    # sort relevant part of datamatrix
     id_idx = match(familiasped$id, rownames(datamatrix))
     if (anyNA(id_idx))
       stop2("ID label not found among the datamatrix rownames: ",

@@ -4,10 +4,13 @@
 \alias{readFam}
 \title{Read Familias .fam files}
 \usage{
-readFam(famfile)
+readFam(famfile, useDVI = F)
 }
 \arguments{
 \item{famfile}{Path to a ".fam" file}
+
+\item{useDVI}{A logical; if TRUE, the DVI section of the fam file is used to
+extract pedigrees and genotypes.}
 }
 \value{
 If the .fam file only contains a database, the output is a list of
@@ -16,6 +19,10 @@ used as \code{locusAttributes} in e.g. \code{\link[=setMarkers]{setMarkers()}}.
 
 If the .fam file describes pedigree data, the output is a \code{ped} object or a
 list of such.
+
+If \code{useDVI = TRUE}, then the families described under \code{Reference Families}
+are parsed and converted to \code{ped} objects. Each family generally describes
+multiple pedigrees, so the output gets another layer in this case.
 }
 \description{
 This function parses the content of a Familias-formatted ".fam" file, and
