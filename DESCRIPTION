@@ -20,7 +20,8 @@ Imports:
     pedprobr,
     maxLik,
     glue,
-    pedmut
+    pedmut,
+    poibin
 Suggests: testthat,
     pedlikCompare
 RoxygenNote: 6.1.1
