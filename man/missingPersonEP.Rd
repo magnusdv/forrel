@@ -2,24 +2,40 @@
 % Please edit documentation in R/missingPersonEP.R
 \name{missingPersonEP}
 \alias{missingPersonEP}
-\title{Exclusion power statistics in missing person cases}
+\title{Exclusion power statistics in missing person cases.}
 \usage{
 missingPersonEP(reference, missing, markers, disableMutations = TRUE,
   verbose = TRUE)
 }
 \arguments{
-\item{reference}{A \code{\link[pedtools:ped]{pedtools::ped()}} object with attached markers.}
+\item{reference}{A \code{ped} object with attached markers.}
 
 \item{missing}{The ID label of the missing pedigree member.}
 
-\item{markers}{Names or indices of the markers to be included. By default, all markers are included.}
+\item{markers}{Names or indices of the markers to be included. By default,
+all markers.}
 
-\item{disableMutations}{A logical (default: TRUE).}
+\item{disableMutations}{A logical, by default TRUE.}
 
-\item{verbose}{A logical.}
+\item{verbose}{A logical, by default TRUE.}
+}
+\value{
+A list of four entries:
+\itemize{
+\item \code{EPindividual}: A numeric vector containing the exclusion power of each
+marker. If the genotypes of a marker are incompatible with the \code{reference}
+pedigree, the corresponding entry is NA.
+\item \code{EPtotal}: The total exclusion power, computed as \code{1 - prod(1 -   EPindividual, na.rm = T)}
+\item \code{expectedMismatch}: The expected number of markers giving exclusion,
+computed as \code{sum(EPindividual, na.rm = T)}
+\item \code{distribMismatch}: The probability distribution of the number of markers
+giving exclusion. This is given as a numeric vector of length \code{n+1}, where
+\code{n} is the number of nonzero element of \code{EPindividual}. The vector has
+names \code{0:n}.
+}
 }
 \description{
-Exclusion power statistics in missing person cases
+Exclusion power statistics in missing person cases.
 }
 \examples{
 

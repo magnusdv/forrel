@@ -1,10 +1,28 @@
-#' Exclusion power statistics in missing person cases
+#' Exclusion power statistics in missing person cases.
 #'
-#' @param reference A [pedtools::ped()] object with attached markers.
+#' @param reference A `ped` object with attached markers.
 #' @param missing The ID label of the missing pedigree member.
-#' @param markers Names or indices of the markers to be included. By default, all markers are included.
-#' @param disableMutations A logical (default: TRUE).
-#' @param verbose A logical.
+#' @param markers Names or indices of the markers to be included. By default,
+#'   all markers.
+#' @param disableMutations A logical, by default TRUE.
+#' @param verbose A logical, by default TRUE.
+#'
+#' @return A list of four entries:
+#'
+#'   * `EPindividual`: A numeric vector containing the exclusion power of each
+#'   marker. If the genotypes of a marker are incompatible with the `reference`
+#'   pedigree, the corresponding entry is NA.
+#'
+#'   * `EPtotal`: The total exclusion power, computed as `1 - prod(1 -
+#'   EPindividual, na.rm = T)`
+#'
+#'   * `expectedMismatch`: The expected number of markers giving exclusion,
+#'   computed as `sum(EPindividual, na.rm = T)`
+#'
+#'   * `distribMismatch`: The probability distribution of the number of markers
+#'   giving exclusion. This is given as a numeric vector of length `n+1`, where
+#'   `n` is the number of nonzero element of `EPindividual`. The vector has
+#'   names `0:n`.
 #'
 #' @examples
 #'
@@ -72,7 +90,7 @@ missingPersonEP = function(reference, missing, markers, disableMutations = TRUE,
   tot = 1 - prod(1 - ep, na.rm = T)
 
   # Result: Expected number of exclusions
-  meanMis = sum(ep, na.rm = T)
+  expMis = sum(ep, na.rm = T)
 
   # Result: Distribution of number of mismatches
   # This is a sum of different Bernoulli variables, i.e., Poisson binomial.
@@ -83,5 +101,5 @@ missingPersonEP = function(reference, missing, markers, disableMutations = TRUE,
   else
     distrib[] = 1
 
-  list(EPindividual = ep, EPtotal = tot, meanMismatches = meanMis, mismatchDistrib = distrib)
+  list(EPindividual = ep, EPtotal = tot, expectedMismatch = expMis, distribMismatch = distrib)
 }
