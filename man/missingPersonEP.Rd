@@ -23,14 +23,21 @@ Exclusion power statistics in missing person cases
 }
 \examples{
 
-# 3 siblings; third is missing
-x = nuclearPed(3)
+# Four siblings; the fourth is missing
+x = nuclearPed(4)
 
-# First two brothers typed with 10 triallelic markers
-x = markerSim(x, N = 5, ids = 3:4, alleles = 1:3, seed = 3, verbose = FALSE)
-x
+# Remaining sibs typed with 4 triallelic markers
+x = markerSim(x, N = 4, ids = 3:5, alleles = 1:3, seed = 577, verbose = FALSE)
+
+# Add marker with inconsistency in reference genotypes
+# (this should be ignored)
+badMarker = marker(x, `3` = 1, `4` = 2, `5` = 3)
+x = addMarkers(x, badMarker)
 
 # Compute exclusion power statistics
-missingPersonEP(x, missing = 5)
+missingPersonEP(x, missing = 6)
+
+# Compare with genotypes
+x
 
 }

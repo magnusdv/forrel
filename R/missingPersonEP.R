@@ -8,15 +8,22 @@
 #'
 #' @examples
 #'
-#' # 3 siblings; third is missing
-#' x = nuclearPed(3)
+#' # Four siblings; the fourth is missing
+#' x = nuclearPed(4)
 #'
-#' # First two brothers typed with 10 triallelic markers
-#' x = markerSim(x, N = 5, ids = 3:4, alleles = 1:3, seed = 3, verbose = FALSE)
-#' x
+#' # Remaining sibs typed with 4 triallelic markers
+#' x = markerSim(x, N = 4, ids = 3:5, alleles = 1:3, seed = 577, verbose = FALSE)
+#'
+#' # Add marker with inconsistency in reference genotypes
+#' # (this should be ignored)
+#' badMarker = marker(x, `3` = 1, `4` = 2, `5` = 3)
+#' x = addMarkers(x, badMarker)
 #'
 #' # Compute exclusion power statistics
-#' missingPersonEP(x, missing = 5)
+#' missingPersonEP(x, missing = 6)
+#'
+#' # Compare with genotypes
+#' x
 #'
 #' @importFrom poibin dpoibin
 #' @importFrom pedprobr likelihood
@@ -33,55 +40,48 @@ missingPersonEP = function(reference, missing, markers, disableMutations = TRUE,
   if(disableMutations)
     mutmod(reference, markers) = NULL
 
-  useMarkers = markers
-
-  # Identify and remove impossible markers
-  liks = sapply(markers, function(i) pedprobr::likelihood(reference, i))
-  imp = liks == 0
-  useMarkers = markers[!imp]
-  if(verbose && any(imp)) {
-    message("Removing markers with mutations in reference: ", toString(which(imp)))
-  }
-
   # Extract markers and set up pedigrees
-  ref = selectMarkers(reference, useMarkers)
+  ref = selectMarkers(reference, markers)
   ped_related = relabel(ref, old = missing, new = "_POI_")
   ped_unrelated = list(ref, singleton("_POI_"))
 
   # Compute the exclusion power of each marker
-  ep = vapply(seq_along(useMarkers), function(i) {
+  ep = vapply(seq_along(markers), function(i) {
 
-    if(verbose) message("Marker ", useMarkers[i], " ... ", appendLF = F)
+    if(verbose)
+      message("Marker ", markers[i], " ... ", appendLF = F)
 
+    # If impossible, return NA
+    lik = pedprobr::likelihood(reference, i)
+    if(lik == 0) {
+      message("Genotypes incompatible with reference pedigree - ignoring marker")
+      return(NA_real_)
+    }
+
+    # Otherwise, compute EP
     this.ep = exclusionPower(ped_claim = ped_related, ped_true = ped_unrelated,
                              ids = "_POI_", markerindex = i, plot = F,
                              verbose = F)
     if(verbose) message("PE = ", this.ep)
-
     this.ep
   }, FUN.VALUE = 0)
 
-  # Result: EP per marker
-  perMarker = numeric(length(markers))
-  perMarker[!imp] = ep
-  perMarker[imp] = NA
-  names(perMarker) = markers
+  names(ep) = markers
 
-  # Result: Total EP
-  tot = 1 - prod(1 - ep)
+  # Total EP
+  tot = 1 - prod(1 - ep, na.rm = T)
 
   # Result: Expected number of exclusions
-  meanMis = sum(ep)
+  meanMis = sum(ep, na.rm = T)
 
   # Result: Distribution of number of mismatches
   # This is a sum of different Bernoulli variables, i.e., Poisson binomial.
-  n.nonz = sum(ep > 0)
+  n.nonz = sum(ep > 0, na.rm = T)
   distrib = structure(numeric(n.nonz + 1), names = 0:n.nonz)
   if(n.nonz > 0)
-    distrib[] = poibin::dpoibin(kk = 0:n.nonz, pp = ep[ep > 0])
+    distrib[] = poibin::dpoibin(kk = 0:n.nonz, pp = ep[!is.na(ep) & ep > 0])
   else
     distrib[] = 1
 
-  list(PEperMarker = perMarker, PEtotal = tot,
-       meanMismatches = meanMis, mismatchDistrib = distrib)
+  list(EPindividual = ep, EPtotal = tot, meanMismatches = meanMis, mismatchDistrib = distrib)
 }
