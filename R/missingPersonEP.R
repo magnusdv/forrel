@@ -9,19 +9,19 @@
 #'
 #' @return A list of four entries:
 #'
-#'   * `EPindividual`: A numeric vector containing the exclusion power of each
+#'   * `EPperMarker`: A numeric vector containing the exclusion power of each
 #'   marker. If the genotypes of a marker are incompatible with the `reference`
 #'   pedigree, the corresponding entry is NA.
 #'
 #'   * `EPtotal`: The total exclusion power, computed as `1 - prod(1 -
-#'   EPindividual, na.rm = T)`
+#'   EPperMarker, na.rm = T)`
 #'
 #'   * `expectedMismatch`: The expected number of markers giving exclusion,
-#'   computed as `sum(EPindividual, na.rm = T)`
+#'   computed as `sum(EPperMarker, na.rm = T)`
 #'
 #'   * `distribMismatch`: The probability distribution of the number of markers
 #'   giving exclusion. This is given as a numeric vector of length `n+1`, where
-#'   `n` is the number of nonzero element of `EPindividual`. The vector has
+#'   `n` is the number of nonzero element of `EPperMarker`. The vector has
 #'   names `0:n`.
 #'
 #' @examples
@@ -101,5 +101,5 @@ missingPersonEP = function(reference, missing, markers, disableMutations = TRUE,
   else
     distrib[] = 1
 
-  list(EPindividual = ep, EPtotal = tot, expectedMismatch = expMis, distribMismatch = distrib)
+  list(EPperMarker = ep, EPtotal = tot, expectedMismatch = expMis, distribMismatch = distrib)
 }

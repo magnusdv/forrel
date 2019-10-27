@@ -22,15 +22,15 @@ all markers.}
 \value{
 A list of four entries:
 \itemize{
-\item \code{EPindividual}: A numeric vector containing the exclusion power of each
+\item \code{EPperMarker}: A numeric vector containing the exclusion power of each
 marker. If the genotypes of a marker are incompatible with the \code{reference}
 pedigree, the corresponding entry is NA.
-\item \code{EPtotal}: The total exclusion power, computed as \code{1 - prod(1 -   EPindividual, na.rm = T)}
+\item \code{EPtotal}: The total exclusion power, computed as \code{1 - prod(1 -   EPperMarker, na.rm = T)}
 \item \code{expectedMismatch}: The expected number of markers giving exclusion,
-computed as \code{sum(EPindividual, na.rm = T)}
+computed as \code{sum(EPperMarker, na.rm = T)}
 \item \code{distribMismatch}: The probability distribution of the number of markers
 giving exclusion. This is given as a numeric vector of length \code{n+1}, where
-\code{n} is the number of nonzero element of \code{EPindividual}. The vector has
+\code{n} is the number of nonzero element of \code{EPperMarker}. The vector has
 names \code{0:n}.
 }
 }
