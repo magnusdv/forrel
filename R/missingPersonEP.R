@@ -40,8 +40,10 @@
 #' # Compute exclusion power statistics
 #' missingPersonEP(x, missing = 6)
 #'
-#' # Compare with genotypes
-#' x
+#' # With marker names:
+#' name(x, 1:5) = paste0("M", 1:5)
+#' missingPersonEP(x, missing = 6)
+#'
 #'
 #' @importFrom poibin dpoibin
 #' @importFrom pedprobr likelihood
@@ -51,8 +53,17 @@ missingPersonEP = function(reference, missing, markers, disableMutations = TRUE,
   if(!is.ped(reference))
     stop2("Expecting a connected pedigree as H1")
 
-  if(missing(markers))
-    markers = seq_len(nMarkers(reference))
+  nmark = nMarkers(reference)
+  if(nmark == 0)
+    stop2("No markers attached to the input reference")
+
+  if(missing(markers)) {
+    if(verbose)
+      message("Using all ", nmark, " attached markers")
+    markers = name(reference, 1:nmark)
+    if(anyNA(markers))
+      markers = 1:nmark
+  }
 
   # Remove mutation models if indicated
   if(disableMutations)
