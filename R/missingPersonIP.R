@@ -61,12 +61,12 @@ missingPersonIP = function(reference, missing, markers, nsim = 1, threshold = NU
   }
 
   # Extract markers and set up pedigrees
-  ref = selectMarkers(reference, markers)
-  ped_related = relabel(ref, old = missing, new = "_POI_")
-  ped_unrelated = list(ref, singleton("_POI_"))
+  midx = whichMarkers(reference, markers)
+  ped_related = relabel(reference, old = missing, new = "_POI_")
+  ped_unrelated = list(reference, singleton("_POI_"))
 
   # Raise error if impossible markers
-  liks = sapply(seq_along(markers), function(i) pedprobr:::likelihood.ped(reference, i))
+  liks = sapply(midx, function(i) pedprobr::likelihood(reference, i))
   if(any(liks == 0))
     stop2("Marker incompatible with reference pedigree: ", markers[liks == 0],
           "\nThis makes conditional simulations impossible. Exclude the marker from the computation or add a mutation model")
@@ -78,7 +78,7 @@ missingPersonIP = function(reference, missing, markers, nsim = 1, threshold = NU
   if(verbose)
     message("Simulating ", nsim, " profiles...", appendLF = F)
 
-  allsims = profileSim(ped_related, ids = "_POI_", N = nsim, conditions = markers)
+  allsims = profileSim(ped_related, ids = "_POI_", N = nsim, conditions = midx)
 
   if(verbose)
     message("done\nComputing likelihood ratios...", appendLF = F)
@@ -91,6 +91,10 @@ missingPersonIP = function(reference, missing, markers, nsim = 1, threshold = NU
     lr = LR(list(rel.sim, unrel.sim), ref = 2)
     lr$LRperMarker[,1]
   }, FUN.VALUE = numeric(length(markers)))
+
+  # Ensure matrix
+  if(length(markers) == 1)
+    lrs = rbind(lrs, deparse.level = 0)
 
   rownames(lrs) = markers
 
