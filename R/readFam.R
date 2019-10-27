@@ -4,9 +4,10 @@
 #' converts it into suitable `ped` objects. This function does not depend on the
 #' `Familias` package.
 #'
-#' @param famfile Path to a ".fam" file
+#' @param famfile Path to a ".fam" file.
 #' @param useDVI A logical; if TRUE, the DVI section of the fam file is used to
 #'   extract pedigrees and genotypes.
+#' @param verbose A logical; if TRUE, various information is written to the screen during the parsing process.
 #'
 #' @return If the .fam file only contains a database, the output is a list of
 #'   information (name, alleles, frequencies) about each locus. This list can be
@@ -21,7 +22,7 @@
 #'
 #' @importFrom pedmut mutationMatrix
 #' @export
-readFam = function(famfile, useDVI = F) {
+readFam = function(famfile, useDVI = F, verbose = T) {
   if(!endsWith(famfile, ".fam"))
     stop("Input file must end with '.fam'", call. = F)
 
@@ -38,7 +39,8 @@ readFam = function(famfile, useDVI = F) {
 
   # Read and print Familias version
   version = x[3]
-  message("Familias version: ", version)
+  if(verbose)
+    message("Familias version: ", version)
 
 
   ### Individuals and genotypes
@@ -47,7 +49,8 @@ readFam = function(famfile, useDVI = F) {
   nid.line = if(x[4] != "") 4 else 5
   nid = as.integer(x[nid.line]) # Number of persons involved in pedigrees (but excluding "extras")
   checkInt(nid, nid.line, "number of individuals")
-  message("\nNumber of individuals (excluding 'extras'): ", nid)
+  if(verbose)
+    message("\nNumber of individuals (excluding 'extras'): ", nid)
 
   # Initialise id & sex
   id = character(nid)
@@ -65,7 +68,8 @@ readFam = function(famfile, useDVI = F) {
     nmi = as.integer(x[id.line + 5])
     checkInt(nmi, id.line + 5,
              sprintf('number of genotypes for "%s"', id[i]))
-    message(sprintf("  Individual '%s': Genotypes for %d markers read", id[i], nmi))
+    if(verbose)
+      message(sprintf("  Individual '%s': Genotypes for %d markers read", id[i], nmi))
 
     a1.lines = seq(id.line + 6, by = 3, length = nmi)
     a1.idx = as.integer(x[a1.lines]) + 1
@@ -81,7 +85,7 @@ readFam = function(famfile, useDVI = F) {
 
   kr.line = id.line
   if(x[kr.line] != "Known relations")
-    stop(sprintf('Expected line %d to be "Known relations", but found: "%s"', id.line, x[id.line]))
+    stop2(sprintf('Expected line %d to be "Known relations", but found: "%s"', id.line, x[id.line]))
 
   # Add extras to id & sex
   nFem = as.integer(x[kr.line + 1])
@@ -110,7 +114,8 @@ readFam = function(famfile, useDVI = F) {
   # Initialise list of final pedigrees
   nPed = as.integer(x[rel.line])
   checkInt(nPed, "number of pedigrees")
-  message("\nNumber of pedigrees: ", nPed)
+  if(verbose)
+    message("\nNumber of pedigrees: ", nPed)
 
   # If no more pedigree info, finish pedigree part
   if(nPed == 0) {
@@ -150,7 +155,8 @@ readFam = function(famfile, useDVI = F) {
       }
 
       # Print summary
-      message(sprintf(" Pedigree '%s': %d extra females, %d extra males", ped.name, nFem.i, nMal.i))
+      if(verbose)
+        message(sprintf(" Pedigree '%s': %d extra females, %d extra males", ped.name, nFem.i, nMal.i))
 
       # Convert to familiaspedigree and insert in list
       pedigrees[[ped.idx]] = asFamiliasPedigree(id.i, fidx.i, midx.i, sex.i)
@@ -172,12 +178,15 @@ readFam = function(famfile, useDVI = F) {
   checkInt(nLoc, "number of loci")
 
   has.info = x[db.line + 1] == "#TRUE#"
-  if(has.info)
-    message("\nDatabase: ", x[db.line + 2])
-  else
-    message("")
+  if(verbose) {
+    if(has.info)
+      message("\nDatabase: ", x[db.line + 2])
+    else
+      message("")
+  }
 
-  message("Number of loci: ", nLoc)
+  if(verbose)
+    message("Number of loci: ", nLoc)
 
   loci = vector("list", nLoc)
   loc.line = db.line + 2 + has.info
@@ -200,7 +209,7 @@ readFam = function(famfile, useDVI = F) {
 
     has.silent = x[loc.line + 10] == "#TRUE#"
     if(has.silent)
-      stop("Locus ", loc.name, " has silent frequencies: this is not implemented yet")
+      stop2("Locus ", loc.name, " has silent frequencies: this is not implemented yet")
     silent.freq = as.numeric(x[loc.line + 11])
 
     # Number of alleles except the silent
@@ -245,7 +254,7 @@ readFam = function(famfile, useDVI = F) {
     else
       mut_txt = sprintf("male model = %s, male rate = %.2g, female model = %s, female rate = %.2g",
                          maleMod, mutrate.mal, femaleMod, mutrate.fem)
-    message(sprintf("  %s: %d alleles, %s", loc.name, length(frqs), mut_txt))
+    if(verbose) message(sprintf("  %s: %d alleles, %s", loc.name, length(frqs), mut_txt))
 
     # Collect locus info
     loci[[i]] = list(locusname = loc.name, alleles = frqs,
@@ -263,20 +272,25 @@ readFam = function(famfile, useDVI = F) {
   ###########
 
   if(useDVI) {
-    message("\n*** Reading DVI section ***")
+    if(verbose)
+      message("\n*** Reading DVI section ***")
     dvi.start = match("[DVI]", raw)
     if(is.na(dvi.start))
-      stop("Expected keyword '[DVI]' not found")
+      stop2("Expected keyword '[DVI]' not found")
     dvi.lines = raw[dvi.start:length(raw)]
     dvi.families = readDVI(dvi.lines)
 
-    message("Returning the following families:")
+    if(verbose)
+      message("Returning the following families:")
+
     famnames = names(dvi.families)
     for(i in seq_along(dvi.families)) {
       fam = dvi.families[[i]]
-      message(sprintf("%s: %d pedigrees", famnames[i], length(fam$pedigrees)))
-      for(nm in names(fam$pedigrees))
-        message("  ", nm)
+      if(verbose) {
+        message(sprintf("%s: %d pedigrees", famnames[i], length(fam$pedigrees)))
+        for(nm in names(fam$pedigrees))
+          message("  ", nm)
+      }
     }
 
     res = lapply(dvi.families, function(fam) {
@@ -320,11 +334,13 @@ readFam = function(famfile, useDVI = F) {
     }
   }
   if(!is.null(pedigrees)) {
-    message("\nReturning pedigrees with attached database.\n")
+    if(verbose)
+      message("\nReturning pedigrees with attached database.\n")
     Familias2ped(familiasped = pedigrees, datamatrix = datamatrix, loci = loci)
   }
   else {
-    message("\nReturning database only.\n")
+    if(verbose)
+      message("\nReturning database only.\n")
     readFamiliasLoci(loci = loci)
   }
 }
