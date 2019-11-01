@@ -4,14 +4,20 @@
 #' @param missing The ID label of the missing pedigree member.
 #' @param markers Names or indices of the markers to be included. By default,
 #'   all markers.
-#' @param disableMutations A logical, by default TRUE.
+#' @param disableMutations This parameter determines how mutation models are
+#'   treated. If `TRUE`, mutations are disabled for all markers. If `NA` (the
+#'   default), mutations are disabled only for those markers with nonzero
+#'   baseline likelihood. (In other words: Mutations are NOT disabled if the
+#'   reference genotypes are inconsistent with the pedigree.) If `FALSE` no
+#'   action is done to disable mutations. Finally, if a vector of marker names
+#'   or indices is given, mutations are disabled for these markers exclusively.
 #' @param verbose A logical, by default TRUE.
 #'
-#' @return A list of four entries:
+#' @return A list with the following entries:
 #'
 #'   * `EPperMarker`: A numeric vector containing the exclusion power of each
 #'   marker. If the genotypes of a marker are incompatible with the `reference`
-#'   pedigree, the corresponding entry is NA.
+#'   pedigree, the corresponding entry is NA
 #'
 #'   * `EPtotal`: The total exclusion power, computed as `1 - prod(1 -
 #'   EPperMarker, na.rm = T)`
@@ -21,8 +27,11 @@
 #'
 #'   * `distribMismatch`: The probability distribution of the number of markers
 #'   giving exclusion. This is given as a numeric vector of length `n+1`, where
-#'   `n` is the number of nonzero element of `EPperMarker`. The vector has
-#'   names `0:n`.
+#'   `n` is the number of nonzero element of `EPperMarker`. The vector has names
+#'   `0:n`
+#'
+#'   * `params`: A list containing the input parameters `missing`, `markers` and
+#'   `disableMutations`
 #'
 #' @examples
 #'
@@ -33,7 +42,7 @@
 #' x = markerSim(x, N = 4, ids = 3:5, alleles = 1:3, seed = 577, verbose = FALSE)
 #'
 #' # Add marker with inconsistency in reference genotypes
-#' # (this should be ignored)
+#' # (this should be ignored by `missingPersonEP()`)
 #' badMarker = marker(x, `3` = 1, `4` = 2, `5` = 3)
 #' x = addMarkers(x, badMarker)
 #'
@@ -44,11 +53,10 @@
 #' name(x, 1:5) = paste0("M", 1:5)
 #' missingPersonEP(x, missing = 6)
 #'
-#'
-#' @importFrom poibin dpoibin
 #' @importFrom pedprobr likelihood
 #' @export
 missingPersonEP = function(reference, missing, markers, disableMutations = TRUE, verbose = TRUE) {
+  st = Sys.time()
 
   if(!is.ped(reference))
     stop2("Expecting a connected pedigree as H1")
@@ -65,24 +73,52 @@ missingPersonEP = function(reference, missing, markers, disableMutations = TRUE,
       markers = 1:nmark
   }
 
-  # Remove mutation models if indicated
-  if(disableMutations)
-    mutmod(reference, markers) = NULL
+  # Do any of the markers model mutatinos?
+  hasMut = sapply(getMarkers(reference, markers), allowsMutations)
+
+  # For which marker should mutations be disabled?
+  disALL = any(hasMut) && isTRUE(disableMutations)
+  disGOOD = any(hasMut) && length(disableMutations) == 1 && is.na(disableMutations)
+  disSELECT = any(hasMut) && !isFALSE(disableMutations) && !is.null(disableMutations)
+
+  if(disALL)
+    disable = markers[hasMut]
+  else if(disGOOD) { # disable only if consistent
+    refNoMut = reference
+    mutmod(refNoMut, markers[hasMut]) = NULL
+    liksNoMut = vapply(markers[hasMut], function(i) pedprobr::likelihood(refNoMut, i), 0)
+    disable = markers[hasMut][liksNoMut > 0]
+  }
+  else if(disSELECT)
+    disable = whichMarkers(reference, disableMutations)
+  else
+    disable = NULL
+
+  # Disable mutations in the chosen cases
+  if(length(disable) > 0)
+    mutmod(reference, disable) = NULL
 
   # Extract markers and set up pedigrees
   ref = selectMarkers(reference, markers)
   ped_related = relabel(ref, old = missing, new = "_POI_")
   ped_unrelated = list(ref, singleton("_POI_"))
+  mseq = seq_along(markers)
+
+  ######################
+  ### Setup finished ###
+  ######################
+
+  # Baseline likelihoods
+  refliks = vapply(mseq, function(i) pedprobr::likelihood(ref, i), 0)
 
   # Compute the exclusion power of each marker
-  ep = vapply(seq_along(markers), function(i) {
+  ep = vapply(mseq, function(i) {
 
     if(verbose)
       message("Marker ", markers[i], " ... ", appendLF = F)
 
     # If impossible, return NA
-    lik = pedprobr::likelihood(reference, i)
-    if(lik == 0) {
+    if(refliks[i] == 0) {
       message("Genotypes incompatible with reference pedigree - ignoring marker")
       return(NA_real_)
     }
@@ -107,10 +143,24 @@ missingPersonEP = function(reference, missing, markers, disableMutations = TRUE,
   # This is a sum of different Bernoulli variables, i.e., Poisson binomial.
   n.nonz = sum(ep > 0, na.rm = T)
   distrib = structure(numeric(n.nonz + 1), names = 0:n.nonz)
-  if(n.nonz > 0)
-    distrib[] = poibin::dpoibin(kk = 0:n.nonz, pp = ep[!is.na(ep) & ep > 0])
+  if(n.nonz > 0) {
+    if (requireNamespace("poibin", quietly = TRUE))
+      distrib[] = poibin::dpoibin(kk = 0:n.nonz, pp = ep[!is.na(ep) & ep > 0])
+    else {
+      warning("Package `poibin` not found. Cannot compute the distribution of exclusion counts without this; returning NA's")
+      distrib[] = NA_real_
+    }
+  }
   else
     distrib[] = 1
 
-  list(EPperMarker = ep, EPtotal = tot, expectedMismatch = expMis, distribMismatch = distrib)
+  # Timing
+  if(verbose)
+    message("\nTotal time used: ", format(Sys.time() - st, digits = 3))
+
+  # List of input parameters
+  params = list(missing = missing, markers = markers, disableMutations = markers[disable])
+
+  list(EPperMarker = ep, EPtotal = tot, expectedMismatch = expMis,
+       distribMismatch = distrib, params = params)
 }

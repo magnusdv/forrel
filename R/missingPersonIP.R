@@ -7,6 +7,13 @@
 #' @param nsim A positive integer: the number of simulations
 #' @param threshold A numeric vector with one or more positive numbers used
 #'   as the likelihood ratio tresholds for inclusion
+#' @param disableMutations This parameter determines how mutation models are
+#'   treated. If `TRUE`, mutations are disabled for all markers. If `NA` (the
+#'   default), mutations are disabled only for those markers with nonzero
+#'   baseline likelihood. (In other words: Mutations are NOT disabled if the
+#'   reference genotypes are inconsistent with the pedigree.) If `FALSE` no
+#'   action is done to disable mutations. Finally, if a vector of marker names
+#'   or indices is given, mutations are disabled for these markers exclusively.
 #' @param seed A numeric seed for the random number generator (optional)
 #' @param verbose A logical, by default TRUE.
 #'
@@ -23,6 +30,8 @@
 #'   `threshold`, the fraction of simulations resulting in a LR exceeding the
 #'   given number.
 #'
+#'   * `params`: A list containing the input parameters `missing`, `markers`, `nsim`, `threshold` and
+#'   `disableMutations`
 #'
 #' @examples
 #'
@@ -38,12 +47,11 @@
 #' # Compare with genotypes
 #' x
 #'
-#' @importFrom poibin dpoibin
 #' @importFrom pedprobr likelihood
 #' @export
 missingPersonIP = function(reference, missing, markers, nsim = 1, threshold = NULL,
-                           seed = NULL, verbose = T) {
-  st = proc.time()
+                           disableMutations = NA, seed = NULL, verbose = T) {
+  st = Sys.time()
 
   if(!is.ped(reference))
     stop2("Expecting a connected pedigree as H1")
@@ -58,6 +66,33 @@ missingPersonIP = function(reference, missing, markers, nsim = 1, threshold = NU
     markers = name(reference, 1:nmark)
     if(anyNA(markers))
       markers = 1:nmark
+  }
+
+  # Do any of the markers model mutatinos?
+  hasMut = sapply(getMarkers(reference, markers), allowsMutations)
+
+  # For which marker should mutations be disabled?
+  disALL = any(hasMut) && isTRUE(disableMutations)
+  disGOOD = any(hasMut) && length(disableMutations) == 1 && is.na(disableMutations)
+  disSELECT = any(hasMut) && !isFALSE(disableMutations) && !is.null(disableMutations)
+
+  if(disALL)
+    disable = markers[hasMut]
+  else if(disGOOD) { # disable only if consistent
+    refNoMut = reference
+    mutmod(refNoMut, markers[hasMut]) = NULL
+    liksNoMut = vapply(markers[hasMut], function(i) pedprobr::likelihood(refNoMut, i), 0)
+    disable = markers[hasMut][liksNoMut > 0]
+  }
+  else if(disSELECT)
+    disable = whichMarkers(reference, disableMutations)
+  else
+    disable = NULL
+
+  # Disable mutations in the chosen cases
+  if(length(disable) > 0) {
+    if(verbose) message("Disabling mutations for marker ", toString(disable))
+    mutmod(reference, disable) = NULL
   }
 
   # Extract markers and set up pedigrees
@@ -76,9 +111,9 @@ missingPersonIP = function(reference, missing, markers, nsim = 1, threshold = NU
 
   # Simulate nsim complete profiles of ped_related
   if(verbose)
-    message("Simulating ", nsim, " profiles...", appendLF = F)
+    message("\nSimulating ", nsim, " profiles...", appendLF = F)
 
-  allsims = profileSim(ped_related, ids = "_POI_", N = nsim, conditions = midx)
+  allsims = profileSim(ped_related, ids = "_POI_", N = nsim, markers = midx)
 
   if(verbose)
     message("done\nComputing likelihood ratios...", appendLF = F)
@@ -108,7 +143,15 @@ missingPersonIP = function(reference, missing, markers, nsim = 1, threshold = NU
   IP = sapply(threshold, function(thr) mean(LRperSim >= thr))
   names(IP) = threshold
 
-  # Return
-  list(LRperSim = LRperSim, ELRperMarker = ELRperMarker, ELRtotal = ELRtotal, IP = IP,
-       time = proc.time() - st)
+  # Timing
+  if(verbose)
+    message("\nTotal time used: ", format(Sys.time() - st, digits = 3))
+
+  # Lits of input parameters
+  params = list(missing = missing, markers = markers,
+                nsim = nsim, threshold = threshold,
+                disableMutations = disableMutations)
+
+  list(LRperSim = LRperSim, ELRperMarker = ELRperMarker,
+       ELRtotal = ELRtotal, IP = IP, params = params)
 }

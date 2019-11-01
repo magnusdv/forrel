@@ -5,7 +5,8 @@
 \title{Inclusion power statistics in missing person cases.}
 \usage{
 missingPersonIP(reference, missing, markers, nsim = 1,
-  threshold = NULL, seed = NULL, verbose = T)
+  threshold = NULL, disableMutations = NA, seed = NULL,
+  verbose = T)
 }
 \arguments{
 \item{reference}{A \code{ped} object with attached markers.}
@@ -19,6 +20,14 @@ all markers.}
 
 \item{threshold}{A numeric vector with one or more positive numbers used
 as the likelihood ratio tresholds for inclusion}
+
+\item{disableMutations}{This parameter determines how mutation models are
+treated. If \code{TRUE}, mutations are disabled for all markers. If \code{NA} (the
+default), mutations are disabled only for those markers with nonzero
+baseline likelihood. (In other words: Mutations are NOT disabled if the
+reference genotypes are inconsistent with the pedigree.) If \code{FALSE} no
+action is done to disable mutations. Finally, if a vector of marker names
+or indices is given, mutations are disabled for these markers exclusively.}
 
 \item{seed}{A numeric seed for the random number generator (optional)}
 
@@ -34,6 +43,8 @@ each simulation.
 \item \code{IP}: A numeric of the same length as \code{threshold}. For each element of
 \code{threshold}, the fraction of simulations resulting in a LR exceeding the
 given number.
+\item \code{params}: A list containing the input parameters \code{missing}, \code{markers}, \code{nsim}, \code{threshold} and
+\code{disableMutations}
 }
 }
 \description{

@@ -15,23 +15,31 @@ missingPersonEP(reference, missing, markers, disableMutations = TRUE,
 \item{markers}{Names or indices of the markers to be included. By default,
 all markers.}
 
-\item{disableMutations}{A logical, by default TRUE.}
+\item{disableMutations}{This parameter determines how mutation models are
+treated. If \code{TRUE}, mutations are disabled for all markers. If \code{NA} (the
+default), mutations are disabled only for those markers with nonzero
+baseline likelihood. (In other words: Mutations are NOT disabled if the
+reference genotypes are inconsistent with the pedigree.) If \code{FALSE} no
+action is done to disable mutations. Finally, if a vector of marker names
+or indices is given, mutations are disabled for these markers exclusively.}
 
 \item{verbose}{A logical, by default TRUE.}
 }
 \value{
-A list of four entries:
+A list with the following entries:
 \itemize{
 \item \code{EPperMarker}: A numeric vector containing the exclusion power of each
 marker. If the genotypes of a marker are incompatible with the \code{reference}
-pedigree, the corresponding entry is NA.
+pedigree, the corresponding entry is NA
 \item \code{EPtotal}: The total exclusion power, computed as \code{1 - prod(1 -   EPperMarker, na.rm = T)}
 \item \code{expectedMismatch}: The expected number of markers giving exclusion,
 computed as \code{sum(EPperMarker, na.rm = T)}
 \item \code{distribMismatch}: The probability distribution of the number of markers
 giving exclusion. This is given as a numeric vector of length \code{n+1}, where
-\code{n} is the number of nonzero element of \code{EPperMarker}. The vector has
-names \code{0:n}.
+\code{n} is the number of nonzero element of \code{EPperMarker}. The vector has names
+\code{0:n}
+\item \code{params}: A list containing the input parameters \code{missing}, \code{markers} and
+\code{disableMutations}
 }
 }
 \description{
@@ -46,7 +54,7 @@ x = nuclearPed(4)
 x = markerSim(x, N = 4, ids = 3:5, alleles = 1:3, seed = 577, verbose = FALSE)
 
 # Add marker with inconsistency in reference genotypes
-# (this should be ignored)
+# (this should be ignored by `missingPersonEP()`)
 badMarker = marker(x, `3` = 1, `4` = 2, `5` = 3)
 x = addMarkers(x, badMarker)
 
@@ -56,6 +64,5 @@ missingPersonEP(x, missing = 6)
 # With marker names:
 name(x, 1:5) = paste0("M", 1:5)
 missingPersonEP(x, missing = 6)
-
 
 }
