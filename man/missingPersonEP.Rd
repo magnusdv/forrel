@@ -4,7 +4,7 @@
 \alias{missingPersonEP}
 \title{Exclusion power statistics in missing person cases.}
 \usage{
-missingPersonEP(reference, missing, markers, disableMutations = TRUE,
+missingPersonEP(reference, missing, markers, disableMutations = NA,
   verbose = TRUE)
 }
 \arguments{

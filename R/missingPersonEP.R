@@ -55,7 +55,7 @@
 #'
 #' @importFrom pedprobr likelihood
 #' @export
-missingPersonEP = function(reference, missing, markers, disableMutations = TRUE, verbose = TRUE) {
+missingPersonEP = function(reference, missing, markers, disableMutations = NA, verbose = TRUE) {
   st = Sys.time()
 
   if(!is.ped(reference))
