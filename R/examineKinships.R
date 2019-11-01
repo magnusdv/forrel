@@ -23,7 +23,7 @@
 #' @seealso [IBDestimate()], [IBDtriangle()], [showInTriangle()]
 #'
 #' @examples
-#' library(pedtools)
+#' # Simulate 500 SNPs in a cousin pedigree
 #' x = cousinPed(1)
 #' x = simpleSim(x, 500, alleles = 1:2)
 #' examineKinships(x)
