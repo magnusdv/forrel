@@ -21,8 +21,8 @@ Imports:
     maxLik,
     glue,
     pedmut,
-    poibin
 Suggests: testthat,
-    pedlikCompare
+    pedlikCompare,
+    poibin
 RoxygenNote: 6.1.1
 Roxygen: list(markdown = TRUE)
