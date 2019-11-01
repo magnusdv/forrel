@@ -40,11 +40,11 @@ test_that("profileSim() keeps marker names", {
   x = setMarkers(x, list(m, m))
   name(x, 1:2) = c("m1", "m2")
 
-  s = profileSim(x, N = 1, conditions = 1:2)
-  expect_identical(name(s[[1]], 1:2), c("m1", "m2"))
+  s = profileSim(x, N = 1)[[1]]
+  expect_identical(name(s, 1:2), c("m1", "m2"))
 
-  s2 = profileSim(x, N = 1, conditions = list(m, m))
-  expect_identical(name(s2[[1]], 1:2), rep(NA_character_, 2))
+  s2 = profileSim(x, N = 1, markers = list(m, m))[[1]]
+  expect_identical(name(s2, 1:2), rep(NA_character_, 2))
 })
 
 test_that("profileSim() treats pedlists as expected", {
@@ -53,11 +53,11 @@ test_that("profileSim() treats pedlists as expected", {
   y = relabel(x, 2)
   SEED = 777
 
-  sim_pedlist = profileSim(list(x, y), N = 3, cond = "M", seed = SEED)
+  sim_pedlist = profileSim(list(x, y), N = 3, markers = "M", seed = SEED)
 
   set.seed(SEED)
-  sim_compwise = list(profileSim(x, N = 3, cond = "M"),
-                      profileSim(y, N = 3, cond = "M"))
+  sim_compwise = list(profileSim(x, N = 3, markers = "M"),
+                      profileSim(y, N = 3, markers = "M"))
 
   # Check third sim
   expect_identical(sim_pedlist[[3]], lapply(sim_compwise, `[[`, 3))

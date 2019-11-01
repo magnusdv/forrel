@@ -2,31 +2,37 @@
 % Please edit documentation in R/profileSim.R
 \name{profileSim}
 \alias{profileSim}
-\title{Simulation of DNA profiles}
+\title{Simulation of complete DNA profiles}
 \usage{
-profileSim(x, N = 1, ids = NULL, conditions = NULL, seed = NULL,
-  ...)
+profileSim(x, N = 1, ids = NULL, markers = NULL, conditions = NULL,
+  seed = NULL, ...)
 }
 \arguments{
-\item{x}{A \code{ped} object}
+\item{x}{A \code{ped} object or a list of such}
 
 \item{N}{The number of complete simulations to be performed}
 
 \item{ids}{A character (or coercible to character) with ID labels indicating
 whose genotypes should be simulated}
 
-\item{conditions}{A list of marker objects, (or an integer vector indicating
-markers attached to \code{x}). If these contain genotypes the simulations will
-condition on these. Locus attributes (allele frequencies, mutation models
-a.s.o.) are extracted from each marker.}
+\item{markers}{A list of marker objects, or a vector containing names or
+indices referring to markers attached to \code{x}. By default (\code{markers = NULL})
+all attached markers are used. The simulations will be conditional on the
+locus attributes (allele frequencies, mutation models a.s.o.) and any
+existing genotypes in the indicated markers.}
+
+\item{conditions}{Deprecated, use \code{markers} instead.}
 
 \item{seed}{NULL, or a numeric seed for the random number generator}
 
 \item{...}{Further arguments passed on to \code{\link[=markerSim]{markerSim()}}}
 }
 \value{
-A list of length \code{N}. Each element is a \code{ped} object with \code{K}
-attached markers, where \code{K = length(conditions)}.
+A list of \code{N} \code{ped} (or \code{pedList}) objects identical to \code{x}, but with
+\code{m} attached markers, where \code{m} is the number of indicated markers. Any
+previous markers are replaced by the simulated profiles. If the indicated
+markers contained genotypes for some pedigree members, these are still
+present in the simulated profiles.
 }
 \description{
 Simulation of DNA profiles for specified pedigree members. Some pedigree
@@ -34,17 +40,16 @@ members may already be genotyped; in that case the simulation is conditional
 on these. The main work of this function is done by \code{\link[=markerSim]{markerSim()}}.
 }
 \examples{
-# Example with two brothers, one of which is already genotyped with 2 markers.
+# Example with two brothers
 x = nuclearPed(children = c("B1", "B2"))
 
-m1 = marker(x, B1 = 1:2, alleles = 1:3, afreq = c(.2, .3, .5))
-m2 = marker(x, B1 = 4, alleles = 1:4, afreq = c(.1,.2,.3,.4))#, chrom = "X")
-
-# These contain the profile of B1
-cond = list(m1, m2)
+# Attach two markers; one brother is already genotyped
+m1 = marker(x, B1 = 1:2, alleles = 1:3)
+m2 = marker(x, B1 = 1, alleles = 1:4, afreq = (1:4)/10, chrom = "X")
+x = setMarkers(x, list(m1, m2))
 
 # Simulate 3 profiles of B2 conditional on the above
-profileSim(x, N = 3, ids = "B2", conditions = cond)
+profileSim(x, N = 3, ids = "B2")
 
 
 }
