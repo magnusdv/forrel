@@ -26,7 +26,7 @@ or indices is given, mutations are disabled for these markers exclusively.}
 \item{verbose}{A logical, by default TRUE.}
 }
 \value{
-A list with the following entries:
+A \code{mpEP} object, which is essentially a list with the following entries:
 \itemize{
 \item \code{EPperMarker}: A numeric vector containing the exclusion power of each
 marker. If the genotypes of a marker are incompatible with the \code{reference}

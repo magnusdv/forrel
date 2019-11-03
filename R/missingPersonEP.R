@@ -13,7 +13,7 @@
 #'   or indices is given, mutations are disabled for these markers exclusively.
 #' @param verbose A logical, by default TRUE.
 #'
-#' @return A list with the following entries:
+#' @return A `mpEP` object, which is essentially a list with the following entries:
 #'
 #'   * `EPperMarker`: A numeric vector containing the exclusion power of each
 #'   marker. If the genotypes of a marker are incompatible with the `reference`
@@ -159,8 +159,16 @@ missingPersonEP = function(reference, missing, markers, disableMutations = NA, v
     message("\nTotal time used: ", format(Sys.time() - st, digits = 3))
 
   # List of input parameters
-  params = list(missing = missing, markers = markers, disableMutations = markers[disable])
+  params = list(missing = missing, markers = markers, disableMutations = disableMutations)
 
-  list(EPperMarker = ep, EPtotal = tot, expectedMismatch = expMis,
-       distribMismatch = distrib, params = params)
+  structure(list(EPperMarker = ep, EPtotal = tot, expectedMismatch = expMis,
+       distribMismatch = distrib, params = params), class = "mpEP")
 }
+
+print.mpEP = function(x, ...) {
+  cat("\n")
+  cat("Total EP:", round(x$EPtotal, 3), "\n")
+  cat("Markers with potential mismatch:", sum(x$EPperMarker > 0), "\n")
+  cat("Expected number of mismatches:", round(x$expectedMismatch, 3), "\n")
+}
+
