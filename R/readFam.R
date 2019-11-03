@@ -7,7 +7,8 @@
 #' @param famfile Path to a ".fam" file.
 #' @param useDVI A logical; if TRUE, the DVI section of the fam file is used to
 #'   extract pedigrees and genotypes.
-#' @param verbose A logical; if TRUE, various information is written to the screen during the parsing process.
+#' @param verbose A logical; if TRUE, various information is written to the
+#'   screen during the parsing process.
 #'
 #' @return If the .fam file only contains a database, the output is a list of
 #'   information (name, alleles, frequencies) about each locus. This list can be
@@ -190,14 +191,17 @@ readFam = function(famfile, useDVI = F, verbose = T) {
 
   loci = vector("list", nLoc)
   loc.line = db.line + 2 + has.info
-  mutWarn = T
+
+  # Storage for unsupported mutation models
+  unsupp = character()
+
 
   for(i in seq_len(nLoc)) {
     loc.name = x[loc.line]
     mutrate.fem = as.numeric(x[loc.line + 1])
     mutrate.mal = as.numeric(x[loc.line + 2])
-    model.idx.fem = as.integer(x[loc.line + 3]) + 1
-    model.idx.mal = as.integer(x[loc.line + 4]) + 1
+    model.idx.fem = as.integer(x[loc.line + 3])
+    model.idx.mal = as.integer(x[loc.line + 4])
 
     nAll.with.silent = as.integer(x[loc.line + 5]) # includes silent allele
 
@@ -224,28 +228,30 @@ readFam = function(famfile, useDVI = F, verbose = T) {
     names(frqs) = als
 
     # Mutation models
-    models = c("equal", "proportional", "stepwise", "custom")
-    maleMod = models[model.idx.mal]
+    models = c("equal", "proportional", "stepwise", "3", "4")
+    maleMod = models[model.idx.mal + 1]
+    femaleMod = models[model.idx.fem + 1]
+
     if(maleMod %in% models[1:3]) {
       maleMutMat = mutationMatrix(model = maleMod, alleles = als, afreq = frqs,
                                   rate = mutrate.mal, rate2 = mutrate2.mal)
     }
     else {
+      if(verbose)
+        message(sprintf("*** Ignoring male mutation model '%s' ***", maleMod))
       maleMutMat = NULL
+      unsupp = c(unsupp, maleMod)
     }
 
-    femaleMod = models[model.idx.fem]
     if(femaleMod %in% models[1:3]) {
       femaleMutMat = mutationMatrix(model = femaleMod, alleles = als, afreq = frqs,
-                                  rate = mutrate.fem, rate2 = mutrate2.fem)
+                                    rate = mutrate.fem, rate2 = mutrate2.fem)
     }
     else {
+      if(verbose)
+        message(sprintf("*** Ignoring female mutation model '%s' ***", femaleMod))
       femaleMutMat = NULL
-    }
-    if((model.idx.mal > 3 || model.idx.fem > 3) && mutWarn) {
-      warning("*** Custom mutation models are not supported yet; ignoring these ***",
-              immediate. = T, noBreaks. = T, call. = F)
-      mutWarn = F
+      unsupp = c(unsupp, femaleMod)
     }
 
     # Print locus summary
@@ -266,6 +272,14 @@ readFam = function(famfile, useDVI = F, verbose = T) {
     # Goto next locus
     loc.line = loc.line + 13 + 2*nAll
   }
+
+  # Warn about unsupported mutation models
+  if(length(unsupp) > 0) {
+    unsupp = sort(unique.default(unsupp))
+    tmp ="Some mutation models were set to NULL. Model '%s' is not supported yet."
+    warning(paste0(sprintf(tmp, unsupp), collapse = "\n"), call. = FALSE)
+  }
+
 
   ###########
   ### DVI ###

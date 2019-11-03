@@ -12,7 +12,8 @@ readFam(famfile, useDVI = F, verbose = T)
 \item{useDVI}{A logical; if TRUE, the DVI section of the fam file is used to
 extract pedigrees and genotypes.}
 
-\item{verbose}{A logical; if TRUE, various information is written to the screen during the parsing process.}
+\item{verbose}{A logical; if TRUE, various information is written to the
+screen during the parsing process.}
 }
 \value{
 If the .fam file only contains a database, the output is a list of
