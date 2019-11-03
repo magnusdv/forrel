@@ -152,6 +152,16 @@ missingPersonIP = function(reference, missing, markers, nsim = 1, threshold = NU
                 nsim = nsim, threshold = threshold,
                 disableMutations = disableMutations)
 
-  list(LRperSim = LRperSim, ELRperMarker = ELRperMarker,
-       ELRtotal = ELRtotal, IP = IP, params = params)
+  structure(list(LRperSim = LRperSim, ELRperMarker = ELRperMarker,
+       ELRtotal = ELRtotal, IP = IP, params = params), class = "mpIP")
 }
+
+print.mpIP = function(x, ...) {
+  cat("\n")
+  cat("Total ELR:", round(x$ELRtotal, 3), "\n")
+  cat("Estimated inclusion powers:\n")
+  for(i in seq_along(x$IP))
+    cat(sprintf("  P(LR > %s) = %.2g\n", names(x$IP)[i], x$IP[i]))
+}
+
+
