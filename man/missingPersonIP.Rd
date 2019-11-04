@@ -18,8 +18,8 @@ all markers.}
 
 \item{nsim}{A positive integer: the number of simulations}
 
-\item{threshold}{A numeric vector with one or more positive numbers used
-as the likelihood ratio tresholds for inclusion}
+\item{threshold}{A numeric vector with one or more positive numbers used as
+the likelihood ratio tresholds for inclusion}
 
 \item{disableMutations}{This parameter determines how mutation models are
 treated. If \code{TRUE}, mutations are disabled for all markers. If \code{NA} (the
@@ -34,17 +34,19 @@ or indices is given, mutations are disabled for these markers exclusively.}
 \item{verbose}{A logical, by default TRUE.}
 }
 \value{
-A list with the following entries:
+A \code{mpIP} object, which is essentially a list with the following
+entries:
 \itemize{
 \item \code{LRperSim}: A numeric vector of length \code{nsim} containing the total LR for
 each simulation.
-\item \code{ELRperMarker}: The mean LR per marker, over all simulations.
-\item \code{ELRtotal}: The mean total LR over all simulations.
-\item \code{IP}: A numeric of the same length as \code{threshold}. For each element of
-\code{threshold}, the fraction of simulations resulting in a LR exceeding the
+\item \code{meanLRperMarker}: The mean LR per marker, over all simulations.
+\item \code{meanLR}: The mean total LR over all simulations.
+\item \code{meanLogLR}: The mean total \code{log10(LR)} over all simulations.
+\item \code{IP}: A named numeric of the same length as \code{threshold}. For each element
+of \code{threshold}, the fraction of simulations resulting in a LR exceeding the
 given number.
-\item \code{params}: A list containing the input parameters \code{missing}, \code{markers}, \code{nsim}, \code{threshold} and
-\code{disableMutations}
+\item \code{params}: A list containing the input parameters \code{missing}, \code{markers},
+\code{nsim}, \code{threshold} and \code{disableMutations}
 }
 }
 \description{

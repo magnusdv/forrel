@@ -5,8 +5,8 @@
 #' @param markers Names or indices of the markers to be included. By default,
 #'   all markers.
 #' @param nsim A positive integer: the number of simulations
-#' @param threshold A numeric vector with one or more positive numbers used
-#'   as the likelihood ratio tresholds for inclusion
+#' @param threshold A numeric vector with one or more positive numbers used as
+#'   the likelihood ratio tresholds for inclusion
 #' @param disableMutations This parameter determines how mutation models are
 #'   treated. If `TRUE`, mutations are disabled for all markers. If `NA` (the
 #'   default), mutations are disabled only for those markers with nonzero
@@ -17,21 +17,24 @@
 #' @param seed A numeric seed for the random number generator (optional)
 #' @param verbose A logical, by default TRUE.
 #'
-#' @return A list with the following entries:
+#' @return A `mpIP` object, which is essentially a list with the following
+#'   entries:
 #'
 #'   * `LRperSim`: A numeric vector of length `nsim` containing the total LR for
 #'   each simulation.
 #'
-#'   * `ELRperMarker`: The mean LR per marker, over all simulations.
+#'   * `meanLRperMarker`: The mean LR per marker, over all simulations.
 #'
-#'   * `ELRtotal`: The mean total LR over all simulations.
+#'   * `meanLR`: The mean total LR over all simulations.
 #'
-#'   * `IP`: A numeric of the same length as `threshold`. For each element of
-#'   `threshold`, the fraction of simulations resulting in a LR exceeding the
+#'   * `meanLogLR`: The mean total `log10(LR)` over all simulations.
+#'
+#'   * `IP`: A named numeric of the same length as `threshold`. For each element
+#'   of `threshold`, the fraction of simulations resulting in a LR exceeding the
 #'   given number.
 #'
-#'   * `params`: A list containing the input parameters `missing`, `markers`, `nsim`, `threshold` and
-#'   `disableMutations`
+#'   * `params`: A list containing the input parameters `missing`, `markers`,
+#'   `nsim`, `threshold` and `disableMutations`
 #'
 #' @examples
 #'
@@ -111,7 +114,7 @@ missingPersonIP = function(reference, missing, markers, nsim = 1, threshold = NU
 
   # Simulate nsim complete profiles of ped_related
   if(verbose)
-    message("\nSimulating ", nsim, " profiles...", appendLF = F)
+    message("Simulating ", nsim, " profiles...", appendLF = F)
 
   allsims = profileSim(ped_related, ids = "_POI_", N = nsim, markers = midx)
 
@@ -137,31 +140,35 @@ missingPersonIP = function(reference, missing, markers, nsim = 1, threshold = NU
     message("done")
 
   # Results
-  ELRperMarker = apply(lrs, 1, mean)
   LRperSim = apply(lrs, 2, prod)
-  ELRtotal = mean(LRperSim)
+  meanLRperMarker = apply(lrs, 1, mean)
+  meanLR = mean(LRperSim)
+  meanLogLR = mean(log10(LRperSim))
   IP = sapply(threshold, function(thr) mean(LRperSim >= thr))
   names(IP) = threshold
 
   # Timing
   if(verbose)
-    message("\nTotal time used: ", format(Sys.time() - st, digits = 3))
+    message("Total time used: ", format(Sys.time() - st, digits = 3))
 
   # Lits of input parameters
   params = list(missing = missing, markers = markers,
                 nsim = nsim, threshold = threshold,
                 disableMutations = disableMutations)
 
-  structure(list(LRperSim = LRperSim, ELRperMarker = ELRperMarker,
-       ELRtotal = ELRtotal, IP = IP, params = params), class = "mpIP")
+  structure(list(LRperSim = LRperSim, meanLRperMarker = meanLRperMarker,
+                 meanLR = meanLR, meanLogLR = meanLogLR, IP = IP,
+                 params = params), class = "mpIP")
 }
 
 print.mpIP = function(x, ...) {
   cat("\n")
-  cat("Total ELR:", round(x$ELRtotal, 3), "\n")
-  cat("Estimated inclusion powers:\n")
-  for(i in seq_along(x$IP))
-    cat(sprintf("  P(LR > %s) = %.2g\n", names(x$IP)[i], x$IP[i]))
+  cat("Mean total LR:", round(x$meanLR, 3), "\n")
+  cat("Mean total log10(LR):", round(x$meanLogLR, 3), "\n")
+  ip = x$IP
+  cat("Estimated inclusion powers:", if(!length(ip)) NA, "\n")
+  for(i in seq_along(ip))
+    cat(sprintf("  P(LR > %s) = %.3g\n", names(ip)[i], ip[i]))
 }
 
 
