@@ -165,6 +165,7 @@ missingPersonEP = function(reference, missing, markers, disableMutations = NA, v
        distribMismatch = distrib, params = params), class = "mpEP")
 }
 
+#' @export
 print.mpEP = function(x, ...) {
   cat("\n")
   cat("Total EP:", round(x$EPtotal, 3), "\n")
