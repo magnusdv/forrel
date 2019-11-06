@@ -39,3 +39,11 @@ pluralise = function(noun, n) {
   for (i in 2:n) v2 = c(v2, i:n)
   cbind(v1, v2, deparse.level = 0)
 }
+
+isEP = function(x) {
+  inherits(x, "mpEP")
+}
+
+isIP = function(x) {
+  inherits(x, "mpIP")
+}

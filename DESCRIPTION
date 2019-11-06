@@ -22,6 +22,7 @@ Imports:
     glue,
     pedmut,
 Suggests: testthat,
+    ggplot2,
     pedlikCompare,
     poibin
 RoxygenNote: 6.1.1
