@@ -15,20 +15,22 @@
 #' It converts each Familias pedigree into a list of connected `ped` objects,
 #' adding missing parents where needed.
 #'
-#' @param familiasped A [Familias::FamiliasPedigree()] object or a list of such.
+#' @param familiasped A `FamiliasPedigree` object or a list of such.
 #' @param datamatrix A data frame with two columns per marker (one for each
 #'   allele) and one row per individual.
-#' @param loci A [Familias::FamiliasLocus()] object or a list of such.
+#' @param loci A `FamiliasLocus` object or a list of such.
 #' @param matchLoci A logical. If TRUE, the column names of `datamatrix` must be
 #'   found either within `names(loci)` or within the `name` entries of `loci`.
-#'   The column names of `datamatrix` are assumed to come in pairs with
-#'   suffixes ".1" and ".2", e.g. "TH01.1", "TH01.2", etc.
-#'   If FALSE (the default) it is assumed that the `loci` correspond to the (pairs
-#'   of) columns in `datamatrix` sequentially.
+#'   The column names of `datamatrix` are assumed to come in pairs with suffixes
+#'   ".1" and ".2", e.g. "TH01.1", "TH01.2", etc. If FALSE (the default) it is
+#'   assumed that the `loci` correspond to the (pairs of) columns in
+#'   `datamatrix` sequentially.
 #' @return A `ped` object, or a list of such.
 #' @author Magnus Dehli Vigeland, Thore Egeland
 #'
-#' @references Windows Familias is freely available from <http://familias.name>.
+#' @seealso [readFam()]
+#'
+#' @references Familias is freely available from <http://familias.name>.
 #' @examples
 #'
 #' ### Example 1 ###

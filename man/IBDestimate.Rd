@@ -23,7 +23,7 @@ labels of \code{x}.}
 on to \code{maxLik}).}
 
 \item{tol}{A single numeric: the optimising tolerance value; passed on to
-\code{maxLik}).}
+\code{maxLik()}).}
 }
 \value{
 A data.frame with 6 columns: \code{ID1}, \code{ID2}, \code{N} (#markers with no
@@ -43,7 +43,6 @@ triangle defined by \deqn{\kappa_0 \ge 0, \kappa_2 \ge 0, \kappa_0 + \kappa_2
 \le 1.}{\kappa0 \ge 0, \kappa2 \ge 0, \kappa0 + \kappa2 \le 1.}
 }
 \examples{
-library(pedtools)
 
 ### Example 1: Siblings
 x = nuclearPed(children = c("sib1", "sib2"))
@@ -65,10 +64,11 @@ IBDestimate(y, ids = 1:2)
 }
 \references{
 \itemize{
-\item E. A. Thompson (1975). \emph{The estimation of pairwise relationships.}
-Annals of Human Genetics 39.
-\item E. A. Thompson (2000). \emph{Statistical Inferences from Genetic Data on Pedigrees.}
-NSF-CBMS Regional Conference Series in Probability and Statistics. Volume 6.
+\item E. A. Thompson (1975). \emph{The estimation of pairwise relationships.} Annals
+of Human Genetics 39.
+\item E. A. Thompson (2000). \emph{Statistical Inferences from Genetic Data on
+Pedigrees.} NSF-CBMS Regional Conference Series in Probability and
+Statistics. Volume 6.
 }
 }
 \seealso{

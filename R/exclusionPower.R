@@ -65,11 +65,11 @@
 #'
 #' # Exclusion power if the child is known to have genotype 1/1:
 #' PE2 = exclusionPower(claim, true, ids = ids, alleles = als, afreq = afreq,
-#'                      known_genotypes = list(c(3, 1, 1)))
+#'                      known_genotypes = list(c(3, 1, 1)), plot = FALSE)
 #'
 #' # Exclusion power if the SNP is on the X chromosome
 #' PE3 = exclusionPower(claim, true, ids = ids, alleles = als, afreq = afreq,
-#'                      Xchrom = TRUE)
+#'                      Xchrom = TRUE, plot = FALSE)
 #'
 #' stopifnot(PE1 == 0.125, PE2 == 0.25, PE3 == 0.25)
 #'
@@ -106,21 +106,21 @@
 #'
 #' # Equifrequent SNP:
 #' PE5 = exclusionPower(ped_claim = mother_daughter, ped_true = sisters_LOOP,
-#'                      ids = c(2, 3), alleles = 2)
+#'                      ids = c(2, 3), alleles = 2, plot = FALSE)
 #'
 #' # SNP with MAF = 0.1:
 #' PE6 = exclusionPower(ped_claim = mother_daughter, ped_true = sisters_LOOP,
-#'                      ids = c(2, 3), alleles = 2, afreq = c(0.9, 0.1))
+#'                      ids = c(2, 3), alleles = 2, afreq = c(0.9, 0.1), plot = FALSE)
 #'
 #' stopifnot(round(c(PE5,PE6), 5) == c(0.03125, 0.00765))
 #'
-#' \dontrun{
+#' \donttest{
 #' # Equifrequent tetra-allelic marker:
 #' PE7 = exclusionPower(ped_claim = mother_daughter, ped_true = sisters_LOOP,
-#'                      ids = c(2, 3), alleles = 4)
+#'                      ids = c(2, 3), alleles = 4, plot = FALSE)
 #'
 #' # Tetra-allelic marker with one major allele:
-#' PE8 = exclusionPower(ped_claim = mother_daughter, ped_true = sisters_LOOP,
+#' PE8 = exclusionPower(ped_claim = mother_daughter, ped_true = sisters_LOOP, plot = FALSE,
 #'                      ids = c(2, 3), alleles = 4, afreq = c(0.7, 0.1, 0.1, 0.1))
 #'
 #' stopifnot(round(c(PE7,PE8), 5) == c(0.07617, 0.03457))
@@ -130,7 +130,7 @@
 #' @export
 exclusionPower = function(ped_claim, ped_true, ids, markerindex = NULL,
                           alleles = NULL, afreq = NULL, known_genotypes = list(),
-                          Xchrom = FALSE, plot = TRUE, verbose = T) {
+                          Xchrom = FALSE, plot = TRUE, verbose = TRUE) {
 
   st = proc.time()
 
@@ -197,7 +197,7 @@ exclusionPower = function(ped_claim, ped_true, ids, markerindex = NULL,
   # Plot
   if (isTRUE(plot) || plot == "plot_only") {
     plotPedList(list(ped_claim, ped_true),
-                newdev = T,
+                newdev = TRUE,
                 frametitles = c("Claim", "True"),
                 shaded = original.ids,
                 marker = 1)
@@ -218,7 +218,7 @@ exclusionPower = function(ped_claim, ped_true, ids, markerindex = NULL,
       ped_claim[[i]],
       ids = ids.i,
       partialmarker = partial_claim[[i]],
-      verbose = F,
+      verbose = FALSE,
       eliminate = 0
     ) == 0
     })
@@ -236,7 +236,7 @@ exclusionPower = function(ped_claim, ped_true, ids, markerindex = NULL,
 
   # Extract the TRUE positions (= incompatible combinations)
   # Columns are named with those `ids` with contribution in I.g.
-  incomp.grid = which(I.g, arr.ind = T, useNames = F)
+  incomp.grid = which(I.g, arr.ind = TRUE, useNames = FALSE)
   colnames(incomp.grid) = ids
 
   ### In the true ped: Sum probs of the incompat combinations
@@ -248,13 +248,13 @@ exclusionPower = function(ped_claim, ped_true, ids, markerindex = NULL,
     if(length(ids.i) == 0)
       return(NULL)
 
-    grid.i = unique.matrix(incomp.grid[, ids.i, drop = F])
+    grid.i = unique.matrix(incomp.grid[, ids.i, drop = FALSE])
 
     oneMarkerDistribution(
       ped_true[[i]], ids.i,
       partialmarker = partial_true[[i]],
       grid.subset = grid.i,
-      verbose = F,
+      verbose = FALSE,
       eliminate = 1
     )
   })

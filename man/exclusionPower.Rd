@@ -6,7 +6,7 @@
 \usage{
 exclusionPower(ped_claim, ped_true, ids, markerindex = NULL,
   alleles = NULL, afreq = NULL, known_genotypes = list(),
-  Xchrom = FALSE, plot = TRUE, verbose = T)
+  Xchrom = FALSE, plot = TRUE, verbose = TRUE)
 }
 \arguments{
 \item{ped_claim}{a \code{ped} object, or a list of several such objects,
@@ -80,11 +80,11 @@ PE1 = exclusionPower(claim, true, ids = ids, alleles = als, afreq = afreq)
 
 # Exclusion power if the child is known to have genotype 1/1:
 PE2 = exclusionPower(claim, true, ids = ids, alleles = als, afreq = afreq,
-                     known_genotypes = list(c(3, 1, 1)))
+                     known_genotypes = list(c(3, 1, 1)), plot = FALSE)
 
 # Exclusion power if the SNP is on the X chromosome
 PE3 = exclusionPower(claim, true, ids = ids, alleles = als, afreq = afreq,
-                     Xchrom = TRUE)
+                     Xchrom = TRUE, plot = FALSE)
 
 stopifnot(PE1 == 0.125, PE2 == 0.25, PE3 == 0.25)
 
@@ -121,21 +121,21 @@ sisters_LOOP = addParents(sisters_LOOP, 102, father = 201, mother = 203)
 
 # Equifrequent SNP:
 PE5 = exclusionPower(ped_claim = mother_daughter, ped_true = sisters_LOOP,
-                     ids = c(2, 3), alleles = 2)
+                     ids = c(2, 3), alleles = 2, plot = FALSE)
 
 # SNP with MAF = 0.1:
 PE6 = exclusionPower(ped_claim = mother_daughter, ped_true = sisters_LOOP,
-                     ids = c(2, 3), alleles = 2, afreq = c(0.9, 0.1))
+                     ids = c(2, 3), alleles = 2, afreq = c(0.9, 0.1), plot = FALSE)
 
 stopifnot(round(c(PE5,PE6), 5) == c(0.03125, 0.00765))
 
-\dontrun{
+\donttest{
 # Equifrequent tetra-allelic marker:
 PE7 = exclusionPower(ped_claim = mother_daughter, ped_true = sisters_LOOP,
-                     ids = c(2, 3), alleles = 4)
+                     ids = c(2, 3), alleles = 4, plot = FALSE)
 
 # Tetra-allelic marker with one major allele:
-PE8 = exclusionPower(ped_claim = mother_daughter, ped_true = sisters_LOOP,
+PE8 = exclusionPower(ped_claim = mother_daughter, ped_true = sisters_LOOP, plot = FALSE,
                      ids = c(2, 3), alleles = 4, afreq = c(0.7, 0.1, 0.1, 0.1))
 
 stopifnot(round(c(PE7,PE8), 5) == c(0.07617, 0.03457))

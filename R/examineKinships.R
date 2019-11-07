@@ -38,7 +38,7 @@
 #'
 #'
 examineKinships = function(x, who = "all", interfam = c("founders", "none", "all"),
-                           makeplot = T, pch = 4, ...) {
+                           makeplot = TRUE, pch = 4, ...) {
 
     pedList = is.pedList(x)
 
@@ -62,7 +62,7 @@ examineKinships = function(x, who = "all", interfam = c("founders", "none", "all
             g = .generations(x)
             marg = max(1, 12 - 2 * g)
             layout(rbind(1:2), widths = c(0.4, 0.6))
-            plot(x, av = T, cex = 0.8, title = "", margins = c(marg, 1, marg, 1))
+            plot(x, av = TRUE, cex = 0.8, title = "", margins = c(marg, 1, marg, 1))
         }
         else if (is.pedList(x))
             warnings("Automatic plotting is not implemented when 'x' is a list of ped objects. Use plotPedList().")
@@ -76,42 +76,42 @@ examineKinships = function(x, who = "all", interfam = c("founders", "none", "all
     p = s = g = co = d = u = NULL
 
     if ("parents" %in% use_groups) {
-        P = related.pairs(x, "parents", available = T)
+        P = related.pairs(x, "parents", available = TRUE)
         p = IBDestimate(x, P)
-        showInTriangle(p$k0, p$k2, new = F, col = group_col["parents"], pch = pch, ...)
+        showInTriangle(p$k0, p$k2, new = FALSE, col = group_col["parents"], pch = pch, ...)
     }
     if ("siblings" %in% use_groups) {
-        S = rbind(related.pairs(x, "siblings", half = F, available = T))
+        S = rbind(related.pairs(x, "siblings", half = FALSE, available = TRUE))
         s = IBDestimate(x, S)
-        showInTriangle(s$k0, s$k2, new = F, col = group_col["siblings"], pch = pch, ...)
+        showInTriangle(s$k0, s$k2, new = FALSE, col = group_col["siblings"], pch = pch, ...)
     }
     if ("cousins" %in% use_groups) {
-        CO = rbind(related.pairs(x, "cousins", half = F, available = T),
-                   related.pairs(x, "grandparents", degree = 3, available = T),
-                   related.pairs(x, "nephews_nieces", half = T, available = T),
-                   related.pairs(x, "nephews_nieces", removal = 2, half = F, available = T))
+        CO = rbind(related.pairs(x, "cousins", half = FALSE, available = TRUE),
+                   related.pairs(x, "grandparents", degree = 3, available = TRUE),
+                   related.pairs(x, "nephews_nieces", half = TRUE, available = TRUE),
+                   related.pairs(x, "nephews_nieces", removal = 2, half = FALSE, available = TRUE))
         co = IBDestimate(x, CO)
-        showInTriangle(co$k0, co$k2, new = F, col = group_col["cousins"], pch = pch, ...)
+        showInTriangle(co$k0, co$k2, new = FALSE, col = group_col["cousins"], pch = pch, ...)
     }
     if ("hugs" %in% use_groups) {
-        G = rbind(related.pairs(x, "siblings", half = T, available = T),
-                  related.pairs(x, "grandparents", available = T),
-                  related.pairs(x, "nephews_nieces", half = F, available = T))
+        G = rbind(related.pairs(x, "siblings", half = TRUE, available = TRUE),
+                  related.pairs(x, "grandparents", available = TRUE),
+                  related.pairs(x, "nephews_nieces", half = FALSE, available = TRUE))
         g = IBDestimate(x, G)
-        showInTriangle(g$k0, g$k2, new = F, col = group_col["hugs"], pch = pch, ...)
+        showInTriangle(g$k0, g$k2, new = FALSE, col = group_col["hugs"], pch = pch, ...)
     }
     if ("unrelated" %in% use_groups) {
         interfam = match.arg(interfam)
-        U = rbind(related.pairs(x, "unrelated", available = T, interfam = interfam))
+        U = rbind(related.pairs(x, "unrelated", available = TRUE, interfam = interfam))
         u = IBDestimate(x, U)
-        showInTriangle(u$k0, u$k2, new = F, col = group_col["unrelated"], pch = pch, ...)
+        showInTriangle(u$k0, u$k2, new = FALSE, col = group_col["unrelated"], pch = pch, ...)
     }
     if ("other" %in% use_groups) {
         rest = t(combn(x$available, 2))
         taken = rbind(P, U, S, G, CO)
-        D = rest[!(rest[, 1] * 1000 + rest[, 2]) %in% (taken[, 1] * 1000 + taken[, 2]), , drop = F]
+        D = rest[!(rest[, 1] * 1000 + rest[, 2]) %in% (taken[, 1] * 1000 + taken[, 2]), , drop = FALSE]
         d = IBDestimate(x, D)
-        showInTriangle(d$k0, d$k2, new = F, col = group_col["other"], pch = pch, ...)
+        showInTriangle(d$k0, d$k2, new = FALSE, col = group_col["other"], pch = pch, ...)
     }
     res = list(parents = p, siblings = s, halfsibs_uncles_grandparents = g,
         cousins = co, other = d, unrelated = u)

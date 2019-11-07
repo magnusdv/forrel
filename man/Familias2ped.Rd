@@ -10,19 +10,19 @@ Familias2ped(familiasped, datamatrix, loci, matchLoci = FALSE)
 readFamiliasLoci(loci)
 }
 \arguments{
-\item{familiasped}{A \code{\link[Familias:FamiliasPedigree]{Familias::FamiliasPedigree()}} object or a list of such.}
+\item{familiasped}{A \code{FamiliasPedigree} object or a list of such.}
 
 \item{datamatrix}{A data frame with two columns per marker (one for each
 allele) and one row per individual.}
 
-\item{loci}{A \code{\link[Familias:FamiliasLocus]{Familias::FamiliasLocus()}} object or a list of such.}
+\item{loci}{A \code{FamiliasLocus} object or a list of such.}
 
 \item{matchLoci}{A logical. If TRUE, the column names of \code{datamatrix} must be
 found either within \code{names(loci)} or within the \code{name} entries of \code{loci}.
-The column names of \code{datamatrix} are assumed to come in pairs with
-suffixes ".1" and ".2", e.g. "TH01.1", "TH01.2", etc.
-If FALSE (the default) it is assumed that the \code{loci} correspond to the (pairs
-of) columns in \code{datamatrix} sequentially.}
+The column names of \code{datamatrix} are assumed to come in pairs with suffixes
+".1" and ".2", e.g. "TH01.1", "TH01.2", etc. If FALSE (the default) it is
+assumed that the \code{loci} correspond to the (pairs of) columns in
+\code{datamatrix} sequentially.}
 }
 \value{
 A \code{ped} object, or a list of such.
@@ -68,7 +68,10 @@ adding missing parents where needed.
 
 }
 \references{
-Windows Familias is freely available from \url{http://familias.name}.
+Familias is freely available from \url{http://familias.name}.
+}
+\seealso{
+\code{\link[=readFam]{readFam()}}
 }
 \author{
 Magnus Dehli Vigeland, Thore Egeland

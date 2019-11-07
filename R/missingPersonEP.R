@@ -20,10 +20,10 @@
 #'   pedigree, the corresponding entry is NA
 #'
 #'   * `EPtotal`: The total exclusion power, computed as `1 - prod(1 -
-#'   EPperMarker, na.rm = T)`
+#'   EPperMarker, na.rm = TRUE)`
 #'
 #'   * `expectedMismatch`: The expected number of markers giving exclusion,
-#'   computed as `sum(EPperMarker, na.rm = T)`
+#'   computed as `sum(EPperMarker, na.rm = TRUE)`
 #'
 #'   * `distribMismatch`: The probability distribution of the number of markers
 #'   giving exclusion. This is given as a numeric vector of length `n+1`, where
@@ -115,7 +115,7 @@ missingPersonEP = function(reference, missing, markers, disableMutations = NA, v
   ep = vapply(mseq, function(i) {
 
     if(verbose)
-      message("Marker ", markers[i], " ... ", appendLF = F)
+      message("Marker ", markers[i], " ... ", appendLF = FALSE)
 
     # If impossible, return NA
     if(refliks[i] == 0) {
@@ -125,8 +125,8 @@ missingPersonEP = function(reference, missing, markers, disableMutations = NA, v
 
     # Otherwise, compute EP
     this.ep = exclusionPower(ped_claim = ped_related, ped_true = ped_unrelated,
-                             ids = "_POI_", markerindex = i, plot = F,
-                             verbose = F)
+                             ids = "_POI_", markerindex = i, plot = FALSE,
+                             verbose = FALSE)
     if(verbose) message("PE = ", this.ep)
     this.ep
   }, FUN.VALUE = 0)
@@ -134,14 +134,14 @@ missingPersonEP = function(reference, missing, markers, disableMutations = NA, v
   names(ep) = markers
 
   # Total EP
-  tot = 1 - prod(1 - ep, na.rm = T)
+  tot = 1 - prod(1 - ep, na.rm = TRUE)
 
   # Result: Expected number of exclusions
-  expMis = sum(ep, na.rm = T)
+  expMis = sum(ep, na.rm = TRUE)
 
   # Result: Distribution of number of mismatches
   # This is a sum of different Bernoulli variables, i.e., Poisson binomial.
-  n.nonz = sum(ep > 0, na.rm = T)
+  n.nonz = sum(ep > 0, na.rm = TRUE)
   distrib = structure(numeric(n.nonz + 1), names = 0:n.nonz)
   if(n.nonz > 0) {
     if (requireNamespace("poibin", quietly = TRUE))

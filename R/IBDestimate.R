@@ -22,7 +22,7 @@
 #'   \eqn{(\kappa_0, \kappa_2)}{(\kappa0, \kappa2)} in the optimisation (passed
 #'   on to `maxLik`).
 #' @param tol A single numeric: the optimising tolerance value; passed on to
-#'   `maxLik`).
+#'   `maxLik()`).
 #'
 #' @return A data.frame with 6 columns: `ID1`, `ID2`, `N` (#markers with no
 #'   missing alleles), `k0`, `k1` and `k2`.
@@ -30,13 +30,15 @@
 #' @seealso [maxLik::maxLik()], [showInTriangle()]
 #'
 #' @references
-#' * E. A. Thompson (1975). _The estimation of pairwise relationships._
-#'   Annals of Human Genetics 39.
-#' * E. A. Thompson (2000). _Statistical Inferences from Genetic Data on Pedigrees._
-#'   NSF-CBMS Regional Conference Series in Probability and Statistics. Volume 6.
+#'
+#' * E. A. Thompson (1975). _The estimation of pairwise relationships._ Annals
+#' of Human Genetics 39.
+#'
+#' * E. A. Thompson (2000). _Statistical Inferences from Genetic Data on
+#' Pedigrees._ NSF-CBMS Regional Conference Series in Probability and
+#' Statistics. Volume 6.
 #'
 #' @examples
-#' library(pedtools)
 #'
 #' ### Example 1: Siblings
 #' x = nuclearPed(children = c("sib1", "sib2"))
@@ -99,7 +101,7 @@ IBDestimate = function(x, ids, markers=NULL, start = c(0.99,0.001), tol = 1e-7) 
                k0 = est[1],
                k1 = 1 - sum(est),
                k2 = est[2],
-               stringsAsFactors = F)
+               stringsAsFactors = FALSE)
   })
 
   do.call(rbind, res)
@@ -121,7 +123,7 @@ pedlistMembership = function(pedl, ids) {
 
     pednr = apply(ped_match, 1, which)
 
-    data.frame(pednr = pednr, id = ids, stringsAsFactors = F)
+    data.frame(pednr = pednr, id = ids, stringsAsFactors = FALSE)
 }
 
 

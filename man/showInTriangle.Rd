@@ -4,7 +4,7 @@
 \alias{showInTriangle}
 \title{Add points to the IBD triangle}
 \usage{
-showInTriangle(k0, k2 = NULL, new = T, col = "blue", cex = 1,
+showInTriangle(k0, k2 = NULL, new = TRUE, col = "blue", cex = 1,
   pch = 4, lwd = 2, labels = FALSE, col_labels = col,
   cex_labels = 0.8, pos = 1, adj = NULL, ...)
 }

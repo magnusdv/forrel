@@ -164,8 +164,10 @@ IBDtriangle = function(relationships = c("UN", "PO", "MZ", "S", "H,U,G", "FC"),
 #' showInTriangle(k0 = 3/8, k2 = 1/8, label = "3/4 siblings", pos = 1)
 #'
 #' @export
-showInTriangle = function(k0, k2 = NULL, new = T, col = "blue", cex = 1, pch = 4, lwd = 2,
-  labels = FALSE, col_labels = col, cex_labels = 0.8, pos = 1, adj = NULL, ...) {
+showInTriangle = function(k0, k2 = NULL, new = TRUE, col = "blue",
+                          cex = 1, pch = 4, lwd = 2, labels = FALSE,
+                          col_labels = col, cex_labels = 0.8,
+                          pos = 1, adj = NULL, ...) {
 
   if(is.matrix(k0))
     k0 = as.data.frame(k0)
