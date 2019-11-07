@@ -12,21 +12,20 @@
 #' `type = 3`: x = Expected number of exclusions; y = average log(LR)
 #'
 #' For each `mpEP` object in `ep`, and the corresponding element of `ip`, the
-#' relevant data is extracted from each, producing a single point the final plot.
+#' relevant data is extracted from each, producing a single point the final
+#' plot.
 #'
-#' In the most general case `ep`
-#' (and similarly for `ip`) can be a list of lists of `mpEP` objects. To
-#' simplify the discussion we refer to the inner lists as "groups". A group
-#' may consist of a single point, or several (typically many simulations of the same
-#' situation). Points within the same group are always drawn with the same
-#' color and shape.
+#' In the most general case `ep` (and similarly for `ip`) can be a list of lists
+#' of `mpEP` objects. To simplify the discussion we refer to the inner lists as
+#' "groups". A group may consist of a single point, or several (typically many
+#' simulations of the same situation). Points within the same group are always
+#' drawn with the same color and shape.
 #'
 #' When plotting several groups, two sets of points are drawn:
 #'
 #' * Major points: Group means.
 #'
 #' * Minor points: Individual points in groups with more than one element.
-#'
 #'
 #' @param ep Exclusion power data, typically in the form of one or several
 #'   `mpEP` objects (output from [missingPersonEP()]. See Details and Examples.
@@ -45,17 +44,20 @@
 #' @param xlim,ylim Axis limits; automatically chosen if NULL.
 #' @param xlab,ylab Axis labels; automatically chosen if NULL.
 #'
-#' @return
-#' @export
+#' @return A `ggplot2` plot object.
 #'
 #' @examples
+#' # TODO
+#'
+#' @importFrom stats aggregate
+#' @export
 powerPlot = function(ep, ip, type = 1, LRthresh = 1e4, ellipse = TRUE, col = NULL,
                                   labs = NULL, alpha = 1, shape = 1, size = 2,
                                   xlim = NULL, ylim = NULL, xlab = NULL, ylab = NULL) {
   if(!requireNamespace("ggplot2", quietly = TRUE))
     stop2("Package `ggplot2` is not installed. Please install this and try again.")
 
-  if(is.null(labs))
+  if(is.null(labs) && is.list(ep) && !isEP(ep))
     labs = names(ep)
 
   if(isEP(ep)) ep = list(ep)
@@ -129,20 +131,20 @@ powerPlot = function(ep, ip, type = 1, LRthresh = 1e4, ellipse = TRUE, col = NUL
   minor = subset(alldata, table(group)[group] > 1)
 
   # Plot
-  p = ggplot(NULL, aes(x = ep, y = ip, color = group, fill = group)) +
-    geom_point(data = minor, size = size, shape = shape, alpha = alpha) +
-    geom_point(data = major, size = 2*size, shape = 21, col = 1, stroke = 1.5) +
-    labs(x = xlab, y = ylab, fill = NULL, color = NULL) +
-    guides(color = F) +
-    scale_color_manual(limits = labs, values = col) +
-    scale_fill_manual(limits = labs, values = col) +
-    scale_x_continuous(limits = xlim) +
-    scale_y_continuous(limits = ylim) +
-    coord_cartesian(clip = 'off') +
-    theme_bw(base_size = 14)
+  p = ggplot2::ggplot(NULL, ggplot2::aes(x = ep, y = ip, color = group, fill = group)) +
+    ggplot2::geom_point(data = minor, size = size, shape = shape, alpha = alpha) +
+    ggplot2::geom_point(data = major, size = 2*size, shape = 21, col = 1, stroke = 1.5) +
+    ggplot2::labs(x = xlab, y = ylab, fill = NULL, color = NULL) +
+    ggplot2::guides(color = FALSE) +
+    ggplot2::scale_color_manual(limits = labs, values = col) +
+    ggplot2::scale_fill_manual(limits = labs, values = col) +
+    ggplot2::scale_x_continuous(limits = xlim) +
+    ggplot2::scale_y_continuous(limits = ylim) +
+    ggplot2::coord_cartesian(clip = 'off') +
+    ggplot2::theme_bw(base_size = 14)
 
   if(ellipse) {
-    p = p + stat_ellipse(data = minor, na.rm = TRUE)
+    p = p + ggplot2::stat_ellipse(data = minor, na.rm = TRUE)
   }
 
   np = length(p$layers)
@@ -151,20 +153,20 @@ powerPlot = function(ep, ip, type = 1, LRthresh = 1e4, ellipse = TRUE, col = NUL
     xmin = xlim[1]; if(is.na(xmin) || xmin > 0) xmin = -Inf
     ymin = ylim[1]; if(is.na(ymin) || ymin > 0) ymin = -Inf
     p = p +
-      annotate("rect", xmin = 0.95, xmax = 1, ymin = ymin, ymax = 1,  fill = "lightblue", alpha = 0.3) +
-      annotate("rect", xmin = xmin, xmax = 1, ymin = 0.95, ymax = 1,  fill = "lightblue", alpha = 0.3)
+      ggplot2::annotate("rect", xmin = 0.95, xmax = 1, ymin = ymin, ymax = 1,  fill = "lightblue", alpha = 0.3) +
+      ggplot2::annotate("rect", xmin = xmin, xmax = 1, ymin = 0.95, ymax = 1,  fill = "lightblue", alpha = 0.3)
     p$layers[] = p$layers[c(np + 1:2, 1:np)]
   }
   if(type == 2) {
     p = p +
-      geom_hline(yintercept = 1, linetype = 2, size = 1) +
-      geom_vline(xintercept = 1, linetype = 2, size = 1)
+      ggplot2::geom_hline(yintercept = 1, linetype = 2, size = 1) +
+      ggplot2::geom_vline(xintercept = 1, linetype = 2, size = 1)
     p$layers[] = p$layers[c(np + 1:2, 1:np)]
   }
   if(type == 3) {
     p = p +
-      geom_hline(yintercept = log10(LRthresh), linetype = 2, size = 1) +
-      geom_vline(xintercept = 1, linetype = 2, size = 1)
+      ggplot2::geom_hline(yintercept = log10(LRthresh), linetype = 2, size = 1) +
+      ggplot2::geom_vline(xintercept = 1, linetype = 2, size = 1)
     p$layers[] = p$layers[c(np + 1:2, 1:np)]
   }
   p

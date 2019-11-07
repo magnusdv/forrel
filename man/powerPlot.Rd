@@ -36,6 +36,9 @@ list of \code{ep}/\code{ip} containing more than 1 element.}
 
 \item{xlab, ylab}{Axis labels; automatically chosen if NULL.}
 }
+\value{
+A \code{ggplot2} plot object.
+}
 \description{
 This function offers three different visualisations of exclusion/inclusion
 powers, particularly for missing person cases.
@@ -50,18 +53,22 @@ The plot types are as follows:
 \code{type = 3}: x = Expected number of exclusions; y = average log(LR)
 
 For each \code{mpEP} object in \code{ep}, and the corresponding element of \code{ip}, the
-relevant data is extracted from each, producing a single point the final plot.
+relevant data is extracted from each, producing a single point the final
+plot.
 
-In the most general case \code{ep}
-(and similarly for \code{ip}) can be a list of lists of \code{mpEP} objects. To
-simplify the discussion we refer to the inner lists as "groups". A group
-may consist of a single point, or several (typically many simulations of the same
-situation). Points within the same group are always drawn with the same
-color and shape.
+In the most general case \code{ep} (and similarly for \code{ip}) can be a list of lists
+of \code{mpEP} objects. To simplify the discussion we refer to the inner lists as
+"groups". A group may consist of a single point, or several (typically many
+simulations of the same situation). Points within the same group are always
+drawn with the same color and shape.
 
 When plotting several groups, two sets of points are drawn:
 \itemize{
 \item Major points: Group means.
 \item Minor points: Individual points in groups with more than one element.
 }
+}
+\examples{
+# TODO
+
 }
