@@ -4,9 +4,22 @@
 \name{forrel}
 \alias{forrel}
 \alias{forrel-package}
-\title{forrel: Relatedness inference and forensic pedigree analysis}
+\title{forrel: Forensic Pedigree Analysis and Relatedness Inference}
 \description{
-Forensic applications of pedigree analysis, including marker simulation,
-relatedness inference and exclusion probabilities. Data import from the
-Familias software is fully supported.
+Forensic applications of pedigree analysis, including likelihood ratios for
+relationship testing, general relatedness inference, marker simulation, and
+power analysis. General computation of exclusion powers is based on Egeland
+et al. (2014) \url{doi:10.1016/j.fsigen.2013.05.001}. Several functions deal
+specifically with family reunion cases, implementing and developing ideas
+from Kling et al. (2017) \url{doi:10.1016/j.fsigen.2017.08.006}. A novelty of
+'forrel' is the ability to model background inbreeding in forensic pedigree
+computations. This can have significant impact in applications, as
+exemplified in Vigeland and Egeland (2019)
+\url{doi:10.1016/j.fsigss.2019.10.175}. 'forrel' is part of the ped suite, a
+collection of packages for pedigree analysis. In particular, 'forrel' imports
+'pedtools' for creating and manipulating pedigrees and markers, 'pedprobr'
+for likelihood computations, and 'pedmut' for mutation modelling. Pedigree
+data may be created from scratch, or loaded from text files. Data import from
+the Familias software (Egeland et al. (2000)
+\url{doi:https://doi.org/10.1016/S0379-0738(00)00147-X}) is supported.
 }
