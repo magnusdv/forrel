@@ -17,14 +17,17 @@ knitr::opts_chunk$set(
 # forrel <img src="man/figures/logo.png" align="right" height=140/>
 
 ## Introduction
-The goal of `forrel` is to provide forensic pedigree computations and relatedness estimation from genetic marker data. Some of its functionality is derived from the retired `paramlink` package, but updated to comply with the `pedtools` package for handling pedigrees and marker data.
+The goal of `forrel` is to provide forensic pedigree computations and relatedness inference from genetic marker data. Some of its functionality is derived from the retired `paramlink` package, but updated to comply with the `pedtools` package for handling pedigrees and marker data.
 
 The most important analyses currently supported by forrel are:
 
-* Simulation of marker data: unconditional or conditional on known genotypes
-* Estimation of IBD (kappa) coefficients from marker data
-* Plotting of IBD coefficients in the IBD triangle
-* Conversion of `Familias` objects to `pedtools::ped` objects
+* Pairwise relatedness inference: Estimation of IBD (kappa) coefficients from marker data
+* Visualisation of IBD coefficients in the IBD triangle
+* Likelihood ratios for relationship testing
+* Simulation of marker genotypes and complete DNA profiles. Unconditional or conditional on known genotypes
+* Power analysis for relationship testing: Exclusion power (EP) and inclusion power (IP)
+* Tailor-made functions for family reunion cases: `missingPersonPlot()`, `missingPersonEP()`, `missingPersonIP()`, `powerPlot()`
+* Import of pedigree data and frequency databaser from the `Familias` software.
 
 ## Installation
 To get the latest version, install from GitHub as follows:
