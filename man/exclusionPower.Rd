@@ -79,7 +79,7 @@ afreq = c(0.5, 0.5)
 PE1 = exclusionPower(claim, true, ids = ids, alleles = als, afreq = afreq)
 
 # Exclusion power if the child is known to have genotype 1/1:
-PE2 = exclusionPower(claim, true, ids = ids, alleles = als, afreq = afreq,
+PE2 = exclusionPower(claim, true, ids = 1, alleles = als, afreq = afreq,
                      known_genotypes = list(c(3, 1, 1)), plot = FALSE)
 
 # Exclusion power if the SNP is on the X chromosome

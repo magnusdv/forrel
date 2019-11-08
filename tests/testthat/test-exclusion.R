@@ -1,7 +1,8 @@
 context("Exclusion power")
 
 quickEP = function(claim, true, ids, afreq = NULL, ...)
-  exclusionPower(claim, true, ids, alleles = seq_along(afreq), afreq = afreq, plot = F, ...)
+  exclusionPower(claim, true, ids, alleles = seq_along(afreq), afreq = afreq,
+                 plot = F, verbose = F, ...)
 
 test_that("EP works in empty paternity case", {
   claim = nuclearPed(1)
