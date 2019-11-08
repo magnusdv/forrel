@@ -31,9 +31,9 @@ A \code{mpEP} object, which is essentially a list with the following entries:
 \item \code{EPperMarker}: A numeric vector containing the exclusion power of each
 marker. If the genotypes of a marker are incompatible with the \code{reference}
 pedigree, the corresponding entry is NA
-\item \code{EPtotal}: The total exclusion power, computed as \code{1 - prod(1 -   EPperMarker, na.rm = T)}
+\item \code{EPtotal}: The total exclusion power, computed as \code{1 - prod(1 -   EPperMarker, na.rm = TRUE)}
 \item \code{expectedMismatch}: The expected number of markers giving exclusion,
-computed as \code{sum(EPperMarker, na.rm = T)}
+computed as \code{sum(EPperMarker, na.rm = TRUE)}
 \item \code{distribMismatch}: The probability distribution of the number of markers
 giving exclusion. This is given as a numeric vector of length \code{n+1}, where
 \code{n} is the number of nonzero element of \code{EPperMarker}. The vector has names

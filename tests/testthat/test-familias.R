@@ -53,6 +53,7 @@ test_that("Familias2ped() converts a single singleton", {
 test_that("Familias2ped() reverses pedlikCompare:::ped2Familias()", {
   skip_on_cran()
   skip_if_not_installed("Familias")
+  skip_if_not_installed("pedlikCompare")
   p2f = pedlikCompare:::ped2Familias
   f2p = function(x) Familias2ped(x$pedigree, datamatrix = x$datamatrix, loci = x$loci)
 
