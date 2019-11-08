@@ -144,19 +144,15 @@ exclusionPower = function(ped_claim, ped_true, ids, markerindex = NULL,
       stop2("Argument `markerindex` must have length 1: ", markerindex)
 
     ped_claim = lapply(ped_claim, function(x) selectMarkers(x, markerindex)) # Various checks performed here
-
-    # Get number of alleles
-    alleles = alleles(ped_claim[[1]], marker = 1)
   }
   else {
     # Locus attribs
     if (length(alleles) == 1)
       alleles = 1:alleles
-    chrom = if (Xchrom) 23 else NA
 
     # Create and attach marker data to each `claim` component
     ped_claim = lapply(ped_claim, function(x) {
-      m = marker(x, alleles = alleles, afreq = afreq, chrom = chrom)
+      m = marker(x, alleles = alleles, afreq = afreq, chrom = if (Xchrom) 23 else NA)
       for (tup in known_genotypes) {
         id = tup[1]
         if (id %in% labels(x))
@@ -168,11 +164,13 @@ exclusionPower = function(ped_claim, ped_true, ids, markerindex = NULL,
 
   # Remove typed individuals from `ids`.
   # TODO: Improve speed, and fix needed for partially typed members
-  typed = unlist(lapply(ped_claim, typedMembers))
   original.ids = ids # for plot!
-  ids = setdiff(ids, typed)
-  if(length(typed) > 0 && verbose)
-    cat("Removed already typed individuals from internal computations:", toString(typed), "\n")
+  typed = unlist(lapply(ped_claim, typedMembers))
+  if(any(ids %in% typed)) {
+    if(verbose)
+      message("Removing already typed individuals from internal computations: ", toString(typed))
+    ids = setdiff(ids, typed)
+  }
 
   # List `ids` indivs in each claim component, and check that all were found
   ids_claim = lapply(ped_claim, function(x) ids[ids %in% labels(x)])
@@ -239,10 +237,18 @@ exclusionPower = function(ped_claim, ped_true, ids, markerindex = NULL,
   incomp.grid = which(I.g, arr.ind = TRUE, useNames = FALSE)
   colnames(incomp.grid) = ids
 
-  ### In the true ped: Sum probs of the incompat combinations
-  # Where are the contributing indivs
-  #ids0_true = lapply(ped_true, function(x) as.character(ids0[ids0 %in% labels(x)]))
+  # If X: Modify male columns of grid
+  if(isXmarker(partial_claim[[1]])) {
+    cmp = whichComp(ids, ped_true)
+    sx = sapply(seq_along(ids), function(i) getSex(ped_true[[cmp[i]]], ids[i]))
+    nall = length(alleles(ped_true[[1]], 1))
+    if(nall > 1) {
+      homoz = c(1, cumsum(nall:2) + 1)
+      incomp.grid[, sx == 1] = homoz[incomp.grid[, sx == 1]]
+    }
+  }
 
+  ### In the true ped: Sum probs of the incompat combinations
   p.g.list = lapply(seq_along(ped_true), function(i) {
     ids.i = as.character(ids_true[[i]])
     if(length(ids.i) == 0)
@@ -250,13 +256,8 @@ exclusionPower = function(ped_claim, ped_true, ids, markerindex = NULL,
 
     grid.i = unique.matrix(incomp.grid[, ids.i, drop = FALSE])
 
-    oneMarkerDistribution(
-      ped_true[[i]], ids.i,
-      partialmarker = partial_true[[i]],
-      grid.subset = grid.i,
-      verbose = FALSE,
-      eliminate = 1
-    )
+    oneMarkerDistribution(ped_true[[i]], ids.i, partialmarker = partial_true[[i]],
+      grid.subset = grid.i, verbose = FALSE, eliminate = 1)
   })
 
   # Remove NULLs

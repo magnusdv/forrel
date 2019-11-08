@@ -47,3 +47,10 @@ isEP = function(x) {
 isIP = function(x) {
   inherits(x, "mpIP")
 }
+
+# TODO: Move to pedtools
+whichComp = function(ids, pedlist) {
+  labs = lapply(pedlist, labels)
+  kvec = rep.int(seq_along(pedlist), times = lengths(labs))
+  kvec[match(ids, unlist(labs))]
+}
