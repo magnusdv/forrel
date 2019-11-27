@@ -473,8 +473,18 @@ parseFamily = function(x) {
 
   ### datamatrix
   vecs = lapply(persons_list, function(p) dnaData2vec(p$`DNA data`))
+
+  # Remove NULLs
+  vecs = vecs[!sapply(vecs, is.null)]
+
+  # All column names
   allnames = unique(unlist(lapply(vecs, names)))
-  datamatrix = do.call(rbind, lapply(vecs, function(v) v[match(allnames, names(v))]))
+
+  # Ensure same order in each vector, and fill in NA's
+  vecs_ordered = lapply(vecs, function(v) structure(v[allnames], names = allnames))
+
+  # Bind to matrix
+  datamatrix = do.call(rbind, vecs_ordered)
   rownames(datamatrix) = id[rownames(datamatrix)]
 
   ### return
