@@ -4,13 +4,15 @@
 \alias{readFam}
 \title{Read Familias .fam files}
 \usage{
-readFam(famfile, useDVI = F, verbose = T)
+readFam(famfile, useDVI = NA, verbose = T)
 }
 \arguments{
 \item{famfile}{Path to a ".fam" file.}
 
-\item{useDVI}{A logical; if TRUE, the DVI section of the fam file is used to
-extract pedigrees and genotypes.}
+\item{useDVI}{A logical, or NA. If TRUE, the DVI section of the fam file is
+used to extract pedigrees and genotypes. If NA (default), the parameter is
+set to TRUE if the input data contains a line equal to "\link{DVI}", and
+otherwise FALSE.}
 
 \item{verbose}{A logical; if TRUE, various information is written to the
 screen during the parsing process.}

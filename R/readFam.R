@@ -5,8 +5,10 @@
 #' `Familias` package.
 #'
 #' @param famfile Path to a ".fam" file.
-#' @param useDVI A logical; if TRUE, the DVI section of the fam file is used to
-#'   extract pedigrees and genotypes.
+#' @param useDVI A logical, or NA. If TRUE, the DVI section of the fam file is
+#'   used to extract pedigrees and genotypes. If NA (default), the parameter is
+#'   set to TRUE if the input data contains a line equal to "[DVI]", and
+#'   otherwise FALSE.
 #' @param verbose A logical; if TRUE, various information is written to the
 #'   screen during the parsing process.
 #'
@@ -23,7 +25,7 @@
 #'
 #' @importFrom pedmut mutationMatrix
 #' @export
-readFam = function(famfile, useDVI = F, verbose = T) {
+readFam = function(famfile, useDVI = NA, verbose = T) {
   if(!endsWith(famfile, ".fam"))
     stop("Input file must end with '.fam'", call. = F)
 
@@ -43,6 +45,13 @@ readFam = function(famfile, useDVI = F, verbose = T) {
   if(verbose)
     message("Familias version: ", version)
 
+  if(is.na(useDVI))
+    useDVI = "[DVI]" %in% x
+  else if(useDVI && !"[DVI]" %in% x)
+    stop2("`useDVI` is TRUE, but no line equals '[DVI]'")
+
+  if(verbose)
+    message("Read DVI: ", if(useDVI) "Yes" else "No")
 
   ### Individuals and genotypes
 
@@ -383,7 +392,7 @@ asFamiliasPedigree = function(id, findex, mindex, sex) {
 readDVI = function(rawlines) {
   r = rawlines
   if(r[1] != "[DVI]")
-    stop("I excepted the first line to be '[DVI]', but got '", r[1], "'")
+    stop("I excepted the first line of DVI part to be '[DVI]', but got '", r[1], "'")
 
   ### Parse raw lines into nested list named `dvi`
   dvi = list()
