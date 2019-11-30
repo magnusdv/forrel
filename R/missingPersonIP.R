@@ -72,7 +72,7 @@ missingPersonIP = function(reference, missing, markers, nsim = 1, threshold = NU
   }
 
   # Do any of the markers model mutatinos?
-  hasMut = sapply(getMarkers(reference, markers), allowsMutations)
+  hasMut = allowsMutations(reference, markers)
 
   # For which marker should mutations be disabled?
   disALL = any(hasMut) && isTRUE(disableMutations)
