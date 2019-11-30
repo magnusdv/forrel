@@ -19,39 +19,26 @@ to the source pedigree are used. If \code{alleles} or \code{afreq} is non-NULL, 
 this parameter is ignored.}
 
 \item{disableMutations}{This parameter determines how mutation models are
-treated:
+treated. Possible values are as follows:
 \itemize{
-\item If \code{NA} (the default), mutations are disabled only for those markers
-whose known genotypes are compatible with both \code{claimPed} and \code{truePed}.
-This is determined by temporarily removing all mutation models and checking
-which markers have nonzero likelihood in both alternatives.
-\item If \code{TRUE}, mutations are disabled for all markers.
-\item If \code{FALSE} no action is done to disable mutations.
-\item If a vector, it must be a subset of \code{markers} indicating explicitly those
-markers for which mutations should be disabled.
+\item \code{NA} (the default): Mutations are disabled only for those markers whose
+known genotypes are compatible with both \code{claimPed} and \code{truePed}. This is
+determined by temporarily removing all mutation models and checking which
+markers have nonzero likelihood in both alternatives.
+\item \code{TRUE}: Mutations are disabled for all markers.
+\item \code{FALSE}: No action is done to disable mutations.
+\item A vector containing the names or indices of those markers for which
+mutations should be disabled.
 }}
 
 \item{verbose}{A logical.}
 }
 \value{
-A \code{mpEP} object, which is essentially a list with the following entries:
-\itemize{
-\item \code{EPperMarker}: A numeric vector containing the exclusion power of each
-marker. If the genotypes of a marker are incompatible with the \code{reference}
-pedigree, the corresponding entry is NA
-\item \code{EPtotal}: The total exclusion power, computed as \code{1 - prod(1 -   EPperMarker, na.rm = TRUE)}
-\item \code{expectedMismatch}: The expected number of markers giving exclusion,
-computed as \code{sum(EPperMarker, na.rm = TRUE)}
-\item \code{distribMismatch}: The probability distribution of the number of markers
-giving exclusion. This is given as a numeric vector of length \code{n+1}, where
-\code{n} is the number of nonzero element of \code{EPperMarker}. The vector has names
-\code{0:n}
-\item \code{params}: A list containing the input parameters \code{missing}, \code{markers} and
-\code{disableMutations}
-}
+The \code{EPresult} object returned by \code{\link[=exclusionPower]{exclusionPower()}}.
 }
 \description{
-Exclusion power for missing person cases.
+This is wrapper of \code{\link[=exclusionPower]{exclusionPower()}} for the special case of a reference
+family with a single missing member.
 }
 \examples{
 

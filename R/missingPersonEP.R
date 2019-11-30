@@ -1,28 +1,13 @@
 #' Exclusion power for missing person cases.
 #'
+#' This is wrapper of [exclusionPower()] for the special case of a reference
+#' family with a single missing member.
+#'
 #' @param reference A `ped` object with attached markers.
 #' @param missing The ID label of the missing pedigree member.
 #' @inheritParams exclusionPower
 #'
-#' @return A `mpEP` object, which is essentially a list with the following entries:
-#'
-#'   * `EPperMarker`: A numeric vector containing the exclusion power of each
-#'   marker. If the genotypes of a marker are incompatible with the `reference`
-#'   pedigree, the corresponding entry is NA
-#'
-#'   * `EPtotal`: The total exclusion power, computed as `1 - prod(1 -
-#'   EPperMarker, na.rm = TRUE)`
-#'
-#'   * `expectedMismatch`: The expected number of markers giving exclusion,
-#'   computed as `sum(EPperMarker, na.rm = TRUE)`
-#'
-#'   * `distribMismatch`: The probability distribution of the number of markers
-#'   giving exclusion. This is given as a numeric vector of length `n+1`, where
-#'   `n` is the number of nonzero element of `EPperMarker`. The vector has names
-#'   `0:n`
-#'
-#'   * `params`: A list containing the input parameters `missing`, `markers` and
-#'   `disableMutations`
+#' @return The `EPresult` object returned by [exclusionPower()].
 #'
 #' @examples
 #'
@@ -47,17 +32,21 @@
 #' @importFrom pedprobr likelihood
 #' @export
 missingPersonEP = function(reference, missing, markers = NULL, disableMutations = NA, verbose = TRUE) {
-  st = Sys.time()
 
   if(!is.ped(reference))
     stop2("Expecting a connected pedigree as H1")
 
-  relatedPed = relabel(reference, old = missing, new = "_POI_")
-  unrelatedPed = list(reference, singleton("_POI_"))
+  poiLabel = "_POI_"
 
-  ep = exclusionPower(claimPed = relatedPed, truePed = unrelatedPed, ids = "_POI_",
-                     markers = markers, disableMutations = disableMutations, plot = FALSE,
-                     verbose = verbose)
+  relatedPed = relabel(reference, old = missing, new = poiLabel)
+  unrelatedPed = list(reference, singleton(poiLabel))
+
+  ep = exclusionPower(claimPed = relatedPed, truePed = unrelatedPed, ids = poiLabel,
+                      markers = markers, source = "claim", disableMutations = disableMutations,
+                      plot = FALSE, verbose = verbose)
+
+  # Change the `ids` entry from "_POI_" to `missing`
+  ep$params$ids = missing
 
   ep
 }

@@ -30,16 +30,16 @@ this parameter is ignored.}
 used as source for marker data.}
 
 \item{disableMutations}{This parameter determines how mutation models are
-treated:
+treated. Possible values are as follows:
 \itemize{
-\item If \code{NA} (the default), mutations are disabled only for those markers
-whose known genotypes are compatible with both \code{claimPed} and \code{truePed}.
-This is determined by temporarily removing all mutation models and checking
-which markers have nonzero likelihood in both alternatives.
-\item If \code{TRUE}, mutations are disabled for all markers.
-\item If \code{FALSE} no action is done to disable mutations.
-\item If a vector, it must be a subset of \code{markers} indicating explicitly those
-markers for which mutations should be disabled.
+\item \code{NA} (the default): Mutations are disabled only for those markers whose
+known genotypes are compatible with both \code{claimPed} and \code{truePed}. This is
+determined by temporarily removing all mutation models and checking which
+markers have nonzero likelihood in both alternatives.
+\item \code{TRUE}: Mutations are disabled for all markers.
+\item \code{FALSE}: No action is done to disable mutations.
+\item A vector containing the names or indices of those markers for which
+mutations should be disabled.
 }}
 
 \item{alleles, afreq, Xchrom}{If these are given, they are used (together with
@@ -69,18 +69,18 @@ plot.
 Otherwise, the function returns an \code{EPresult} object, which is essentially
 a list with the following entries:
 \itemize{
-\item \code{EPperMarker}: A numeric vector containing the probability of exclusion
-for each marker. If the known genotypes of a marker are incompatible with
-the true pedigree, the corresponding entry is \code{NA}.
-\item \code{EPtotal}: The total exclusion power, computed as \code{1 - prod(1 -   EPperMarker, na.rm = TRUE)}
+\item \code{EPperMarker}: A numeric vector containing the exclusion power of each
+marker. If the known genotypes of a marker are incompatible with the true
+pedigree, the corresponding entry is \code{NA}.
+\item \code{EPtotal}: The total exclusion power, computed as \code{1 - prod(1 -   EPperMarker, na.rm = TRUE)}.
 \item \code{expectedMismatch}: The expected number of markers giving exclusion,
-computed as \code{sum(EPperMarker, na.rm = TRUE)}
+computed as \code{sum(EPperMarker, na.rm = TRUE)}.
 \item \code{distribMismatch}: The probability distribution of the number of markers
 giving exclusion. This is given as a numeric vector of length \code{n+1}, where
 \code{n} is the number of nonzero elements of \code{EPperMarker}. The vector has
-names \code{0:n}
-\item \code{params}: A list containing the input parameters \code{missing}, \code{markers} and
-\code{disableMutations}
+names \code{0:n}.
+\item \code{params}: A list containing the input parameters \code{ids}, \code{markers} and
+\code{disableMutations} (after processing).
 }
 }
 \description{

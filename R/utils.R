@@ -41,7 +41,7 @@ pluralise = function(noun, n) {
 }
 
 isEP = function(x) {
-  inherits(x, "mpEP")
+  inherits(x, "EPresult")
 }
 
 isIP = function(x) {
@@ -53,7 +53,7 @@ isIP = function(x) {
 consistentMarkers = function(x, markers = seq_len(nMarkers(x))) {
 
   # `marker` may be numeric, character or logical
-  x = selectMarkers(x)
+  x = selectMarkers(x, markers)
   nMark = if(is.logical(markers)) sum(markers) else length(markers)
 
   # Compute likelihoods with no mutation model

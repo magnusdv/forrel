@@ -20,19 +20,20 @@
 #' @param source Either "claim" (default) or "true", deciding which pedigree is
 #'   used as source for marker data.
 #' @param disableMutations This parameter determines how mutation models are
-#'   treated:
+#'   treated. Possible values are as follows:
 #'
-#'   * If `NA` (the default), mutations are disabled only for those markers
-#'   whose known genotypes are compatible with both `claimPed` and `truePed`.
-#'   This is determined by temporarily removing all mutation models and checking
-#'   which markers have nonzero likelihood in both alternatives.
+#'   * `NA` (the default): Mutations are disabled only for those markers whose
+#'   known genotypes are compatible with both `claimPed` and `truePed`. This is
+#'   determined by temporarily removing all mutation models and checking which
+#'   markers have nonzero likelihood in both alternatives.
 #'
-#'   * If `TRUE`, mutations are disabled for all markers.
+#'   * `TRUE`: Mutations are disabled for all markers.
 #'
-#'   * If `FALSE` no action is done to disable mutations.
+#'   * `FALSE`: No action is done to disable mutations.
 #'
-#'   * If a vector, it must be a subset of `markers` indicating explicitly those
-#'   markers for which mutations should be disabled.
+#'   * A vector containing the names or indices of those markers for which
+#'   mutations should be disabled.
+#'
 #' @param alleles,afreq,Xchrom If these are given, they are used (together with
 #'   `knownGenotypes`) to create a marker object on the fly.
 #' @param knownGenotypes A list of triplets `(a, b, c)`, indicating that
@@ -54,23 +55,23 @@
 #'   Otherwise, the function returns an `EPresult` object, which is essentially
 #'   a list with the following entries:
 #'
-#'   * `EPperMarker`: A numeric vector containing the probability of exclusion
-#'   for each marker. If the known genotypes of a marker are incompatible with
-#'   the true pedigree, the corresponding entry is `NA`.
+#'   * `EPperMarker`: A numeric vector containing the exclusion power of each
+#'   marker. If the known genotypes of a marker are incompatible with the true
+#'   pedigree, the corresponding entry is `NA`.
 #'
 #'   * `EPtotal`: The total exclusion power, computed as `1 - prod(1 -
-#'   EPperMarker, na.rm = TRUE)`
+#'   EPperMarker, na.rm = TRUE)`.
 #'
 #'   * `expectedMismatch`: The expected number of markers giving exclusion,
-#'   computed as `sum(EPperMarker, na.rm = TRUE)`
+#'   computed as `sum(EPperMarker, na.rm = TRUE)`.
 #'
 #'   * `distribMismatch`: The probability distribution of the number of markers
 #'   giving exclusion. This is given as a numeric vector of length `n+1`, where
 #'   `n` is the number of nonzero elements of `EPperMarker`. The vector has
-#'   names `0:n`
+#'   names `0:n`.
 #'
-#'   * `params`: A list containing the input parameters `missing`, `markers` and
-#'   `disableMutations`
+#'   * `params`: A list containing the input parameters `ids`, `markers` and
+#'   `disableMutations` (after processing).
 #'
 #'
 #' @author Magnus Dehli Vigeland
@@ -185,7 +186,7 @@ exclusionPower = function(claimPed, truePed, ids, markers = NULL, source = "clai
     claimPed = ped_claim
   }
   if(!is.null(ped_true)) {
-    warning("Argument `truePed` has been renamed to `truePed`")
+    warning("Argument `true_ped` has been renamed to `truePed`")
     truePed = ped_true
   }
   if(!is.null(known_genotypes)) {
@@ -278,9 +279,10 @@ exclusionPower = function(claimPed, truePed, ids, markers = NULL, source = "clai
 
   ### Mutation disabling
 
+  # Which of the markers allow mutations?
+  hasMut = allowsMutations(claimPed)
+
   if(!is.null(disableMutations) && !isFALSE(disableMutations)) {
-    # Which of the markers allow mutations?
-    hasMut = allowsMutations(claimPed)
 
     if(isTRUE(disableMutations))
       disableMutations = which(hasMut)
@@ -292,8 +294,11 @@ exclusionPower = function(claimPed, truePed, ids, markers = NULL, source = "clai
       disableTF[hasMut] = cons
       disableMutations = which(disableTF)
     }
-    else # if numeric or character: Must be subset of `markers`
-      disableMutations = match(disableMutations, markers)
+    else {# if numeric or character: Use original pedigree, i.e. before selection
+      midx_orig = whichMarkers(sourcePed, markers)
+      dis_idx = whichMarkers(sourcePed, disableMutations)
+      disableMutations = match(dis_idx, midx_orig) # = index in the after-selection peds!
+    }
 
     # Disable
     if(length(disableMutations)) {
@@ -311,25 +316,25 @@ exclusionPower = function(claimPed, truePed, ids, markers = NULL, source = "clai
 
     m = markers[i]
     if(verbose)
-      message("Marker ", m, ": ", appendLF = FALSE)
+      message("Marker ", m, ". ", appendLF = FALSE)
 
     # Disable mutations?
     if(verbose) {
-      action = if(i %in% disableMutations) "disabled." else if(hasMut[i]) "kept.    " else "no model. "
-      message("Mutations = ", action, appendLF = FALSE)
+      action = if(i %in% disableMutations) "disabled. " else if(hasMut[i]) "kept. " else "not found. "
+      message("Mutation model ", action, appendLF = FALSE)
     }
 
     # If impossible, return NA
     if(trueBase[i] == 0) {
       if(verbose)
-        message("Incompatible with true pedigree. PE = NA")
+        message("INCOMPATIBLE WITH TRUE PEDIGREE! PE = NA")
       return(NA_real_)
     }
 
     # If impossible, return NA
     if(claimBase[i] == 0) {
       if(verbose)
-        message("Incompatible with `claimed pedigree. PE = 1")
+        message("INCOMPATIBLE WITH CLAIMED PEDIGREE! PE = 1")
       return(1)
     }
 
@@ -360,6 +365,11 @@ exclusionPower = function(claimPed, truePed, ids, markers = NULL, source = "clai
       warning("Package `poibin` not found. Cannot compute the distribution of exclusion counts without this; returning NA's")
   }
 
+  # Ad hoc fix: If all ep are NA, the other results should also be NA (not 0)
+  if(all(is.na(ep))) {
+    tot = expMis = distrib = NA
+  }
+
   # Timing
   if(verbose)
     message("Total time used: ", format(Sys.time() - st, digits = 3))
@@ -373,9 +383,19 @@ exclusionPower = function(claimPed, truePed, ids, markers = NULL, source = "clai
 
 #' @export
 print.EPresult = function(x, ...) {
+  incons = is.na(x$EPperMarker)
+  incons_names = if(any(incons)) sprintf("(%s)", toString(x$params$markers[incons])) else ""
+
+  poss = !incons & x$EPperMarker > 0
+  poss_names = if(any(poss)) sprintf("(%s)", toString(x$params$markers[poss])) else ""
+  nPoss = if(all(incons)) NA else sum(poss)
+
+  expMis = round(x$expectedMismatch, 3)
+
   cat("Total EP:", round(x$EPtotal, 3), "\n")
-  cat("Markers with potential mismatch:", sum(x$EPperMarker > 0), "\n")
-  cat("Expected number of mismatches:", round(x$expectedMismatch, 3), "\n")
+  cat("Markers inconsistent with pedigree:", sum(incons), incons_names, "\n")
+  cat("Markers with potential mismatch:", nPoss, poss_names, "\n")
+  cat("Expected number of mismatches:", expMis, "\n")
 }
 
   ###############################

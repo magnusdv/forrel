@@ -11,12 +11,12 @@
 #'
 #' `type = 3`: x = Expected number of exclusions; y = average log(LR)
 #'
-#' For each `mpEP` object in `ep`, and the corresponding element of `ip`, the
+#' For each `EPresult` object in `ep`, and the corresponding element of `ip`, the
 #' relevant data is extracted from each, producing a single point the final
 #' plot.
 #'
 #' In the most general case `ep` (and similarly for `ip`) can be a list of lists
-#' of `mpEP` objects. To simplify the discussion we refer to the inner lists as
+#' of `EPresult` objects. To simplify the discussion we refer to the inner lists as
 #' "groups". A group may consist of a single point, or several (typically many
 #' simulations of the same situation). Points within the same group are always
 #' drawn with the same color and shape.
@@ -28,7 +28,7 @@
 #' * Minor points: Individual points in groups with more than one element.
 #'
 #' @param ep Exclusion power data, typically in the form of one or several
-#'   `mpEP` objects (output from [missingPersonEP()]. See Details and Examples.
+#'   `EPresult` objects (output from [missingPersonEP()]. See Details and Examples.
 #' @param ip Inclusion power data, typically in the form of one or several
 #'   `mpIP` objects (output from [missingPersonIP()]. See Details and Examples.
 #'   The list structure of `ip` must be identical to that of `ep`.
@@ -63,7 +63,7 @@ powerPlot = function(ep, ip, type = 1, LRthresh = 1e4, ellipse = TRUE, col = NUL
   if(isEP(ep)) ep = list(ep)
   if(isIP(ip)) ip = list(ip)
 
-  # Ensure each element of ep (ip) is a *list* of mpEP objects.
+  # Ensure each element of ep (ip) is a *list* of EPresult objects.
   for(i in seq_along(ep)) {
     if(isEP(ep[[i]])) ep[[i]] = list(ep[[i]])
   }

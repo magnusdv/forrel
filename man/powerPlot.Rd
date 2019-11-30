@@ -10,7 +10,7 @@ powerPlot(ep, ip, type = 1, LRthresh = 10000, ellipse = TRUE,
 }
 \arguments{
 \item{ep}{Exclusion power data, typically in the form of one or several
-\code{mpEP} objects (output from \code{\link[=missingPersonEP]{missingPersonEP()}}. See Details and Examples.}
+\code{EPresult} objects (output from \code{\link[=missingPersonEP]{missingPersonEP()}}. See Details and Examples.}
 
 \item{ip}{Inclusion power data, typically in the form of one or several
 \code{mpIP} objects (output from \code{\link[=missingPersonIP]{missingPersonIP()}}. See Details and Examples.
@@ -52,12 +52,12 @@ The plot types are as follows:
 
 \code{type = 3}: x = Expected number of exclusions; y = average log(LR)
 
-For each \code{mpEP} object in \code{ep}, and the corresponding element of \code{ip}, the
+For each \code{EPresult} object in \code{ep}, and the corresponding element of \code{ip}, the
 relevant data is extracted from each, producing a single point the final
 plot.
 
 In the most general case \code{ep} (and similarly for \code{ip}) can be a list of lists
-of \code{mpEP} objects. To simplify the discussion we refer to the inner lists as
+of \code{EPresult} objects. To simplify the discussion we refer to the inner lists as
 "groups". A group may consist of a single point, or several (typically many
 simulations of the same situation). Points within the same group are always
 drawn with the same color and shape.
