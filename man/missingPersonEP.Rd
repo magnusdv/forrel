@@ -2,28 +2,36 @@
 % Please edit documentation in R/missingPersonEP.R
 \name{missingPersonEP}
 \alias{missingPersonEP}
-\title{Exclusion power statistics in missing person cases.}
+\title{Exclusion power for missing person cases.}
 \usage{
-missingPersonEP(reference, missing, markers, disableMutations = NA,
-  verbose = TRUE)
+missingPersonEP(reference, missing, markers = NULL,
+  disableMutations = NA, verbose = TRUE)
 }
 \arguments{
 \item{reference}{A \code{ped} object with attached markers.}
 
 \item{missing}{The ID label of the missing pedigree member.}
 
-\item{markers}{Names or indices of the markers to be included. By default,
-all markers.}
+\item{markers}{A vector indicating the names or indices of markers attached
+to the source pedigree. (This is either \code{claimPed} or \code{truePed}, depending
+on the value of \code{source}). If NULL (the default), then all markers attached
+to the source pedigree are used. If \code{alleles} or \code{afreq} is non-NULL, then
+this parameter is ignored.}
 
 \item{disableMutations}{This parameter determines how mutation models are
-treated. If \code{TRUE}, mutations are disabled for all markers. If \code{NA} (the
-default), mutations are disabled only for those markers with nonzero
-baseline likelihood. (In other words: Mutations are NOT disabled if the
-reference genotypes are inconsistent with the pedigree.) If \code{FALSE} no
-action is done to disable mutations. Finally, if a vector of marker names
-or indices is given, mutations are disabled for these markers exclusively.}
+treated:
+\itemize{
+\item If \code{NA} (the default), mutations are disabled only for those markers
+whose known genotypes are compatible with both \code{claimPed} and \code{truePed}.
+This is determined by temporarily removing all mutation models and checking
+which markers have nonzero likelihood in both alternatives.
+\item If \code{TRUE}, mutations are disabled for all markers.
+\item If \code{FALSE} no action is done to disable mutations.
+\item If a vector, it must be a subset of \code{markers} indicating explicitly those
+markers for which mutations should be disabled.
+}}
 
-\item{verbose}{A logical, by default TRUE.}
+\item{verbose}{A logical.}
 }
 \value{
 A \code{mpEP} object, which is essentially a list with the following entries:
@@ -43,7 +51,7 @@ giving exclusion. This is given as a numeric vector of length \code{n+1}, where
 }
 }
 \description{
-Exclusion power statistics in missing person cases.
+Exclusion power for missing person cases.
 }
 \examples{
 

@@ -47,3 +47,21 @@ isEP = function(x) {
 isIP = function(x) {
   inherits(x, "mpIP")
 }
+
+# Test if genotypes are consistent with ped
+# (A better, but slower, alternative to `mendelianCheck()`)
+consistentMarkers = function(x, markers = seq_len(nMarkers(x))) {
+
+  # `marker` may be numeric, character or logical
+  x = selectMarkers(x)
+  nMark = if(is.logical(markers)) sum(markers) else length(markers)
+
+  # Compute likelihoods with no mutation model
+  liks = vapply(seq_len(nMark), function(i) {
+    mutmod(x, i) = NULL
+    pedprobr::likelihood(x, i)
+  }, FUN.VALUE = 0)
+
+  # Return TRUE if likelihood is nonzero
+  liks > 0
+}

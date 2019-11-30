@@ -1,37 +1,77 @@
 #' Power of exclusion
 #'
-#' Computes the power (of a single marker) of excluding a claimed relationship,
-#' given the true relationship.
+#' Computes the power (of a single marker, or for a collection of markers) of
+#' excluding a claimed relationship, given the true relationship.
 #'
-#' This function computes the 'Power of exclusion', as defined and discussed in
-#' (Egeland et al., 2014).
+#' This function implements the formula for exclusion power as defined and
+#' discussed in (Egeland et al., 2014).
 #'
-#' @param ped_claim a `ped` object, or a list of several such objects,
-#'   describing the claimed relationship. If a list, the sets of ID labels must
-#'   be disjoint, that is, all ID labels must be unique.
-#' @param ped_true a `ped` object, or a list of several such objects, describing
-#'   the true relationship. ID labels must be consistent with `ped_claim`.
-#' @param ids individuals available for genotyping.
-#' @param markerindex NULL, or a single numeric indicating the index of a marker
-#'   of `ped_claim` from which `alleles`, `afreq` and `known_genotypes` will be
-#'   extracted.
-#' @param alleles a numeric or character vector containing marker alleles names.
-#'   Ignored if `markerindex` is non-NULL.
-#' @param afreq a numerical vector with allele frequencies. An error is given if
-#'   they don't sum to 1 (rounded to 3 decimals). Ignored if `markerindex` is
+#' @param claimPed A `ped` object (or a list of such), describing the claimed
+#'   relationship. If a list, the sets of ID labels must be disjoint, that is,
+#'   all ID labels must be unique.
+#' @param truePed A `ped` object (or a list of such), describing the true
+#'   relationship. ID labels must be consistent with `claimPed`.
+#' @param ids Individuals available for genotyping.
+#' @param markers A vector indicating the names or indices of markers attached
+#'   to the source pedigree. (This is either `claimPed` or `truePed`, depending
+#'   on the value of `source`). If NULL (the default), then all markers attached
+#'   to the source pedigree are used. If `alleles` or `afreq` is non-NULL, then
+#'   this parameter is ignored.
+#' @param source Either "claim" (default) or "true", deciding which pedigree is
+#'   used as source for marker data.
+#' @param disableMutations This parameter determines how mutation models are
+#'   treated:
+#'
+#'   * If `NA` (the default), mutations are disabled only for those markers
+#'   whose known genotypes are compatible with both `claimPed` and `truePed`.
+#'   This is determined by temporarily removing all mutation models and checking
+#'   which markers have nonzero likelihood in both alternatives.
+#'
+#'   * If `TRUE`, mutations are disabled for all markers.
+#'
+#'   * If `FALSE` no action is done to disable mutations.
+#'
+#'   * If a vector, it must be a subset of `markers` indicating explicitly those
+#'   markers for which mutations should be disabled.
+#' @param alleles,afreq,Xchrom If these are given, they are used (together with
+#'   `knownGenotypes`) to create a marker object on the fly.
+#' @param knownGenotypes A list of triplets `(a, b, c)`, indicating that
+#'   individual `a` has genotype `b/c`. Ignored unless `alleles` or `afreq` is
 #'   non-NULL.
-#' @param known_genotypes list of triplets `(a, b, c)`, indicating that
-#'   individual `a` has genotype `b/c`. Must be NULL if `markerindex` is
-#'   non-NULL.
-#' @param Xchrom a logical: Is the marker on the X chromosome? Ignored if
-#'   `markerindex` is non-NULL.
-#' @param plot either a logical or the character 'plot_only', controlling if a
-#'   plot should be produced. If 'plot_only', a plot is drawn, but no further
-#'   computations are done.
-#' @param verbose a logical.
+#' @param plot Either a logical or the character "plotOnly". If the latter, a
+#'   plot is drawn, but no further computations are done.
+#' @param plotMarkers A vector of marker names or indices whose genotypes are to
+#'   be included in the plot.
+#' @param verbose A logical.
+#' @param ped_claim,ped_true,known_genotypes,markerindex These arguments have
+#'   been renamed to `claimPed`, `truePed`, `knownGenotypes` and `markers`,
+#'   respectively. They still work (but triggers a warning), but they will be
+#'   removed in a future version.
 #'
-#' @return A single numeric value. If `plot = "plot_only"`, the function returns
-#'   NULL after producing the plot.
+#' @return If `plot = "plotOnly"`, the function returns NULL after producing the
+#'   plot.
+#'
+#'   Otherwise, the function returns an `EPresult` object, which is essentially
+#'   a list with the following entries:
+#'
+#'   * `EPperMarker`: A numeric vector containing the probability of exclusion
+#'   for each marker. If the known genotypes of a marker are incompatible with
+#'   the true pedigree, the corresponding entry is `NA`.
+#'
+#'   * `EPtotal`: The total exclusion power, computed as `1 - prod(1 -
+#'   EPperMarker, na.rm = TRUE)`
+#'
+#'   * `expectedMismatch`: The expected number of markers giving exclusion,
+#'   computed as `sum(EPperMarker, na.rm = TRUE)`
+#'
+#'   * `distribMismatch`: The probability distribution of the number of markers
+#'   giving exclusion. This is given as a numeric vector of length `n+1`, where
+#'   `n` is the number of nonzero elements of `EPperMarker`. The vector has
+#'   names `0:n`
+#'
+#'   * `params`: A list containing the input parameters `missing`, `markers` and
+#'   `disableMutations`
+#'
 #'
 #' @author Magnus Dehli Vigeland
 #'
@@ -53,25 +93,39 @@
 #' # Truth: 1 and 3 are unrelated
 #' true = list(singleton(id = 1), singleton(id = 3, sex = 2))
 #'
-#' # Indivs 1 and 3 are available for genotyping
-#' ids = c(1, 3)
+#' # Attach 3 markers
+#' m1 = marker(claim, alleles = 1:2)
+#' m2 = marker(claim, alleles = 1:3)
+#' m3 = marker(claim, alleles = 1:2, chrom = "X")
+#' claim = setMarkers(claim, list(m1,m2,m3))
 #'
-#' # An equifrequent SNP
-#' als = 2
-#' afreq = c(0.5, 0.5)
+#' # Compute EP when father and child is available for genotyping
+#' exclusionPower(claim, true, ids = c(1,3))
 #'
-#' # The exclusion power assuming no known genotypes
-#' PE1 = exclusionPower(claim, true, ids = ids, alleles = als, afreq = afreq)
+#' # Suppose child is genotyped
+#' genotype(claim, marker = 1, id = 3) = c(1,1)
+#' genotype(claim, marker = 2, id = 3) = c(1,1)
+#' genotype(claim, marker = 3, id = 3) = c(1,2)
 #'
-#' # Exclusion power if the child is known to have genotype 1/1:
-#' PE2 = exclusionPower(claim, true, ids = 1, alleles = als, afreq = afreq,
-#'                      known_genotypes = list(c(3, 1, 1)), plot = FALSE)
+#' # Compute EP when father is available
+#' exclusionPower(claim, true, ids = 1, plotMarker = 1:3)
 #'
-#' # Exclusion power if the SNP is on the X chromosome
-#' PE3 = exclusionPower(claim, true, ids = ids, alleles = als, afreq = afreq,
+#'
+#' #-------------------
+#' # EP for single marker described directly in the function call
+#'
+#' # EP of empty (equifrequent) SNP marker
+#' EP1 = exclusionPower(claim, true, ids = c(1,3), alleles = 2, plot = FALSE)
+#'
+#' # EP of same marker when the child ("3") is known to be 1/1:
+#' EP2 = exclusionPower(claim, true, ids = 1, alleles = 2,
+#'                      knownGenotypes = list(c(3, 1, 1)), plot = FALSE)
+#'
+#' # EP of X-chromosomal SNP
+#' EP3 = exclusionPower(claim, true, ids = c(1,3), alleles = 2,
 #'                      Xchrom = TRUE, plot = FALSE)
 #'
-#' stopifnot(PE1 == 0.125, PE2 == 0.25, PE3 == 0.25)
+#' stopifnot(EP1$EPtotal == 0.125, EP2$EPtotal == 0.25, EP3$EPtotal == 0.25)
 #'
 #' ############################################
 #' ### Example from Egeland et al. (2012):
@@ -83,131 +137,282 @@
 #' sisters = relabel(nuclearPed(2, sex = c(2, 2)), c(101, 102, 2, 3))
 #'
 #' # Equifrequent SNP:
-#' PE1 = exclusionPower(ped_claim = mother_daughter, ped_true = sisters, ids = c(2, 3),
+#' PE1 = exclusionPower(claimPed = mother_daughter, truePed = sisters, ids = c(2, 3),
 #'                      alleles = 2)
 #'
 #' # SNP with MAF = 0.1:
-#' PE2 = exclusionPower(ped_claim = mother_daughter, ped_true = sisters, ids = c(2, 3),
+#' PE2 = exclusionPower(claimPed = mother_daughter, truePed = sisters, ids = c(2, 3),
 #'                      alleles = 2, afreq = c(0.9, 0.1))
 #'
 #' # Equifrequent tetra-allelic marker:
-#' PE3 = exclusionPower(ped_claim = mother_daughter, ped_true = sisters, ids = c(2, 3),
+#' PE3 = exclusionPower(claimPed = mother_daughter, truePed = sisters, ids = c(2, 3),
 #'                      alleles = 4)
 #'
 #' # Tetra-allelic marker with one major allele:
-#' PE4 = exclusionPower(ped_claim = mother_daughter, ped_true = sisters, ids = c(2, 3),
+#' PE4 = exclusionPower(claimPed = mother_daughter, truePed = sisters, ids = c(2, 3),
 #'                      alleles = 4, afreq = c(0.7, 0.1, 0.1, 0.1))
 #'
-#' stopifnot(round(c(PE1,PE2,PE3,PE4), 5) == c(0.03125, 0.00405, 0.08203, 0.03090))
+#' stopifnot(all.equal(c(PE1$EPtotal, PE2$EPtotal, PE3$EPtotal, PE4$EPtotal),
+#'                 c(0.03125, 0.00405, 0.08203125, 0.03090)))
 #'
-#' ####### How does the power change if the true pedigree is inbred?
+#' ### How does the power change if the true pedigree is inbred?
 #' sisters_LOOP = addParents(sisters, 101, father = 201, mother = 202)
 #' sisters_LOOP = addParents(sisters_LOOP, 102, father = 201, mother = 203)
 #'
 #' # Equifrequent SNP:
-#' PE5 = exclusionPower(ped_claim = mother_daughter, ped_true = sisters_LOOP,
+#' PE5 = exclusionPower(claimPed = mother_daughter, truePed = sisters_LOOP,
 #'                      ids = c(2, 3), alleles = 2, plot = FALSE)
 #'
 #' # SNP with MAF = 0.1:
-#' PE6 = exclusionPower(ped_claim = mother_daughter, ped_true = sisters_LOOP,
+#' PE6 = exclusionPower(claimPed = mother_daughter, truePed = sisters_LOOP,
 #'                      ids = c(2, 3), alleles = 2, afreq = c(0.9, 0.1), plot = FALSE)
 #'
-#' stopifnot(round(c(PE5,PE6), 5) == c(0.03125, 0.00765))
+#' stopifnot(all.equal(c(PE5$EPtotal, PE6$EPtotal), c(0.03125, 0.00765)))
 #'
-#' \donttest{
-#' # Equifrequent tetra-allelic marker:
-#' PE7 = exclusionPower(ped_claim = mother_daughter, ped_true = sisters_LOOP,
-#'                      ids = c(2, 3), alleles = 4, plot = FALSE)
 #'
-#' # Tetra-allelic marker with one major allele:
-#' PE8 = exclusionPower(ped_claim = mother_daughter, ped_true = sisters_LOOP, plot = FALSE,
-#'                      ids = c(2, 3), alleles = 4, afreq = c(0.7, 0.1, 0.1, 0.1))
-#'
-#' stopifnot(round(c(PE7,PE8), 5) == c(0.07617, 0.03457))
-#' }
-#'
-#' @importFrom graphics abline grconvertX grconvertY layout mtext par plot rect
 #' @export
-exclusionPower = function(ped_claim, ped_true, ids, markerindex = NULL,
-                          alleles = NULL, afreq = NULL, known_genotypes = list(),
-                          Xchrom = FALSE, plot = TRUE, verbose = TRUE) {
+exclusionPower = function(claimPed, truePed, ids, markers = NULL, source = "claim", disableMutations = NA,
+                          alleles = NULL, afreq = NULL, knownGenotypes = NULL,
+                          Xchrom = FALSE, plot = TRUE, plotMarkers = NULL, verbose = TRUE,
+                          ped_true = NULL, ped_claim = NULL, known_genotypes = NULL, markerindex = NULL) {
 
-  # st = proc.time()
+  if(!is.null(markerindex)) {
+      warning("Argument `markerindex` is deprecated; use `markers` instead")
+      markers = markerindex
+  }
+  if(!is.null(ped_claim)) {
+    warning("Argument `ped_claim` has been renamed to `claimPed`")
+    claimPed = ped_claim
+  }
+  if(!is.null(ped_true)) {
+    warning("Argument `truePed` has been renamed to `truePed`")
+    truePed = ped_true
+  }
+  if(!is.null(known_genotypes)) {
+    warning("Argument `known_genotypes` has been renamed to `knownGenotypes`")
+    knownGenotypes = known_genotypes
+  }
+
+  st = Sys.time()
   ids = as.character(ids)
 
-  if (is.ped(ped_claim))
-    ped_claim = list(ped_claim)
-  if (is.ped(ped_true))
-    ped_true = list(ped_true)
+  ### Input option 1: Single marker with attributes given directly
+  if(!is.null(alleles) || !is.null(afreq)) {
 
-  # Extract ped component of each id, and check that all were found
-  compsClaim = getComponent(ped_claim, ids, checkUnique = TRUE)
-  if(anyNA(compsClaim))
-    stop2("Individuals not found in `ped_claim`: ", ids[is.na(compsClaim)])
+    # Convert knownGenotypes to allele matrix
+    am = NULL
+    if(!is.null(knownGenotypes)) {
 
-  # Check that all `ids` are in `true`
-  compsTrue = getComponent(ped_true, ids, checkUnique = TRUE)
-  if(anyNA(compsTrue))
-    stop2("Individuals not found in `ped_true`: ", ids[is.na(compsTrue)])
+      # Check format
+      if(!is.list(knownGenotypes) || !all(lengths(knownGenotypes) == 3))
+        stop2("`knownGenotypes` must be a list of vectors of the form `c(ID, allele1, allele2)`")
 
-  names(compsClaim) = names(compsTrue) = ids
+      am = do.call(rbind, knownGenotypes)
+      rownames(am) = as.character(am[, 1])
+      am = am[, -1, drop = FALSE]
+    }
 
-  if (!is.null(markerindex)) {
-    if(length(markerindex) != 1)
-      stop2("Argument `markerindex` must have length 1: ", markerindex)
+    # If `alleles` is integer, convert to sequence
+    if(length(alleles) == 1 && is.numeric(alleles))
+      alleles = seq_len(alleles)
 
-    ped_claim = lapply(ped_claim, function(x) selectMarkers(x, markerindex))
+    # Create and attach locus to both pedigrees
+    locus = list(alleles = alleles, afreq = afreq, chrom = if (Xchrom) 23 else NA)
+    claimPed = setMarkers(claimPed, alleleMatrix = am, locusAttributes = locus)
+    truePed = setMarkers(truePed, alleleMatrix = am, locusAttributes = locus)
+
+    markers = 1
+    hasMut = FALSE
+    disableMutations = FALSE # don't do anything
   }
   else {
-    if (length(alleles) == 1)
-      alleles = 1:alleles
+    sourcePed = switch(source, claim = claimPed, true = truePed,
+                       stop2("`source` must be either 'claim' or 'true': ", source))
 
-    # Create and attach locus to each `claim` component
-    locus = list(alleles = alleles, afreq = afreq, chrom = if (Xchrom) 23 else NA)
-    ped_claim = lapply(ped_claim, function(x) setMarkers(x, locusAttributes = locus))
+    nmTot = nMarkers(sourcePed)
+    if(nmTot == 0)
+      stop2("No markers attached to the source pedigree ('", source, "')")
 
-    # Set known genotypes
-    for (tup in known_genotypes) {
-      id = as.character(tup[1])
-      cmp = getComponent(ped_claim, id)
-      genotype(ped_claim[[cmp]], marker = 1, id = id) = tup[2:3]
+    # If `markers` not given, use all attached. Use names if present.
+    if(is.null(markers)) {
+      if(verbose)
+        message("Using all ", nmTot, " attached markers")
+      markers = name(sourcePed, 1:nmTot)
+      if(anyNA(markers))
+        markers = 1:nmTot
     }
+
+    # Check for already typed members. TODO: Support for partially typed members
+    typed = typedMembers(sourcePed)
+    if(length(bad <- intersect(ids, typed)))
+      stop2("Individual is already genotyped: ", toString(bad))
+
+    # Transfer marker data to the other pedigree
+    switch(source,
+           claim = {
+             claimPed = selectMarkers(claimPed, markers)
+
+             truePed = transferMarkers(from = claimPed, to = truePed)
+
+           },
+           true = {
+             truePed = selectMarkers(truePed, markers)
+             typed = typedMembers(truePed)
+             claimPed = transferMarkers(from = truePed, to = claimPed)
+           })
   }
 
-  # Check for already typed members. TODO: Suppert for partially typed members
-  typed = unlist(lapply(ped_claim, typedMembers))
-  if(length(bad <- intersect(ids, typed)))
-    stop2("Individual is already genotyped: ", toString(bad))
-
-  # Transfer marker data to `true` peds
-  ped_true = transferMarkers(ped_claim, ped_true)
-
   # Plot
-  if (isTRUE(plot) || plot == "plot_only") {
-    plotPedList(list(ped_claim, ped_true),
+  if (isTRUE(plot) || plot == "plotOnly") {
+    plotPedList(list(claimPed, truePed),
                 newdev = TRUE,
                 frametitles = c("Claim", "True"),
                 shaded = ids,
-                marker = 1)
+                marker = match(plotMarkers, markers))
 
-    if (plot == "plot_only")
+    if (plot == "plotOnly")
       return()
   }
+
+  nMark = length(markers)
+
+  ### Mutation disabling
+
+  if(!is.null(disableMutations) && !isFALSE(disableMutations)) {
+    # Which of the markers allow mutations?
+    hasMut = allowsMutations(claimPed)
+
+    if(isTRUE(disableMutations))
+      disableMutations = which(hasMut)
+    else if(identical(disableMutations, NA)) {
+      # Disable mutations for markers consistent in both true and claim
+      cons = consistentMarkers(claimPed, hasMut) & consistentMarkers(truePed, hasMut)
+
+      disableTF = logical(nMark)
+      disableTF[hasMut] = cons
+      disableMutations = which(disableTF)
+    }
+    else # if numeric or character: Must be subset of `markers`
+      disableMutations = match(disableMutations, markers)
+
+    # Disable
+    if(length(disableMutations)) {
+      mutmod(claimPed, disableMutations) = NULL
+      mutmod(truePed, disableMutations) = NULL
+    }
+  }
+
+  ### Baseline likelihoods
+  trueBase = vapply(markers, function(m) pedprobr::likelihood(truePed, m), 0)
+  claimBase = vapply(markers, function(m) pedprobr::likelihood(claimPed, m), 0)
+
+  ### Compute the exclusion power of each marker
+  ep = vapply(seq_along(markers), function(i) {
+
+    m = markers[i]
+    if(verbose)
+      message("Marker ", m, ": ", appendLF = FALSE)
+
+    # Disable mutations?
+    if(verbose) {
+      action = if(i %in% disableMutations) "disabled." else if(hasMut[i]) "kept.    " else "no model. "
+      message("Mutations = ", action, appendLF = FALSE)
+    }
+
+    # If impossible, return NA
+    if(trueBase[i] == 0) {
+      if(verbose)
+        message("Incompatible with true pedigree. PE = NA")
+      return(NA_real_)
+    }
+
+    # If impossible, return NA
+    if(claimBase[i] == 0) {
+      if(verbose)
+        message("Incompatible with `claimed pedigree. PE = 1")
+      return(1)
+    }
+
+    # Otherwise, compute EP
+    this.ep = .exclusionPowerSingleMarker(claimPed, truePed, ids, marker = i, verbose = FALSE)
+    if(verbose)
+      message("PE = ", this.ep)
+
+    this.ep
+  }, FUN.VALUE = 0)
+
+  # Total EP
+  tot = 1 - prod(1 - ep, na.rm = TRUE)
+
+  # Expected number of exclusions
+  expMis = sum(ep, na.rm = TRUE)
+
+  # Distribution of number of mismatches
+  # This is a sum of different Bernoulli variables, i.e., Poisson binomial.
+  n.nonz = sum(ep > 0, na.rm = TRUE)
+  if(n.nonz == 0)
+    distrib = c(`0` = 1)
+  else {
+    distrib = setNames(rep(NA_real_, n.nonz + 1), 0:n.nonz)
+    if (requireNamespace("poibin", quietly = TRUE))
+      distrib[] = poibin::dpoibin(kk = 0:n.nonz, pp = ep[!is.na(ep) & ep > 0])
+    else
+      warning("Package `poibin` not found. Cannot compute the distribution of exclusion counts without this; returning NA's")
+  }
+
+  # Timing
+  if(verbose)
+    message("Total time used: ", format(Sys.time() - st, digits = 3))
+
+  # List of input parameters
+  params = list(ids = ids, markers = markers, disableMutations = disableMutations)
+
+  structure(list(EPperMarker = ep, EPtotal = tot, expectedMismatch = expMis,
+                 distribMismatch = distrib, params = params), class = "EPresult")
+}
+
+#' @export
+print.EPresult = function(x, ...) {
+  cat("Total EP:", round(x$EPtotal, 3), "\n")
+  cat("Markers with potential mismatch:", sum(x$EPperMarker > 0), "\n")
+  cat("Expected number of mismatches:", round(x$expectedMismatch, 3), "\n")
+}
 
   ###############################
   ### Computations start here ###
   ###############################
 
+.exclusionPowerSingleMarker = function(claimPed, truePed, ids, marker, verbose = TRUE) {
   # Step 1: Genotype combinations incompatible with "claim"
   # Step 2: Probability of incomp under `true` pedigree
 
+  if (is.ped(claimPed))
+    claimPed = list(claimPed)
+  if (is.ped(truePed))
+    truePed = list(truePed)
+
+  claim = selectMarkers(claimPed, marker)
+  true = selectMarkers(truePed, marker)
+
+  # Extract ped component of each id, and check that all were found
+  compsClaim = getComponent(claim, ids, checkUnique = TRUE)
+  if(anyNA(compsClaim))
+    stop2("Individuals not found in `claimPed`: ", ids[is.na(compsClaim)])
+
+  # Check that all `ids` are in `true`
+  compsTrue = getComponent(true, ids, checkUnique = TRUE)
+  if(anyNA(compsTrue))
+    stop2("Individuals not found in `truePed`: ", ids[is.na(compsTrue)])
+
+  names(compsClaim) = names(compsTrue) = ids
+
   ### Step 1
   # Incompatible combinations in each component
-  I.g.list = lapply(seq_along(ped_claim), function(i) {
+  I.g.list = lapply(seq_along(claim), function(i) {
     if(!any(compsClaim == i))
       return(NULL)
 
-    omd = oneMarkerDistribution(ped_claim[[i]], ids = ids[compsClaim == i],
+    omd = oneMarkerDistribution(claim[[i]], ids = ids[compsClaim == i],
                                 partialmarker = 1, verbose = FALSE, eliminate = 0)
     omd == 0
     })
@@ -243,26 +448,25 @@ exclusionPower = function(ped_claim, ped_true, ids, markerindex = NULL,
   incomp.grid = incomp
 
   # If X: Modify male columns.  TODO: would be nice to clean this up a bit.
-  m = getMarkers(ped_claim[[1]], 1)[[1]]
+  m = getMarkers(claim[[1]], 1)[[1]]
   if(isXmarker(m)) {
-    sx = sapply(seq_along(ids), function(i) getSex(ped_true[[compsTrue[i]]], ids[i]))
-    nall = length(alleles(ped_true[[1]], 1))
+    sx = sapply(seq_along(ids), function(i) getSex(true[[compsTrue[i]]], ids[i]))
+    nall = nAlleles(true[[1]], 1)
     if(nall > 1) {
       homoz = c(1, cumsum(nall:2) + 1)
       incomp.grid[, sx == 1] = homoz[incomp.grid[, sx == 1]]
     }
   }
 
-
-  ### In the true ped: Sum probs of the incompat combinations
-  p.g.list = lapply(seq_along(ped_true), function(i) {
+  # In the true ped: Sum probs of the incompat combinations
+  p.g.list = lapply(seq_along(true), function(i) {
     if(!any(compsTrue == i))
       return(NULL)
 
     ids.i = ids[compsTrue == i]
     grid.i = unique.matrix(incomp.grid[, ids.i, drop = FALSE])
 
-    omd = oneMarkerDistribution(ped_true[[i]], ids.i, partialmarker = 1,
+    omd = oneMarkerDistribution(true[[i]], ids.i, partialmarker = 1,
                           grid.subset = grid.i, verbose = FALSE,
                           eliminate = 1)
     omd

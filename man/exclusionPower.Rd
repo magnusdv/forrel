@@ -4,55 +4,92 @@
 \alias{exclusionPower}
 \title{Power of exclusion}
 \usage{
-exclusionPower(ped_claim, ped_true, ids, markerindex = NULL,
-  alleles = NULL, afreq = NULL, known_genotypes = list(),
-  Xchrom = FALSE, plot = TRUE, verbose = TRUE)
+exclusionPower(claimPed, truePed, ids, markers = NULL,
+  source = "claim", disableMutations = NA, alleles = NULL,
+  afreq = NULL, knownGenotypes = NULL, Xchrom = FALSE, plot = TRUE,
+  plotMarkers = NULL, verbose = TRUE, ped_true = NULL,
+  ped_claim = NULL, known_genotypes = NULL, markerindex = NULL)
 }
 \arguments{
-\item{ped_claim}{a \code{ped} object, or a list of several such objects,
-describing the claimed relationship. If a list, the sets of ID labels must
-be disjoint, that is, all ID labels must be unique.}
+\item{claimPed}{A \code{ped} object (or a list of such), describing the claimed
+relationship. If a list, the sets of ID labels must be disjoint, that is,
+all ID labels must be unique.}
 
-\item{ped_true}{a \code{ped} object, or a list of several such objects, describing
-the true relationship. ID labels must be consistent with \code{ped_claim}.}
+\item{truePed}{A \code{ped} object (or a list of such), describing the true
+relationship. ID labels must be consistent with \code{claimPed}.}
 
-\item{ids}{individuals available for genotyping.}
+\item{ids}{Individuals available for genotyping.}
 
-\item{markerindex}{NULL, or a single numeric indicating the index of a marker
-of \code{ped_claim} from which \code{alleles}, \code{afreq} and \code{known_genotypes} will be
-extracted.}
+\item{markers}{A vector indicating the names or indices of markers attached
+to the source pedigree. (This is either \code{claimPed} or \code{truePed}, depending
+on the value of \code{source}). If NULL (the default), then all markers attached
+to the source pedigree are used. If \code{alleles} or \code{afreq} is non-NULL, then
+this parameter is ignored.}
 
-\item{alleles}{a numeric or character vector containing marker alleles names.
-Ignored if \code{markerindex} is non-NULL.}
+\item{source}{Either "claim" (default) or "true", deciding which pedigree is
+used as source for marker data.}
 
-\item{afreq}{a numerical vector with allele frequencies. An error is given if
-they don't sum to 1 (rounded to 3 decimals). Ignored if \code{markerindex} is
+\item{disableMutations}{This parameter determines how mutation models are
+treated:
+\itemize{
+\item If \code{NA} (the default), mutations are disabled only for those markers
+whose known genotypes are compatible with both \code{claimPed} and \code{truePed}.
+This is determined by temporarily removing all mutation models and checking
+which markers have nonzero likelihood in both alternatives.
+\item If \code{TRUE}, mutations are disabled for all markers.
+\item If \code{FALSE} no action is done to disable mutations.
+\item If a vector, it must be a subset of \code{markers} indicating explicitly those
+markers for which mutations should be disabled.
+}}
+
+\item{alleles, afreq, Xchrom}{If these are given, they are used (together with
+\code{knownGenotypes}) to create a marker object on the fly.}
+
+\item{knownGenotypes}{A list of triplets \code{(a, b, c)}, indicating that
+individual \code{a} has genotype \code{b/c}. Ignored unless \code{alleles} or \code{afreq} is
 non-NULL.}
 
-\item{known_genotypes}{list of triplets \code{(a, b, c)}, indicating that
-individual \code{a} has genotype \code{b/c}. Must be NULL if \code{markerindex} is
-non-NULL.}
+\item{plot}{Either a logical or the character "plotOnly". If the latter, a
+plot is drawn, but no further computations are done.}
 
-\item{Xchrom}{a logical: Is the marker on the X chromosome? Ignored if
-\code{markerindex} is non-NULL.}
+\item{plotMarkers}{A vector of marker names or indices whose genotypes are to
+be included in the plot.}
 
-\item{plot}{either a logical or the character 'plot_only', controlling if a
-plot should be produced. If 'plot_only', a plot is drawn, but no further
-computations are done.}
+\item{verbose}{A logical.}
 
-\item{verbose}{a logical.}
+\item{ped_claim, ped_true, known_genotypes, markerindex}{These arguments have
+been renamed to \code{claimPed}, \code{truePed}, \code{knownGenotypes} and \code{markers},
+respectively. They still work (but triggers a warning), but they will be
+removed in a future version.}
 }
 \value{
-A single numeric value. If \code{plot = "plot_only"}, the function returns
-NULL after producing the plot.
+If \code{plot = "plotOnly"}, the function returns NULL after producing the
+plot.
+
+Otherwise, the function returns an \code{EPresult} object, which is essentially
+a list with the following entries:
+\itemize{
+\item \code{EPperMarker}: A numeric vector containing the probability of exclusion
+for each marker. If the known genotypes of a marker are incompatible with
+the true pedigree, the corresponding entry is \code{NA}.
+\item \code{EPtotal}: The total exclusion power, computed as \code{1 - prod(1 -   EPperMarker, na.rm = TRUE)}
+\item \code{expectedMismatch}: The expected number of markers giving exclusion,
+computed as \code{sum(EPperMarker, na.rm = TRUE)}
+\item \code{distribMismatch}: The probability distribution of the number of markers
+giving exclusion. This is given as a numeric vector of length \code{n+1}, where
+\code{n} is the number of nonzero elements of \code{EPperMarker}. The vector has
+names \code{0:n}
+\item \code{params}: A list containing the input parameters \code{missing}, \code{markers} and
+\code{disableMutations}
+}
 }
 \description{
-Computes the power (of a single marker) of excluding a claimed relationship,
-given the true relationship.
+Computes the power (of a single marker, or for a collection of markers) of
+excluding a claimed relationship, given the true relationship.
 }
 \details{
-This function computes the 'Power of exclusion', as defined and discussed in
-(Egeland et al., 2014).
+This function implements the formula for exclusion power as defined and
+discussed in (Egeland et al., 2014).
 }
 \examples{
 
@@ -68,25 +105,39 @@ claim = nuclearPed(nch = 1, sex = 2)
 # Truth: 1 and 3 are unrelated
 true = list(singleton(id = 1), singleton(id = 3, sex = 2))
 
-# Indivs 1 and 3 are available for genotyping
-ids = c(1, 3)
+# Attach 3 markers
+m1 = marker(claim, alleles = 1:2)
+m2 = marker(claim, alleles = 1:3)
+m3 = marker(claim, alleles = 1:2, chrom = "X")
+claim = setMarkers(claim, list(m1,m2,m3))
 
-# An equifrequent SNP
-als = 2
-afreq = c(0.5, 0.5)
+# Compute EP when father and child is available for genotyping
+exclusionPower(claim, true, ids = c(1,3))
 
-# The exclusion power assuming no known genotypes
-PE1 = exclusionPower(claim, true, ids = ids, alleles = als, afreq = afreq)
+# Suppose child is genotyped
+genotype(claim, marker = 1, id = 3) = c(1,1)
+genotype(claim, marker = 2, id = 3) = c(1,1)
+genotype(claim, marker = 3, id = 3) = c(1,2)
 
-# Exclusion power if the child is known to have genotype 1/1:
-PE2 = exclusionPower(claim, true, ids = 1, alleles = als, afreq = afreq,
-                     known_genotypes = list(c(3, 1, 1)), plot = FALSE)
+# Compute EP when father is available
+exclusionPower(claim, true, ids = 1, plotMarker = 1:3)
 
-# Exclusion power if the SNP is on the X chromosome
-PE3 = exclusionPower(claim, true, ids = ids, alleles = als, afreq = afreq,
+
+#-------------------
+# EP for single marker described directly in the function call
+
+# EP of empty (equifrequent) SNP marker
+EP1 = exclusionPower(claim, true, ids = c(1,3), alleles = 2, plot = FALSE)
+
+# EP of same marker when the child ("3") is known to be 1/1:
+EP2 = exclusionPower(claim, true, ids = 1, alleles = 2,
+                     knownGenotypes = list(c(3, 1, 1)), plot = FALSE)
+
+# EP of X-chromosomal SNP
+EP3 = exclusionPower(claim, true, ids = c(1,3), alleles = 2,
                      Xchrom = TRUE, plot = FALSE)
 
-stopifnot(PE1 == 0.125, PE2 == 0.25, PE3 == 0.25)
+stopifnot(EP1$EPtotal == 0.125, EP2$EPtotal == 0.25, EP3$EPtotal == 0.25)
 
 ############################################
 ### Example from Egeland et al. (2012):
@@ -98,48 +149,38 @@ mother_daughter = nuclearPed(1, sex = 2)
 sisters = relabel(nuclearPed(2, sex = c(2, 2)), c(101, 102, 2, 3))
 
 # Equifrequent SNP:
-PE1 = exclusionPower(ped_claim = mother_daughter, ped_true = sisters, ids = c(2, 3),
+PE1 = exclusionPower(claimPed = mother_daughter, truePed = sisters, ids = c(2, 3),
                      alleles = 2)
 
 # SNP with MAF = 0.1:
-PE2 = exclusionPower(ped_claim = mother_daughter, ped_true = sisters, ids = c(2, 3),
+PE2 = exclusionPower(claimPed = mother_daughter, truePed = sisters, ids = c(2, 3),
                      alleles = 2, afreq = c(0.9, 0.1))
 
 # Equifrequent tetra-allelic marker:
-PE3 = exclusionPower(ped_claim = mother_daughter, ped_true = sisters, ids = c(2, 3),
+PE3 = exclusionPower(claimPed = mother_daughter, truePed = sisters, ids = c(2, 3),
                      alleles = 4)
 
 # Tetra-allelic marker with one major allele:
-PE4 = exclusionPower(ped_claim = mother_daughter, ped_true = sisters, ids = c(2, 3),
+PE4 = exclusionPower(claimPed = mother_daughter, truePed = sisters, ids = c(2, 3),
                      alleles = 4, afreq = c(0.7, 0.1, 0.1, 0.1))
 
-stopifnot(round(c(PE1,PE2,PE3,PE4), 5) == c(0.03125, 0.00405, 0.08203, 0.03090))
+stopifnot(all.equal(c(PE1$EPtotal, PE2$EPtotal, PE3$EPtotal, PE4$EPtotal),
+                c(0.03125, 0.00405, 0.08203125, 0.03090)))
 
-####### How does the power change if the true pedigree is inbred?
+### How does the power change if the true pedigree is inbred?
 sisters_LOOP = addParents(sisters, 101, father = 201, mother = 202)
 sisters_LOOP = addParents(sisters_LOOP, 102, father = 201, mother = 203)
 
 # Equifrequent SNP:
-PE5 = exclusionPower(ped_claim = mother_daughter, ped_true = sisters_LOOP,
+PE5 = exclusionPower(claimPed = mother_daughter, truePed = sisters_LOOP,
                      ids = c(2, 3), alleles = 2, plot = FALSE)
 
 # SNP with MAF = 0.1:
-PE6 = exclusionPower(ped_claim = mother_daughter, ped_true = sisters_LOOP,
+PE6 = exclusionPower(claimPed = mother_daughter, truePed = sisters_LOOP,
                      ids = c(2, 3), alleles = 2, afreq = c(0.9, 0.1), plot = FALSE)
 
-stopifnot(round(c(PE5,PE6), 5) == c(0.03125, 0.00765))
+stopifnot(all.equal(c(PE5$EPtotal, PE6$EPtotal), c(0.03125, 0.00765)))
 
-\donttest{
-# Equifrequent tetra-allelic marker:
-PE7 = exclusionPower(ped_claim = mother_daughter, ped_true = sisters_LOOP,
-                     ids = c(2, 3), alleles = 4, plot = FALSE)
-
-# Tetra-allelic marker with one major allele:
-PE8 = exclusionPower(ped_claim = mother_daughter, ped_true = sisters_LOOP, plot = FALSE,
-                     ids = c(2, 3), alleles = 4, afreq = c(0.7, 0.1, 0.1, 0.1))
-
-stopifnot(round(c(PE7,PE8), 5) == c(0.07617, 0.03457))
-}
 
 }
 \references{
