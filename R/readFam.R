@@ -5,10 +5,9 @@
 #' `Familias` package.
 #'
 #' @param famfile Path to a ".fam" file.
-#' @param useDVI A logical, or NA. If TRUE, the DVI section of the fam file is
-#'   used to extract pedigrees and genotypes. If NA (default), the parameter is
-#'   set to TRUE if the input data contains a line equal to "[DVI]", and
-#'   otherwise FALSE.
+#' @param useDVI A logical, indicating if the DVI section of the fam file should
+#'   be identified and parsed. If `NA` (the default), the DVI section is
+#'   included if it is present in the input file.
 #' @param verbose A logical; if TRUE, various information is written to the
 #'   screen during the parsing process.
 #'
