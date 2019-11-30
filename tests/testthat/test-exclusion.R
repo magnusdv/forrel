@@ -2,7 +2,7 @@ context("Exclusion power")
 
 quickEP = function(claim, true, ids, afreq = NULL, ...)
   exclusionPower(claim, true, ids, alleles = seq_along(afreq), afreq = afreq,
-                 plot = F, verbose = F, ...)
+                 plot = F, verbose = F, ...)$EPtotal
 
 test_that("EP works in empty paternity case", {
   claim = nuclearPed(1)
@@ -53,11 +53,11 @@ test_that("EP works in paternity case with child typed", {
   claim = setMarkers(claim, list(m, mX))
 
   # Autosomal
-  ep_aut = quickEP(claim, true, ids = 1, marker = 1)
+  ep_aut = quickEP(claim, true, ids = 1, markers = 1)
   expect_equal(ep_aut, sum(afr[-1])^2)
 
   # X
-  ep_X = quickEP(claim, true, ids = 1, marker = 2)
+  ep_X = quickEP(claim, true, ids = 1, markers = 2)
   expect_equal(ep_X, sum(afr[-1]))
 })
 
