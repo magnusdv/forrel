@@ -303,11 +303,11 @@ exclusionPower = function(claimPed, truePed, ids, markers = NULL, source = "clai
   }
 
   ### Baseline likelihoods
-  trueBase = vapply(markers, function(m) pedprobr::likelihood(truePed, m), 0)
-  claimBase = vapply(markers, function(m) pedprobr::likelihood(claimPed, m), 0)
+  trueBase = vapply(seq_len(nMark), function(m) pedprobr::likelihood(truePed, m), 0)
+  claimBase = vapply(seq_len(nMark), function(m) pedprobr::likelihood(claimPed, m), 0)
 
   ### Compute the exclusion power of each marker
-  ep = vapply(seq_along(markers), function(i) {
+  ep = vapply(seq_len(nMark), function(i) {
 
     m = markers[i]
     if(verbose)
