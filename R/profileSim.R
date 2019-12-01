@@ -52,6 +52,11 @@ profileSim = function(x, N = 1, ids = NULL, markers = NULL, conditions = NULL, s
     markers = conditions
   }
 
+  # Check that all `ids` are in x
+  labs = if(is.ped(x)) labels(x) else unlist(lapply(x, labels))
+  if(length(err <- setdiff(ids, labs)))
+    stop2("Unknown ID label: ", err)
+
   # If pedlist input: Recurse over components
   if(is.pedList(x)) {
     if(is.marker(markers) || is.markerList(markers))
