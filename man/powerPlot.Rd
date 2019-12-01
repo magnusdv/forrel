@@ -69,6 +69,42 @@ When plotting several groups, two sets of points are drawn:
 }
 }
 \examples{
-# TODO
+
+ref = nuclearPed(father = "fa", mother = "mo", child = "MP")
+ref = setMarkers(ref, marker(ref, alleles = 1:2))
+
+# Baseline EP/IP
+ep = missingPersonEP(ref, missing = "MP")
+ip = missingPersonIP(ref, missing = "MP")
+
+powerPlot(ep, ip, type = 3, LRthresh = 10)
+
+### Simulation parameters (increase!)
+nProfiles = 10
+ipSims = 10 # sims in each IP estimate
+
+### Simulate father profiles
+simFath = profileSim(ref, ids = "fa", N = nProfiles)
+
+# Compute updated EP and IP for each profile
+epFath = lapply(simFath, function(y)
+                missingPersonEP(y, missing = "MP", verbose = FALSE))
+ipFath = lapply(simFath, function(y)
+                missingPersonIP(y, missing = "MP", verbose = FALSE, nsim = ipSims))
+
+### Both parents
+
+# Simulate profiles for parents
+simBoth = profileSim(ref, ids = c("fa", "mo"), N = nProfiles)
+
+# Compute updated EP and IP for each profile
+epBoth = lapply(simBoth, function(y)
+                missingPersonEP(y, missing = "MP", verbose = FALSE))
+ipBoth = lapply(simBoth, function(y)
+                missingPersonIP(y, missing = "MP", verbose = FALSE, nsim = ipSims))
+
+powerPlot(list(ep, epFath, epBoth), list(ip, ipFath, ipBoth), type = 3,
+          LRthresh = 10, labs = c("Baseline", "Father", "Both"))
+
 
 }

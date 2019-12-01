@@ -47,7 +47,43 @@
 #' @return A `ggplot2` plot object.
 #'
 #' @examples
-#' # TODO
+#'
+#' ref = nuclearPed(father = "fa", mother = "mo", child = "MP")
+#' ref = setMarkers(ref, marker(ref, alleles = 1:2))
+#'
+#' # Baseline EP/IP
+#' ep = missingPersonEP(ref, missing = "MP")
+#' ip = missingPersonIP(ref, missing = "MP")
+#'
+#' powerPlot(ep, ip, type = 3, LRthresh = 10)
+#'
+#' ### Simulation parameters (increase!)
+#' nProfiles = 10
+#' ipSims = 10 # sims in each IP estimate
+#'
+#' ### Simulate father profiles
+#' simFath = profileSim(ref, ids = "fa", N = nProfiles)
+#'
+#' # Compute updated EP and IP for each profile
+#' epFath = lapply(simFath, function(y)
+#'                 missingPersonEP(y, missing = "MP", verbose = FALSE))
+#' ipFath = lapply(simFath, function(y)
+#'                 missingPersonIP(y, missing = "MP", verbose = FALSE, nsim = ipSims))
+#'
+#' ### Both parents
+#'
+#' # Simulate profiles for parents
+#' simBoth = profileSim(ref, ids = c("fa", "mo"), N = nProfiles)
+#'
+#' # Compute updated EP and IP for each profile
+#' epBoth = lapply(simBoth, function(y)
+#'                 missingPersonEP(y, missing = "MP", verbose = FALSE))
+#' ipBoth = lapply(simBoth, function(y)
+#'                 missingPersonIP(y, missing = "MP", verbose = FALSE, nsim = ipSims))
+#'
+#' powerPlot(list(ep, epFath, epBoth), list(ip, ipFath, ipBoth), type = 3,
+#'           LRthresh = 10, labs = c("Baseline", "Father", "Both"))
+#'
 #'
 #' @importFrom stats aggregate
 #' @export
@@ -81,7 +117,7 @@ powerPlot = function(ep, ip, type = 1, LRthresh = 1e4, ellipse = TRUE, col = NUL
   group = as.factor(rep(labs, times = L))
 
   if(is.null(col)) {
-    Set1 = c("#377EB8", "#4DAF4A", "#E41A1C", "#984EA3", "#FF7F00", "#FFFF33", "#A65628", "#F781BF")
+    Set1 = c("white", "#4DAF4A", "#E41A1C", "#984EA3", "#FF7F00", "#FFFF33", "#A65628", "#F781BF")
     col = Set1[seq_along(L)]
   }
 
