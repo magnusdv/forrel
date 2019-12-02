@@ -159,6 +159,17 @@ powerPlot = function(ep, ip, type = 1, LRthresh = 1e4, ellipse = TRUE, col = NUL
     if(is.null(xlim)) xlim = c(0, if(max(epnum) < 1) 1 else NA)
     if(is.null(ylim)) ylim = c(0, if(max(ipnum) < 1) 1 else NA)
   }
+  else if(type == 4) {
+    epnum = vapply(unlist(ep, recursive = F), function(a) a$EPtotal, FUN.VALUE = 1)
+    ipnum = vapply(unlist(ip, recursive = F), function(a) a$meanLR, FUN.VALUE = 1)
+
+    alldata = data.frame(ep = epnum, ip = ipnum, group = group)
+
+    if(is.null(xlab)) xlab = "Exclusion power"
+    if(is.null(ylab)) ylab = "Average LR"
+    if(is.null(xlim)) xlim = c(0, if(max(epnum) < 1) 1 else NA)
+    if(is.null(ylim)) ylim = c(0, if(max(ipnum) < 1) 1 else NA)
+  }
 
   # Major data points: Mean points of each group
   major = aggregate(. ~ group, alldata, mean)
@@ -203,6 +214,15 @@ powerPlot = function(ep, ip, type = 1, LRthresh = 1e4, ellipse = TRUE, col = NUL
     p = p +
       ggplot2::geom_hline(yintercept = log10(LRthresh), linetype = 2, size = 1) +
       ggplot2::geom_vline(xintercept = 1, linetype = 2, size = 1)
+    p$layers[] = p$layers[c(np + 1:2, 1:np)]
+  }
+  if(type == 4) {
+    epvec = seq(0 , 0.9999, length = 100)
+    asympt = data.frame(ep = epvec, ip = 1/(1 - epvec))
+    p = p +
+      ggplot2::geom_line(data = asympt, ggplot2::aes(color = NULL, fill = NULL), linetype = 3, size = 1) +
+      ggplot2::annotate("text", 0, 1, label = "ELR == frac(1, 1 - EP)", hjust = 0, vjust = -0.2, parse = TRUE)
+    p = suppressMessages(p + ggplot2::scale_y_log10())
     p$layers[] = p$layers[c(np + 1:2, 1:np)]
   }
   p

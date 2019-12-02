@@ -163,7 +163,6 @@ missingPersonIP = function(reference, missing, markers, nsim = 1, threshold = NU
 
 #' @export
 print.mpIP = function(x, ...) {
-  cat("\n")
   cat("Mean total LR:", round(x$meanLR, 3), "\n")
   cat("Mean total log10(LR):", round(x$meanLogLR, 3), "\n")
   ip = x$IP
