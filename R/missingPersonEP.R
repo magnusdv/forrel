@@ -39,7 +39,7 @@ missingPersonEP = function(reference, missing, markers = NULL, disableMutations 
   poiLabel = "_POI_"
 
   relatedPed = relabel(reference, old = missing, new = poiLabel)
-  unrelatedPed = list(reference, singleton(poiLabel))
+  unrelatedPed = list(reference, singleton(poiLabel, sex = getSex(reference, missing)))
 
   ep = exclusionPower(claimPed = relatedPed, truePed = unrelatedPed, ids = poiLabel,
                       markers = markers, source = "claim", disableMutations = disableMutations,
