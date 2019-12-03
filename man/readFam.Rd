@@ -24,7 +24,7 @@ used as \code{locusAttributes} in e.g. \code{\link[=setMarkers]{setMarkers()}}.
 If the .fam file describes pedigree data, the output is a \code{ped} object or a
 list of such.
 
-If \code{useDVI = TRUE}, then the families described under \code{Reference Families}
+If \code{useDVI = TRUE}, then the families described under \verb{Reference Families}
 are parsed and converted to \code{ped} objects. Each family generally describes
 multiple pedigrees, so the output gets another layer in this case.
 }

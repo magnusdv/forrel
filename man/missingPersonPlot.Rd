@@ -4,12 +4,23 @@
 \alias{missingPersonPlot}
 \title{Missing person plot}
 \usage{
-missingPersonPlot(reference, missing, id.labels = labels(reference),
-  MP.label = "MP", POI.label = "POI", marker = NULL,
-  shaded = "typed", POI.col = "red", POI.shaded = FALSE,
-  POI.height = 8, width = 4, newdev = TRUE,
-  frametitles = c(expression(H[1] * ": POI related"), expression(H[2] *
-  ": POI unrelated")), ...)
+missingPersonPlot(
+  reference,
+  missing,
+  id.labels = labels(reference),
+  MP.label = "MP",
+  POI.label = "POI",
+  marker = NULL,
+  shaded = "typed",
+  POI.col = "red",
+  POI.shaded = FALSE,
+  POI.height = 8,
+  width = 4,
+  newdev = TRUE,
+  frametitles = c(expression(H[1] * ": POI is MP"), expression(H[2] *
+    ": POI unrelated")),
+  ...
+)
 }
 \arguments{
 \item{reference}{A \code{\link[pedtools:ped]{pedtools::ped()}} object}

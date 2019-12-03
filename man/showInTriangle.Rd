@@ -4,9 +4,21 @@
 \alias{showInTriangle}
 \title{Add points to the IBD triangle}
 \usage{
-showInTriangle(k0, k2 = NULL, new = TRUE, col = "blue", cex = 1,
-  pch = 4, lwd = 2, labels = FALSE, col_labels = col,
-  cex_labels = 0.8, pos = 1, adj = NULL, ...)
+showInTriangle(
+  k0,
+  k2 = NULL,
+  new = TRUE,
+  col = "blue",
+  cex = 1,
+  pch = 4,
+  lwd = 2,
+  labels = FALSE,
+  col_labels = col,
+  cex_labels = 0.8,
+  pos = 1,
+  adj = NULL,
+  ...
+)
 }
 \arguments{
 \item{k0, k2}{Numerical vectors giving coordinates for points to be plotted in

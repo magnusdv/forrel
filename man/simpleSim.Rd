@@ -4,8 +4,17 @@
 \alias{simpleSim}
 \title{Unconditional marker simulation}
 \usage{
-simpleSim(x, N, alleles, afreq, ids, Xchrom = FALSE, mutmod = NULL,
-  seed = NULL, verbose = TRUE)
+simpleSim(
+  x,
+  N,
+  alleles,
+  afreq,
+  ids,
+  Xchrom = FALSE,
+  mutmod = NULL,
+  seed = NULL,
+  verbose = TRUE
+)
 }
 \arguments{
 \item{x}{a \code{ped} object}

@@ -4,8 +4,13 @@
 \alias{missingPersonEP}
 \title{Exclusion power for missing person cases.}
 \usage{
-missingPersonEP(reference, missing, markers = NULL,
-  disableMutations = NA, verbose = TRUE)
+missingPersonEP(
+  reference,
+  missing,
+  markers = NULL,
+  disableMutations = NA,
+  verbose = TRUE
+)
 }
 \arguments{
 \item{reference}{A \code{ped} object with attached markers.}

@@ -4,9 +4,16 @@
 \alias{missingPersonIP}
 \title{Inclusion power statistics in missing person cases.}
 \usage{
-missingPersonIP(reference, missing, markers, nsim = 1,
-  threshold = NULL, disableMutations = NA, seed = NULL,
-  verbose = T)
+missingPersonIP(
+  reference,
+  missing,
+  markers,
+  nsim = 1,
+  threshold = NULL,
+  disableMutations = NA,
+  seed = NULL,
+  verbose = T
+)
 }
 \arguments{
 \item{reference}{A \code{ped} object with attached markers.}

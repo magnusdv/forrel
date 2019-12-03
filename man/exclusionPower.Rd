@@ -4,11 +4,25 @@
 \alias{exclusionPower}
 \title{Power of exclusion}
 \usage{
-exclusionPower(claimPed, truePed, ids, markers = NULL,
-  source = "claim", disableMutations = NA, alleles = NULL,
-  afreq = NULL, knownGenotypes = NULL, Xchrom = FALSE, plot = TRUE,
-  plotMarkers = NULL, verbose = TRUE, ped_true = NULL,
-  ped_claim = NULL, known_genotypes = NULL, markerindex = NULL)
+exclusionPower(
+  claimPed,
+  truePed,
+  ids,
+  markers = NULL,
+  source = "claim",
+  disableMutations = NA,
+  alleles = NULL,
+  afreq = NULL,
+  knownGenotypes = NULL,
+  Xchrom = FALSE,
+  plot = TRUE,
+  plotMarkers = NULL,
+  verbose = TRUE,
+  ped_true = NULL,
+  ped_claim = NULL,
+  known_genotypes = NULL,
+  markerindex = NULL
+)
 }
 \arguments{
 \item{claimPed}{A \code{ped} object (or a list of such), describing the claimed
@@ -45,7 +59,7 @@ mutations should be disabled.
 \item{alleles, afreq, Xchrom}{If these are given, they are used (together with
 \code{knownGenotypes}) to create a marker object on the fly.}
 
-\item{knownGenotypes}{A list of triplets \code{(a, b, c)}, indicating that
+\item{knownGenotypes}{A list of triplets \verb{(a, b, c)}, indicating that
 individual \code{a} has genotype \code{b/c}. Ignored unless \code{alleles} or \code{afreq} is
 non-NULL.}
 

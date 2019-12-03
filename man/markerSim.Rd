@@ -4,9 +4,20 @@
 \alias{markerSim}
 \title{Marker simulation}
 \usage{
-markerSim(x, N = 1, ids = NULL, alleles = NULL, afreq = NULL,
-  mutmod = NULL, rate = NULL, partialmarker = NULL,
-  loop_breakers = NULL, eliminate = 0, seed = NULL, verbose = TRUE)
+markerSim(
+  x,
+  N = 1,
+  ids = NULL,
+  alleles = NULL,
+  afreq = NULL,
+  mutmod = NULL,
+  rate = NULL,
+  partialmarker = NULL,
+  loop_breakers = NULL,
+  eliminate = 0,
+  seed = NULL,
+  verbose = TRUE
+)
 }
 \arguments{
 \item{x}{a \code{ped} object}

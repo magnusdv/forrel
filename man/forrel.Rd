@@ -3,7 +3,6 @@
 \docType{package}
 \name{forrel}
 \alias{forrel}
-\alias{forrel-package}
 \title{forrel: Forensic Pedigree Analysis and Relatedness Inference}
 \description{
 Forensic applications of pedigree analysis, including likelihood ratios for

@@ -4,8 +4,15 @@
 \alias{profileSim}
 \title{Simulation of complete DNA profiles}
 \usage{
-profileSim(x, N = 1, ids = NULL, markers = NULL, conditions = NULL,
-  seed = NULL, ...)
+profileSim(
+  x,
+  N = 1,
+  ids = NULL,
+  markers = NULL,
+  conditions = NULL,
+  seed = NULL,
+  ...
+)
 }
 \arguments{
 \item{x}{A \code{ped} object or a list of such}

@@ -4,8 +4,7 @@
 \alias{IBDestimate}
 \title{Relatedness estimation}
 \usage{
-IBDestimate(x, ids, markers = NULL, start = c(0.99, 0.001),
-  tol = 1e-07)
+IBDestimate(x, ids, markers = NULL, start = c(0.99, 0.001), tol = 1e-07)
 }
 \arguments{
 \item{x}{A single \code{ped} object or a list of \code{ped} and/or \code{singleton} objects.}
