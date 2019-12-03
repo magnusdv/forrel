@@ -27,12 +27,10 @@
 #'
 #' * Minor points: Individual points in groups with more than one element.
 #'
-#' @param ep Exclusion power data, typically in the form of one or several
-#'   `EPresult` objects (output from [missingPersonEP()]. See Details and
-#'   Examples.
-#' @param ip Inclusion power data, typically in the form of one or several
-#'   `mpIP` objects (output from [missingPersonIP()]. See Details and Examples.
-#'   The list structure of `ip` must be identical to that of `ep`.
+#' @param ep,ip Lists of equal length, with outputs from one or more runs of
+#'   [missingPersonEP()] and [missingPersonIP()] respectively. Alternatively,
+#'   `ep` can be a single output from [MPPsims()], in which case `ip` should be
+#'   NULL. See Examples.
 #' @param type Plot type; either 1, 2 or 3.
 #' @param ellipse A logical. If TRUE, data ellipsis are drawn for each inner
 #'   list of `ep`/`ip` containing more than 1 element.
@@ -53,24 +51,30 @@
 #' @examples
 #'
 #' ref = nuclearPed(father = "fa", mother = "mo", child = "MP")
-#' ref = setMarkers(ref, marker(ref, alleles = 1:2))
+#' ref = setMarkers(ref, marker(ref, alleles = 1:5))
 #'
 #' # Alternatives for genotyping
 #' sel = list("fa", c("fa", "mo"))
 #'
 #' # Simulate power for each selection
 #' simData = MPPsims(ref, selections = sel, nProfiles = 10,
-#'                   lrSims = 10, thresh = 2)
-#'
-#' # Extract EP and IP data
-#' epSims = lapply(simData, '[[', 'ep')
-#' ipSims = lapply(simData, '[[', 'ip')
+#'                   lrSims = 10, thresholdIP = 2)
 #'
 #' # Power plot 1: EP vs IP
-#' powerPlot(epSims, ipSims, type = 1)
+#' powerPlot(simData, type = 1)
+#'
+#' # Zoom in, and adjust the blue strips
+#' powerPlot(simData, type = 1, xlim = c(0.5, 1), ylim = c(0.5, 1),
+#'           hline = 0.8, vline = 0.9)
 #'
 #' # Power plot 3: Expected number of exclusions vs E[LR]
-#' powerPlot(epSims, ipSims, type = 3, hline = log10(2), vline = 1)
+#' powerPlot(simData, type = 3)
+#'
+#' # With horizontal/vertical lines
+#' powerPlot(simData, type = 3, hline = log10(2), vline = 1)
+#'
+#' # Plot 4: Illustrating the general inequality ELR > 1/(1-EP)
+#' powerPlot(simData, type = 4)
 #'
 #' @importFrom stats aggregate
 #' @export
@@ -79,6 +83,11 @@ powerPlot = function(ep, ip, type = 1, ellipse = FALSE, col = NULL, labs = NULL,
                      xlab = NULL, ylab = NULL) {
   if(!requireNamespace("ggplot2", quietly = TRUE))
     stop2("Package `ggplot2` is not installed. Please install this and try again.")
+
+  if(inherits(ep, "MPPsim")) {
+    ip = lapply(ep, "[[", "ip")
+    ep = lapply(ep, "[[", "ep")
+  }
 
   if(is.null(labs) && is.list(ep) && !isEP(ep))
     labs = names(ep)

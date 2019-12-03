@@ -23,13 +23,10 @@ powerPlot(
 )
 }
 \arguments{
-\item{ep}{Exclusion power data, typically in the form of one or several
-\code{EPresult} objects (output from \code{\link[=missingPersonEP]{missingPersonEP()}}. See Details and
-Examples.}
-
-\item{ip}{Inclusion power data, typically in the form of one or several
-\code{mpIP} objects (output from \code{\link[=missingPersonIP]{missingPersonIP()}}. See Details and Examples.
-The list structure of \code{ip} must be identical to that of \code{ep}.}
+\item{ep, ip}{Lists of equal length, with outputs from one or more runs of
+\code{\link[=missingPersonEP]{missingPersonEP()}} and \code{\link[=missingPersonIP]{missingPersonIP()}} respectively. Alternatively,
+\code{ep} can be a single output from \code{\link[=MPPsims]{MPPsims()}}, in which case \code{ip} should be
+NULL. See Examples.}
 
 \item{type}{Plot type; either 1, 2 or 3.}
 
@@ -88,24 +85,30 @@ When plotting several groups, two sets of points are drawn:
 \examples{
 
 ref = nuclearPed(father = "fa", mother = "mo", child = "MP")
-ref = setMarkers(ref, marker(ref, alleles = 1:2))
+ref = setMarkers(ref, marker(ref, alleles = 1:5))
 
 # Alternatives for genotyping
 sel = list("fa", c("fa", "mo"))
 
 # Simulate power for each selection
 simData = MPPsims(ref, selections = sel, nProfiles = 10,
-                  lrSims = 10, thresh = 2)
-
-# Extract EP and IP data
-epSims = lapply(simData, '[[', 'ep')
-ipSims = lapply(simData, '[[', 'ip')
+                  lrSims = 10, thresholdIP = 2)
 
 # Power plot 1: EP vs IP
-powerPlot(epSims, ipSims, type = 1)
+powerPlot(simData, type = 1)
+
+# Zoom in, and adjust the blue strips
+powerPlot(simData, type = 1, xlim = c(0.5, 1), ylim = c(0.5, 1),
+          hline = 0.8, vline = 0.9)
 
 # Power plot 3: Expected number of exclusions vs E[LR]
-powerPlot(epSims, ipSims, type = 3, hline = log10(2), vline = 1)
+powerPlot(simData, type = 3)
+
+# With horizontal/vertical lines
+powerPlot(simData, type = 3, hline = log10(2), vline = 1)
+
+# Plot 4: Illustrating the general inequality ELR > 1/(1-EP)
+powerPlot(simData, type = 4)
 
 }
 \seealso{
