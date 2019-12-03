@@ -121,12 +121,9 @@ powerPlot = function(ep, ip, type = 1, ellipse = FALSE, col = NULL, labs = NULL,
   # Extract numbers and build data frame with plotting data
   if(type == 1) {
     epnum = vapply(unlist(ep, recursive = FALSE), function(a) a$EPtotal, FUN.VALUE = 1)
-    ipnumList = lapply(unlist(ip, recursive = FALSE), function(a) a$IP)
-    if(any(empty <- sapply(ipnumList, is.null)))
-      stop2("No IP found for this entry: ",
-            ifelse(is.null(names(ip)), which(empty), names(ip)[empty]),
-            "\n\nAre you sure you wanted power plot type 1?")
-    ipnum = unlist(ipnumList)
+    ipnum = tryCatch(vapply(unlist(ip, recursive = F), function(a) a$IP, FUN.VALUE = 1),
+                     error = function(e) stop2("Missing IP data. Are you sure you wanted power plot type 1?"))
+
 
     alldata = data.frame(ep = epnum, ip = ipnum, group = group)
     if(is.null(xlab)) xlab = "Exclusion power"
@@ -136,7 +133,8 @@ powerPlot = function(ep, ip, type = 1, ellipse = FALSE, col = NULL, labs = NULL,
   }
   else if(type == 2) {
     epnum = vapply(unlist(ep, recursive = F), function(a) a$EPtotal, FUN.VALUE = 1)
-    ipnum = vapply(unlist(ip, recursive = F), function(a) a$IP, FUN.VALUE = 1)
+    ipnum = tryCatch(vapply(unlist(ip, recursive = F), function(a) a$IP, FUN.VALUE = 1),
+                     error = function(e) stop2("Missing IP data. Are you sure you wanted power plot type 2?"))
 
     # Odds ratios: Assumes first entry is baseline!
     ep.odds = epnum/(1 - epnum)
@@ -159,8 +157,8 @@ powerPlot = function(ep, ip, type = 1, ellipse = FALSE, col = NULL, labs = NULL,
 
     if(is.null(xlab)) xlab = "Expected number of exclusions"
     if(is.null(ylab)) ylab = expression("Average "~log[10](LR))
-    if(is.null(xlim)) xlim = c(0, if(max(epnum) < 1) 1 else NA)
-    if(is.null(ylim)) ylim = c(0, if(max(ipnum) < 1) 1 else NA)
+    if(is.null(xlim)) xlim = c(min(0, epnum), max(1, epnum))
+    if(is.null(ylim)) ylim = c(min(0, ipnum), max(1, ipnum))
   }
   else if(type == 4) {
     epnum = vapply(unlist(ep, recursive = F), function(a) a$EPtotal, FUN.VALUE = 1)
@@ -170,8 +168,8 @@ powerPlot = function(ep, ip, type = 1, ellipse = FALSE, col = NULL, labs = NULL,
 
     if(is.null(xlab)) xlab = "Exclusion power"
     if(is.null(ylab)) ylab = "Average LR"
-    if(is.null(xlim)) xlim = c(0, if(max(epnum) < 1) 1 else NA)
-    if(is.null(ylim)) ylim = c(0, if(max(ipnum) < 1) 1 else NA)
+    if(is.null(xlim)) xlim = c(min(0, epnum), max(1, epnum))
+    if(is.null(ylim)) ylim = c(min(0, ipnum), max(1, ipnum))
   }
 
   # Major data points: Mean points of each group
