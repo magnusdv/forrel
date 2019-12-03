@@ -35,8 +35,7 @@ relationship. ID labels must be consistent with \code{claimPed}.}
 \item{ids}{Individuals available for genotyping.}
 
 \item{markers}{A vector indicating the names or indices of markers attached
-to the source pedigree. (This is either \code{claimPed} or \code{truePed}, depending
-on the value of \code{source}). If NULL (the default), then all markers attached
+to the source pedigree. If NULL (default), then all markers attached
 to the source pedigree are used. If \code{alleles} or \code{afreq} is non-NULL, then
 this parameter is ignored.}
 
