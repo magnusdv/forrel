@@ -1,4 +1,4 @@
-#' Exclusion/inclusion power plots
+#L' Exclusion/inclusion power plots
 #'
 #' This function offers three different visualisations of exclusion/inclusion
 #' powers, particularly for missing person cases.
@@ -178,12 +178,13 @@ powerPlot = function(ep, ip, type = 1, LRthresh = 1e4, ellipse = TRUE, col = NUL
   minor = subset(alldata, table(group)[group] > 1)
 
   # Plot
-  p = ggplot2::ggplot(NULL, ggplot2::aes(x = ep, y = ip, color = group, fill = group)) +
+  p = ggplot2::ggplot() +
+    ggplot2::aes(x = ep, y = ip, colour = group, fill = group) +
     ggplot2::geom_point(data = minor, size = size, shape = shape, alpha = alpha) +
-    ggplot2::geom_point(data = major, size = 2*size, shape = 21, col = 1, stroke = 1.5) +
-    ggplot2::labs(x = xlab, y = ylab, fill = NULL, color = NULL) +
-    ggplot2::guides(color = FALSE) +
-    ggplot2::scale_color_manual(limits = labs, values = col) +
+    ggplot2::geom_point(data = major, size = 2*size, shape = 21, colour = 1, stroke = 1.5) +
+    ggplot2::labs(x = xlab, y = ylab, fill = NULL, colour = NULL) +
+    ggplot2::guides(colour = FALSE) +
+    ggplot2::scale_colour_manual(limits = labs, values = col) +
     ggplot2::scale_fill_manual(limits = labs, values = col) +
     ggplot2::scale_x_continuous(limits = xlim) +
     ggplot2::scale_y_continuous(limits = ylim) +
@@ -220,7 +221,7 @@ powerPlot = function(ep, ip, type = 1, LRthresh = 1e4, ellipse = TRUE, col = NUL
     epvec = seq(0 , 0.9999, length = 100)
     asympt = data.frame(ep = epvec, ip = 1/(1 - epvec))
     p = p +
-      ggplot2::geom_line(data = asympt, ggplot2::aes(color = NULL, fill = NULL), linetype = 3, size = 1) +
+      ggplot2::geom_line(data = asympt, ggplot2::aes(colour = NULL, fill = NULL), linetype = 3, size = 1) +
       ggplot2::annotate("text", 0, 1, label = "ELR == frac(1, 1 - EP)", hjust = 0, vjust = -0.2, parse = TRUE)
     p = suppressMessages(p + ggplot2::scale_y_log10())
     p$layers[] = p$layers[c(np + 1:2, 1:np)]
