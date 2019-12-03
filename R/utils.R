@@ -41,11 +41,11 @@ pluralise = function(noun, n) {
 }
 
 isEP = function(x) {
-  inherits(x, "EPresult")
+  inherits(x, "EPresult") || inherits(x, "mpEP")
 }
 
 isIP = function(x) {
-  inherits(x, "mpIP")
+  inherits(x, "IPresult") || inherits(x, "mpIP")
 }
 
 # Test if genotypes are consistent with ped
