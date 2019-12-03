@@ -153,7 +153,7 @@ missingPersonIP = function(reference, missing, markers, nsim = 1, threshold = NU
 
   # Lits of input parameters
   params = list(missing = missing, markers = markers,
-                nsim = nsim, threshold = threshold,
+                nsim = nsim, threshold = threshold, seed = seed,
                 disableMutations = disableMutations)
 
   structure(list(LRperSim = LRperSim, meanLRperMarker = meanLRperMarker,
