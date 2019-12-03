@@ -12,9 +12,13 @@
 #' @param truePed A `ped` object (or a list of such), describing the true
 #'   relationship. By default equal to `numeratorPed`.
 #' @param ids Individuals available for genotyping.
-#' @param source Either "true" (default), "numerator" or "denominator", indicating which
-#'   pedigree is used as source for marker data.
+#' @param source Either "true" (default), "numerator" or "denominator",
+#'   indicating which pedigree is used as source for marker data.
+#' @param nsim A positive integer: the number of simulations.
+#' @param threshold A numeric vector with one or more positive numbers used as
+#'   LR tresholds.
 #' @param disableMutations Not implemented yet.
+#' @param seed A numeric seed for the random number generator (optional)
 #'
 #' @inheritParams exclusionPower
 #' @examples
@@ -124,7 +128,7 @@ LRpower = function(numeratorPed, denominatorPed, truePed = numeratorPed, ids, ma
   }
 
   # Plot
-  if (isTRUE(plot) || plot == "plotOnly") {print(denominatorPed)
+  if (isTRUE(plot) || plot == "plotOnly") {
     tp = selectMarkers(truePed, NULL)
     if(identical(tp, selectMarkers(numeratorPed, NULL))) {
       peds = list(numeratorPed, denominatorPed)
@@ -138,10 +142,9 @@ LRpower = function(numeratorPed, denominatorPed, truePed = numeratorPed, ids, ma
       peds = list(numeratorPed, denominatorPed, truePed)
       frms = c("Numerator", "Denominator", "True")
     }
-p<<- peds
+
     plotPedList(peds, newdev = TRUE, frametitles = frms,
-                shaded = function(p) c(ids, typedMembers(p)),
-                col = list(red = ids),
+                shaded = ids, # col = list(red = ids),
                 marker = match(plotMarkers, markers))
 
     if (plot == "plotOnly")

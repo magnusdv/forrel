@@ -38,8 +38,13 @@ to the source pedigree. If NULL (default), then all markers attached
 to the source pedigree are used. If \code{alleles} or \code{afreq} is non-NULL, then
 this parameter is ignored.}
 
-\item{source}{Either "true" (default), "numerator" or "denominator", indicating which
-pedigree is used as source for marker data.}
+\item{source}{Either "true" (default), "numerator" or "denominator",
+indicating which pedigree is used as source for marker data.}
+
+\item{nsim}{A positive integer: the number of simulations.}
+
+\item{threshold}{A numeric vector with one or more positive numbers used as
+LR tresholds.}
 
 \item{disableMutations}{Not implemented yet.}
 
@@ -61,6 +66,8 @@ plot is drawn, but no further computations are done.}
 
 \item{plotMarkers}{A vector of marker names or indices whose genotypes are to
 be included in the plot.}
+
+\item{seed}{A numeric seed for the random number generator (optional)}
 
 \item{verbose}{A logical.}
 }
