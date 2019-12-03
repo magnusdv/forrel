@@ -146,8 +146,8 @@ powerPlot = function(ep, ip, type = 1, ellipse = FALSE, col = NULL, labs = NULL,
 
     if(is.null(xlab)) xlab = "Exclusion odds ratio"
     if(is.null(ylab)) ylab = "Inclusion odds ratio"
-    if(is.null(xlim)) xlim = c(0, NA)
-    if(is.null(ylim)) ylim = c(0, NA)
+    if(is.null(xlim)) xlim = c(0, max(ep.OR))
+    if(is.null(ylim)) ylim = c(0, max(ip.OR))
   }
   else if(type == 3) {
     epnum = vapply(unlist(ep, recursive = F), function(a) a$expectedMismatch, FUN.VALUE = 1)
@@ -215,12 +215,14 @@ powerPlot = function(ep, ip, type = 1, ellipse = FALSE, col = NULL, labs = NULL,
     # Nothing to do
   }
   if(type == 4) {
-    epvec = seq(0 , 0.9999, length = 100)
+    epvec = seq(xlim[1], xlim[2], length = 100)[-100]
     asympt = data.frame(ep = epvec, ip = 1/(1 - epvec))
     np = length(p$layers)
+
     p = p +
       ggplot2::geom_line(data = asympt, ggplot2::aes(colour = NULL, fill = NULL)) +
-      ggplot2::annotate("text", 0, 1, label = "ELR == frac(1, 1 - EP)", hjust = -0.05, vjust = -0.25, parse = TRUE)
+      ggplot2::annotate("text", asympt$ep[1], asympt$ip[1], label = "ELR == frac(1, 1 - EP)",
+                        hjust = -0.05, vjust = -0.5, parse = TRUE)
     p = suppressMessages(p + ggplot2::scale_y_log10())
     p$layers[] = p$layers[c(np + 1:2, 1:np)]
   }
