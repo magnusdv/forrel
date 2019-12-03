@@ -51,16 +51,16 @@ x = addChildren(x, fa = "Father", mo = "Mother", nch = 3, sex = c(1,2,1),
 x = addSon(x, "Father", id = "HS")
 
 # Brother S1 is already genotyped with a marker with 5 alleles
-m = marker(x, S1 = 1:2, alleles = 1:5)
+m = marker(x, S1 = 1:2, alleles = 1:4)
 x = setMarkers(x, m)
 
 # Alternatives for additional genotyping
-sel = list("Father", "S2", "HS", "Gm", "Uncle", c("Gm", "Uncle"))
+sel = list("Father", "S2", "HS", c("Gm", "Uncle"))
 
 plot(x, marker = 1, shaded = sel)
 
 # Simulate
-simData = MPPsims(x, selections = sel, nProfiles = 10, lrSims = 10)
+simData = MPPsims(x, selections = sel, nProfiles = 2, lrSims = 2)
 
 # Power plot
 powerPlot(simData, type = 3)
