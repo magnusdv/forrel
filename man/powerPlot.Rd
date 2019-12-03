@@ -2,7 +2,8 @@
 % Please edit documentation in R/powerPlot.R
 \name{powerPlot}
 \alias{powerPlot}
-\title{Exclusion/inclusion power plots}
+\title{This function offers three different visualisations of exclusion/inclusion
+powers, particularly for missing person cases.}
 \usage{
 powerPlot(ep, ip, type = 1, LRthresh = 10000, ellipse = TRUE,
   col = NULL, labs = NULL, alpha = 1, shape = 1, size = 2,
@@ -40,12 +41,9 @@ list of \code{ep}/\code{ip} containing more than 1 element.}
 A \code{ggplot2} plot object.
 }
 \description{
-This function offers three different visualisations of exclusion/inclusion
-powers, particularly for missing person cases.
+The plot types are as follows:
 }
 \details{
-The plot types are as follows:
-
 \code{type = 1}: x = Exclusion power; y = Inclusion power
 
 \code{type = 2}: x = Exclusion odds ratio; y = Inclusion odds ratio

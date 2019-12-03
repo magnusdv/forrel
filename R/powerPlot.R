@@ -117,7 +117,7 @@ powerPlot = function(ep, ip, type = 1, LRthresh = 1e4, ellipse = TRUE, col = NUL
   group = as.factor(rep(labs, times = L))
 
   if(is.null(col)) {
-    Set1 = c("white", "#4DAF4A", "#E41A1C", "#984EA3", "#FF7F00", "#FFFF33", "#A65628", "#F781BF")
+    Set1 = c("white", "lightgreen", "#E41A1C", "#984EA3", "#FF7F00", "#FFFF33", "#A65628", "#F781BF")
     col = Set1[seq_along(L)]
   }
 
@@ -179,9 +179,10 @@ powerPlot = function(ep, ip, type = 1, LRthresh = 1e4, ellipse = TRUE, col = NUL
 
   # Plot
   p = ggplot2::ggplot() +
-    ggplot2::aes(x = ep, y = ip, colour = group, fill = group) +
-    ggplot2::geom_point(data = minor, size = size, shape = shape, alpha = alpha) +
-    ggplot2::geom_point(data = major, size = 2*size, shape = 21, colour = 1, stroke = 1.5) +
+    ggplot2::aes(x = ep, y = ip) +
+    ggplot2::geom_point(data = minor, ggplot2::aes(colour = group), size = size, shape = shape, alpha = alpha) +
+    ggplot2::geom_point(data = major, ggplot2::aes(fill = group), size = 2*size, shape = 21,
+                        colour = "black", stroke = 1.5) +
     ggplot2::labs(x = xlab, y = ylab, fill = NULL, colour = NULL) +
     ggplot2::guides(colour = FALSE) +
     ggplot2::scale_colour_manual(limits = labs, values = col) +
