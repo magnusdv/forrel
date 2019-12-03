@@ -2,24 +2,36 @@
 % Please edit documentation in R/powerPlot.R
 \name{powerPlot}
 \alias{powerPlot}
-\title{This function offers three different visualisations of exclusion/inclusion
-powers, particularly for missing person cases.}
+\title{Exclusion/inclusion power plots}
 \usage{
-powerPlot(ep, ip, type = 1, LRthresh = 10000, ellipse = TRUE,
-  col = NULL, labs = NULL, alpha = 1, shape = 1, size = 2,
-  xlim = NULL, ylim = NULL, xlab = NULL, ylab = NULL)
+powerPlot(
+  ep,
+  ip,
+  type = 1,
+  ellipse = FALSE,
+  col = NULL,
+  labs = NULL,
+  alpha = 1,
+  shape = 1,
+  size = 2,
+  hline = NULL,
+  vline = NULL,
+  xlim = NULL,
+  ylim = NULL,
+  xlab = NULL,
+  ylab = NULL
+)
 }
 \arguments{
 \item{ep}{Exclusion power data, typically in the form of one or several
-\code{EPresult} objects (output from \code{\link[=missingPersonEP]{missingPersonEP()}}. See Details and Examples.}
+\code{EPresult} objects (output from \code{\link[=missingPersonEP]{missingPersonEP()}}. See Details and
+Examples.}
 
 \item{ip}{Inclusion power data, typically in the form of one or several
 \code{mpIP} objects (output from \code{\link[=missingPersonIP]{missingPersonIP()}}. See Details and Examples.
 The list structure of \code{ip} must be identical to that of \code{ep}.}
 
 \item{type}{Plot type; either 1, 2 or 3.}
-
-\item{LRthresh}{A single positive number; the LR threshold for "inclusion".}
 
 \item{ellipse}{A logical. If TRUE, data ellipsis are drawn for each inner
 list of \code{ep}/\code{ip} containing more than 1 element.}
@@ -33,6 +45,10 @@ list of \code{ep}/\code{ip} containing more than 1 element.}
 
 \item{shape, size}{Plotting parameters}
 
+\item{hline, vline}{Single numbers indicating positions for
+horizontal/vertical "threshold" lines. When \code{type = 1}, these determine the
+shaded vertical regions, by default starting at 0.95.}
+
 \item{xlim, ylim}{Axis limits; automatically chosen if NULL.}
 
 \item{xlab, ylab}{Axis labels; automatically chosen if NULL.}
@@ -41,24 +57,27 @@ list of \code{ep}/\code{ip} containing more than 1 element.}
 A \code{ggplot2} plot object.
 }
 \description{
-The plot types are as follows:
+This function offers three different visualisations of exclusion/inclusion
+powers, particularly for missing person cases.
 }
 \details{
+The plot types are as follows:
+
 \code{type = 1}: x = Exclusion power; y = Inclusion power
 
 \code{type = 2}: x = Exclusion odds ratio; y = Inclusion odds ratio
 
 \code{type = 3}: x = Expected number of exclusions; y = average log(LR)
 
-For each \code{EPresult} object in \code{ep}, and the corresponding element of \code{ip}, the
-relevant data is extracted from each, producing a single point the final
+For each \code{EPresult} object in \code{ep}, and the corresponding element of \code{ip},
+the relevant data is extracted from each, producing a single point the final
 plot.
 
 In the most general case \code{ep} (and similarly for \code{ip}) can be a list of lists
-of \code{EPresult} objects. To simplify the discussion we refer to the inner lists as
-"groups". A group may consist of a single point, or several (typically many
-simulations of the same situation). Points within the same group are always
-drawn with the same color and shape.
+of \code{EPresult} objects. To simplify the discussion we refer to the inner lists
+as "groups". A group may consist of a single point, or several (typically
+many simulations of the same situation). Points within the same group are
+always drawn with the same color and shape.
 
 When plotting several groups, two sets of points are drawn:
 \itemize{
@@ -71,38 +90,24 @@ When plotting several groups, two sets of points are drawn:
 ref = nuclearPed(father = "fa", mother = "mo", child = "MP")
 ref = setMarkers(ref, marker(ref, alleles = 1:2))
 
-# Baseline EP/IP
-ep = missingPersonEP(ref, missing = "MP")
-ip = missingPersonIP(ref, missing = "MP")
+# Alternatives for genotyping
+sel = list("fa", c("fa", "mo"))
 
-powerPlot(ep, ip, type = 3, LRthresh = 10)
+# Simulate power for each selection
+simData = MPPsims(ref, selections = sel, nProfiles = 10,
+                  lrSims = 10, thresh = 2)
 
-### Simulation parameters (increase!)
-nProfiles = 10
-ipSims = 10 # sims in each IP estimate
+# Extract EP and IP data
+epSims = lapply(simData, '[[', 'ep')
+ipSims = lapply(simData, '[[', 'ip')
 
-### Simulate father profiles
-simFath = profileSim(ref, ids = "fa", N = nProfiles)
+# Power plot 1: EP vs IP
+powerPlot(epSims, ipSims, type = 1)
 
-# Compute updated EP and IP for each profile
-epFath = lapply(simFath, function(y)
-                missingPersonEP(y, missing = "MP", verbose = FALSE))
-ipFath = lapply(simFath, function(y)
-                missingPersonIP(y, missing = "MP", verbose = FALSE, nsim = ipSims))
+# Power plot 3: Expected number of exclusions vs E[LR]
+powerPlot(epSims, ipSims, type = 3, hline = log10(2), vline = 1)
 
-### Both parents
-
-# Simulate profiles for parents
-simBoth = profileSim(ref, ids = c("fa", "mo"), N = nProfiles)
-
-# Compute updated EP and IP for each profile
-epBoth = lapply(simBoth, function(y)
-                missingPersonEP(y, missing = "MP", verbose = FALSE))
-ipBoth = lapply(simBoth, function(y)
-                missingPersonIP(y, missing = "MP", verbose = FALSE, nsim = ipSims))
-
-powerPlot(list(ep, epFath, epBoth), list(ip, ipFath, ipBoth), type = 3,
-          LRthresh = 10, labs = c("Baseline", "Father", "Both"))
-
-
+}
+\seealso{
+\code{\link[=missingPersonEP]{missingPersonEP()}}, \code{\link[=missingPersonEP]{missingPersonEP()}}, \code{\link[=MPPsims]{MPPsims()}}
 }

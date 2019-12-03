@@ -1,4 +1,4 @@
-#L' Exclusion/inclusion power plots
+#' Exclusion/inclusion power plots
 #'
 #' This function offers three different visualisations of exclusion/inclusion
 #' powers, particularly for missing person cases.
@@ -11,15 +11,15 @@
 #'
 #' `type = 3`: x = Expected number of exclusions; y = average log(LR)
 #'
-#' For each `EPresult` object in `ep`, and the corresponding element of `ip`, the
-#' relevant data is extracted from each, producing a single point the final
+#' For each `EPresult` object in `ep`, and the corresponding element of `ip`,
+#' the relevant data is extracted from each, producing a single point the final
 #' plot.
 #'
 #' In the most general case `ep` (and similarly for `ip`) can be a list of lists
-#' of `EPresult` objects. To simplify the discussion we refer to the inner lists as
-#' "groups". A group may consist of a single point, or several (typically many
-#' simulations of the same situation). Points within the same group are always
-#' drawn with the same color and shape.
+#' of `EPresult` objects. To simplify the discussion we refer to the inner lists
+#' as "groups". A group may consist of a single point, or several (typically
+#' many simulations of the same situation). Points within the same group are
+#' always drawn with the same color and shape.
 #'
 #' When plotting several groups, two sets of points are drawn:
 #'
@@ -28,12 +28,12 @@
 #' * Minor points: Individual points in groups with more than one element.
 #'
 #' @param ep Exclusion power data, typically in the form of one or several
-#'   `EPresult` objects (output from [missingPersonEP()]. See Details and Examples.
+#'   `EPresult` objects (output from [missingPersonEP()]. See Details and
+#'   Examples.
 #' @param ip Inclusion power data, typically in the form of one or several
 #'   `mpIP` objects (output from [missingPersonIP()]. See Details and Examples.
 #'   The list structure of `ip` must be identical to that of `ep`.
 #' @param type Plot type; either 1, 2 or 3.
-#' @param LRthresh A single positive number; the LR threshold for "inclusion".
 #' @param ellipse A logical. If TRUE, data ellipsis are drawn for each inner
 #'   list of `ep`/`ip` containing more than 1 element.
 #' @param col A color vector, recycle to match the top level length of `ep`.
@@ -41,55 +41,42 @@
 #'   `ep` are used, if present.
 #' @param alpha Transparency for minor points (see Details).
 #' @param shape,size Plotting parameters
+#' @param hline,vline Single numbers indicating positions for
+#'   horizontal/vertical "threshold" lines. When `type = 1`, these determine the
+#'   shaded vertical regions, by default starting at 0.95.
 #' @param xlim,ylim Axis limits; automatically chosen if NULL.
 #' @param xlab,ylab Axis labels; automatically chosen if NULL.
 #'
 #' @return A `ggplot2` plot object.
+#' @seealso [missingPersonEP()], [missingPersonEP()], [MPPsims()]
 #'
 #' @examples
 #'
 #' ref = nuclearPed(father = "fa", mother = "mo", child = "MP")
 #' ref = setMarkers(ref, marker(ref, alleles = 1:2))
 #'
-#' # Baseline EP/IP
-#' ep = missingPersonEP(ref, missing = "MP")
-#' ip = missingPersonIP(ref, missing = "MP")
+#' # Alternatives for genotyping
+#' sel = list("fa", c("fa", "mo"))
 #'
-#' powerPlot(ep, ip, type = 3, LRthresh = 10)
+#' # Simulate power for each selection
+#' simData = MPPsims(ref, selections = sel, nProfiles = 10,
+#'                   lrSims = 10, thresh = 2)
 #'
-#' ### Simulation parameters (increase!)
-#' nProfiles = 10
-#' ipSims = 10 # sims in each IP estimate
+#' # Extract EP and IP data
+#' epSims = lapply(simData, '[[', 'ep')
+#' ipSims = lapply(simData, '[[', 'ip')
 #'
-#' ### Simulate father profiles
-#' simFath = profileSim(ref, ids = "fa", N = nProfiles)
+#' # Power plot 1: EP vs IP
+#' powerPlot(epSims, ipSims, type = 1)
 #'
-#' # Compute updated EP and IP for each profile
-#' epFath = lapply(simFath, function(y)
-#'                 missingPersonEP(y, missing = "MP", verbose = FALSE))
-#' ipFath = lapply(simFath, function(y)
-#'                 missingPersonIP(y, missing = "MP", verbose = FALSE, nsim = ipSims))
-#'
-#' ### Both parents
-#'
-#' # Simulate profiles for parents
-#' simBoth = profileSim(ref, ids = c("fa", "mo"), N = nProfiles)
-#'
-#' # Compute updated EP and IP for each profile
-#' epBoth = lapply(simBoth, function(y)
-#'                 missingPersonEP(y, missing = "MP", verbose = FALSE))
-#' ipBoth = lapply(simBoth, function(y)
-#'                 missingPersonIP(y, missing = "MP", verbose = FALSE, nsim = ipSims))
-#'
-#' powerPlot(list(ep, epFath, epBoth), list(ip, ipFath, ipBoth), type = 3,
-#'           LRthresh = 10, labs = c("Baseline", "Father", "Both"))
-#'
+#' # Power plot 3: Expected number of exclusions vs E[LR]
+#' powerPlot(epSims, ipSims, type = 3, hline = log10(2), vline = 1)
 #'
 #' @importFrom stats aggregate
 #' @export
-powerPlot = function(ep, ip, type = 1, LRthresh = 1e4, ellipse = TRUE, col = NULL,
-                                  labs = NULL, alpha = 1, shape = 1, size = 2,
-                                  xlim = NULL, ylim = NULL, xlab = NULL, ylab = NULL) {
+powerPlot = function(ep, ip, type = 1, ellipse = FALSE, col = NULL, labs = NULL, alpha = 1,
+                     shape = 1, size = 2, hline = NULL, vline = NULL, xlim = NULL, ylim = NULL,
+                     xlab = NULL, ylab = NULL) {
   if(!requireNamespace("ggplot2", quietly = TRUE))
     stop2("Package `ggplot2` is not installed. Please install this and try again.")
 
@@ -98,6 +85,7 @@ powerPlot = function(ep, ip, type = 1, LRthresh = 1e4, ellipse = TRUE, col = NUL
 
   if(isEP(ep)) ep = list(ep)
   if(isIP(ip)) ip = list(ip)
+
 
   # Ensure each element of ep (ip) is a *list* of EPresult objects.
   for(i in seq_along(ep)) {
@@ -117,14 +105,20 @@ powerPlot = function(ep, ip, type = 1, LRthresh = 1e4, ellipse = TRUE, col = NUL
   group = as.factor(rep(labs, times = L))
 
   if(is.null(col)) {
-    Set1 = c("white", "lightgreen", "#E41A1C", "#984EA3", "#FF7F00", "#FFFF33", "#A65628", "#F781BF")
+    Set1 = c("white", "lightgreen", "firebrick1", "deepskyblue", "#FFFF33", "gray70", "#F781BF", "#FF7F00")
     col = Set1[seq_along(L)]
   }
 
   # Extract numbers and build data frame with plotting data
   if(type == 1) {
-    epnum = vapply(unlist(ep, recursive = F), function(a) a$EPtotal, FUN.VALUE = 1)
-    ipnum = vapply(unlist(ip, recursive = F), function(a) a$IP, FUN.VALUE = 1)
+    epnum = vapply(unlist(ep, recursive = FALSE), function(a) a$EPtotal, FUN.VALUE = 1)
+    ipnumList = lapply(unlist(ip, recursive = FALSE), function(a) a$IP)
+    if(any(empty <- sapply(ipnumList, is.null)))
+      stop2("No IP found for this entry: ",
+            ifelse(is.null(names(ip)), which(empty), names(ip)[empty]),
+            "\n\nAre you sure you wanted power plot type 1?")
+    ipnum = unlist(ipnumList)
+
     alldata = data.frame(ep = epnum, ip = ipnum, group = group)
     if(is.null(xlab)) xlab = "Exclusion power"
     if(is.null(ylab)) ylab = "Inclusion power"
@@ -196,37 +190,47 @@ powerPlot = function(ep, ip, type = 1, LRthresh = 1e4, ellipse = TRUE, col = NUL
     p = p + ggplot2::stat_ellipse(data = minor, na.rm = TRUE)
   }
 
-  np = length(p$layers)
-
   if(type == 1) {
     xmin = xlim[1]; if(is.na(xmin) || xmin > 0) xmin = -Inf
     ymin = ylim[1]; if(is.na(ymin) || ymin > 0) ymin = -Inf
+    ethresh = if(is.null(vline)) 0.95 else vline
+    ithresh = if(is.null(hline)) 0.95 else hline
+    np = length(p$layers)
     p = p +
-      ggplot2::annotate("rect", xmin = 0.95, xmax = 1, ymin = ymin, ymax = 1,  fill = "lightblue", alpha = 0.3) +
-      ggplot2::annotate("rect", xmin = xmin, xmax = 1, ymin = 0.95, ymax = 1,  fill = "lightblue", alpha = 0.3)
+      ggplot2::annotate("rect", xmin = ethresh, xmax = 1, ymin = ymin, ymax = 1,  fill = "lightblue", alpha = 0.3) +
+      ggplot2::annotate("rect", xmin = xmin, xmax = 1, ymin = ithresh, ymax = 1,  fill = "lightblue", alpha = 0.3)
     p$layers[] = p$layers[c(np + 1:2, 1:np)]
   }
   if(type == 2) {
-    p = p +
-      ggplot2::geom_hline(yintercept = 1, linetype = 2, size = 1) +
-      ggplot2::geom_vline(xintercept = 1, linetype = 2, size = 1)
-    p$layers[] = p$layers[c(np + 1:2, 1:np)]
+    # Nothing to do
   }
   if(type == 3) {
-    p = p +
-      ggplot2::geom_hline(yintercept = log10(LRthresh), linetype = 2, size = 1) +
-      ggplot2::geom_vline(xintercept = 1, linetype = 2, size = 1)
-    p$layers[] = p$layers[c(np + 1:2, 1:np)]
+    # Nothing to do
   }
   if(type == 4) {
     epvec = seq(0 , 0.9999, length = 100)
     asympt = data.frame(ep = epvec, ip = 1/(1 - epvec))
+    np = length(p$layers)
     p = p +
-      ggplot2::geom_line(data = asympt, ggplot2::aes(colour = NULL, fill = NULL), linetype = 3, size = 1) +
-      ggplot2::annotate("text", 0, 1, label = "ELR == frac(1, 1 - EP)", hjust = 0, vjust = -0.2, parse = TRUE)
+      ggplot2::geom_line(data = asympt, ggplot2::aes(colour = NULL, fill = NULL)) +
+      ggplot2::annotate("text", 0, 1, label = "ELR == frac(1, 1 - EP)", hjust = -0.05, vjust = -0.25, parse = TRUE)
     p = suppressMessages(p + ggplot2::scale_y_log10())
     p$layers[] = p$layers[c(np + 1:2, 1:np)]
   }
+
+  if(type > 1) {
+    if(!is.null(hline)) {
+      np = length(p$layers)
+      p = p + ggplot2::geom_hline(yintercept = hline, linetype = 2, size = 1)
+      p$layers[] = p$layers[c(np + 1, 1:np)]
+    }
+    if(!is.null(vline)) {
+      np = length(p$layers)
+      p = p + ggplot2::geom_vline(xintercept = vline, linetype = 2, size = 1)
+      p$layers[] = p$layers[c(np + 1, 1:np)]
+    }
+  }
+
   p
 }
 
