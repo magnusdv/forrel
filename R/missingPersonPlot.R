@@ -73,7 +73,7 @@ missingPersonPlot = function(reference, missing, id.labels = labels(reference),
                              MP.label = "MP", POI.label = "POI", marker = NULL,
                              shaded = "typed", POI.col = "red", POI.shaded = FALSE,
                              POI.height = 8, width = 4, newdev = TRUE,
-                             frametitles = c(expression(H[1] * ": POI related"),
+                             frametitles = c(expression(H[1] * ": POI is MP"),
                                            expression(H[2] * ": POI unrelated")),
                              ...) {
 
