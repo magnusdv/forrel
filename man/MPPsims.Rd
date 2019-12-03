@@ -12,6 +12,7 @@ MPPsims(
   nProfiles = 1,
   lrSims = 1,
   thresholdIP = NULL,
+  seed = NULL,
   verbose = TRUE
 )
 }
@@ -30,6 +31,8 @@ simple vector.}
 \item{nProfiles}{The number of profile simulations for each selection.}
 
 \item{lrSims, thresholdIP}{Parameters passed onto \code{\link[=missingPersonIP]{missingPersonIP()}}}
+
+\item{seed}{A numeric seed for the random number generator (optional)}
 
 \item{verbose}{A logical}
 }
@@ -60,8 +63,6 @@ plot(x, marker = 1, shaded = sel)
 simData = MPPsims(x, selections = sel, nProfiles = 10, lrSims = 10)
 
 # Power plot
-epSims = lapply(simData, '[[', 'ep')
-ipSims = lapply(simData, '[[', 'ip')
-powerPlot(epSims, ipSims, type = 3)
+powerPlot(simData, type = 3)
 
 }

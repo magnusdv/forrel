@@ -11,6 +11,7 @@
 #'   "Baseline", is added as the first element of `selection`.
 #' @param nProfiles The number of profile simulations for each selection.
 #' @param lrSims,thresholdIP Parameters passed onto [missingPersonIP()]
+#' @param seed A numeric seed for the random number generator (optional)
 #' @param verbose A logical
 #'
 #' @return A list with the same length as `selections`. Each entry has elements
@@ -36,12 +37,10 @@
 #' simData = MPPsims(x, selections = sel, nProfiles = 10, lrSims = 10)
 #'
 #' # Power plot
-#' epSims = lapply(simData, '[[', 'ep')
-#' ipSims = lapply(simData, '[[', 'ip')
-#' powerPlot(epSims, ipSims, type = 3)
+#' powerPlot(simData, type = 3)
 #'
 MPPsims = function(reference, missing = "MP", selections, baseline = TRUE,
-                   nProfiles = 1, lrSims = 1, thresholdIP = NULL, verbose = TRUE) {
+                   nProfiles = 1, lrSims = 1, thresholdIP = NULL, seed = NULL, verbose = TRUE) {
 
   if(!is.ped(reference))
     stop2("Expecting a connected pedigree as H1")
@@ -49,33 +48,44 @@ MPPsims = function(reference, missing = "MP", selections, baseline = TRUE,
   if(!hasMarkers(reference))
     stop2("No markers attached to `reference` pedigree")
 
+  set.seed(seed)
+
   if(!is.list(selections))
     selections = as.list(selections)
 
-  powSims = lapply(selections, function(ids) {
-    if(verbose) message("Selection: ", toString(ids))
+  names(selections) = sapply(selections, toString)
+
+  if(baseline)
+    selections = c(list(Baseline = NULL), selections)
+
+  # Wrappers (just for simplification)
+  epfun = function(x) missingPersonEP(x, missing = missing, verbose = FALSE)
+  ipfun = function(x) missingPersonIP(x, missing = missing, nsim = lrSims,
+                                      threshold = thresholdIP, verbose = FALSE)
+
+  powSims = lapply(names(selections), function(sel) {
+    if(verbose)
+      message("Selection: ", sel)
+
+    ids = selections[[sel]]
+
+    # Baseline
+    if(is.null(ids)) {
+      ep0 = epfun(reference)
+      ip0 = ipfun(reference)
+      return(list(ep = ep0, ip = ip0))
+    }
 
     # Simulate profile for `ids`
     sims = profileSim(reference, ids = ids, N = nProfiles)
 
     # Compute updated EP and IP for each profile
-    ep = lapply(sims, function(y)
-      missingPersonEP(y, missing = "MP", verbose = FALSE))
-
-    ip = lapply(sims, function(y)
-      missingPersonIP(y, missing = "MP", verbose = FALSE, nsim = lrSims, threshold = thresholdIP))
-
+    ep = lapply(sims, epfun)
+    ip = lapply(sims, ipfun)
     list(ep = ep, ip = ip)
   })
 
-  names(powSims) = sapply(selections, toString)
-
-  if(baseline) {
-    ep0 = missingPersonEP(reference, missing = missing, verbose = FALSE)
-    ip0 = missingPersonIP(reference, missing = missing, nsim = lrSims, threshold = thresholdIP, verbose = FALSE)
-    pow0 = list(ep = ep0, ip = ip0)
-    powSims = c(list(Baseline = pow0), powSims)
-  }
-
-  powSims
+  structure(powSims, nProfiles = nProfiles, lrSims = lrSims, thresholdIP = thresholdIP,
+            names = names(selections), class = "MPPsim")
 }
+
