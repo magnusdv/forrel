@@ -218,13 +218,12 @@ powerPlot = function(ep, ip, type = 1, ellipse = FALSE, col = NULL, labs = NULL,
     epvec = seq(xlim[1], xlim[2], length = 100)[-100]
     asympt = data.frame(ep = epvec, ip = 1/(1 - epvec))
     np = length(p$layers)
-
     p = p +
-      ggplot2::geom_line(data = asympt, ggplot2::aes(colour = NULL, fill = NULL)) +
-      ggplot2::annotate("text", asympt$ep[1], asympt$ip[1], label = "ELR == frac(1, 1 - EP)",
-                        hjust = -0.05, vjust = -0.5, parse = TRUE)
+      ggplot2::geom_line(data = asympt, ggplot2::aes(colour = NULL, fill = NULL))
+      #ggplot2::annotate("text", asympt$ep[1], asympt$ip[1], label = "ELR == frac(1, 1 - EP)",
+      #                  hjust = -0.05, vjust = -0.5, parse = TRUE)
+      p$layers[] = p$layers[c(np + 1, 1:np)]
     p = suppressMessages(p + ggplot2::scale_y_log10())
-    p$layers[] = p$layers[c(np + 1:2, 1:np)]
   }
 
   if(type > 1) {
