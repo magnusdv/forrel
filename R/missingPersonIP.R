@@ -98,10 +98,12 @@ missingPersonIP = function(reference, missing, markers, nsim = 1, threshold = NU
     mutmod(reference, disable) = NULL
   }
 
+  poiLabel = "_POI_"
+
   # Extract markers and set up pedigrees
   midx = whichMarkers(reference, markers)
-  ped_related = relabel(reference, old = missing, new = "_POI_")
-  ped_unrelated = list(reference, singleton("_POI_"))
+  relatedPed = relabel(reference, old = missing, new = poiLabel)
+  unrelatedPed = list(reference, singleton(poiLabel, sex = getSex(reference, missing)))
 
   # Raise error if impossible markers
   liks = sapply(midx, function(i) pedprobr::likelihood(reference, i))
@@ -112,22 +114,21 @@ missingPersonIP = function(reference, missing, markers, nsim = 1, threshold = NU
   # Set seed once
   set.seed(seed)
 
-  # Simulate nsim complete profiles of ped_related
+  # Simulate nsim complete profiles of relatedPed
   if(verbose)
     message("Simulating ", nsim, " profiles...", appendLF = F)
 
-  allsims = profileSim(ped_related, ids = "_POI_", N = nsim, markers = midx)
+  allsims = profileSim(relatedPed, ids = "_POI_", N = nsim, markers = midx)
 
   if(verbose)
     message("done\nComputing likelihood ratios...", appendLF = F)
 
   # Compute the exclusion power of each marker
-  lrs = vapply(1:nsim, function(i) {
-    rel.sim = allsims[[i]]
-    unrel.sim = transferMarkers(from = rel.sim, to = ped_unrelated)
+  lrs = vapply(allsims, function(s) {
+    unrelSim = transferMarkers(from = s, to = unrelatedPed)
 
-    lr = LR(list(rel.sim, unrel.sim), ref = 2)
-    lr$LRperMarker[,1]
+    lr = LR(list(s, unrelSim), ref = 2)
+    lr$LRperMarker[, 1]
   }, FUN.VALUE = numeric(length(markers)))
 
   # Ensure matrix
