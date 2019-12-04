@@ -251,13 +251,10 @@ exclusionPower = function(claimPed, truePed, ids, markers = NULL, source = "clai
     switch(source,
            claim = {
              claimPed = selectMarkers(claimPed, markers)
-
              truePed = transferMarkers(from = claimPed, to = truePed)
-
            },
            true = {
              truePed = selectMarkers(truePed, markers)
-             typed = typedMembers(truePed)
              claimPed = transferMarkers(from = truePed, to = claimPed)
            })
   }
