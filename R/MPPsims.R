@@ -2,12 +2,13 @@
 #'
 #' Estimate the exclusion/inclusion power for various selections of available
 #' individuals.
-#' @param reference A connected `ped` object
+#' @param reference A connected `ped` object, or a list of pedigrees. In the
+#'   latter case, the list must have the same length as `selections`.
 #' @param missing The label of the missing person. By default "MP".
 #' @param selections A list of pedigree member subsets. In the special case that
 #'   all subsets consist of a single individual, `selections` can be given as a
 #'   simple vector.
-#' @param baseline A logical. If TRUE (default) an *empty* selection, named
+#' @param addBaseline A logical. If TRUE (default) an *empty* selection, named
 #'   "Baseline", is added as the first element of `selection`.
 #' @param nProfiles The number of profile simulations for each selection.
 #' @param lrSims,thresholdIP Parameters passed onto [missingPersonIP()]
@@ -64,61 +65,54 @@
 #' mutmod(x, 1:2) = list("equal", rate = 0.1)
 #'
 #' # By default mutations are disabled for consistent markers
-#' MPPsims(x, selections = "Father", baseline = FALSE, seed = 123)
+#' MPPsims(x, selections = "Father", addBaseline = FALSE, seed = 123)
 #'
 #' # Don't disable anything
-#' MPPsims(x, selections = "Father", baseline = FALSE, seed = 123,
+#' MPPsims(x, selections = "Father", addBaseline = FALSE, seed = 123,
 #'         disableMutations = FALSE)
 #'
 #' \donttest{
 #' # Disable all mutation models. SHOULD GIVE ERROR FOR SECOND MARKER
-#' MPPsims(x, selections = "Father", baseline = FALSE, seed = 123,
+#' MPPsims(x, selections = "Father", addBaseline = FALSE, seed = 123,
 #'         disableMutations = TRUE)
 #' }
-MPPsims = function(reference, missing = "MP", selections, baseline = TRUE,
+#'
+#' # Effect of variable number of alleles
+#' y = nuclearPed(father = "fa", child = "MP")
+#' mlist = lapply(2:5, function(k) marker(y, alleles = 1:k))
+#' y = setMarkers(y, mlist)
+#' peds = lapply(1:nMarkers(y), function(i) selectMarkers(y, i))
+#' sel = rep("fa", 4)
+#' names(sel) = paste(2:5, "alleles")
+#' pows = MPPsims(peds, selections = sel, addBaseline = FALSE, lrSims = 10)
+#' powerPlot(pows, type = 3)
+MPPsims = function(reference, missing = "MP", selections, addBaseline = TRUE,
                    nProfiles = 1, lrSims = 1, thresholdIP = NULL,
                    disableMutations = NA, seed = NULL, verbose = TRUE) {
-
-  if(!is.ped(reference))
-    stop2("Expecting a connected pedigree as H1")
-
-  nMark = nMarkers(reference)
-  if(nMark == 0)
-    stop2("No markers attached to `reference` pedigree")
 
   if(!is.list(selections))
     selections = as.list(selections)
 
-  names(selections) = sapply(selections, toString)
+  if(is.null(names(selections)))
+    names(selections) = sapply(selections, toString)
+  if(anyDuplicated(names(selections)))
+    stop2("`selections` cannot have duplicated names")
 
-  if(baseline)
+  if(addBaseline)
     selections = c(list(Baseline = NULL), selections)
 
-  ### Mutation disabling
-  if(!is.null(disableMutations) && !isFALSE(disableMutations)) {
-
-    # Which of the markers allow mutations?
-    hasMut = allowsMutations(reference)
-
-    if(isTRUE(disableMutations))
-      disableMutations = which(hasMut)
-    else if(identical(disableMutations, NA)) {
-      # Disable mutations for consisten markers
-      disableTF = logical(nMark)
-      disableTF[hasMut] = consistentMarkers(reference, hasMut)
-      disableMutations = which(disableTF)
-    }
-    else {# if numeric or character
-      disableMutations = whichMarkers(reference, disableMutations)
-    }
-
-    # Disable
-    if(length(disableMutations)) {
-      if(verbose)
-        message("Disabling mutations for markers: ", toString(disableMutations))
-      mutmod(reference, disableMutations) = NULL
-    }
+  if(is.ped(reference)) {
+    reference = disableMutationModels(reference, disableMutations, verbose = verbose)
+    reference = rep(list(reference), length(selections))
   }
+  else {
+    if(!is.pedList(reference))
+      stop2("`reference` must be a single connected pedigree, or a list of pedigrees")
+    else if(length(reference) != length(selections))
+      stop2("Incompatible lengths of `reference` and `selections`")
+    reference = lapply(reference, disableMutationModels, disable = disableMutations, verbose = FALSE)
+  }
+
   # Wrappers (just for simplification)
   epfun = function(x) missingPersonEP(x, missing = missing, disableMutations = FALSE, verbose = FALSE)
   ipfun = function(x) missingPersonIP(x, missing = missing, disableMutations = FALSE, nsim = lrSims,
@@ -126,21 +120,22 @@ MPPsims = function(reference, missing = "MP", selections, baseline = TRUE,
 
   set.seed(seed)
 
-  powSims = lapply(names(selections), function(sel) {
-    if(verbose)
-      message("Selection: ", sel)
+  powSims = lapply(seq_along(selections), function(i) {
+    ref = reference[[i]]
+    ids = selections[[i]]
 
-    ids = selections[[sel]]
+    if(verbose)
+      message("Selection: ", names(selections)[i])
 
     # Baseline
     if(is.null(ids)) {
-      ep0 = epfun(reference)
-      ip0 = ipfun(reference)
+      ep0 = epfun(ref)
+      ip0 = ipfun(ref)
       return(list(ep = ep0, ip = ip0))
     }
 
     # Simulate profile for `ids`
-    sims = profileSim(reference, ids = ids, N = nProfiles)
+    sims = profileSim(ref, ids = ids, N = nProfiles)
 
     # Compute updated EP and IP for each profile
     ep = lapply(sims, epfun)

@@ -65,3 +65,34 @@ consistentMarkers = function(x, markers = seq_len(nMarkers(x))) {
   # Return TRUE if likelihood is nonzero
   liks > 0
 }
+
+# Disable mutations
+disableMutationModels = function(x, disable, verbose = FALSE) {
+
+  if(isFALSE(disable) || is.null(disable))
+    return(x)
+
+  # Which of the markers allow mutations?
+  hasMut = allowsMutations(x)
+
+  # Return early if no markers has mutation models
+  if(!any(hasMut))
+    return(x)
+
+  if(isTRUE(disable))
+    disable = which(hasMut)
+  else if(identical(disable, NA)) # Disable for consistent markers
+    disable = which(hasMut & consistentMarkers(x, hasMut))
+  else # if numeric or character
+    disable = whichMarkers(x, disable)
+
+  # Disable
+  if(length(disable)) {
+    if(verbose)
+      message("Disabling mutations for markers: ", toString(disable))
+    mutmod(x, disable) = NULL
+  }
+
+  # Return the modified object
+  x
+}

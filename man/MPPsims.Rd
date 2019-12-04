@@ -8,7 +8,7 @@ MPPsims(
   reference,
   missing = "MP",
   selections,
-  baseline = TRUE,
+  addBaseline = TRUE,
   nProfiles = 1,
   lrSims = 1,
   thresholdIP = NULL,
@@ -18,7 +18,8 @@ MPPsims(
 )
 }
 \arguments{
-\item{reference}{A connected \code{ped} object}
+\item{reference}{A connected \code{ped} object, or a list of pedigrees. In the
+latter case, the list must have the same length as \code{selections}.}
 
 \item{missing}{The label of the missing person. By default "MP".}
 
@@ -26,7 +27,7 @@ MPPsims(
 all subsets consist of a single individual, \code{selections} can be given as a
 simple vector.}
 
-\item{baseline}{A logical. If TRUE (default) an \emph{empty} selection, named
+\item{addBaseline}{A logical. If TRUE (default) an \emph{empty} selection, named
 "Baseline", is added as the first element of \code{selection}.}
 
 \item{nProfiles}{The number of profile simulations for each selection.}
@@ -90,15 +91,25 @@ x = setMarkers(x, list(m, m2))
 mutmod(x, 1:2) = list("equal", rate = 0.1)
 
 # By default mutations are disabled for consistent markers
-MPPsims(x, selections = "Father", baseline = FALSE, seed = 123)
+MPPsims(x, selections = "Father", addBaseline = FALSE, seed = 123)
 
 # Don't disable anything
-MPPsims(x, selections = "Father", baseline = FALSE, seed = 123,
+MPPsims(x, selections = "Father", addBaseline = FALSE, seed = 123,
         disableMutations = FALSE)
 
 \donttest{
 # Disable all mutation models. SHOULD GIVE ERROR FOR SECOND MARKER
-MPPsims(x, selections = "Father", baseline = FALSE, seed = 123,
+MPPsims(x, selections = "Father", addBaseline = FALSE, seed = 123,
         disableMutations = TRUE)
 }
+
+# Effect of variable number of alleles
+y = nuclearPed(father = "fa", child = "MP")
+mlist = lapply(2:5, function(k) marker(y, alleles = 1:k))
+y = setMarkers(y, mlist)
+peds = lapply(1:nMarkers(y), function(i) selectMarkers(y, i))
+sel = rep("fa", 4)
+names(sel) = paste(2:5, "alleles")
+pows = MPPsims(peds, selections = sel, addBaseline = FALSE, lrSims = 10)
+powerPlot(pows, type = 3)
 }
