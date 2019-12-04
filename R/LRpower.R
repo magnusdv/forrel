@@ -53,10 +53,9 @@
 #' # Founder inbreeding in true pedigree
 #' founderInbreeding(truth, founders(truth)) = 0.5
 #' pow3 = LRpower(claim, unrel, truth, ids = ids, nsim = nsim, threshold = thresh,
-#'                markers = 1, seed = 123)
+#'                markers = 1, seed = 123, plot = TRUE)
 #' pow3
 #'
-#' # If the alleged mother is typed, with genotype 1/1
 #'
 #' @export
 LRpower = function(numeratorPed, denominatorPed, truePed = numeratorPed, ids, markers = NULL,
@@ -144,7 +143,8 @@ LRpower = function(numeratorPed, denominatorPed, truePed = numeratorPed, ids, ma
     }
 
     plotPedList(peds, newdev = TRUE, frametitles = frms,
-                shaded = ids, # col = list(red = ids),
+                shaded = function(p) c(ids, typedMembers(p)),
+                col = list(red = ids),
                 marker = match(plotMarkers, markers))
 
     if (plot == "plotOnly")
