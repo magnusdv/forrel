@@ -45,7 +45,7 @@ isEP = function(x) {
 }
 
 isIP = function(x) {
-  inherits(x, "IPresult") || inherits(x, "mpIP")
+  inherits(x, "LRpowerResult") || inherits(x, "mpIP")
 }
 
 # Test if genotypes are consistent with ped
