@@ -12,6 +12,7 @@ MPPsims(
   nProfiles = 1,
   lrSims = 1,
   thresholdIP = NULL,
+  disableMutations = NA,
   seed = NULL,
   verbose = TRUE
 )
@@ -31,6 +32,20 @@ simple vector.}
 \item{nProfiles}{The number of profile simulations for each selection.}
 
 \item{lrSims, thresholdIP}{Parameters passed onto \code{\link[=missingPersonIP]{missingPersonIP()}}}
+
+\item{disableMutations}{This parameter determines how mutation models are
+treated. Possible values are as follows:
+\itemize{
+\item \code{NA} (the default): Mutations are disabled only for those markers whose
+known genotypes are consistent with \code{reference}. This is determined by
+temporarily removing all mutation models and checking which markers have
+nonzero likelihood.
+\item \code{TRUE}: Mutations are disabled for all markers. This will result in an
+error if any markers are inconsistent with \code{reference}.
+\item \code{FALSE}: No action is done to disable mutations.
+\item A vector containing the names or indices of those markers for which
+mutations should be disabled.
+}}
 
 \item{seed}{A numeric seed for the random number generator (optional)}
 
@@ -65,4 +80,25 @@ simData = MPPsims(x, selections = sel, nProfiles = 2, lrSims = 2)
 # Power plot
 powerPlot(simData, type = 3)
 
+### With  mutations
+# Create inconsistent marker
+m2 = m
+genotype(m2, "Father") = 3
+x = setMarkers(x, list(m, m2))
+
+# Set mutation models for both
+mutmod(x, 1:2) = list("equal", rate = 0.1)
+
+# By default mutations are disabled for consistent markers
+MPPsims(x, selections = "Father", baseline = FALSE, seed = 123)
+
+# Don't disable anything
+MPPsims(x, selections = "Father", baseline = FALSE, seed = 123,
+        disableMutations = FALSE)
+
+\donttest{
+# Disable all mutation models. SHOULD GIVE ERROR FOR SECOND MARKER
+MPPsims(x, selections = "Father", baseline = FALSE, seed = 123,
+        disableMutations = TRUE)
+}
 }

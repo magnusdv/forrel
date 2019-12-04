@@ -11,6 +11,21 @@
 #'   "Baseline", is added as the first element of `selection`.
 #' @param nProfiles The number of profile simulations for each selection.
 #' @param lrSims,thresholdIP Parameters passed onto [missingPersonIP()]
+#' @param disableMutations This parameter determines how mutation models are
+#'   treated. Possible values are as follows:
+#'
+#'   * `NA` (the default): Mutations are disabled only for those markers whose
+#'   known genotypes are consistent with `reference`. This is determined by
+#'   temporarily removing all mutation models and checking which markers have
+#'   nonzero likelihood.
+#'
+#'   * `TRUE`: Mutations are disabled for all markers. This will result in an
+#'   error if any markers are inconsistent with `reference`.
+#'
+#'   * `FALSE`: No action is done to disable mutations.
+#'
+#'   * A vector containing the names or indices of those markers for which
+#'   mutations should be disabled.
 #' @param seed A numeric seed for the random number generator (optional)
 #' @param verbose A logical
 #'
@@ -39,16 +54,37 @@
 #' # Power plot
 #' powerPlot(simData, type = 3)
 #'
+#' ### With  mutations
+#' # Create inconsistent marker
+#' m2 = m
+#' genotype(m2, "Father") = 3
+#' x = setMarkers(x, list(m, m2))
+#'
+#' # Set mutation models for both
+#' mutmod(x, 1:2) = list("equal", rate = 0.1)
+#'
+#' # By default mutations are disabled for consistent markers
+#' MPPsims(x, selections = "Father", baseline = FALSE, seed = 123)
+#'
+#' # Don't disable anything
+#' MPPsims(x, selections = "Father", baseline = FALSE, seed = 123,
+#'         disableMutations = FALSE)
+#'
+#' \donttest{
+#' # Disable all mutation models. SHOULD GIVE ERROR FOR SECOND MARKER
+#' MPPsims(x, selections = "Father", baseline = FALSE, seed = 123,
+#'         disableMutations = TRUE)
+#' }
 MPPsims = function(reference, missing = "MP", selections, baseline = TRUE,
-                   nProfiles = 1, lrSims = 1, thresholdIP = NULL, seed = NULL, verbose = TRUE) {
+                   nProfiles = 1, lrSims = 1, thresholdIP = NULL,
+                   disableMutations = NA, seed = NULL, verbose = TRUE) {
 
   if(!is.ped(reference))
     stop2("Expecting a connected pedigree as H1")
 
-  if(!hasMarkers(reference))
+  nMark = nMarkers(reference)
+  if(nMark == 0)
     stop2("No markers attached to `reference` pedigree")
-
-  set.seed(seed)
 
   if(!is.list(selections))
     selections = as.list(selections)
@@ -58,10 +94,37 @@ MPPsims = function(reference, missing = "MP", selections, baseline = TRUE,
   if(baseline)
     selections = c(list(Baseline = NULL), selections)
 
+  ### Mutation disabling
+  if(!is.null(disableMutations) && !isFALSE(disableMutations)) {
+
+    # Which of the markers allow mutations?
+    hasMut = allowsMutations(reference)
+
+    if(isTRUE(disableMutations))
+      disableMutations = which(hasMut)
+    else if(identical(disableMutations, NA)) {
+      # Disable mutations for consisten markers
+      disableTF = logical(nMark)
+      disableTF[hasMut] = consistentMarkers(reference, hasMut)
+      disableMutations = which(disableTF)
+    }
+    else {# if numeric or character
+      disableMutations = whichMarkers(reference, disableMutations)
+    }
+
+    # Disable
+    if(length(disableMutations)) {
+      if(verbose)
+        message("Disabling mutations for markers: ", toString(disableMutations))
+      mutmod(reference, disableMutations) = NULL
+    }
+  }
   # Wrappers (just for simplification)
-  epfun = function(x) missingPersonEP(x, missing = missing, verbose = FALSE)
-  ipfun = function(x) missingPersonIP(x, missing = missing, nsim = lrSims,
+  epfun = function(x) missingPersonEP(x, missing = missing, disableMutations = FALSE, verbose = FALSE)
+  ipfun = function(x) missingPersonIP(x, missing = missing, disableMutations = FALSE, nsim = lrSims,
                                       threshold = thresholdIP, verbose = FALSE)
+
+  set.seed(seed)
 
   powSims = lapply(names(selections), function(sel) {
     if(verbose)
