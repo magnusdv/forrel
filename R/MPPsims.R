@@ -160,11 +160,14 @@ MPPsims = function(reference, missing = "MP", selections, addBaseline = TRUE,
     list(ep = ep, ip = ip)
   })
 
+  names(powSims) = names(selections)
+
   # Timing
   totalTime = format(Sys.time() - st, digits = 3)
   if(verbose)
     message("Total time used: ", totalTime)
 
+  # Return with attributes
   structure(powSims, reference = reference, selections = selections,
             nProfiles = nProfiles, lrSims = lrSims, thresholdIP = thresholdIP,
             seed = seed, totalTime = totalTime, class = "MPPsim")
