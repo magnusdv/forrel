@@ -165,7 +165,7 @@ MPPsims = function(reference, missing = "MP", selections, addBaseline = TRUE,
   if(verbose)
     message("Total time used: ", totalTime)
 
-  structure(powSims, reference = reference, selectons = selections,
+  structure(powSims, reference = reference, selections = selections,
             nProfiles = nProfiles, lrSims = lrSims, thresholdIP = thresholdIP,
             seed = seed, totalTime = totalTime, class = "MPPsim")
 }
