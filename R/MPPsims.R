@@ -30,8 +30,24 @@
 #' @param seed A numeric seed for the random number generator (optional)
 #' @param verbose A logical
 #'
-#' @return A list with the same length as `selections`. Each entry has elements
-#'   `ep` and `ip`, each of which is a list of length `nProfiles`.
+#' @return An object of class "MPPsim", which is basically a list with one entry
+#'   for each element of `selections`. Each entry has elements `ep` and `ip`,
+#'   each of which is a list of length `nProfiles`.
+#'
+#'   The output object has various attributes reflecting the input. Note that
+#'   `reference` and `selection` may differ from the original input, since they
+#'   may be modified during the function run. (For instance, a "Baseline" entry
+#'   is added to `selection` if `addBaseline` is TRUE.) The crucial point is
+#'   that the output attributes correspond exactly to the output *data*.
+#'
+#'   * `reference` (always a list, of the same length as the `selections` attribute
+#'
+#'   * `selectons`
+#'
+#'   * `nProfiles`,`lrSims`,thresholdIP`,`seed` (as in the input)
+#'
+#'   * `totalTime` (the total time used)
+#'
 #' @export
 #'
 #' @examples
@@ -89,6 +105,7 @@
 MPPsims = function(reference, missing = "MP", selections, addBaseline = TRUE,
                    nProfiles = 1, lrSims = 1, thresholdIP = NULL,
                    disableMutations = NA, seed = NULL, verbose = TRUE) {
+  st = Sys.time()
 
   if(!is.list(selections))
     selections = as.list(selections)
@@ -143,7 +160,13 @@ MPPsims = function(reference, missing = "MP", selections, addBaseline = TRUE,
     list(ep = ep, ip = ip)
   })
 
-  structure(powSims, nProfiles = nProfiles, lrSims = lrSims, thresholdIP = thresholdIP,
-            names = names(selections), class = "MPPsim")
+  # Timing
+  totalTime = format(Sys.time() - st, digits = 3)
+  if(verbose)
+    message("Total time used: ", totalTime)
+
+  structure(powSims, reference = reference, selectons = selections,
+            nProfiles = nProfiles, lrSims = lrSims, thresholdIP = thresholdIP,
+            seed = seed, totalTime = totalTime, class = "MPPsim")
 }
 

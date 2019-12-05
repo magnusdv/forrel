@@ -53,8 +53,21 @@ mutations should be disabled.
 \item{verbose}{A logical}
 }
 \value{
-A list with the same length as \code{selections}. Each entry has elements
-\code{ep} and \code{ip}, each of which is a list of length \code{nProfiles}.
+An object of class "MPPsim", which is basically a list with one entry
+for each element of \code{selections}. Each entry has elements \code{ep} and \code{ip},
+each of which is a list of length \code{nProfiles}.
+
+The output object has various attributes reflecting the input. Note that
+\code{reference} and \code{selection} may differ from the original input, since they
+may be modified during the function run. (For instance, a "Baseline" entry
+is added to \code{selection} if \code{addBaseline} is TRUE.) The crucial point is
+that the output attributes correspond exactly to the output \emph{data}.
+\itemize{
+\item \code{reference} (always a list, of the same length as the \code{selections} attribute
+\item \code{selectons}
+\item \code{nProfiles},\code{lrSims},thresholdIP\verb{,}seed` (as in the input)
+\item \code{totalTime} (the total time used)
+}
 }
 \description{
 Estimate the exclusion/inclusion power for various selections of available
