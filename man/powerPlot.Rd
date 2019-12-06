@@ -12,7 +12,7 @@ powerPlot(
   col = NULL,
   labs = NULL,
   alpha = 1,
-  shape = 1,
+  shape = "circle",
   size = 2,
   hline = NULL,
   vline = NULL,
@@ -40,7 +40,10 @@ list of \code{ep}/\code{ip} containing more than 1 element.}
 
 \item{alpha}{Transparency for minor points (see Details).}
 
-\item{shape, size}{Plotting parameters}
+\item{shape}{Either "circle", "square", "diamond", "triangleUp" or
+"triangleDown", determining the shapes of both minor and major points.}
+
+\item{size}{Point size.}
 
 \item{hline, vline}{Single numbers indicating positions for
 horizontal/vertical "threshold" lines. When \code{type = 1}, these determine the

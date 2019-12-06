@@ -38,7 +38,9 @@
 #' @param labs A character of the same length as `ep`. If NULL, the names of
 #'   `ep` are used, if present.
 #' @param alpha Transparency for minor points (see Details).
-#' @param shape,size Plotting parameters
+#' @param shape Either "circle", "square", "diamond", "triangleUp" or
+#'   "triangleDown", determining the shapes of both minor and major points.
+#' @param size Point size.
 #' @param hline,vline Single numbers indicating positions for
 #'   horizontal/vertical "threshold" lines. When `type = 1`, these determine the
 #'   shaded vertical regions, by default starting at 0.95.
@@ -79,7 +81,7 @@
 #' @importFrom stats aggregate
 #' @export
 powerPlot = function(ep, ip, type = 1, ellipse = FALSE, col = NULL, labs = NULL, alpha = 1,
-                     shape = 1, size = 2, hline = NULL, vline = NULL, xlim = NULL, ylim = NULL,
+                     shape = "circle", size = 2, hline = NULL, vline = NULL, xlim = NULL, ylim = NULL,
                      xlab = NULL, ylab = NULL) {
   if(!requireNamespace("ggplot2", quietly = TRUE))
     stop2("Package `ggplot2` is not installed. Please install this and try again.")
@@ -178,14 +180,20 @@ powerPlot = function(ep, ip, type = 1, ellipse = FALSE, col = NULL, labs = NULL,
   # Minor data points: Individual entries in groups with more than one
   minor = subset(alldata, table(group)[group] > 1)
 
+  # Point shapes of minor and major points
+  shapes = switch(match.arg(shape, c("circle", "square", "diamond", "triangleUp", "triangleDown")),
+                  circle = c(1, 21), square = c(0,22), diamond = c(5,23),
+                  triangleUp = c(2,24), triangleDown = c(6,25))
+
   # Plot
   p = ggplot2::ggplot() +
     ggplot2::aes(x = ep, y = ip) +
-    ggplot2::geom_point(data = minor, ggplot2::aes(colour = group), size = size, shape = shape, alpha = alpha) +
-    ggplot2::geom_point(data = major, ggplot2::aes(fill = group), size = 2*size, shape = 21,
+    ggplot2::geom_point(data = minor, ggplot2::aes(colour = group), size = size, shape = shapes[1],
+                        alpha = alpha) +
+    ggplot2::geom_point(data = major, ggplot2::aes(fill = group), size = 2*size, shape = shapes[2],
                         colour = "black", stroke = 1.5) +
     ggplot2::labs(x = xlab, y = ylab, fill = NULL, colour = NULL) +
-    ggplot2::guides(colour = FALSE) +
+    ggplot2::guides(colour = FALSE, fill = ggplot2::guide_legend(reverse = TRUE)) +
     ggplot2::scale_colour_manual(limits = labs, values = col) +
     ggplot2::scale_fill_manual(limits = labs, values = col) +
     ggplot2::scale_x_continuous(limits = xlim) +
