@@ -103,6 +103,9 @@ simData = MPPsims(ref, selections = sel, nProfiles = 10,
 # Power plot 1: EP vs IP
 powerPlot(simData, type = 1)
 
+# Change shape, and modify legend order
+powerPlot(simData, type = 1, shape = "square", legendOrder = c(1,3,2))
+
 # Zoom in, and adjust the blue strips
 powerPlot(simData, type = 1, xlim = c(0.5, 1), ylim = c(0.5, 1),
           hline = 0.8, vline = 0.9)
