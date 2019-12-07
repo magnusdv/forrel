@@ -19,7 +19,8 @@ powerPlot(
   xlim = NULL,
   ylim = NULL,
   xlab = NULL,
-  ylab = NULL
+  ylab = NULL,
+  legendOrder = NULL
 )
 }
 \arguments{
@@ -52,6 +53,8 @@ shaded vertical regions, by default starting at 0.95.}
 \item{xlim, ylim}{Axis limits; automatically chosen if NULL.}
 
 \item{xlab, ylab}{Axis labels; automatically chosen if NULL.}
+
+\item{legendOrder}{A permutation of \verb{1,2,...,L}, where \code{L=length(ep)}.}
 }
 \value{
 A \code{ggplot2} plot object.

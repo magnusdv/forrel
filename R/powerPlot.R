@@ -46,6 +46,7 @@
 #'   shaded vertical regions, by default starting at 0.95.
 #' @param xlim,ylim Axis limits; automatically chosen if NULL.
 #' @param xlab,ylab Axis labels; automatically chosen if NULL.
+#' @param legendOrder A permutation of `1,2,...,L`, where `L=length(ep)`.
 #'
 #' @return A `ggplot2` plot object.
 #' @seealso [missingPersonEP()], [missingPersonEP()], [MPPsims()]
@@ -82,7 +83,7 @@
 #' @export
 powerPlot = function(ep, ip, type = 1, ellipse = FALSE, col = NULL, labs = NULL, alpha = 1,
                      shape = "circle", size = 2, hline = NULL, vline = NULL, xlim = NULL, ylim = NULL,
-                     xlab = NULL, ylab = NULL) {
+                     xlab = NULL, ylab = NULL, legendOrder = NULL) {
   if(!requireNamespace("ggplot2", quietly = TRUE))
     stop2("Package `ggplot2` is not installed. Please install this and try again.")
 
@@ -110,15 +111,17 @@ powerPlot = function(ep, ip, type = 1, ellipse = FALSE, col = NULL, labs = NULL,
   if(!all(L == lengths(ip)))
     stop2("Arguments `ep` and `ip` are incompatible")
 
-  # Group labels and colors
+  # Group labels legend ordering
   if(is.null(labs))
     labs = seq_along(L)
-  group = as.factor(rep(labs, times = L))
+  if(is.null(legendOrder))
+    legendOrder = seq_along(labs)
+  group = factor(rep(labs, times = L), levels = labs[legendOrder])
 
-  if(is.null(col)) {
-    Set1 = c("white", "lightgreen", "firebrick1", "deepskyblue", "#FFFF33", "gray70", "#F781BF", "#FF7F00")
-    col = Set1[seq_along(L)]
-  }
+  # COlors
+  if(is.null(col))
+    col = c("white", "lightgreen", "firebrick1", "deepskyblue", "#FFFF33", "gray70", "#F781BF", "#FF7F00")
+  col = col[legendOrder]
 
   # Extract numbers and build data frame with plotting data
   if(type == 1) {
@@ -158,7 +161,7 @@ powerPlot = function(ep, ip, type = 1, ellipse = FALSE, col = NULL, labs = NULL,
     alldata = data.frame(ep = epnum, ip = ipnum, group = group)
 
     if(is.null(xlab)) xlab = "Expected number of exclusions"
-    if(is.null(ylab)) ylab = expression("Average "~log[10](LR))
+    if(is.null(ylab)) ylab = expression(log[10]~LR)
     if(is.null(xlim)) xlim = c(min(0, epnum), max(1, epnum))
     if(is.null(ylim)) ylim = c(min(0, ipnum), max(1, ipnum))
   }
@@ -169,7 +172,7 @@ powerPlot = function(ep, ip, type = 1, ellipse = FALSE, col = NULL, labs = NULL,
     alldata = data.frame(ep = epnum, ip = ipnum, group = group)
 
     if(is.null(xlab)) xlab = "Exclusion power"
-    if(is.null(ylab)) ylab = "Average LR"
+    if(is.null(ylab)) ylab = "LR"
     if(is.null(xlim)) xlim = c(min(0, epnum), max(1, epnum))
     if(is.null(ylim)) ylim = c(min(0, ipnum), max(1, ipnum))
   }
@@ -193,11 +196,12 @@ powerPlot = function(ep, ip, type = 1, ellipse = FALSE, col = NULL, labs = NULL,
     ggplot2::geom_point(data = major, ggplot2::aes(fill = group), size = 2*size, shape = shapes[2],
                         colour = "black", stroke = 1.5) +
     ggplot2::labs(x = xlab, y = ylab, fill = NULL, colour = NULL) +
-    ggplot2::guides(colour = FALSE, fill = ggplot2::guide_legend(reverse = TRUE)) +
-    ggplot2::scale_colour_manual(limits = labs, values = col) +
-    ggplot2::scale_fill_manual(limits = labs, values = col) +
+    ggplot2::scale_colour_manual(limits = labs[legendOrder], values = col) +
+    ggplot2::scale_fill_manual(limits = labs[legendOrder], values = col) +
     ggplot2::scale_x_continuous(limits = xlim) +
     ggplot2::scale_y_continuous(limits = ylim) +
+    ggplot2::guides(colour = FALSE,
+                    fill = ggplot2::guide_legend(reverse = TRUE)) +
     ggplot2::coord_cartesian(clip = 'off') +
     ggplot2::theme_bw(base_size = 14)
 
