@@ -31,8 +31,9 @@ NULL. See Examples.}
 
 \item{type}{Plot type; either 1, 2 or 3.}
 
-\item{ellipse}{A logical. If TRUE, data ellipsis are drawn for each inner
-list of \code{ep}/\code{ip} containing more than 1 element.}
+\item{ellipse}{A logical. If TRUE, data ellipsis are drawn for each group
+containing more than 1 element. NB: This fails with a warning if all points
+in a group fall on a line.}
 
 \item{col}{A color vector, recycle to match the top level length of \code{ep}.}
 

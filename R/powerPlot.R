@@ -32,8 +32,9 @@
 #'   `ep` can be a single output from [MPPsims()], in which case `ip` should be
 #'   NULL. See Examples.
 #' @param type Plot type; either 1, 2 or 3.
-#' @param ellipse A logical. If TRUE, data ellipsis are drawn for each inner
-#'   list of `ep`/`ip` containing more than 1 element.
+#' @param ellipse A logical. If TRUE, data ellipsis are drawn for each group
+#'   containing more than 1 element. NB: This fails with a warning if all points
+#'   in a group fall on a line.
 #' @param col A color vector, recycle to match the top level length of `ep`.
 #' @param labs A character of the same length as `ep`. If NULL, the names of
 #'   `ep` are used, if present.
