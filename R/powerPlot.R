@@ -139,7 +139,7 @@ powerPlot = function(ep, ip, type = 1, ellipse = FALSE, col = NULL, labs = NULL,
   shapeIdx = pmatch(shape, names(majorShapes), duplicates.ok = TRUE)
   if(anyNA(shapeIdx))
     stop2("Unrecognized `shape` entry: ", shape[is.na(shapeIdx)],
-          "\nMust match uniquely to one of: ", choices)
+          "\nMust match uniquely to one of: ", names(majorShapes))
   shapeIdx = rep_len(shapeIdx, length(labs))
 
   # Major points: Use as group aestethic
