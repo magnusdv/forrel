@@ -60,20 +60,20 @@
 #' sel = list("fa", c("fa", "mo"))
 #'
 #' # Simulate power for each selection
-#' simData = MPPsims(ref, selections = sel, nProfiles = 10,
-#'                   lrSims = 10, thresholdIP = 2)
+#' simData = MPPsims(ref, selections = sel, nProfiles = 5,
+#'                   lrSims = 10, thresholdIP = 2, seed = 123)
 #'
 #' # Power plot 1: EP vs IP
 #' powerPlot(simData, type = 1)
 #'
 #' # Change shape, and modify legend order
-#' powerPlot(simData, type = 1, shape = "square", legendOrder = c(1,3,2))
+#' powerPlot(simData, type = 1, shape = c("ci", "sq", "di"), legendOrder = 3:1)
 #'
 #' # Zoom in, and adjust the blue strips
-#' powerPlot(simData, type = 1, xlim = c(0.5, 1), ylim = c(0.5, 1),
-#'           hline = 0.8, vline = 0.9)
+#' powerPlot(simData, type = 1, xlim = c(0.4, 1), ylim = c(0.4, 1),
+#'           hline = 0.8, vline = 0.8)
 #'
-#' # Power plot 3: Expected number of exclusions vs E[LR]
+#' # Power plot 3: Expected number of exclusions vs E[log LR]
 #' powerPlot(simData, type = 3)
 #'
 #' # With horizontal/vertical lines
