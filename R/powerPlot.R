@@ -230,7 +230,7 @@ powerPlot = function(ep, ip, type = 1, ellipse = FALSE, col = NULL, labs = NULL,
     ggplot2::theme_bw(base_size = 14)
 
   if(ellipse) {
-    p = p + ggplot2::stat_ellipse(data = minor, na.rm = TRUE)
+    p = p + ggplot2::stat_ellipse(data = minor, ggplot2::aes(colour = group), na.rm = TRUE)
   }
 
   if(type == 1) {
