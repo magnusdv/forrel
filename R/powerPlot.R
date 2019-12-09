@@ -102,7 +102,7 @@ powerPlot = function(ep, ip, type = 1, ellipse = FALSE, col = NULL, labs = NULL,
   if(isIP(ip)) ip = list(ip)
 
 
-  # Ensure each element of ep (ip) is a *list* of EPresult objects.
+  ### Ensure each element of ep (ip) is a *list* of EPresult objects.
   for(i in seq_along(ep)) {
     if(isEP(ep[[i]])) ep[[i]] = list(ep[[i]])
   }
@@ -114,19 +114,41 @@ powerPlot = function(ep, ip, type = 1, ellipse = FALSE, col = NULL, labs = NULL,
   if(!all(L == lengths(ip)))
     stop2("Arguments `ep` and `ip` are incompatible")
 
-  # Group labels legend ordering
+  ### Group labels legend ordering
   if(is.null(labs))
     labs = seq_along(L)
   if(is.null(legendOrder))
     legendOrder = seq_along(labs)
   group = factor(rep(labs, times = L), levels = labs[legendOrder])
 
-  # COlors
-  if(is.null(col))
-    col = c("white", "lightgreen", "firebrick1", "deepskyblue", "#FFFF33", "gray70", "#F781BF", "#FF7F00")
-  col = col[legendOrder]
+  ### COlors
+  if(is.null(col)) {
+    col = c("lightgreen", "firebrick1", "deepskyblue", "#FFFF33", "gray70", "#F781BF", "cyan", "wheat", "#FF7F00")
 
-  # Extract numbers and build data frame with plotting data
+    # Use white for "Baseline", if present
+    if(!is.na(baseIdx <- match("Baseline", labs)))
+      col = append(col, "white", after = baseIdx - 1)
+  }
+
+  col = setNames(rep_len(col, length(labs)), labs)
+
+  ### Point shapes of minor and major points
+
+  majorShapes = c(circle=21, square=22, diamond=23, triangleUp=24, triangleDown=25)
+  minorShapes = c(circle=1, square=0, diamond=5, triangleUp=2, triangleDown=6)
+  shapeIdx = pmatch(shape, names(majorShapes), duplicates.ok = TRUE)
+  if(anyNA(shapeIdx))
+    stop2("Unrecognized `shape` entry: ", shape[is.na(shapeIdx)],
+          "\nMust match uniquely to one of: ", choices)
+  shapeIdx = rep_len(shapeIdx, length(labs))
+
+  # Major points: Use as group aestethic
+  shapeMapMajor = setNames(majorShapes[shapeIdx], labs)
+
+  # Minor points: Add column; map explicitly
+  shapeMapMinor = setNames(minorShapes[shapeIdx], labs)
+
+  ### Extract numbers and build data frame with plotting data
   if(type == 1) {
     epnum = vapply(unlist(ep, recursive = FALSE), function(a) a$EPtotal, FUN.VALUE = 1)
     ipnum = tryCatch(vapply(unlist(ip, recursive = F), function(a) a$IP, FUN.VALUE = 1),
@@ -180,31 +202,30 @@ powerPlot = function(ep, ip, type = 1, ellipse = FALSE, col = NULL, labs = NULL,
     if(is.null(ylim)) ylim = c(min(0, ipnum), max(1, ipnum))
   }
 
-  # Major data points: Mean points of each group
+
+  ### Major data points: Mean points of each group
   major = aggregate(. ~ group, alldata, mean)
 
-  # Minor data points: Individual entries in groups with more than one
+  ### Minor data points: Individual entries in groups with more than one
   minor = subset(alldata, table(group)[group] > 1)
 
-  # Point shapes of minor and major points
-  shapes = switch(match.arg(shape, c("circle", "square", "diamond", "triangleUp", "triangleDown")),
-                  circle = c(1, 21), square = c(0,22), diamond = c(5,23),
-                  triangleUp = c(2,24), triangleDown = c(6,25))
-
-  # Plot
+  ### Plot
   p = ggplot2::ggplot() +
     ggplot2::aes(x = ep, y = ip) +
-    ggplot2::geom_point(data = minor, ggplot2::aes(colour = group), size = size, shape = shapes[1],
-                        alpha = alpha) +
-    ggplot2::geom_point(data = major, ggplot2::aes(fill = group), size = 2*size, shape = shapes[2],
-                        colour = "black", stroke = 1.5) +
+    ggplot2::geom_point(data = minor, ggplot2::aes(colour = group), size = size,
+                        shape = shapeMapMinor[minor$group], alpha = alpha) +
+    ggplot2::geom_point(data = major, ggplot2::aes(fill = group, shape = group),
+                        size = 2*size, colour = "black", stroke = 1.5) +
     ggplot2::labs(x = xlab, y = ylab, fill = NULL, colour = NULL) +
-    ggplot2::scale_colour_manual(limits = labs[legendOrder], values = col) +
-    ggplot2::scale_fill_manual(limits = labs[legendOrder], values = col) +
+    ggplot2::scale_colour_manual(values = col) +
+    ggplot2::scale_fill_manual(values = col) +
+    ggplot2::scale_shape_manual(values = shapeMapMajor) +
     ggplot2::scale_x_continuous(limits = xlim) +
     ggplot2::scale_y_continuous(limits = ylim) +
     ggplot2::guides(colour = FALSE,
-                    fill = ggplot2::guide_legend(reverse = TRUE)) +
+                    fill = ggplot2::guide_legend(title = "", reverse = TRUE),
+                    shape = ggplot2::guide_legend(title = "", reverse = TRUE)
+                    ) +
     ggplot2::coord_cartesian(clip = 'off') +
     ggplot2::theme_bw(base_size = 14)
 
