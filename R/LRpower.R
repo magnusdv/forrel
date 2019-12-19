@@ -18,11 +18,31 @@
 #' @param threshold A numeric vector with one or more positive numbers used as
 #'   LR tresholds.
 #' @param disableMutations Not implemented yet.
+#' @param alleles,afreq,Xchrom If these are given, they are used (together with
+#'   `knownGenotypes`) to create a marker object on the fly.
 #' @param seed A numeric seed for the random number generator (optional)
+#'
+#' @return A `LRpowerResult` object, which is essentially a list with the
+#'   following entries:
+#'
+#'   * `LRperSim`: A numeric vector of length `nsim` containing the total LR for
+#'   each simulation.
+#'
+#'   * `meanLRperMarker`: The mean LR per marker, over all simulations.
+#'
+#'   * `meanLR`: The mean total LR over all simulations.
+#'
+#'   * `meanLogLR`: The mean total `log10(LR)` over all simulations.
+#'
+#'   * `IP`: A named numeric of the same length as `threshold`. For each element
+#'   of `threshold`, the fraction of simulations resulting in a LR exceeding the
+#'   given number.
+#'
+#'   * `params`: A list containing the input parameters `missing`, `markers`,
+#'   `nsim`, `threshold` and `disableMutations`
 #'
 #' @inheritParams exclusionPower
 #' @examples
-#'
 #' # Paternity LR of siblings
 #' claim = nuclearPed(fa = "A", mo = "NN", children = "B")
 #' unrel = list(singleton("A"), singleton("B"))
@@ -168,7 +188,7 @@ LRpower = function(numeratorPed, denominatorPed, truePed = numeratorPed, ids, ma
     numerSim = transferMarkers(from = s, to = numeratorPed)
     denomSim = transferMarkers(from = s, to = denominatorPed)
 
-    lr = LR(list(numerSim, denomSim), ref = 2)
+    lr = kinshipLR(list(numerSim, denomSim), ref = 2)
     lr$LRperMarker[,1]
   }, FUN.VALUE = numeric(length(markers)))
 

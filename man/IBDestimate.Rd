@@ -7,9 +7,9 @@
 IBDestimate(x, ids, markers = NULL, start = c(0.99, 0.001), tol = 1e-07)
 }
 \arguments{
-\item{x}{A single \code{ped} object or a list of \code{ped} and/or \code{singleton} objects.}
+\item{x}{A \code{ped} object or a list of such.}
 
-\item{ids}{Either a vector with two ID labels, or a data.frame/matrix with
+\item{ids}{Either a vector with two ID labels, or a data frame/matrix with
 two columns, where each row contains the ID labels of two individuals. The
 entries are coerced to characters, and must match uniquely against the ID
 labels of \code{x}.}
@@ -25,13 +25,13 @@ on to \code{maxLik}).}
 \code{maxLik()}).}
 }
 \value{
-A data.frame with 6 columns: \code{ID1}, \code{ID2}, \code{N} (#markers with no
+A data frame with 6 columns: \code{ID1}, \code{ID2}, \code{N} (the number of markers with no
 missing alleles), \code{k0}, \code{k1} and \code{k2}.
 }
 \description{
 Estimate the pairwise IBD coefficients \eqn{(\kappa_0, \kappa_1,
 \kappa_2)}{(\kappa0, \kappa1, \kappa2)} for specified pairs of pedigree
-members, using maximum likelihood methods. The optimization machinery is
+members, using maximum likelihood methods. The optimisation machinery is
 imported from the \code{maxLik} package.
 }
 \details{

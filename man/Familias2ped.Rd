@@ -28,43 +28,45 @@ assumed that the \code{loci} correspond to the (pairs of) columns in
 A \code{ped} object, or a list of such.
 }
 \description{
-Familias is a widely used program for computations in forensic genetics. The
-function documented here converts pedigrees and marker data from Familias to
-\code{\link[pedtools:ped]{pedtools::ped()}} format, thus enabling such data to be analysed with
-\code{forrel}. This may be of interest for specialized computations not
-implemented in Familias, e.g. conditional simulations.
+\code{Familias} is a widely used software for forensic kinship computations, which
+also features an accompanying R package (also called \code{Familias}). The
+function documented here converts pedigrees and marker data from the R
+version of 'Familias' to \code{\link[pedtools:ped]{pedtools::ped()}} format, used by \code{forrel}. This may
+be of interest for specialized computations not implemented in \code{Familias},
+e.g. conditional simulations. Note: For importing ".fam" files created by
+(the stand-alone) \code{Familias}, see \code{\link[=readFam]{readFam()}}.
 }
 \details{
 The Familias program represents pedigrees and marker data in a way that
-differs from \code{pedtools} in several ways, mostly because of the latter's
-stricter definition of a \emph{pedigree}. In \code{pedtools} pedigrees must be
-connected, and each member must have either 0 or 2 parents present in the
-pedigree. None of this is required by \code{FamiliasPedigree} objects. The
-conversion function \code{Familias2ped} takes care of all potential differences:
-It converts each Familias pedigree into a list of connected \code{ped} objects,
-adding missing parents where needed.
+differs from the \code{ped} format in several ways, mostly because of the latter's
+stricter definition of a \emph{pedigree}. A \code{ped} object always represent a
+connected pedigree, and each member must have either 0 or 2 parents. None of
+this is required by \code{FamiliasPedigree} objects. The conversion function
+\code{Familias2ped} takes care of all potential differences: It converts each
+Familias pedigree into a list of connected \code{ped} objects, adding missing
+parents where needed.
 }
 \examples{
 
-### Example 1 ###
+famPed = structure(
+  list(id = c('mother', 'daughter', 'AF'),
+       findex = c(0, 3, 0),
+       mindex = c(0, 1, 0),
+       sex = c('female', 'female', 'male')),
+  class = "FamiliasPedigree")
 
-#if (requireNamespace("Familias", quietly = TRUE)) {
-#  data(NorwegianFrequencies, package = "Familias")
-#  TH01 = Familias::FamiliasLocus(NorwegianFrequencies$TH01, name = "TH01")
+datamatrix = data.frame(
+  M1.1 = c(NA, 8, NA),
+  M1.2 = c(NA, 9.3, NA),
+  row.names = famPed$id)
 
-# ped = Familias::FamiliasPedigree(
-#    id = c('mother', 'daughter', 'AF'),
-#    dadid = c(NA, 'AF', NA),
-#    momid = c(NA, 'mother', NA),
-#    sex   = c('female', 'female', 'male'))
-#
-#  datamatrix = data.frame(
-#    TH01.1 = c(NA, 8, NA),
-#    TH01.2 = c(NA, 9.3, NA),
-#    row.names = ped$id)
-#
-#  Familias2ped(ped, datamatrix, loci = list(TH01))
-#}
+famLoc = structure(
+  list(locusname = "M1",
+       alleles = c("8" = 0.2, "9" = 0.5, "9.3" = 0.3)),
+  class = "FamiliasLocus")
+
+Familias2ped(famPed, datamatrix, loci = famLoc, matchLoci = TRUE)
+
 
 }
 \references{

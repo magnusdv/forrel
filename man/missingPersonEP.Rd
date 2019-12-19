@@ -18,9 +18,9 @@ missingPersonEP(
 \item{missing}{The ID label of the missing pedigree member.}
 
 \item{markers}{A vector indicating the names or indices of markers attached
-to the source pedigree. If NULL (default), then all markers attached
-to the source pedigree are used. If \code{alleles} or \code{afreq} is non-NULL, then
-this parameter is ignored.}
+to the source pedigree. If NULL (default), then all markers attached to the
+source pedigree are used. If \code{alleles} or \code{afreq} is non-NULL, then this
+parameter is ignored.}
 
 \item{disableMutations}{This parameter determines how mutation models are
 treated. Possible values are as follows:

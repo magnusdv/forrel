@@ -6,7 +6,7 @@
 \usage{
 IBDtriangle(
   relationships = c("UN", "PO", "MZ", "S", "H,U,G", "FC"),
-  kinship.lines = numeric(),
+  kinshipLines = numeric(),
   shading = "lightgray",
   pch = 16,
   cex_points = 1.2,
@@ -24,7 +24,7 @@ IBDtriangle(
 \item{relationships}{A character vector indicating relationships points to be
 included in the plot. See Details for a list of valid entries.}
 
-\item{kinship.lines}{A numeric vector. (See Details.)}
+\item{kinshipLines}{A numeric vector. (See Details.)}
 
 \item{shading}{The shading colour for the unattainable region.}
 
@@ -53,8 +53,8 @@ coefficients, and shading of the unattainable region.
 \details{
 For any pair of non-inbred individuals A and B, their genetic relationship
 can be summarized by the IBD coefficients \eqn{(\kappa_0, \kappa_1,
-\kappa_2)}{(\kappa0, \kappa1, \kappa2)}, where \deqn{\kappa_i = P(A and B
-share i alleles IBD at random autosomal locus).} Since \eqn{\kappa_0 +
+\kappa_2)}{(\kappa0, \kappa1, \kappa2)}, where \eqn{\kappa_i} = P(A and B
+share i alleles IBD at random autosomal locus). Since \eqn{\kappa_0 +
 \kappa_1 + \kappa_2 = 1}{\kappa0 + \kappa1 + \kappa2 = 1}, any relationship
 corresponds to a point in the triangle in the \eqn{(\kappa_0,
 \kappa_2)}{(\kappa0, \kappa2)}-plane defined by \eqn{\kappa_0 \ge 0, \kappa_2
@@ -72,7 +72,7 @@ a 'lightgray' colour.
 The IBD coefficients are linearly related to the kinship coefficient
 \eqn{\phi} by the formula \deqn{\phi = 0.25\kappa_1 + 0.5\kappa_2.}{\phi =
 0.25*\kappa1 + 0.5*\kappa2.} By indicating values for \eqn{\phi} in the
-\code{kinship.lines} argument, the corresponding contour lines are shown as dashed
+\code{kinshipLines} argument, the corresponding contour lines are shown as dashed
 lines in the triangle plot.
 
 The following abbreviations are valid entries in the \code{relationships}
@@ -93,7 +93,7 @@ argument:
 
 IBDtriangle()
 
-IBDtriangle(kinship = c(0.25, 0.125), shading = NULL, cex_text = 0.8)
+IBDtriangle(kinshipLines = c(0.25, 0.125), shading = NULL, cex_text = 0.8)
 
 }
 \references{

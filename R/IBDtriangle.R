@@ -7,8 +7,8 @@
 #'
 #' For any pair of non-inbred individuals A and B, their genetic relationship
 #' can be summarized by the IBD coefficients \eqn{(\kappa_0, \kappa_1,
-#' \kappa_2)}{(\kappa0, \kappa1, \kappa2)}, where \deqn{\kappa_i = P(A and B
-#' share i alleles IBD at random autosomal locus).} Since \eqn{\kappa_0 +
+#' \kappa_2)}{(\kappa0, \kappa1, \kappa2)}, where \eqn{\kappa_i} = P(A and B
+#' share i alleles IBD at random autosomal locus). Since \eqn{\kappa_0 +
 #' \kappa_1 + \kappa_2 = 1}{\kappa0 + \kappa1 + \kappa2 = 1}, any relationship
 #' corresponds to a point in the triangle in the \eqn{(\kappa_0,
 #' \kappa_2)}{(\kappa0, \kappa2)}-plane defined by \eqn{\kappa_0 \ge 0, \kappa_2
@@ -26,7 +26,7 @@
 #' The IBD coefficients are linearly related to the kinship coefficient
 #' \eqn{\phi} by the formula \deqn{\phi = 0.25\kappa_1 + 0.5\kappa_2.}{\phi =
 #' 0.25*\kappa1 + 0.5*\kappa2.} By indicating values for \eqn{\phi} in the
-#' `kinship.lines` argument, the corresponding contour lines are shown as dashed
+#' `kinshipLines` argument, the corresponding contour lines are shown as dashed
 #' lines in the triangle plot.
 #'
 #' The following abbreviations are valid entries in the `relationships`
@@ -52,7 +52,7 @@
 #'
 #' @param relationships A character vector indicating relationships points to be
 #'   included in the plot. See Details for a list of valid entries.
-#' @param kinship.lines A numeric vector. (See Details.)
+#' @param kinshipLines A numeric vector. (See Details.)
 #' @param shading The shading colour for the unattainable region.
 #' @param pch Symbol used for the relationship points (see [par()]).
 #' @param cex_points A number controlling the symbol size for the relationship
@@ -79,14 +79,14 @@
 #'
 #' IBDtriangle()
 #'
-#' IBDtriangle(kinship = c(0.25, 0.125), shading = NULL, cex_text = 0.8)
+#' IBDtriangle(kinshipLines = c(0.25, 0.125), shading = NULL, cex_text = 0.8)
 #'
 #' @importFrom graphics abline grconvertX grconvertY layout legend mtext par
 #'   plot points polygon rect segments text
 #'
 #' @export
 IBDtriangle = function(relationships = c("UN", "PO", "MZ", "S", "H,U,G", "FC"),
-                       kinship.lines = numeric(), shading = "lightgray",
+                       kinshipLines = numeric(), shading = "lightgray",
                        pch = 16, cex_points = 1.2, cex_text = 1.2, axes = FALSE,
                        xlim = c(0, 1), ylim = c(0, 1),
                        xlab = expression(kappa[0]), ylab = expression(kappa[2]),
@@ -113,7 +113,7 @@ IBDtriangle = function(relationships = c("UN", "PO", "MZ", "S", "H,U,G", "FC"),
     segments(c(0, 0, 0), c(0, 0, 1), c(1, 0, 1), c(0, 1, 0))
 
     # kinship lines
-    for (phi in kinship.lines) {
+    for (phi in kinshipLines) {
         if (phi < 0 || phi > 0.5)
             stop2("kinship coefficient not in intervall [0, 0.5]", phi)
         abline(a = (4 * phi - 1), b = 1, lty = 2)

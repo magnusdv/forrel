@@ -1,14 +1,16 @@
 #' Marker simulation
 #'
 #' Simulates marker genotypes conditional on the pedigree structure and known
-#' genotypes.
+#' genotypes. Note: This function produces independent simulations at a single
+#' locus. For simulations of multiple markers, see [profileSim()].
 #'
 #' This implements (with various time savers) the algorithm used in SLINK of the
 #' LINKAGE/FASTLINK suite. If `partialmarker` is NULL, genotypes are simulated
 #' by simple gene dropping, using [simpleSim()].
 #'
 #' @param x a `ped` object
-#' @param N a positive integer: the number of markers to be simulated
+#' @param N a positive integer: the number of (independent) markers to be
+#'   simulated.
 #' @param ids a vector containing ID labels of those pedigree members whose
 #'   genotypes should be simulated. By default, all individuals are included.
 #' @param alleles a vector containing the alleles for the marker to be
@@ -22,7 +24,7 @@
 #' @param partialmarker Either NULL (resulting in unconditional simulation), a
 #'   marker object (on which the simulation should be conditioned) or the name
 #'   (or index) of a marker attached to `x`.
-#' @param loop_breakers a numeric containing IDs of individuals to be used as
+#' @param loopBreakers a numeric containing IDs of individuals to be used as
 #'   loop breakers. Relevant only if the pedigree has loops, and only if
 #'   `partialmarker` is non-NULL. See [pedtools::breakLoops()].
 #' @param eliminate A non-negative integer, indicating the number of iterations
@@ -32,25 +34,29 @@
 #' @param verbose a logical.
 #' @return a `ped` object equal to `x` except its `MARKERS` entry, which
 #'   consists of the `N` simulated markers.
+#'
 #' @author Magnus Dehli Vigeland
-#' @seealso [simpleSim()], [pedtools::ped()]
+#' @seealso [profileSim()], [simpleSim()]
+#'
 #' @references G. M. Lathrop, J.-M. Lalouel, C. Julier, and J. Ott, *Strategies
 #'   for Multilocus Analysis in Humans*, PNAS 81(1984), pp. 3443-3446.
 #'
 #' @examples
-#' library(pedtools)
 #' x = nuclearPed(2)
-#' partial = marker(x, '3' = 1, alleles = 1:3)
-#' markerSim(x, N = 1, alleles = 1:3)
-#' markerSim(x, N = 1, partialmarker = partial)
-#' markerSim(x, N = 1, partialmarker = partial)
-#' markerSim(x, N = 1, ids = 4, partialmarker = partial)
+#'
+#' # Unconditional simulation
+#' markerSim(x, N = 2, alleles = 1:3)
+#'
+#' # Conditional on one child being homozygous 1/1
+#' x = setMarkers(x, marker(x, '3' = 1, alleles = 1:3))
+#' markerSim(x, N = 2, partialmarker = 1)
+#' markerSim(x, N = 1, ids = 4, partialmarker = 1, verbose = FALSE)
 #'
 #' @importFrom stats rbinom
 #' @export
 markerSim = function(x, N = 1, ids = NULL, alleles = NULL, afreq = NULL,
                      mutmod = NULL, rate = NULL, partialmarker = NULL,
-                     loop_breakers = NULL, eliminate = 0, seed = NULL,
+                     loopBreakers = NULL, eliminate = 0, seed = NULL,
                      verbose = TRUE) {
 
   if (!is.ped(x) && !is.pedList(x))
@@ -64,7 +70,7 @@ markerSim = function(x, N = 1, ids = NULL, alleles = NULL, afreq = NULL,
     return(lapply(x, function(xi) markerSim(xi, N = N, ids = intersect(labels(xi), ids),
                                             alleles = alleles, afreq = afreq,
                                             partialmarker = partialmarker,
-                                            loop_breakers = loop_breakers,
+                                            loopBreakers = loopBreakers,
                                             eliminate = eliminate, verbose = verbose)))
 
   starttime = proc.time()
@@ -84,8 +90,8 @@ markerSim = function(x, N = 1, ids = NULL, alleles = NULL, afreq = NULL,
       stop2("When `partialmarker` is given, both 'alleles' and 'afreq' must be NULL.")
 
     if(is.marker(m)) {
-      pedtools:::validateMarker(m)
-      pedtools:::checkConsistency(x, list(m)) #TODO export this from pedtools
+      # pedtools:::validateMarker(m)
+      # pedtools:::checkConsistency(x, list(m)) #TODO export this from pedtools
     }
     else if (is.atomic(m) && length(m) == 1) {
       m = getMarkers(x, markers = m)[[1]]
@@ -173,10 +179,10 @@ markerSim = function(x, N = 1, ids = NULL, alleles = NULL, afreq = NULL,
 
   if (loops <- x$UNBROKEN_LOOPS) {
     orig_ids = labels(x)
-    x = breakLoops(setMarkers(x, m), loop_breakers = loop_breakers, verbose = verbose)
+    x = breakLoops(setMarkers(x, m), loop_breakers = loopBreakers, verbose = verbose)
     m = x$MARKERS[[1]]
-    loop_breakers = x$LOOP_BREAKERS[, 1]
-    gridlist = gridlist[sort.int(match(c(orig_ids, loop_breakers), orig_ids))]
+    loopBreakers = x$LOOP_BREAKERS[, 1]
+    gridlist = gridlist[sort.int(match(c(orig_ids, loopBreakers), orig_ids))]
   }
 
   ngrid = lengths(gridlist)
@@ -195,7 +201,7 @@ markerSim = function(x, N = 1, ids = NULL, alleles = NULL, afreq = NULL,
 
   # Target individuals: untyped individuals that we seek to simulate
   targets = .mysetdiff(ids, typed)
-  untyped_breakers = if (loops) .mysetdiff(loop_breakers, typed) else NULL
+  untyped_breakers = if (loops) .mysetdiff(loopBreakers, typed) else NULL
 
   # Method 2: Compute joint dist of some target individuals, brute force on the remaining
   hardsim.method2 = unique.default(c(untyped_breakers, targets))

@@ -34,9 +34,9 @@ relationship. By default equal to \code{numeratorPed}.}
 \item{ids}{Individuals available for genotyping.}
 
 \item{markers}{A vector indicating the names or indices of markers attached
-to the source pedigree. If NULL (default), then all markers attached
-to the source pedigree are used. If \code{alleles} or \code{afreq} is non-NULL, then
-this parameter is ignored.}
+to the source pedigree. If NULL (default), then all markers attached to the
+source pedigree are used. If \code{alleles} or \code{afreq} is non-NULL, then this
+parameter is ignored.}
 
 \item{source}{Either "true" (default), "numerator" or "denominator",
 indicating which pedigree is used as source for marker data.}
@@ -48,13 +48,7 @@ LR tresholds.}
 
 \item{disableMutations}{Not implemented yet.}
 
-\item{alleles}{If these are given, they are used (together with
-\code{knownGenotypes}) to create a marker object on the fly.}
-
-\item{afreq}{If these are given, they are used (together with
-\code{knownGenotypes}) to create a marker object on the fly.}
-
-\item{Xchrom}{If these are given, they are used (together with
+\item{alleles, afreq, Xchrom}{If these are given, they are used (together with
 \code{knownGenotypes}) to create a marker object on the fly.}
 
 \item{knownGenotypes}{A list of triplets \verb{(a, b, c)}, indicating that
@@ -71,6 +65,22 @@ be included in the plot.}
 
 \item{verbose}{A logical.}
 }
+\value{
+A \code{LRpowerResult} object, which is essentially a list with the
+following entries:
+\itemize{
+\item \code{LRperSim}: A numeric vector of length \code{nsim} containing the total LR for
+each simulation.
+\item \code{meanLRperMarker}: The mean LR per marker, over all simulations.
+\item \code{meanLR}: The mean total LR over all simulations.
+\item \code{meanLogLR}: The mean total \code{log10(LR)} over all simulations.
+\item \code{IP}: A named numeric of the same length as \code{threshold}. For each element
+of \code{threshold}, the fraction of simulations resulting in a LR exceeding the
+given number.
+\item \code{params}: A list containing the input parameters \code{missing}, \code{markers},
+\code{nsim}, \code{threshold} and \code{disableMutations}
+}
+}
 \description{
 This functions uses simulations to estimate the distribution of LR in a given
 kinship testing scenario, given a certain subset of individuals who are
@@ -80,7 +90,6 @@ three pedigrees may be involved: The two pedigrees being compared, and the
 true relationship (which may differ from the other two).
 }
 \examples{
-
 # Paternity LR of siblings
 claim = nuclearPed(fa = "A", mo = "NN", children = "B")
 unrel = list(singleton("A"), singleton("B"))

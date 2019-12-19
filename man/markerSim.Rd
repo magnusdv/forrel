@@ -13,7 +13,7 @@ markerSim(
   mutmod = NULL,
   rate = NULL,
   partialmarker = NULL,
-  loop_breakers = NULL,
+  loopBreakers = NULL,
   eliminate = 0,
   seed = NULL,
   verbose = TRUE
@@ -22,7 +22,8 @@ markerSim(
 \arguments{
 \item{x}{a \code{ped} object}
 
-\item{N}{a positive integer: the number of markers to be simulated}
+\item{N}{a positive integer: the number of (independent) markers to be
+simulated.}
 
 \item{ids}{a vector containing ID labels of those pedigree members whose
 genotypes should be simulated. By default, all individuals are included.}
@@ -42,7 +43,7 @@ the marker alleles. Must be NULL if \code{partialmarker} is non-NULL.}
 marker object (on which the simulation should be conditioned) or the name
 (or index) of a marker attached to \code{x}.}
 
-\item{loop_breakers}{a numeric containing IDs of individuals to be used as
+\item{loopBreakers}{a numeric containing IDs of individuals to be used as
 loop breakers. Relevant only if the pedigree has loops, and only if
 \code{partialmarker} is non-NULL. See \code{\link[pedtools:breakLoops]{pedtools::breakLoops()}}.}
 
@@ -60,7 +61,8 @@ consists of the \code{N} simulated markers.
 }
 \description{
 Simulates marker genotypes conditional on the pedigree structure and known
-genotypes.
+genotypes. Note: This function produces independent simulations at a single
+locus. For simulations of multiple markers, see \code{\link[=profileSim]{profileSim()}}.
 }
 \details{
 This implements (with various time savers) the algorithm used in SLINK of the
@@ -68,13 +70,15 @@ LINKAGE/FASTLINK suite. If \code{partialmarker} is NULL, genotypes are simulated
 by simple gene dropping, using \code{\link[=simpleSim]{simpleSim()}}.
 }
 \examples{
-library(pedtools)
 x = nuclearPed(2)
-partial = marker(x, '3' = 1, alleles = 1:3)
-markerSim(x, N = 1, alleles = 1:3)
-markerSim(x, N = 1, partialmarker = partial)
-markerSim(x, N = 1, partialmarker = partial)
-markerSim(x, N = 1, ids = 4, partialmarker = partial)
+
+# Unconditional simulation
+markerSim(x, N = 2, alleles = 1:3)
+
+# Conditional on one child being homozygous 1/1
+x = setMarkers(x, marker(x, '3' = 1, alleles = 1:3))
+markerSim(x, N = 2, partialmarker = 1)
+markerSim(x, N = 1, ids = 4, partialmarker = 1, verbose = FALSE)
 
 }
 \references{
@@ -82,7 +86,7 @@ G. M. Lathrop, J.-M. Lalouel, C. Julier, and J. Ott, \emph{Strategies
 for Multilocus Analysis in Humans}, PNAS 81(1984), pp. 3443-3446.
 }
 \seealso{
-\code{\link[=simpleSim]{simpleSim()}}, \code{\link[pedtools:ped]{pedtools::ped()}}
+\code{\link[=profileSim]{profileSim()}}, \code{\link[=simpleSim]{simpleSim()}}
 }
 \author{
 Magnus Dehli Vigeland

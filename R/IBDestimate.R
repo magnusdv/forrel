@@ -2,7 +2,7 @@
 #'
 #' Estimate the pairwise IBD coefficients \eqn{(\kappa_0, \kappa_1,
 #' \kappa_2)}{(\kappa0, \kappa1, \kappa2)} for specified pairs of pedigree
-#' members, using maximum likelihood methods. The optimization machinery is
+#' members, using maximum likelihood methods. The optimisation machinery is
 #' imported from the `maxLik` package.
 #'
 #' This function optimises the log-likelihood function first described in
@@ -11,8 +11,8 @@
 #' triangle defined by \deqn{\kappa_0 \ge 0, \kappa_2 \ge 0, \kappa_0 + \kappa_2
 #' \le 1.}{\kappa0 \ge 0, \kappa2 \ge 0, \kappa0 + \kappa2 \le 1.}
 #'
-#' @param x A single `ped` object or a list of `ped` and/or `singleton` objects.
-#' @param ids Either a vector with two ID labels, or a data.frame/matrix with
+#' @param x A `ped` object or a list of such.
+#' @param ids Either a vector with two ID labels, or a data frame/matrix with
 #'   two columns, where each row contains the ID labels of two individuals. The
 #'   entries are coerced to characters, and must match uniquely against the ID
 #'   labels of `x`.
@@ -24,7 +24,7 @@
 #' @param tol A single numeric: the optimising tolerance value; passed on to
 #'   `maxLik()`).
 #'
-#' @return A data.frame with 6 columns: `ID1`, `ID2`, `N` (#markers with no
+#' @return A data frame with 6 columns: `ID1`, `ID2`, `N` (the number of markers with no
 #'   missing alleles), `k0`, `k1` and `k2`.
 #' @author Magnus Dehli Vigeland
 #' @seealso [maxLik::maxLik()], [showInTriangle()]
