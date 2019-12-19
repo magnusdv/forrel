@@ -1,6 +1,7 @@
 ^.*\.Rproj$
 ^\.Rproj\.user$
 ^R/examineKinships.R$
+^R/kinshipPowerSims.R
 ^R/relationLR.R$
 ^README\.Rmd$
 ^notes-private$

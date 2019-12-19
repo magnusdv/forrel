@@ -5,3 +5,5 @@
 notes-private
 R/examineKinships.R
 R/relationLR.R
+R/kinshipPowerSims.R
+man/kinshipPowerSims.Rd
