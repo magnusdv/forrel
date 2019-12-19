@@ -1,9 +1,7 @@
-#' Likelihood ratios of pedigree hypotheses
+#' Likelihood ratios for kinship testing
 #'
-#' This function computes likelihood ratios for a given a list of pedigrees
-#' (`ped` and/or `singleton` objects), with genotype data from the same set of
-#' markers. Data exported from the 'Familias' software can be analysed by using
-#' [Familias2ped()] prior to calling this function.
+#' This function computes likelihood ratios for a given a list of pedigrees with
+#' attached markers. with genotype data from the same set of markers.
 #'
 #' @param x A list of pedigree alternatives. Each alternative should be either a
 #'   single `ped` object or a list of such.
@@ -14,11 +12,11 @@
 #'
 #' @return A list with entries
 #'
-#'   * `LR` : Likelihood ratios
+#'   * `LRtotal` : Total likelihood ratios
 #'
 #'   * `LRperMarker` : Likelihood ratios for each marker
 #'
-#'   * `likelihoodsPerSystem` : Likelihoods for each marker
+#'   * `likelihoodsPerMarker` : Likelihoods for each marker
 #'
 #'   * `time` user system and elapsed time
 #'
@@ -26,7 +24,7 @@
 #'
 #' @examples
 #'
-#' # Simulate genotypes for 5 tetra-allelic markers for a pair of full sibs
+#' # Simulate 5 markers for a pair of full sibs
 #' set.seed(123)
 #' sibs = nuclearPed(children = c("A", "B"))
 #' sibs = simpleSim(sibs, N = 5, alleles = 1:4, ids = c("A", "B"))
@@ -39,10 +37,10 @@
 #' unrel = transferMarkers(sibs, unrel)
 #'
 #' # Compute LR with 'unrelated' as reference
-#' LR(list(sibs, halfsibs, unrel), ref = 3)
+#' kinshipLR(list(sibs, halfsibs, unrel), ref = 3)
 #'
 #' @export
-LR = function(x, ref, markers) {
+kinshipLR = function(x, ref, markers) {
   st = proc.time()
 
   # get marker names
@@ -67,19 +65,23 @@ LR = function(x, ref, markers) {
   # compute likelihoods
   liks = lapply(x_loopfree, function(xx) vapply(markers, function(i)
       likelihood(xx, marker1 = i), FUN.VALUE = 1))
-  likelihoodsPerSystem = do.call(cbind, liks)
+  likelihoodsPerMarker = do.call(cbind, liks)
 
   # LR per marker and total
   LRperMarker = do.call(cbind, lapply(1:length(x), function(j) liks[[j]]/liks[[ref]]))
 
   # total LR
-  LR = apply(LRperMarker, 2, prod)
+  LRtotal = apply(LRperMarker, 2, prod)
 
   # output
-  rownames(likelihoodsPerSystem) = rownames(LRperMarker) = markernames
-  list(LR = LR,
+  rownames(likelihoodsPerMarker) = rownames(LRperMarker) = markernames
+
+  list(LRtotal = LRtotal,
        LRperMarker = LRperMarker,
-       likelihoodsPerSystem = likelihoodsPerSystem,
+       likelihoodsPerMarker = likelihoodsPerMarker,
        time = proc.time()-st)
 }
+
+# Alias
+LR = kinshipLR
 

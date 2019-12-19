@@ -127,7 +127,7 @@ missingPersonIP = function(reference, missing, markers, nsim = 1, threshold = NU
   lrs = vapply(allsims, function(s) {
     unrelSim = transferMarkers(from = s, to = unrelatedPed)
 
-    lr = LR(list(s, unrelSim), ref = 2)
+    lr = kinshipLR(list(s, unrelSim), ref = 2)
     lr$LRperMarker[, 1]
   }, FUN.VALUE = numeric(length(markers)))
 
