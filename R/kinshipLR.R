@@ -10,7 +10,7 @@
 #' @param markers A vector of integers, indexing which markers should be
 #'   included. If NULL (the default) all markers are used.
 #'
-#' @return A list with entries
+#' @return A `LRresult`object, which is essentially a list with entries
 #'
 #'   * `LRtotal` : Total likelihood ratios
 #'
@@ -37,8 +37,12 @@
 #' unrel = transferMarkers(sibs, unrel)
 #'
 #' # Compute LR with 'unrelated' as reference
-#' kinshipLR(list(sibs, halfsibs, unrel), ref = 3)
+#' res = kinshipLR(list(sibs, halfsibs, unrel), ref = 3)
+#' res
 #'
+#' # Detailed results
+#' res$LRperMarker
+#' res$likelihoodsPerMarker
 #' @export
 kinshipLR = function(x, ref, markers) {
   st = proc.time()
@@ -70,18 +74,34 @@ kinshipLR = function(x, ref, markers) {
   # LR per marker and total
   LRperMarker = do.call(cbind, lapply(1:length(x), function(j) liks[[j]]/liks[[ref]]))
 
+  # ensure output has labels for the hypotheses
+  hypnames = colnames(likelihoodsPerMarker)
+  if(is.null(hypnames)) {
+    hypnames = paste("Hyp", seq_along(x))
+    colnames(likelihoodsPerMarker) = hypnames
+  }
+  colnames(LRperMarker) = hypnames
+
   # total LR
   LRtotal = apply(LRperMarker, 2, prod)
 
   # output
   rownames(likelihoodsPerMarker) = rownames(LRperMarker) = markernames
 
-  list(LRtotal = LRtotal,
-       LRperMarker = LRperMarker,
-       likelihoodsPerMarker = likelihoodsPerMarker,
-       time = proc.time()-st)
+  structure(list(
+    LRtotal = LRtotal,
+    LRperMarker = LRperMarker,
+    likelihoodsPerMarker = likelihoodsPerMarker,
+    time = proc.time()-st),
+    class = "LRresult")
 }
 
 # Alias
 LR = kinshipLR
 
+
+#' @export
+print.LRresult = function(x, ...) {
+  cat("Total LR:\n")
+  print(x$LRtotal)
+}

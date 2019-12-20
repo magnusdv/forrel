@@ -17,7 +17,7 @@ reference alternative. This is used in the denominator of each LR.}
 included. If NULL (the default) all markers are used.}
 }
 \value{
-A list with entries
+A \code{LRresult}object, which is essentially a list with entries
 \itemize{
 \item \code{LRtotal} : Total likelihood ratios
 \item \code{LRperMarker} : Likelihood ratios for each marker
@@ -44,8 +44,12 @@ unrel = list(singleton("A"), singleton("B"))
 unrel = transferMarkers(sibs, unrel)
 
 # Compute LR with 'unrelated' as reference
-kinshipLR(list(sibs, halfsibs, unrel), ref = 3)
+res = kinshipLR(list(sibs, halfsibs, unrel), ref = 3)
+res
 
+# Detailed results
+res$LRperMarker
+res$likelihoodsPerMarker
 }
 \author{
 Magnus Dehli Vigeland and Thore Egeland
