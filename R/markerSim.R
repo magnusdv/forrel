@@ -189,8 +189,8 @@ markerSim = function(x, N = 1, ids = NULL, alleles = NULL, afreq = NULL,
   SEX = x$SEX
   FIDX = x$FIDX
   MIDX = x$MIDX
-  FOU = founders(x, internal = T)
-  NONFOU = nonfounders(x, internal = T)
+  FOU = founders(x, internal = TRUE)
+  NONFOU = nonfounders(x, internal = TRUE)
 
   ##### Determine simulation strategy #### Note: Using original x and m in this section (i.e.
   ##### before loop breaking)

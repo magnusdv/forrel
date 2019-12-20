@@ -20,7 +20,7 @@ Description: Forensic applications of pedigree analysis, including likelihood ra
     'pedprobr' for likelihood computations, and 'pedmut' for mutation modelling. 
     Pedigree data may be created from scratch, or loaded from text files. Data 
     import from the Familias software (Egeland et al. (2000) 
-    <doi:https://doi.org/10.1016/S0379-0738(00)00147-X>) is supported. 
+    <doi:10.1016/S0379-0738(00)00147-X>) is supported. 
 License: GPL-3
 URL: https://github.com/magnusdv/forrel
 BugReports: https://github.com/magnusdv/forrel/issues
@@ -28,7 +28,7 @@ Encoding: UTF-8
 Language: en-GB
 LazyData: true
 Depends: R (>= 3.1.0),
-    pedtools
+    pedtools (>= 0.9.1)
 Imports:
     pedprobr,
     maxLik,

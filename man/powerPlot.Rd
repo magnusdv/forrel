@@ -29,7 +29,7 @@ powerPlot(
 \code{ep} can be a single output from \code{\link[=MPPsims]{MPPsims()}}, in which case \code{ip} should be
 NULL. See Examples.}
 
-\item{type}{Plot type; either 1, 2 or 3.}
+\item{type}{Plot type; either 1, 2, 3 or 4.}
 
 \item{ellipse}{A logical. If TRUE, data ellipsis are drawn for each group
 containing more than 1 element. NB: This fails with a warning if all points
@@ -55,14 +55,16 @@ shaded vertical regions, by default starting at 0.95.}
 
 \item{xlab, ylab}{Axis labels; automatically chosen if NULL.}
 
-\item{legendOrder}{A permutation of \verb{1,2,...,L}, where \code{L=length(ep)}.}
+\item{legendOrder}{A permutation of \verb{1,2,...,L}, where \code{L = length(ep)}.}
 }
 \value{
 A \code{ggplot2} plot object.
 }
 \description{
-This function offers three different visualisations of exclusion/inclusion
-powers, particularly for missing person cases.
+This function offers four different visualisations of exclusion/inclusion
+powers, particularly for missing person cases. Output from \code{\link[=MPPsims]{MPPsims()}} may be
+fed directly as input to this function. The actual plotting is done with
+\code{ggplot2}.
 }
 \details{
 The plot types are as follows:
@@ -72,6 +74,8 @@ The plot types are as follows:
 \code{type = 2}: x = Exclusion odds ratio; y = Inclusion odds ratio
 
 \code{type = 3}: x = Expected number of exclusions; y = average log(LR)
+
+\code{type = 4}: x = Exclusion power; y = average LR
 
 For each \code{EPresult} object in \code{ep}, and the corresponding element of \code{ip},
 the relevant data is extracted from each, producing a single point the final
@@ -122,5 +126,5 @@ powerPlot(simData, type = 4)
 
 }
 \seealso{
-\code{\link[=missingPersonEP]{missingPersonEP()}}, \code{\link[=missingPersonEP]{missingPersonEP()}}, \code{\link[=MPPsims]{MPPsims()}}
+\code{\link[=MPPsims]{MPPsims()}}, \code{\link[=missingPersonEP]{missingPersonEP()}}, \code{\link[=missingPersonEP]{missingPersonEP()}}
 }

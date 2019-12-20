@@ -21,7 +21,7 @@ MPPsims(
 \item{reference}{A connected \code{ped} object, or a list of pedigrees. In the
 latter case, the list must have the same length as \code{selections}.}
 
-\item{missing}{The label of the missing person. By default "MP".}
+\item{missing}{The ID label of the missing pedigree member.}
 
 \item{selections}{A list of pedigree member subsets. In the special case that
 all subsets consist of a single individual, \code{selections} can be given as a
@@ -50,7 +50,7 @@ mutations should be disabled.
 
 \item{seed}{A numeric seed for the random number generator (optional)}
 
-\item{verbose}{A logical}
+\item{verbose}{A logical.}
 }
 \value{
 An object of class "MPPsim", which is basically a list with one entry
@@ -58,14 +58,14 @@ for each element of \code{selections}. Each entry has elements \code{ep} and \co
 each of which is a list of length \code{nProfiles}.
 
 The output object has various attributes reflecting the input. Note that
-\code{reference} and \code{selection} may differ from the original input, since they
+\code{reference} and \code{selection} may differ slightly from the original input, since they
 may be modified during the function run. (For instance, a "Baseline" entry
 is added to \code{selection} if \code{addBaseline} is TRUE.) The crucial point is
-that the output attributes correspond exactly to the output \emph{data}.
+that the output attributes correspond exactly to the output data.
 \itemize{
 \item \code{reference} (always a list, of the same length as the \code{selections} attribute
-\item \code{selectons}
-\item \code{nProfiles},\code{lrSims},thresholdIP\verb{,}seed` (as in the input)
+\item \code{selections}
+\item \code{nProfiles},\code{lrSims},\code{thresholdIP},\code{seed} (as in the input)
 \item \code{totalTime} (the total time used)
 }
 }

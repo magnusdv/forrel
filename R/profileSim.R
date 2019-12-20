@@ -17,11 +17,10 @@
 #' @param conditions Deprecated, use `markers` instead.
 #' @param ... Further arguments passed on to [markerSim()]
 #'
-#' @return A list of `N` `ped` (or `pedList`) objects identical to `x`, but with
-#'   `m` attached markers, where `m` is the number of indicated markers. Any
-#'   previous markers are replaced by the simulated profiles. If the indicated
-#'   markers contained genotypes for some pedigree members, these are still
-#'   present in the simulated profiles.
+#' @return A list of `N` objects similar to `x`, but with simulated genotypes.
+#'   Any previously attached markers are replaced by the simulated profiles. If
+#'   the indicated markers contained genotypes for some pedigree members, these
+#'   are still present in the simulated profiles.
 #'
 #' @examples
 #' # Example with two brothers

@@ -163,7 +163,7 @@ stopifnot(all.equal(PE3$EPtotal, 0.00765))
 \references{
 T. Egeland, N. Pinto and M.D. Vigeland, \emph{A general approach to
 power calculation for relationship testing.} Forensic Science
-International: Genetics 9 (2014): 186-190. doi:10.1016/j.fsigen.2013.05.001
+International: Genetics 9 (2014): 186-190. \doi{10.1016/j.fsigen.2013.05.001}
 }
 \author{
 Magnus Dehli Vigeland

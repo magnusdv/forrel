@@ -1,10 +1,28 @@
 #' Exclusion power for missing person cases.
 #'
 #' This is wrapper of [exclusionPower()] for the special case of a reference
-#' family with a single missing member.
+#' family with a single missing member. Some reference members should already be
+#' genotyped. The function computes the power to exclude an unrelated
+#' individual, i.e. the probability of observing (in a truly unrelated
+#' individual) a genotype incompatible with the reference.
 #'
 #' @param reference A `ped` object with attached markers.
 #' @param missing The ID label of the missing pedigree member.
+#' @param disableMutations This parameter determines how mutation models are
+#'   treated. Possible values are as follows:
+#'
+#'   * `NA` (the default): Mutations are disabled only for those markers whose
+#'   known genotypes are consistent with `reference`. This is determined by
+#'   temporarily removing all mutation models and checking which markers have
+#'   nonzero likelihood.
+#'
+#'   * `TRUE`: Mutations are disabled for all markers. This will result in an
+#'   error if any markers are inconsistent with `reference`.
+#'
+#'   * `FALSE`: No action is done to disable mutations.
+#'
+#'   * A vector containing the names or indices of those markers for which
+#'   mutations should be disabled.
 #' @inheritParams exclusionPower
 #'
 #' @return The `EPresult` object returned by [exclusionPower()].

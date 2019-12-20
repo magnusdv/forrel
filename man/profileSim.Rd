@@ -35,11 +35,10 @@ existing genotypes in the indicated markers.}
 \item{...}{Further arguments passed on to \code{\link[=markerSim]{markerSim()}}}
 }
 \value{
-A list of \code{N} \code{ped} (or \code{pedList}) objects identical to \code{x}, but with
-\code{m} attached markers, where \code{m} is the number of indicated markers. Any
-previous markers are replaced by the simulated profiles. If the indicated
-markers contained genotypes for some pedigree members, these are still
-present in the simulated profiles.
+A list of \code{N} objects similar to \code{x}, but with simulated genotypes.
+Any previously attached markers are replaced by the simulated profiles. If
+the indicated markers contained genotypes for some pedigree members, these
+are still present in the simulated profiles.
 }
 \description{
 Simulation of DNA profiles for specified pedigree members. Some pedigree

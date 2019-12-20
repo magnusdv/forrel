@@ -82,12 +82,12 @@ given number.
 }
 }
 \description{
-This functions uses simulations to estimate the distribution of LR in a given
-kinship testing scenario, given a certain subset of individuals who are
-available for testing. Some individuals individuals may already be genotyped;
-all simulations are then conditional on these. In the most general setting,
-three pedigrees may be involved: The two pedigrees being compared, and the
-true relationship (which may differ from the other two).
+This functions uses simulations to estimate the likelihood ratio (LR)
+distribution in a given kinship testing scenario. In the most general
+setting, three pedigrees are involved: the two pedigrees being compared, and
+the true relationship (which may differ from the other two). A subset of
+individuals are available for genotyping. Some individuals may already be
+genotyped; all simulations are then conditional on these.
 }
 \examples{
 # Paternity LR of siblings
@@ -96,7 +96,7 @@ unrel = list(singleton("A"), singleton("B"))
 truth = nuclearPed(children = c("A", "B"))
 
 # Simulation parameters
-nsim = 10
+nsim = 10   # increase!
 thresh = 1
 ids = c("A", "B")
 

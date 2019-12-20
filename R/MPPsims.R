@@ -2,9 +2,10 @@
 #'
 #' Estimate the exclusion/inclusion power for various selections of available
 #' individuals.
+#'
+#' @inheritParams missingPersonIP
 #' @param reference A connected `ped` object, or a list of pedigrees. In the
 #'   latter case, the list must have the same length as `selections`.
-#' @param missing The label of the missing person. By default "MP".
 #' @param selections A list of pedigree member subsets. In the special case that
 #'   all subsets consist of a single individual, `selections` can be given as a
 #'   simple vector.
@@ -12,39 +13,22 @@
 #'   "Baseline", is added as the first element of `selection`.
 #' @param nProfiles The number of profile simulations for each selection.
 #' @param lrSims,thresholdIP Parameters passed onto [missingPersonIP()]
-#' @param disableMutations This parameter determines how mutation models are
-#'   treated. Possible values are as follows:
-#'
-#'   * `NA` (the default): Mutations are disabled only for those markers whose
-#'   known genotypes are consistent with `reference`. This is determined by
-#'   temporarily removing all mutation models and checking which markers have
-#'   nonzero likelihood.
-#'
-#'   * `TRUE`: Mutations are disabled for all markers. This will result in an
-#'   error if any markers are inconsistent with `reference`.
-#'
-#'   * `FALSE`: No action is done to disable mutations.
-#'
-#'   * A vector containing the names or indices of those markers for which
-#'   mutations should be disabled.
-#' @param seed A numeric seed for the random number generator (optional)
-#' @param verbose A logical
 #'
 #' @return An object of class "MPPsim", which is basically a list with one entry
 #'   for each element of `selections`. Each entry has elements `ep` and `ip`,
 #'   each of which is a list of length `nProfiles`.
 #'
 #'   The output object has various attributes reflecting the input. Note that
-#'   `reference` and `selection` may differ from the original input, since they
+#'   `reference` and `selection` may differ slightly from the original input, since they
 #'   may be modified during the function run. (For instance, a "Baseline" entry
 #'   is added to `selection` if `addBaseline` is TRUE.) The crucial point is
-#'   that the output attributes correspond exactly to the output *data*.
+#'   that the output attributes correspond exactly to the output data.
 #'
 #'   * `reference` (always a list, of the same length as the `selections` attribute
 #'
-#'   * `selectons`
+#'   * `selections`
 #'
-#'   * `nProfiles`,`lrSims`,thresholdIP`,`seed` (as in the input)
+#'   * `nProfiles`,`lrSims`,`thresholdIP`,`seed` (as in the input)
 #'
 #'   * `totalTime` (the total time used)
 #'

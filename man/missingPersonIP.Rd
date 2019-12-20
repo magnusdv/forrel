@@ -2,7 +2,7 @@
 % Please edit documentation in R/missingPersonIP.R
 \name{missingPersonIP}
 \alias{missingPersonIP}
-\title{Inclusion power statistics in missing person cases.}
+\title{Inclusion power for missing person cases.}
 \usage{
 missingPersonIP(
   reference,
@@ -20,8 +20,10 @@ missingPersonIP(
 
 \item{missing}{The ID label of the missing pedigree member.}
 
-\item{markers}{Names or indices of the markers to be included. By default,
-all markers.}
+\item{markers}{A vector indicating the names or indices of markers attached
+to the source pedigree. If NULL (default), then all markers attached to the
+source pedigree are used. If \code{alleles} or \code{afreq} is non-NULL, then this
+parameter is ignored.}
 
 \item{nsim}{A positive integer: the number of simulations}
 
@@ -29,16 +31,22 @@ all markers.}
 the likelihood ratio tresholds for inclusion}
 
 \item{disableMutations}{This parameter determines how mutation models are
-treated. If \code{TRUE}, mutations are disabled for all markers. If \code{NA} (the
-default), mutations are disabled only for those markers with nonzero
-baseline likelihood. (In other words: Mutations are NOT disabled if the
-reference genotypes are inconsistent with the pedigree.) If \code{FALSE} no
-action is done to disable mutations. Finally, if a vector of marker names
-or indices is given, mutations are disabled for these markers exclusively.}
+treated. Possible values are as follows:
+\itemize{
+\item \code{NA} (the default): Mutations are disabled only for those markers whose
+known genotypes are consistent with \code{reference}. This is determined by
+temporarily removing all mutation models and checking which markers have
+nonzero likelihood.
+\item \code{TRUE}: Mutations are disabled for all markers. This will result in an
+error if any markers are inconsistent with \code{reference}.
+\item \code{FALSE}: No action is done to disable mutations.
+\item A vector containing the names or indices of those markers for which
+mutations should be disabled.
+}}
 
 \item{seed}{A numeric seed for the random number generator (optional)}
 
-\item{verbose}{A logical, by default TRUE.}
+\item{verbose}{A logical.}
 }
 \value{
 A \code{mpIP} object, which is essentially a list with the following
@@ -57,7 +65,7 @@ given number.
 }
 }
 \description{
-Inclusion power statistics in missing person cases.
+Inclusion power for missing person cases.
 }
 \examples{
 

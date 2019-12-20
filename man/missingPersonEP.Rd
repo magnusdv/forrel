@@ -26,10 +26,11 @@ parameter is ignored.}
 treated. Possible values are as follows:
 \itemize{
 \item \code{NA} (the default): Mutations are disabled only for those markers whose
-known genotypes are compatible with both \code{claimPed} and \code{truePed}. This is
-determined by temporarily removing all mutation models and checking which
-markers have nonzero likelihood in both alternatives.
-\item \code{TRUE}: Mutations are disabled for all markers.
+known genotypes are consistent with \code{reference}. This is determined by
+temporarily removing all mutation models and checking which markers have
+nonzero likelihood.
+\item \code{TRUE}: Mutations are disabled for all markers. This will result in an
+error if any markers are inconsistent with \code{reference}.
 \item \code{FALSE}: No action is done to disable mutations.
 \item A vector containing the names or indices of those markers for which
 mutations should be disabled.
@@ -42,7 +43,10 @@ The \code{EPresult} object returned by \code{\link[=exclusionPower]{exclusionPow
 }
 \description{
 This is wrapper of \code{\link[=exclusionPower]{exclusionPower()}} for the special case of a reference
-family with a single missing member.
+family with a single missing member. Some reference members should already be
+genotyped. The function computes the power to exclude an unrelated
+individual, i.e. the probability of observing (in a truly unrelated
+individual) a genotype incompatible with the reference.
 }
 \examples{
 

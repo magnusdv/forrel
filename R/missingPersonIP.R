@@ -1,21 +1,10 @@
-#' Inclusion power statistics in missing person cases.
+#' Inclusion power for missing person cases.
 #'
-#' @param reference A `ped` object with attached markers.
-#' @param missing The ID label of the missing pedigree member.
-#' @param markers Names or indices of the markers to be included. By default,
-#'   all markers.
+#' @inheritParams missingPersonEP
 #' @param nsim A positive integer: the number of simulations
 #' @param threshold A numeric vector with one or more positive numbers used as
 #'   the likelihood ratio tresholds for inclusion
-#' @param disableMutations This parameter determines how mutation models are
-#'   treated. If `TRUE`, mutations are disabled for all markers. If `NA` (the
-#'   default), mutations are disabled only for those markers with nonzero
-#'   baseline likelihood. (In other words: Mutations are NOT disabled if the
-#'   reference genotypes are inconsistent with the pedigree.) If `FALSE` no
-#'   action is done to disable mutations. Finally, if a vector of marker names
-#'   or indices is given, mutations are disabled for these markers exclusively.
 #' @param seed A numeric seed for the random number generator (optional)
-#' @param verbose A logical, by default TRUE.
 #'
 #' @return A `mpIP` object, which is essentially a list with the following
 #'   entries:

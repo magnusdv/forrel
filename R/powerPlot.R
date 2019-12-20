@@ -1,7 +1,9 @@
 #' Exclusion/inclusion power plots
 #'
-#' This function offers three different visualisations of exclusion/inclusion
-#' powers, particularly for missing person cases.
+#' This function offers four different visualisations of exclusion/inclusion
+#' powers, particularly for missing person cases. Output from [MPPsims()] may be
+#' fed directly as input to this function. The actual plotting is done with
+#' `ggplot2`.
 #'
 #' The plot types are as follows:
 #'
@@ -10,6 +12,8 @@
 #' `type = 2`: x = Exclusion odds ratio; y = Inclusion odds ratio
 #'
 #' `type = 3`: x = Expected number of exclusions; y = average log(LR)
+#'
+#' `type = 4`: x = Exclusion power; y = average LR
 #'
 #' For each `EPresult` object in `ep`, and the corresponding element of `ip`,
 #' the relevant data is extracted from each, producing a single point the final
@@ -31,7 +35,7 @@
 #'   [missingPersonEP()] and [missingPersonIP()] respectively. Alternatively,
 #'   `ep` can be a single output from [MPPsims()], in which case `ip` should be
 #'   NULL. See Examples.
-#' @param type Plot type; either 1, 2 or 3.
+#' @param type Plot type; either 1, 2, 3 or 4.
 #' @param ellipse A logical. If TRUE, data ellipsis are drawn for each group
 #'   containing more than 1 element. NB: This fails with a warning if all points
 #'   in a group fall on a line.
@@ -47,10 +51,10 @@
 #'   shaded vertical regions, by default starting at 0.95.
 #' @param xlim,ylim Axis limits; automatically chosen if NULL.
 #' @param xlab,ylab Axis labels; automatically chosen if NULL.
-#' @param legendOrder A permutation of `1,2,...,L`, where `L=length(ep)`.
+#' @param legendOrder A permutation of `1,2,...,L`, where `L = length(ep)`.
 #'
 #' @return A `ggplot2` plot object.
-#' @seealso [missingPersonEP()], [missingPersonEP()], [MPPsims()]
+#' @seealso [MPPsims()], [missingPersonEP()], [missingPersonEP()]
 #'
 #' @examples
 #'
