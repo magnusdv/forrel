@@ -4,18 +4,17 @@
 #' members may already be genotyped; in that case the simulation is conditional
 #' on these. The main work of this function is done by [markerSim()].
 #'
-#' @param x A `ped` object or a list of such
-#' @param N The number of complete simulations to be performed
+#' @param x A `ped` object or a list of such.
+#' @param N The number of complete simulations to be performed.
 #' @param ids A character (or coercible to character) with ID labels indicating
-#'   whose genotypes should be simulated
+#'   whose genotypes should be simulated.
 #' @param markers A list of marker objects, or a vector containing names or
 #'   indices referring to markers attached to `x`. By default (`markers = NULL`)
 #'   all attached markers are used. The simulations will be conditional on the
 #'   locus attributes (allele frequencies, mutation models a.s.o.) and any
 #'   existing genotypes in the indicated markers.
-#' @param seed NULL, or a numeric seed for the random number generator
-#' @param conditions Deprecated, use `markers` instead.
-#' @param ... Further arguments passed on to [markerSim()]
+#' @param seed NULL, or a numeric seed for the random number generator.
+#' @param ... Further arguments passed on to [markerSim()].
 #'
 #' @return A list of `N` objects similar to `x`, but with simulated genotypes.
 #'   Any previously attached markers are replaced by the simulated profiles. If
@@ -36,20 +35,11 @@
 #'
 #'
 #' @export
-profileSim = function(x, N = 1, ids = NULL, markers = NULL, conditions = NULL, seed = NULL, ...){
+profileSim = function(x, N = 1, ids = NULL, markers = NULL, seed = NULL, ...){
 
   # Set seed once (instead of passing it to markerSim)
   if(!is.null(seed))
     set.seed(seed)
-
-  if(!is.null(conditions)) {
-    if(!is.null(markers))
-      stop2("`markers` and `conditions` cannot be used simultaneously\n",
-            "The `conditions` parameter has been renamed to `markers` and will be removed in a future version.")
-    warning("Parameter `conditions` has been renamed to `markers`.\n  ",
-            "Either works for now, but `conditions` will be removed in the future.")
-    markers = conditions
-  }
 
   # Check that all `ids` are in x
   labs = if(is.ped(x)) labels(x) else unlist(lapply(x, labels))

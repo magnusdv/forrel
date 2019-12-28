@@ -26,8 +26,10 @@ A \code{LRresult}object, which is essentially a list with entries
 }
 }
 \description{
-This function computes likelihood ratios for a given a list of pedigrees with
-attached markers. with genotype data from the same set of markers.
+This function computes likelihood ratios (LRs) for a given a list of
+pedigrees with attached markers. The user must indicate which of the
+pedigrees is the 'reference', which will be used in the denominator in each
+LR.
 }
 \examples{
 
@@ -50,6 +52,9 @@ res
 # Detailed results
 res$LRperMarker
 res$likelihoodsPerMarker
+}
+\seealso{
+\code{\link[=LRpower]{LRpower()}}, \code{\link[pedtools:transferMarkers]{pedtools::transferMarkers()}}
 }
 \author{
 Magnus Dehli Vigeland and Thore Egeland

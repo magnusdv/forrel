@@ -23,52 +23,53 @@ missingPersonPlot(
 )
 }
 \arguments{
-\item{reference}{A \code{\link[pedtools:ped]{pedtools::ped()}} object}
+\item{reference}{A \code{\link[pedtools:ped]{pedtools::ped()}} object.}
 
-\item{missing}{The ID label of the missing pedigree member}
+\item{missing}{The ID label of the missing pedigree member.}
 
 \item{id.labels}{A character vector with labels for the pedigree members. See
-\code{\link[pedtools:plot.ped]{pedtools::plot.ped()}} for}
+\code{\link[pedtools:plot.ped]{pedtools::plot.ped()}}.}
 
-\item{MP.label}{The label of the missing member. Default: "MP"}
+\item{MP.label}{The label of the missing member. Default: "MP".}
 
-\item{POI.label}{The label of the person of interest. Default: "POI"}
+\item{POI.label}{The label of the person of interest. Default: "POI".}
 
-\item{marker}{Optional vector of marker indices to be included in the plot}
+\item{marker}{Optional vector of marker indices to be included in the plot.}
 
 \item{shaded}{A vector of ID labels indicating who should appear with shaded
 symbols. By default, all typed members.}
 
-\item{POI.col}{The plot colour of POI. Default: red}
+\item{POI.col}{The plot colour of POI. Default: red.}
 
 \item{POI.shaded}{A logical: If TRUE (default), the POI is plotted with a
-shaded symbol}
+shaded symbol.}
 
 \item{POI.height}{A numeric controlling the vertical placement of the POI
-singleton (in the right panel)}
+singleton (in the right panel).}
 
 \item{width}{A positive number controlling the width of the plot. More
 specifically this number is the relative width of the reference pedigree,
-compared to a singleton. Default: 4}
+compared to a singleton. Default: 4.}
 
-\item{newdev}{A logical: If TRUE the plot is created in a new plot window}
+\item{newdev}{A logical: If TRUE the plot is created in a new plot window.}
 
-\item{frametitles}{A character of length 2, with subtitles for the two frames}
+\item{frametitles}{A character of length 2, with subtitles for the two frames.}
 
-\item{...}{Extra parameters passed on to \code{\link[pedtools:plotPedList]{pedtools::plotPedList()}}}
+\item{...}{Extra parameters passed on to \code{\link[pedtools:plotPedList]{pedtools::plotPedList()}}.}
 }
 \description{
-Plot the competing hypotheses of a family reunion case. A plot with two
+Visualises the competing hypotheses of a family reunion case. A plot with two
 panels is generated. The left panel shows a pedigree in which the \emph{person of
 interest} (POI) is identical to the \emph{missing person} (MP). The right panel
-shows the situation where these two are unrelated.
+shows the situation where these two are unrelated. See Details for further
+explanations.
 }
 \details{
 A standard family reunification case involves the following ingredients:
 \itemize{
-\item A family in which a single member ("MP") is missing.
+\item A reference family in which a single member ("MP") is missing.
 \item Some of the family members have been genotyped
-\item A person of interest ("POI") may be the missing person.
+\item A person of interest ("POI") is to be matched against the reference family
 }
 
 After genotyping of POI, the genetic evidence is typically assessed by
@@ -79,7 +80,8 @@ computing the likelihood ratio of the following hypotheses:
 }
 
 The goal of this function is to illustrate the above hypotheses, using
-labels, colours and shading to visualise the different aspects of the situation.
+labels, colours and shading to visualise the different aspects of the
+situation.
 
 This function cannot handle cases with more complicated hypotheses (e.g.
 multiple missing persons, or where H2 specifies a different relationship).

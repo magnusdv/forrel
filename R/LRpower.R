@@ -1,6 +1,6 @@
 #' Power simulation for kinship LR
 #'
-#' This functions uses simulations to estimate the likelihood ratio (LR)
+#' This function uses simulations to estimate the likelihood ratio (LR)
 #' distribution in a given kinship testing scenario. In the most general
 #' setting, three pedigrees are involved: the two pedigrees being compared, and
 #' the true relationship (which may differ from the other two). A subset of
@@ -20,7 +20,7 @@
 #' @param disableMutations Not implemented yet.
 #' @param alleles,afreq,Xchrom If these are given, they are used (together with
 #'   `knownGenotypes`) to create a marker object on the fly.
-#' @param seed A numeric seed for the random number generator (optional)
+#' @param seed A numeric seed for the random number generator (optional).
 #'
 #' @return A `LRpowerResult` object, which is essentially a list with the
 #'   following entries:
@@ -70,12 +70,14 @@
 #'                markers = 1, seed = 123)
 #' stopifnot(identical(pow1$LRperSim, pow2$LRperSim))
 #'
+#' \donttest{
 #' # Founder inbreeding in true pedigree
 #' founderInbreeding(truth, founders(truth)) = 0.5
+#' truth
 #' pow3 = LRpower(claim, unrel, truth, ids = ids, nsim = nsim, threshold = thresh,
 #'                markers = 1, seed = 123, plot = TRUE)
 #' pow3
-#'
+#' }
 #'
 #' @export
 LRpower = function(numeratorPed, denominatorPed, truePed = numeratorPed, ids, markers = NULL,
@@ -112,7 +114,7 @@ LRpower = function(numeratorPed, denominatorPed, truePed = numeratorPed, ids, ma
 
     markers = 1
     typed = typedMembers(truePed)
-    hasMut = FALSE
+    #hasMut = FALSE
     disableMutations = FALSE # don't do anything
   }
   else {
@@ -228,7 +230,7 @@ print.LRpowerResult = function(x, ...) {
   cat("Mean total LR:", round(x$meanLR, 3), "\n")
   cat("Mean total log10(LR):", round(x$meanLogLR, 3), "\n")
   ip = x$IP
-  cat("Estimated inclusion powers:", if(!length(ip)) NA, "\n")
+  cat("Estimated inclusion power:", if(!length(ip)) NA, "\n")
   for(i in seq_along(ip))
     cat(sprintf("  P(LR > %s) = %.3g\n", names(ip)[i], ip[i]))
 }

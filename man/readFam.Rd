@@ -2,7 +2,7 @@
 % Please edit documentation in R/readFam.R
 \name{readFam}
 \alias{readFam}
-\title{Read Familias .fam files}
+\title{Read \code{Familias} .fam files}
 \usage{
 readFam(famfile, useDVI = NA, verbose = T)
 }
@@ -29,7 +29,7 @@ are parsed and converted to \code{ped} objects. Each family generally describes
 multiple pedigrees, so the output gets another layer in this case.
 }
 \description{
-This function parses the content of a Familias-formatted ".fam" file, and
+This function parses the content of a \code{Familias}-formatted ".fam" file, and
 converts it into suitable \code{ped} objects. This function does not depend on the
-\code{Familias} package.
+\code{Familias} R package.
 }

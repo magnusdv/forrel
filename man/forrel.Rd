@@ -19,6 +19,6 @@ collection of packages for pedigree analysis. In particular, 'forrel' imports
 'pedtools' for creating and manipulating pedigrees and markers, 'pedprobr'
 for likelihood computations, and 'pedmut' for mutation modelling. Pedigree
 data may be created from scratch, or loaded from text files. Data import from
-the Familias software (Egeland et al. (2000)
+the 'Familias' software (Egeland et al. (2000)
 \doi{10.1016/S0379-0738(00)00147-X}) is supported.
 }

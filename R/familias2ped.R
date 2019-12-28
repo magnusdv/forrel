@@ -3,18 +3,18 @@
 #' `Familias` is a widely used software for forensic kinship computations, which
 #' also features an accompanying R package (also called `Familias`). The
 #' function documented here converts pedigrees and marker data from the R
-#' version of 'Familias' to [pedtools::ped()] format, used by `forrel`. This may
+#' version of `Familias` to [pedtools::ped()] format, used by `forrel`. This may
 #' be of interest for specialized computations not implemented in `Familias`,
 #' e.g. conditional simulations. Note: For importing ".fam" files created by
 #' (the stand-alone) `Familias`, see [readFam()].
 #'
-#' The Familias program represents pedigrees and marker data in a way that
+#' The `Familias` program represents pedigrees and marker data in a way that
 #' differs from the `ped` format in several ways, mostly because of the latter's
 #' stricter definition of a *pedigree*. A `ped` object always represent a
 #' connected pedigree, and each member must have either 0 or 2 parents. None of
 #' this is required by `FamiliasPedigree` objects. The conversion function
 #' `Familias2ped` takes care of all potential differences: It converts each
-#' Familias pedigree into a list of connected `ped` objects, adding missing
+#' `Familias` pedigree into a list of connected `ped` objects, adding missing
 #' parents where needed.
 #'
 #' @param familiasped A `FamiliasPedigree` object or a list of such.

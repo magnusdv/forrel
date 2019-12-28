@@ -1,38 +1,40 @@
 #' Marker simulation
 #'
 #' Simulates marker genotypes conditional on the pedigree structure and known
-#' genotypes. Note: This function produces independent simulations at a single
-#' locus. For simulations of multiple markers, see [profileSim()].
+#' genotypes. Note: This function simulates independent realisations at a single
+#' locus. Equivalently, it can be thought of as independent simulations of
+#' identical, unlinked markers. For simulations of a _set_ of markers, see
+#' [profileSim()].
 #'
 #' This implements (with various time savers) the algorithm used in SLINK of the
 #' LINKAGE/FASTLINK suite. If `partialmarker` is NULL, genotypes are simulated
 #' by simple gene dropping, using [simpleSim()].
 #'
-#' @param x a `ped` object
-#' @param N a positive integer: the number of (independent) markers to be
+#' @param x A `ped` object or a list of such.
+#' @param N A positive integer: the number of (independent) markers to be
 #'   simulated.
-#' @param ids a vector containing ID labels of those pedigree members whose
+#' @param ids A vector containing ID labels of those pedigree members whose
 #'   genotypes should be simulated. By default, all individuals are included.
-#' @param alleles a vector containing the alleles for the marker to be
+#' @param alleles A vector containing the alleles for the marker to be
 #'   simulation. If a single integer is given, this is interpreted as the number
 #'   of alleles, and the actual alleles as `1:alleles`. Must be NULL if
 #'   `partialmarker` is non-NULL.
-#' @param afreq a vector of length 2 containing the population frequencies for
+#' @param afreq A vector containing the population frequencies for
 #'   the marker alleles. Must be NULL if `partialmarker` is non-NULL.
 #' @param mutmod,rate Arguments specifying a mutation model, passed on to
-#'   [pedtools::marker()] (see there for explanations)
+#'   [pedtools::marker()] (see there for explanations).
 #' @param partialmarker Either NULL (resulting in unconditional simulation), a
 #'   marker object (on which the simulation should be conditioned) or the name
 #'   (or index) of a marker attached to `x`.
-#' @param loopBreakers a numeric containing IDs of individuals to be used as
+#' @param loopBreakers A numeric containing IDs of individuals to be used as
 #'   loop breakers. Relevant only if the pedigree has loops, and only if
 #'   `partialmarker` is non-NULL. See [pedtools::breakLoops()].
 #' @param eliminate A non-negative integer, indicating the number of iterations
 #'   in the internal genotype-compatibility algorithm. Positive values can save
 #'   time if `partialmarker` is non-NULL and the number of alleles is large.
 #' @param seed NULL, or a numeric seed for the random number generator.
-#' @param verbose a logical.
-#' @return a `ped` object equal to `x` except its `MARKERS` entry, which
+#' @param verbose A logical.
+#' @return A `ped` object equal to `x` except its `MARKERS` entry, which
 #'   consists of the `N` simulated markers.
 #'
 #' @author Magnus Dehli Vigeland

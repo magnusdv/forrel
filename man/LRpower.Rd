@@ -61,7 +61,7 @@ plot is drawn, but no further computations are done.}
 \item{plotMarkers}{A vector of marker names or indices whose genotypes are to
 be included in the plot.}
 
-\item{seed}{A numeric seed for the random number generator (optional)}
+\item{seed}{A numeric seed for the random number generator (optional).}
 
 \item{verbose}{A logical.}
 }
@@ -82,7 +82,7 @@ given number.
 }
 }
 \description{
-This functions uses simulations to estimate the likelihood ratio (LR)
+This function uses simulations to estimate the likelihood ratio (LR)
 distribution in a given kinship testing scenario. In the most general
 setting, three pedigrees are involved: the two pedigrees being compared, and
 the true relationship (which may differ from the other two). A subset of
@@ -117,11 +117,13 @@ pow2 = LRpower(claim, unrel, truth, ids = ids, nsim = nsim, threshold = thresh,
                markers = 1, seed = 123)
 stopifnot(identical(pow1$LRperSim, pow2$LRperSim))
 
+\donttest{
 # Founder inbreeding in true pedigree
 founderInbreeding(truth, founders(truth)) = 0.5
+truth
 pow3 = LRpower(claim, unrel, truth, ids = ids, nsim = nsim, threshold = thresh,
                markers = 1, seed = 123, plot = TRUE)
 pow3
-
+}
 
 }

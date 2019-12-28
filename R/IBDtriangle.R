@@ -19,7 +19,7 @@
 #' triangle).
 #'
 #' As shown in (Thompson, 1976) points in the subset of the triangle defined by
-#' \eqn{4\kappa_0\kappa_2 > \kappa_1^2}{4*\kappa0*\kappa2 > \kappa1^2} is
+#' \eqn{4\kappa_0\kappa_2 > \kappa_1^2}{4*\kappa0*\kappa2 > \kappa1^2} are
 #' unattainable for pairwise relationships. By default this region in shaded in
 #' a 'lightgray' colour.
 #'
@@ -52,7 +52,7 @@
 #'
 #' @param relationships A character vector indicating relationships points to be
 #'   included in the plot. See Details for a list of valid entries.
-#' @param kinshipLines A numeric vector. (See Details.)
+#' @param kinshipLines A numeric vector (see Details).
 #' @param shading The shading colour for the unattainable region.
 #' @param pch Symbol used for the relationship points (see [par()]).
 #' @param cex_points A number controlling the symbol size for the relationship
@@ -134,7 +134,7 @@ IBDtriangle = function(relationships = c("UN", "PO", "MZ", "S", "H,U,G", "FC"),
     if (length(relationships) > 0) {
         rels = RELS[RELS$label %in% relationships, ]
         points(rels$k0, rels$k2, pch = pch, cex = cex_points)
-        text(rels$k0, rels$k2, labels = rels$label, pos = rels$pos, cex = cex_text, offset = 1.2)
+        text(rels$k0, rels$k2, labels = rels$label, pos = rels$pos, cex = cex_text, offset = 0.7)
     }
 }
 

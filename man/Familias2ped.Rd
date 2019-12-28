@@ -31,19 +31,19 @@ A \code{ped} object, or a list of such.
 \code{Familias} is a widely used software for forensic kinship computations, which
 also features an accompanying R package (also called \code{Familias}). The
 function documented here converts pedigrees and marker data from the R
-version of 'Familias' to \code{\link[pedtools:ped]{pedtools::ped()}} format, used by \code{forrel}. This may
+version of \code{Familias} to \code{\link[pedtools:ped]{pedtools::ped()}} format, used by \code{forrel}. This may
 be of interest for specialized computations not implemented in \code{Familias},
 e.g. conditional simulations. Note: For importing ".fam" files created by
 (the stand-alone) \code{Familias}, see \code{\link[=readFam]{readFam()}}.
 }
 \details{
-The Familias program represents pedigrees and marker data in a way that
+The \code{Familias} program represents pedigrees and marker data in a way that
 differs from the \code{ped} format in several ways, mostly because of the latter's
 stricter definition of a \emph{pedigree}. A \code{ped} object always represent a
 connected pedigree, and each member must have either 0 or 2 parents. None of
 this is required by \code{FamiliasPedigree} objects. The conversion function
 \code{Familias2ped} takes care of all potential differences: It converts each
-Familias pedigree into a list of connected \code{ped} objects, adding missing
+\code{Familias} pedigree into a list of connected \code{ped} objects, adding missing
 parents where needed.
 }
 \examples{

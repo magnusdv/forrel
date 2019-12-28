@@ -24,7 +24,7 @@ IBDtriangle(
 \item{relationships}{A character vector indicating relationships points to be
 included in the plot. See Details for a list of valid entries.}
 
-\item{kinshipLines}{A numeric vector. (See Details.)}
+\item{kinshipLines}{A numeric vector (see Details).}
 
 \item{shading}{The shading colour for the unattainable region.}
 
@@ -65,7 +65,7 @@ and is not significant (other authors have used different views of the
 triangle).
 
 As shown in (Thompson, 1976) points in the subset of the triangle defined by
-\eqn{4\kappa_0\kappa_2 > \kappa_1^2}{4*\kappa0*\kappa2 > \kappa1^2} is
+\eqn{4\kappa_0\kappa_2 > \kappa_1^2}{4*\kappa0*\kappa2 > \kappa1^2} are
 unattainable for pairwise relationships. By default this region in shaded in
 a 'lightgray' colour.
 

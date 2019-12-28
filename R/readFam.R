@@ -1,8 +1,8 @@
-#' Read Familias .fam files
+#' Read `Familias` .fam files
 #'
-#' This function parses the content of a Familias-formatted ".fam" file, and
+#' This function parses the content of a `Familias`-formatted ".fam" file, and
 #' converts it into suitable `ped` objects. This function does not depend on the
-#' `Familias` package.
+#' `Familias` R package.
 #'
 #' @param famfile Path to a ".fam" file.
 #' @param useDVI A logical, indicating if the DVI section of the fam file should

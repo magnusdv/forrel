@@ -2,7 +2,7 @@
 % Please edit documentation in R/missingPersonEP.R
 \name{missingPersonEP}
 \alias{missingPersonEP}
-\title{Exclusion power for missing person cases.}
+\title{Exclusion power for missing person cases}
 \usage{
 missingPersonEP(
   reference,
@@ -42,7 +42,7 @@ mutations should be disabled.
 The \code{EPresult} object returned by \code{\link[=exclusionPower]{exclusionPower()}}.
 }
 \description{
-This is wrapper of \code{\link[=exclusionPower]{exclusionPower()}} for the special case of a reference
+This is a wrapper of \code{\link[=exclusionPower]{exclusionPower()}} for the special case of a reference
 family with a single missing member. Some reference members should already be
 genotyped. The function computes the power to exclude an unrelated
 individual, i.e. the probability of observing (in a truly unrelated

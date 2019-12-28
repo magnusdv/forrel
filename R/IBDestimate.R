@@ -24,8 +24,8 @@
 #' @param tol A single numeric: the optimising tolerance value; passed on to
 #'   `maxLik()`).
 #'
-#' @return A data frame with 6 columns: `ID1`, `ID2`, `N` (the number of markers with no
-#'   missing alleles), `k0`, `k1` and `k2`.
+#' @return A data frame with 6 columns: `ID1`, `ID2`, `N` (the number of markers
+#'   with no missing alleles), `k0`, `k1` and `k2`.
 #' @author Magnus Dehli Vigeland
 #' @seealso [maxLik::maxLik()], [showInTriangle()]
 #'
@@ -34,7 +34,7 @@
 #' * E. A. Thompson (1975). _The estimation of pairwise relationships._ Annals
 #' of Human Genetics 39.
 #'
-#' * E. A. Thompson (2000). _Statistical Inferences from Genetic Data on
+#' * E. A. Thompson (2000). _Statistical Inference from Genetic Data on
 #' Pedigrees._ NSF-CBMS Regional Conference Series in Probability and
 #' Statistics. Volume 6.
 #'

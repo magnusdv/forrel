@@ -83,7 +83,7 @@
 #' ### unrelated to the child.
 #' ############################################
 #'
-#' # Claim: Individual 1 is the father of indiv 3
+#' # Claim: Individual 1 is the father of individual 3
 #' claim = nuclearPed(nch = 1, sex = 2)
 #'
 #' # Truth: 1 and 3 are unrelated

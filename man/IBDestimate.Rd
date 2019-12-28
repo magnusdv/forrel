@@ -25,8 +25,8 @@ on to \code{maxLik}).}
 \code{maxLik()}).}
 }
 \value{
-A data frame with 6 columns: \code{ID1}, \code{ID2}, \code{N} (the number of markers with no
-missing alleles), \code{k0}, \code{k1} and \code{k2}.
+A data frame with 6 columns: \code{ID1}, \code{ID2}, \code{N} (the number of markers
+with no missing alleles), \code{k0}, \code{k1} and \code{k2}.
 }
 \description{
 Estimate the pairwise IBD coefficients \eqn{(\kappa_0, \kappa_1,
@@ -65,7 +65,7 @@ IBDestimate(y, ids = 1:2)
 \itemize{
 \item E. A. Thompson (1975). \emph{The estimation of pairwise relationships.} Annals
 of Human Genetics 39.
-\item E. A. Thompson (2000). \emph{Statistical Inferences from Genetic Data on
+\item E. A. Thompson (2000). \emph{Statistical Inference from Genetic Data on
 Pedigrees.} NSF-CBMS Regional Conference Series in Probability and
 Statistics. Volume 6.
 }

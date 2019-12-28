@@ -1,6 +1,6 @@
-#' Exclusion power for missing person cases.
+#' Exclusion power for missing person cases
 #'
-#' This is wrapper of [exclusionPower()] for the special case of a reference
+#' This is a wrapper of [exclusionPower()] for the special case of a reference
 #' family with a single missing member. Some reference members should already be
 #' genotyped. The function computes the power to exclude an unrelated
 #' individual, i.e. the probability of observing (in a truly unrelated

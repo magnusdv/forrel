@@ -8,9 +8,10 @@ Introduction
 
 The goal of `forrel` is to provide forensic pedigree computations and
 relatedness inference from genetic marker data. Some of its
-functionality is derived from the retired `paramlink` package, but
-updated to comply with the `pedtools` package for handling pedigrees and
-marker data.
+functionality is derived from `paramlink`, which is no longer actively
+developed. ‘forrel’ is part of the *ped suite*, a collection of packages
+for pedigree analysis with `pedtools` as the central package for
+handling pedigrees and marker data.
 
 The most important analyses currently supported by forrel are:
 
@@ -22,10 +23,13 @@ The most important analyses currently supported by forrel are:
     Unconditional or conditional on known genotypes
 -   Power analysis for relationship testing: Exclusion power (EP) and
     inclusion power (IP)
--   Tailor-made functions for family reunion cases:
-    `missingPersonPlot()`, `missingPersonEP()`, `missingPersonIP()`,
-    `powerPlot()`
--   Import of pedigree data and frequency databaser from the `Familias`
+-   Tailor-made functions for power analysis in family reunion cases:
+    -   `missingPersonPlot()`
+    -   `missingPersonEP()`
+    -   `missingPersonIP()`
+    -   `MPPsims()`
+    -   `powerPlot()`
+-   Import of pedigree data and frequency databases from the `Familias`
     software.
 
 Installation
@@ -74,7 +78,7 @@ plot(x)
 **Marker simulation**
 
 Now let us simulate the genotypes of 100 independent SNPs for the
-brothers. Each sNP has alleles 1 and 2, with equal frequencies by
+brothers. Each SNP has alleles 1 and 2, with equal frequencies by
 default. This is an example of *unconditional* simulation, since we
 don’t give any genotypes to condition on. Unconditional simulation is
 performed by simple *gene dropping*, i.e., by drawing random alleles
@@ -92,7 +96,7 @@ x = markerSim(x, N = 100, ids = bros, alleles = 1:2, seed = 1234)
 #> 
 #> Simulation finished.
 #> Number of calls to the likelihood function: 0.
-#> Total time used: 0.2 seconds.
+#> Total time used: 0.14 seconds.
 ```
 
 Note 1: The `seed` argument is passed onto the random number generator.

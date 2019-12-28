@@ -1,7 +1,9 @@
 #' Likelihood ratios for kinship testing
 #'
-#' This function computes likelihood ratios for a given a list of pedigrees with
-#' attached markers. with genotype data from the same set of markers.
+#' This function computes likelihood ratios (LRs) for a given a list of
+#' pedigrees with attached markers. The user must indicate which of the
+#' pedigrees is the 'reference', which will be used in the denominator in each
+#' LR.
 #'
 #' @param x A list of pedigree alternatives. Each alternative should be either a
 #'   single `ped` object or a list of such.
@@ -9,6 +11,8 @@
 #'   reference alternative. This is used in the denominator of each LR.
 #' @param markers A vector of integers, indexing which markers should be
 #'   included. If NULL (the default) all markers are used.
+#'
+#' @seealso [LRpower()], [pedtools::transferMarkers()]
 #'
 #' @return A `LRresult`object, which is essentially a list with entries
 #'

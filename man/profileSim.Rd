@@ -4,23 +4,15 @@
 \alias{profileSim}
 \title{Simulation of complete DNA profiles}
 \usage{
-profileSim(
-  x,
-  N = 1,
-  ids = NULL,
-  markers = NULL,
-  conditions = NULL,
-  seed = NULL,
-  ...
-)
+profileSim(x, N = 1, ids = NULL, markers = NULL, seed = NULL, ...)
 }
 \arguments{
-\item{x}{A \code{ped} object or a list of such}
+\item{x}{A \code{ped} object or a list of such.}
 
-\item{N}{The number of complete simulations to be performed}
+\item{N}{The number of complete simulations to be performed.}
 
 \item{ids}{A character (or coercible to character) with ID labels indicating
-whose genotypes should be simulated}
+whose genotypes should be simulated.}
 
 \item{markers}{A list of marker objects, or a vector containing names or
 indices referring to markers attached to \code{x}. By default (\code{markers = NULL})
@@ -28,11 +20,9 @@ all attached markers are used. The simulations will be conditional on the
 locus attributes (allele frequencies, mutation models a.s.o.) and any
 existing genotypes in the indicated markers.}
 
-\item{conditions}{Deprecated, use \code{markers} instead.}
+\item{seed}{NULL, or a numeric seed for the random number generator.}
 
-\item{seed}{NULL, or a numeric seed for the random number generator}
-
-\item{...}{Further arguments passed on to \code{\link[=markerSim]{markerSim()}}}
+\item{...}{Further arguments passed on to \code{\link[=markerSim]{markerSim()}}.}
 }
 \value{
 A list of \code{N} objects similar to \code{x}, but with simulated genotypes.

@@ -20,30 +20,30 @@ markerSim(
 )
 }
 \arguments{
-\item{x}{a \code{ped} object}
+\item{x}{A \code{ped} object or a list of such.}
 
-\item{N}{a positive integer: the number of (independent) markers to be
+\item{N}{A positive integer: the number of (independent) markers to be
 simulated.}
 
-\item{ids}{a vector containing ID labels of those pedigree members whose
+\item{ids}{A vector containing ID labels of those pedigree members whose
 genotypes should be simulated. By default, all individuals are included.}
 
-\item{alleles}{a vector containing the alleles for the marker to be
+\item{alleles}{A vector containing the alleles for the marker to be
 simulation. If a single integer is given, this is interpreted as the number
 of alleles, and the actual alleles as \code{1:alleles}. Must be NULL if
 \code{partialmarker} is non-NULL.}
 
-\item{afreq}{a vector of length 2 containing the population frequencies for
+\item{afreq}{A vector containing the population frequencies for
 the marker alleles. Must be NULL if \code{partialmarker} is non-NULL.}
 
 \item{mutmod, rate}{Arguments specifying a mutation model, passed on to
-\code{\link[pedtools:marker]{pedtools::marker()}} (see there for explanations)}
+\code{\link[pedtools:marker]{pedtools::marker()}} (see there for explanations).}
 
 \item{partialmarker}{Either NULL (resulting in unconditional simulation), a
 marker object (on which the simulation should be conditioned) or the name
 (or index) of a marker attached to \code{x}.}
 
-\item{loopBreakers}{a numeric containing IDs of individuals to be used as
+\item{loopBreakers}{A numeric containing IDs of individuals to be used as
 loop breakers. Relevant only if the pedigree has loops, and only if
 \code{partialmarker} is non-NULL. See \code{\link[pedtools:breakLoops]{pedtools::breakLoops()}}.}
 
@@ -53,16 +53,18 @@ time if \code{partialmarker} is non-NULL and the number of alleles is large.}
 
 \item{seed}{NULL, or a numeric seed for the random number generator.}
 
-\item{verbose}{a logical.}
+\item{verbose}{A logical.}
 }
 \value{
-a \code{ped} object equal to \code{x} except its \code{MARKERS} entry, which
+A \code{ped} object equal to \code{x} except its \code{MARKERS} entry, which
 consists of the \code{N} simulated markers.
 }
 \description{
 Simulates marker genotypes conditional on the pedigree structure and known
-genotypes. Note: This function produces independent simulations at a single
-locus. For simulations of multiple markers, see \code{\link[=profileSim]{profileSim()}}.
+genotypes. Note: This function simulates independent realisations at a single
+locus. Equivalently, it can be thought of as independent simulations of
+identical, unlinked markers. For simulations of a \emph{set} of markers, see
+\code{\link[=profileSim]{profileSim()}}.
 }
 \details{
 This implements (with various time savers) the algorithm used in SLINK of the
