@@ -183,7 +183,7 @@ markerSim = function(x, N = 1, ids = NULL, alleles = NULL, afreq = NULL,
     orig_ids = labels(x)
     x = breakLoops(setMarkers(x, m), loop_breakers = loopBreakers, verbose = verbose)
     m = x$MARKERS[[1]]
-    loopBreakers = x$LOOP_BREAKERS[, 1]
+    loopBreakers = labels(x)[x$LOOP_BREAKERS[, 1]] # NB: LOOP_BREAKERS are internal ints
     gridlist = gridlist[sort.int(match(c(orig_ids, loopBreakers), orig_ids))]
   }
 
@@ -194,8 +194,8 @@ markerSim = function(x, N = 1, ids = NULL, alleles = NULL, afreq = NULL,
   FOU = founders(x, internal = TRUE)
   NONFOU = nonfounders(x, internal = TRUE)
 
-  ##### Determine simulation strategy #### Note: Using original x and m in this section (i.e.
-  ##### before loop breaking)
+  ### Determine simulation strategy
+  # Note: Using original x and m in this section (i.e. before loop breaking)
 
   # Individuals that are typed (or forced - see above). Simulations condition on these.
   typedTF = (morig[, 1] != 0 | morig[, 2] != 0)
@@ -373,8 +373,9 @@ markerSim = function(x, N = 1, ids = NULL, alleles = NULL, afreq = NULL,
 
   unavailable = !labels(x) %in% ids
   markers[!typedTF & unavailable, ] = 0
-  attrib = attributes(m)
+  attrib = attributes(morig)
   attrib$name = NA_character_
+
   markerdata_list = lapply(seq_len(N), function(k) {
     mk = markers[, c(2 * k - 1, 2 * k)]
     attributes(mk) = attrib

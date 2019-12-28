@@ -70,3 +70,29 @@ m = marker(x, "3" = 1, "4" = 2) # parents must be 1:2
 y = markerSim(x, partialmarker = m, verbose = F)
 expect_identical(genotype(y, id = 1, marker = 1), c("1", "2"))
 })
+
+test_that("markerSim() works in looped pedigree 1", {
+  x = addChildren(linearPed(2), 5,2,1)
+  x = setMarkers(x, marker(x, "5" = 1, alleles = 1:2, afreq = c(0.001, 0.999)))
+  set.seed(123)
+  y = markerSim(x, partialmarker = 1, verbose = FALSE)
+  expect_identical(genotype(y, id = 3, marker = 1), c("1", "2"))
+  expect_identical(genotype(y, id = 4, marker = 1), c("1", "2"))
+})
+
+test_that("markerSim() works in looped pedigree 2", {
+  x = addChildren(linearPed(2), 5,2,1)
+  x = setMarkers(x, marker(x, "6" = 1, "2" = c(0,2)))
+  # plot(x,1)
+  y1 = markerSim(x,partialmarker = 1, verbose = FALSE)
+  expect_identical(genotype(y1, id = 2, marker = 1), c("1", "2")) # Forced
+
+  x = addParents(x, 2, 10, 11, verbose = FALSE)
+  x = setMarkers(x, marker(x, "6" = 1, "10" = 2))
+  # plot(x,1)
+  y2 = markerSim(x, partialmarker = 1, verbose = FALSE)
+  expect_identical(genotype(y2, id = 2, marker = 1), c("1", "2")) # Forced!
+
+  y3 = markerSim(x, partialmarker = 1, loopBreaker = "5", verbose = FALSE)
+  expect_identical(genotype(y3, id = 2, marker = 1), c("1", "2")) # Forced!
+})
