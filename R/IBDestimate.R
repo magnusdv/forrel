@@ -8,14 +8,15 @@
 #' This function optimises the log-likelihood function first described in
 #' (Thompson, 1975). Optimisation is done in the \eqn{(\kappa_0,
 #' \kappa_2)}{(\kappa0, \kappa2)}-plane and restricted to the probability
-#' triangle defined by \deqn{\kappa_0 \ge 0, \kappa_2 \ge 0, \kappa_0 + \kappa_2
+#' triangle defined by \deqn{\kappa_0 \ge 0, \kappa_2 \ge 0, \kpapa_0 + \kappa_2
 #' \le 1.}{\kappa0 \ge 0, \kappa2 \ge 0, \kappa0 + \kappa2 \le 1.}
 #'
 #' @param x A `ped` object or a list of such.
-#' @param ids Either a vector with two ID labels, or a data frame/matrix with
-#'   two columns, where each row contains the ID labels of two individuals. The
-#'   entries are coerced to characters, and must match uniquely against the ID
-#'   labels of `x`.
+#' @param ids Either a vector with ID labels, or a data frame/matrix with two
+#'   columns, where each row contains the ID labels of two individuals. The entries
+#'   are coerced to characters, and must match uniquely against the ID labels of
+#'   `x`. If `ids` is a vector, it is converted to a matrix containing all pairs.
+#'   By default, all individuals of `x` are included.
 #' @param markers A numeric indicating which marker(s) to include. If NULL
 #'   (default), all markers are used.
 #' @param start Numeric of length 2, indicating the initial value of
@@ -58,23 +59,29 @@
 #'
 #'
 #' @importFrom maxLik maxLik
+#' @importFrom utils combn
 #' @export
-IBDestimate = function(x, ids, markers=NULL, start = c(0.99,0.001), tol = 1e-7) {
-  single_ped = is.ped(x)
-  if(single_ped)
+IBDestimate = function(x, ids = NULL, markers = NULL, start = c(0.99,0.001), tol = 1e-7) {
+  if(is.ped(x))
     x = list(x)
-  if(!is.pedList(x))
+  else if(!is.pedList(x))
     stop2("The first argument must be a `ped` object or a list of such")
 
   if(is.null(markers))
-      markers = seq_len(nMarkers(x[[1]]))
+    markers = seq_len(nMarkers(x))
 
-  if(is.vector(ids) && length(ids) == 2)
-    ids = rbind(ids)
-  if(is.data.frame(ids))
+  if(is.null(ids))
+    ids = unlist(lapply(x, labels))
+  if(length(ids) < 2)
+    stop2("`ids` must be either a vector of length at least 2, or a matrix/data.frame with 2 columns")
+
+  if(is.vector(ids))
+    ids = t.default(combn(ids, 2))
+  else if(is.data.frame(ids))
     ids = as.matrix(ids)
+
   if(!is.matrix(ids) && ncol(ids) == 2)
-    stop2("`ids` must be either a vector of length 2 or a matrix/data.frame with 2 columns")
+    stop2("`ids` must be either a vector of length at least 2, or a matrix/data.frame with 2 columns")
 
   ids_df_list = lapply(seq_len(nrow(ids)), function(i) pedlistMembership(x, ids[i,]))
 
@@ -86,7 +93,7 @@ IBDestimate = function(x, ids, markers=NULL, start = c(0.99,0.001), tol = 1e-7) 
     A = IBDest_getAlleleData(x, ids_df, markers)
     # Remove markers with missing alleles
     if(any(miss <- apply(A, 2, anyNA)))
-        A = A[, !miss]
+        A = A[, !miss, drop = FALSE]
 
     # Likelihood function
     a=A[1,]; b=A[2,]; cc=A[3,]; d=A[4,]; pa=A[5,]; pb=A[6,]; pc=A[7,]; pd=A[8,]

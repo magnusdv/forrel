@@ -4,15 +4,16 @@
 \alias{IBDestimate}
 \title{Relatedness estimation}
 \usage{
-IBDestimate(x, ids, markers = NULL, start = c(0.99, 0.001), tol = 1e-07)
+IBDestimate(x, ids = NULL, markers = NULL, start = c(0.99, 0.001), tol = 1e-07)
 }
 \arguments{
 \item{x}{A \code{ped} object or a list of such.}
 
-\item{ids}{Either a vector with two ID labels, or a data frame/matrix with
-two columns, where each row contains the ID labels of two individuals. The
-entries are coerced to characters, and must match uniquely against the ID
-labels of \code{x}.}
+\item{ids}{Either a vector with ID labels, or a data frame/matrix with two
+columns, where each row contains the ID labels of two individuals. The entries
+are coerced to characters, and must match uniquely against the ID labels of
+\code{x}. If \code{ids} is a vector, it is converted to a matrix containing all pairs.
+By default, all individuals of \code{x} are included.}
 
 \item{markers}{A numeric indicating which marker(s) to include. If NULL
 (default), all markers are used.}
@@ -38,7 +39,7 @@ imported from the \code{maxLik} package.
 This function optimises the log-likelihood function first described in
 (Thompson, 1975). Optimisation is done in the \eqn{(\kappa_0,
 \kappa_2)}{(\kappa0, \kappa2)}-plane and restricted to the probability
-triangle defined by \deqn{\kappa_0 \ge 0, \kappa_2 \ge 0, \kappa_0 + \kappa_2
+triangle defined by \deqn{\kappa_0 \ge 0, \kappa_2 \ge 0, \kpapa_0 + \kappa_2
 \le 1.}{\kappa0 \ge 0, \kappa2 \ge 0, \kappa0 + \kappa2 \le 1.}
 }
 \examples{
