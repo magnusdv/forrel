@@ -15,7 +15,7 @@ library(forrel)
 #' res = getOrAttachMarker(p, 'TH01')
 #' p = res$ped
 #' index = res$index
-#' # marker TH01 is now guaranteed to be at ped$markerdata[[index]]
+#' # marker TH01 is now guaranteed to be at ped$MARKERS[[index]]
 getOrAttachMarker = function(ped, markerName) {
   foundMarkers = tryCatch(
     whichMarkers(ped, markerName),
@@ -43,7 +43,7 @@ getMarkerNames = function(ped) {
     return(getMarkerNames(ped[[1]]))
   }
 
-  as.vector(lapply(ped$markerdata, function(item) attr(item, 'name')), mode = 'character')
+  as.vector(lapply(ped$MARKERS, function(item) attr(item, 'name')), mode = 'character')
 }
 
 #' Returns the union over all markers in a pedigree of the possible alleles on
@@ -57,7 +57,7 @@ allAlleles = function(ped) {
   }
 
   list = c()
-  for (marker in ped$markerdata) {
+  for (marker in ped$MARKERS) {
     list = union(list, attr(marker, 'alleles'))
   }
 
@@ -79,7 +79,7 @@ getTabularFrequencyDb = function(ped) {
 
   df = data.frame('Allele' = allAlleles(ped))
 
-  for (marker in ped$markerdata) {
+  for (marker in ped$MARKERS) {
     colI = vapply(df[[1]], function(allele) {
       als = attr(marker, 'alleles')
       afreq = attr(marker, 'afreq')
@@ -131,7 +131,7 @@ locusAnnotationsToDataFrame = function(ped, includedMarkers) {
   if (is.pedList(ped))
     return(locusAnnotationsToDataFrame(ped[[1]], includedMarkers))
 
-  lapply(ped$markerdata, function(m) {
+  lapply(ped$MARKERS, function(m) {
     list('Marker' = attr(m, 'name'),
          'Include in calculation?' = attr(m, 'name') %in% includedMarkers,
          'Sex-linked?' = if (!is.na(attr(m, 'chrom')) && 23 == attr(m, 'chrom')) '23' else '1',

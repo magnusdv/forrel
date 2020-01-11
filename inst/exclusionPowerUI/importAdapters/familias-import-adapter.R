@@ -54,11 +54,11 @@ attachAlleleFrequenciesToPedigree.familias = function(ped, path, markers = NULL,
       ped = res$ped
       index = res$index
 
-      attr(ped$markerdata[[index]], 'alleles') = alleles
-      attr(ped$markerdata[[index]], 'afreq') = afreq
+      attr(ped$MARKERS[[index]], 'alleles') = alleles
+      attr(ped$MARKERS[[index]], 'afreq') = afreq
 
       if (markerName %in% Xchrom) {
-        attr(ped$markerdata[[index]], 'chrom') = 23
+        attr(ped$MARKERS[[index]], 'chrom') = 23
       }
     }
   }

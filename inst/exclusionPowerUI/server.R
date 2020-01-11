@@ -241,14 +241,17 @@ shinyServer(function(input, output, session) {
 
           EP = 1
           if (markerName %in% includedMarkers) {
-            EP = exclusionPower(ped_claim = computedClaimPed(),
-                                ped_true = truePedigree(),
+            EP = exclusionPower(claimPed = computedClaimPed(),
+                                truePed = truePedigree(),
                                 ids = input$ids,
-                                markerindex = i,
+                                markers = c(i),
+                                source = "claim",
+                                disableMutations = FALSE,
                                 plot = FALSE)
+            print(EP)
           }
 
-          exclusionProbabilities[i] = EP
+          exclusionProbabilities[i] = EP$EPtotal
 
           incProgress(1/Nmarkers)
         }
