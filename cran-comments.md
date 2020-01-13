@@ -1,7 +1,7 @@
 ## Test environments
 * local Windows 10 install, R 3.6.2
-* usethis::check_rhub()
-* usethis::check_win_devel()
+* rhub::check_for_cran()
+* devtools::check_win_devel()
 
 ## R CMD check results
 
