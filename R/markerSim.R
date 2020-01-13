@@ -91,9 +91,9 @@ markerSim = function(x, N = 1, ids = NULL, alleles = NULL, afreq = NULL,
     if (!is.null(alleles) || !is.null(afreq))
       stop2("When `partialmarker` is given, both 'alleles' and 'afreq' must be NULL.")
 
-    if(is.marker(m)) {
-      # pedtools:::validateMarker(m)
-      # pedtools:::checkConsistency(x, list(m)) #TODO export this from pedtools
+    if(is.marker(m)) { # TODO (fix/export from pedtools
+      # validateMarker(m)
+      # checkConsistency(x, list(m))
     }
     else if (is.atomic(m) && length(m) == 1) {
       m = getMarkers(x, markers = m)[[1]]
