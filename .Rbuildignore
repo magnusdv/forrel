@@ -5,3 +5,4 @@
 ^R/relationLR.R$
 ^README\.Rmd$
 ^notes-private$
+^cran-comments\.md$
