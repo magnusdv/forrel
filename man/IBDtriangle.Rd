@@ -17,7 +17,8 @@ IBDtriangle(
   xlab = expression(kappa[0]),
   ylab = expression(kappa[2]),
   cex_lab = cex_text,
-  mar = c(3.1, 3.1, 1, 1)
+  mar = c(3.1, 3.1, 1, 1),
+  keep.par = TRUE
 )
 }
 \arguments{
@@ -43,6 +44,9 @@ labels.}
 \item{xlab, ylab}{Axis labels}
 
 \item{cex_lab}{A number controlling the font size for the axis labels.}
+
+\item{keep.par}{A logical. If TRUE, the graphical parameters are not reset
+after plotting, which may be useful for adding additional annotation.}
 }
 \description{
 The IBD triangle is typically used to visualize the pairwise relatedness of
@@ -90,10 +94,12 @@ argument:
 }
 }
 \examples{
+opar = par() # store graphical parameters
 
 IBDtriangle()
-
 IBDtriangle(kinshipLines = c(0.25, 0.125), shading = NULL, cex_text = 0.8)
+
+par(opar) # reset graphical parameters
 
 }
 \references{

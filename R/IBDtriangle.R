@@ -63,7 +63,8 @@
 #' @param xlab,ylab Axis labels
 #' @param cex_lab A number controlling the font size for the axis labels.
 #' @param xlim,ylim,mar Graphical parameters; see [par()].
-#'
+#' @param keep.par A logical. If TRUE, the graphical parameters are not reset
+#'   after plotting, which may be useful for adding additional annotation.
 #' @return NULL
 #' @author Magnus Dehli Vigeland
 #' @seealso [IBDestimate()]
@@ -76,10 +77,12 @@
 #' relationships._ Annals of Human Genetics 40.
 #'
 #' @examples
+#' opar = par() # store graphical parameters
 #'
 #' IBDtriangle()
-#'
 #' IBDtriangle(kinshipLines = c(0.25, 0.125), shading = NULL, cex_text = 0.8)
+#'
+#' par(opar) # reset graphical parameters
 #'
 #' @importFrom graphics abline grconvertX grconvertY layout legend mtext par
 #'   plot points polygon rect segments text
@@ -90,10 +93,12 @@ IBDtriangle = function(relationships = c("UN", "PO", "MZ", "S", "H,U,G", "FC"),
                        pch = 16, cex_points = 1.2, cex_text = 1.2, axes = FALSE,
                        xlim = c(0, 1), ylim = c(0, 1),
                        xlab = expression(kappa[0]), ylab = expression(kappa[2]),
-                       cex_lab = cex_text, mar = c(3.1, 3.1, 1, 1)) {
+                       cex_lab = cex_text, mar = c(3.1, 3.1, 1, 1), keep.par = TRUE) {
 
     xpd = all(c(xlim, ylim) == c(0,1,0,1))
-    par(xpd = xpd, mar = mar, pty = "s")
+    opar = par(xpd = xpd, mar = mar, pty = "s")
+    if (!keep.par)
+      on.exit(par(opar))
 
     plot(NULL, xlim = xlim, ylim = ylim, axes = axes, ann = FALSE)
 
@@ -160,7 +165,6 @@ IBDtriangle = function(relationships = c("UN", "PO", "MZ", "S", "H,U,G", "FC"),
 #' @seealso [IBDestimate()]
 #'
 #' @examples
-#'
 #' showInTriangle(k0 = 3/8, k2 = 1/8, label = "3/4 siblings", pos = 1)
 #'
 #' @export
@@ -198,8 +202,12 @@ showInTriangle = function(k0, k2 = NULL, new = TRUE, col = "blue",
   if(is.character(labels) && length(labels) != length(k0))
     stop2("When `labels` is a character, it must have the same length as `k0`")
 
-  if(new)
+  if(new) {
+    opar = par() # store graphical parameters
+    on.exit(par(opar))
+
     IBDtriangle(...)
+  }
 
   points(k0, k2, col = col, pch = pch, lwd = lwd, cex = cex)
 

@@ -43,7 +43,6 @@ default, no labels are plotted.}
 Utility function for plotting points in the IBD triangle.
 }
 \examples{
-
 showInTriangle(k0 = 3/8, k2 = 1/8, label = "3/4 siblings", pos = 1)
 
 }
