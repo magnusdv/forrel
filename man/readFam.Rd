@@ -4,7 +4,7 @@
 \alias{readFam}
 \title{Read \code{Familias} .fam files}
 \usage{
-readFam(famfile, useDVI = NA, verbose = T)
+readFam(famfile, useDVI = NA, verbose = TRUE)
 }
 \arguments{
 \item{famfile}{Path to a ".fam" file.}

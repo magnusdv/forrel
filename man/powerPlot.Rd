@@ -35,7 +35,7 @@ NULL. See Examples.}
 containing more than 1 element. NB: This fails with a warning if all points
 in a group fall on a line.}
 
-\item{col}{A color vector, recycle to match the top level length of \code{ep}.}
+\item{col}{A colour vector, recycle to match the top level length of \code{ep}.}
 
 \item{labs}{A character of the same length as \code{ep}. If NULL, the names of
 \code{ep} are used, if present.}
@@ -85,7 +85,7 @@ In the most general case \code{ep} (and similarly for \code{ip}) can be a list o
 of \code{EPresult} objects. To simplify the discussion we refer to the inner lists
 as "groups". A group may consist of a single point, or several (typically
 many simulations of the same situation). Points within the same group are
-always drawn with the same color and shape.
+always drawn with the same colour and shape.
 
 When plotting several groups, two sets of points are drawn:
 \itemize{

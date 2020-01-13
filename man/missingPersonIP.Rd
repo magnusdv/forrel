@@ -12,7 +12,7 @@ missingPersonIP(
   threshold = NULL,
   disableMutations = NA,
   seed = NULL,
-  verbose = T
+  verbose = TRUE
 )
 }
 \arguments{
@@ -28,7 +28,7 @@ parameter is ignored.}
 \item{nsim}{A positive integer: the number of simulations}
 
 \item{threshold}{A numeric vector with one or more positive numbers used as
-the likelihood ratio tresholds for inclusion}
+the likelihood ratio thresholds for inclusion}
 
 \item{disableMutations}{This parameter determines how mutation models are
 treated. Possible values are as follows:

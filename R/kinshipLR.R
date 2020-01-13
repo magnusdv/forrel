@@ -65,7 +65,7 @@ kinshipLR = function(x, ref, markers) {
       return(lapply(a, breaklp))
     if(is.singleton(a))
       return(a)
-    breakLoops(a, verbose = F)
+    breakLoops(a, verbose = FALSE)
   }
 
   x_loopfree = lapply(x, breaklp)

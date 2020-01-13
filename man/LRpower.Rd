@@ -44,7 +44,7 @@ indicating which pedigree is used as source for marker data.}
 \item{nsim}{A positive integer: the number of simulations.}
 
 \item{threshold}{A numeric vector with one or more positive numbers used as
-LR tresholds.}
+LR thresholds.}
 
 \item{disableMutations}{Not implemented yet.}
 

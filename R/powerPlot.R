@@ -23,7 +23,7 @@
 #' of `EPresult` objects. To simplify the discussion we refer to the inner lists
 #' as "groups". A group may consist of a single point, or several (typically
 #' many simulations of the same situation). Points within the same group are
-#' always drawn with the same color and shape.
+#' always drawn with the same colour and shape.
 #'
 #' When plotting several groups, two sets of points are drawn:
 #'
@@ -39,7 +39,7 @@
 #' @param ellipse A logical. If TRUE, data ellipsis are drawn for each group
 #'   containing more than 1 element. NB: This fails with a warning if all points
 #'   in a group fall on a line.
-#' @param col A color vector, recycle to match the top level length of `ep`.
+#' @param col A colour vector, recycle to match the top level length of `ep`.
 #' @param labs A character of the same length as `ep`. If NULL, the names of
 #'   `ep` are used, if present.
 #' @param alpha Transparency for minor points (see Details).
@@ -126,7 +126,7 @@ powerPlot = function(ep, ip, type = 1, ellipse = FALSE, col = NULL, labs = NULL,
     legendOrder = seq_along(labs)
   group = factor(rep(labs, times = L), levels = labs[legendOrder])
 
-  ### COlors
+  ### COlours
   if(is.null(col)) {
     col = c("lightgreen", "firebrick1", "deepskyblue", "#FFFF33", "gray70", "#F781BF", "cyan", "wheat", "#FF7F00")
 
@@ -156,7 +156,7 @@ powerPlot = function(ep, ip, type = 1, ellipse = FALSE, col = NULL, labs = NULL,
   ### Extract numbers and build data frame with plotting data
   if(type == 1) {
     epnum = vapply(unlist(ep, recursive = FALSE), function(a) a$EPtotal, FUN.VALUE = 1)
-    ipnum = tryCatch(vapply(unlist(ip, recursive = F), function(a) a$IP, FUN.VALUE = 1),
+    ipnum = tryCatch(vapply(unlist(ip, recursive = FALSE), function(a) a$IP, FUN.VALUE = 1),
                      error = function(e) stop2("Missing IP data. Are you sure you wanted power plot type 1?"))
 
 
@@ -167,8 +167,8 @@ powerPlot = function(ep, ip, type = 1, ellipse = FALSE, col = NULL, labs = NULL,
     if(is.null(ylim)) ylim = c(0, 1)
   }
   else if(type == 2) {
-    epnum = vapply(unlist(ep, recursive = F), function(a) a$EPtotal, FUN.VALUE = 1)
-    ipnum = tryCatch(vapply(unlist(ip, recursive = F), function(a) a$IP, FUN.VALUE = 1),
+    epnum = vapply(unlist(ep, recursive = FALSE), function(a) a$EPtotal, FUN.VALUE = 1)
+    ipnum = tryCatch(vapply(unlist(ip, recursive = FALSE), function(a) a$IP, FUN.VALUE = 1),
                      error = function(e) stop2("Missing IP data. Are you sure you wanted power plot type 2?"))
 
     # Odds ratios: Assumes first entry is baseline!
@@ -185,8 +185,8 @@ powerPlot = function(ep, ip, type = 1, ellipse = FALSE, col = NULL, labs = NULL,
     if(is.null(ylim)) ylim = c(0, max(ip.OR))
   }
   else if(type == 3) {
-    epnum = vapply(unlist(ep, recursive = F), function(a) a$expectedMismatch, FUN.VALUE = 1)
-    ipnum = vapply(unlist(ip, recursive = F), function(a) a$meanLogLR, FUN.VALUE = 1)
+    epnum = vapply(unlist(ep, recursive = FALSE), function(a) a$expectedMismatch, FUN.VALUE = 1)
+    ipnum = vapply(unlist(ip, recursive = FALSE), function(a) a$meanLogLR, FUN.VALUE = 1)
 
     alldata = data.frame(ep = epnum, ip = ipnum, group = group)
 
@@ -196,8 +196,8 @@ powerPlot = function(ep, ip, type = 1, ellipse = FALSE, col = NULL, labs = NULL,
     if(is.null(ylim)) ylim = c(min(0, ipnum), max(1, ipnum))
   }
   else if(type == 4) {
-    epnum = vapply(unlist(ep, recursive = F), function(a) a$EPtotal, FUN.VALUE = 1)
-    ipnum = vapply(unlist(ip, recursive = F), function(a) a$meanLR, FUN.VALUE = 1)
+    epnum = vapply(unlist(ep, recursive = FALSE), function(a) a$EPtotal, FUN.VALUE = 1)
+    ipnum = vapply(unlist(ip, recursive = FALSE), function(a) a$meanLR, FUN.VALUE = 1)
 
     alldata = data.frame(ep = epnum, ip = ipnum, group = group)
 

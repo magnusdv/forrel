@@ -124,7 +124,7 @@ genotype(claim, marker = 2, id = 3) = c(1, 1)
 genotype(claim, marker = 3, id = 3) = c(1, 2)
 
 # Compute EP when father is available
-exclusionPower(claim, true, ids = 1, plotMarker = 1:3)
+exclusionPower(claim, true, ids = 1, plot = FALSE)
 
 
 ############################################

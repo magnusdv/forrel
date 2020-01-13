@@ -102,7 +102,7 @@ markerSim = function(x, N = 1, ids = NULL, alleles = NULL, afreq = NULL,
       stop2("Argument `partialmarker` must be a `marker` object, or the name (or index) of a single marker attached to `x`")
 
     if (!allowsMutations(m)) {
-      err = mendelianCheck(setMarkers(x, m), verbose = F)
+      err = mendelianCheck(setMarkers(x, m), verbose = FALSE)
       if (length(err) > 0)
         stop2("Mendelian error in the given partial marker.")
     }
@@ -145,7 +145,7 @@ markerSim = function(x, N = 1, ids = NULL, alleles = NULL, afreq = NULL,
 
   allgenos = pedprobr::allGenotypes(nall)
 
-  gridlist = pedprobr::genoCombinations(x, m, labels(x), make.grid = F)
+  gridlist = pedprobr::genoCombinations(x, m, labels(x), make.grid = FALSE)
 
 
   if (verbose) {
@@ -423,8 +423,8 @@ markerSim = function(x, N = 1, ids = NULL, alleles = NULL, afreq = NULL,
   else {
     males = target_int[SEX[target_int] == 1]
     females = target_int[SEX[target_int] == 2]
-    ngrid_m = lengths(gridlist[males], use.names = F)
-    ngrid_f = lengths(gridlist[females], use.names = F)
+    ngrid_m = lengths(gridlist[males], use.names = FALSE)
+    ngrid_f = lengths(gridlist[females], use.names = FALSE)
     nM = length(males)
     nF = length(females)
 
@@ -543,7 +543,7 @@ simpleSim = function(x, N, alleles, afreq, ids, Xchrom = FALSE,
       cat("Allele frequencies:\n")
       # hack to get 1 sp indent
       afr = afreq; names(afr) = alleles
-      print(data.frame(as.list(afr), check.names = F), row.names = F)
+      print(data.frame(as.list(afr), check.names = FALSE), row.names = FALSE)
     }
     cat("Mutation model:", if(mutations) "Yes" else "No", "\n\n")
   }
@@ -599,8 +599,8 @@ simpleSim = function(x, N, alleles, afreq, ids, Xchrom = FALSE,
   FIDX = x$FIDX
   MIDX = x$MIDX
   SEX = x$SEX
-  FOU = founders(x, internal = T)
-  NONFOU = nonfounders(x, internal = T)
+  FOU = founders(x, internal = TRUE)
+  NONFOU = nonfounders(x, internal = TRUE)
   mutations = !is.null(mutmod)
 
   if (!is.null(seed)) set.seed(seed)
@@ -610,7 +610,7 @@ simpleSim = function(x, N, alleles, afreq, ids, Xchrom = FALSE,
   odd = seq_len(N) * 2 - 1
 
   # Sample alleles for the founders
-  variableSNPfreqs = nall==2 && length(afreq) != 2
+  variableSNPfreqs = nall == 2 && length(afreq) != 2
   if (variableSNPfreqs)
     fou_alleles = unlist(lapply(afreq, function(f)
       sample.int(2, length(FOU)*2, replace = TRUE, prob = c(f, 1 - f))))
@@ -647,8 +647,8 @@ simpleSim = function(x, N, alleles, afreq, ids, Xchrom = FALSE,
   FIDX = x$FIDX
   MIDX = x$MIDX
   SEX = x$SEX
-  FOU = founders(x, internal = T)
-  NONFOU = nonfounders(x, internal = T)
+  FOU = founders(x, internal = TRUE)
+  NONFOU = nonfounders(x, internal = TRUE)
   mutations = !is.null(mutmod)
 
   # Initialise the marker matrix

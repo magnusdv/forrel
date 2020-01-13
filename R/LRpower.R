@@ -16,7 +16,7 @@
 #'   indicating which pedigree is used as source for marker data.
 #' @param nsim A positive integer: the number of simulations.
 #' @param threshold A numeric vector with one or more positive numbers used as
-#'   LR tresholds.
+#'   LR thresholds.
 #' @param disableMutations Not implemented yet.
 #' @param alleles,afreq,Xchrom If these are given, they are used (together with
 #'   `knownGenotypes`) to create a marker object on the fly.
@@ -178,12 +178,12 @@ LRpower = function(numeratorPed, denominatorPed, truePed = numeratorPed, ids, ma
 
   # Simulate nsim complete profiles from truePed
   if(verbose)
-    message("Simulating ", nsim, " profiles from true pedigree...", appendLF = F)
+    message("Simulating ", nsim, " profiles from true pedigree...", appendLF = FALSE)
 
   allsims = profileSim(truePed, N = nsim, ids = ids)
 
   if(verbose)
-    message("done\nComputing likelihood ratios...", appendLF = F)
+    message("done\nComputing likelihood ratios...", appendLF = FALSE)
 
   # Compute the exclusion power of each marker
   lrs = vapply(allsims, function(s) {

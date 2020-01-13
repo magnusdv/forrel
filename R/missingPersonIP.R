@@ -3,7 +3,7 @@
 #' @inheritParams missingPersonEP
 #' @param nsim A positive integer: the number of simulations
 #' @param threshold A numeric vector with one or more positive numbers used as
-#'   the likelihood ratio tresholds for inclusion
+#'   the likelihood ratio thresholds for inclusion
 #' @param seed A numeric seed for the random number generator (optional)
 #'
 #' @return A `mpIP` object, which is essentially a list with the following
@@ -42,7 +42,7 @@
 #' @importFrom pedprobr likelihood
 #' @export
 missingPersonIP = function(reference, missing, markers, nsim = 1, threshold = NULL,
-                           disableMutations = NA, seed = NULL, verbose = T) {
+                           disableMutations = NA, seed = NULL, verbose = TRUE) {
   st = Sys.time()
 
   if(!is.ped(reference))
@@ -105,12 +105,12 @@ missingPersonIP = function(reference, missing, markers, nsim = 1, threshold = NU
 
   # Simulate nsim complete profiles of relatedPed
   if(verbose)
-    message("Simulating ", nsim, " profiles...", appendLF = F)
+    message("Simulating ", nsim, " profiles...", appendLF = FALSE)
 
   allsims = profileSim(relatedPed, ids = "_POI_", N = nsim, markers = midx)
 
   if(verbose)
-    message("done\nComputing likelihood ratios...", appendLF = F)
+    message("done\nComputing likelihood ratios...", appendLF = FALSE)
 
   # Compute the exclusion power of each marker
   lrs = vapply(allsims, function(s) {

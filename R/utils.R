@@ -27,7 +27,7 @@ pluralise = function(noun, n) {
 
 #random 0/1 vector of length n.
 .rand01 = function(n) {
-  sample.int(2, size = n, replace = T) - 1L
+  sample.int(2, size = n, replace = TRUE) - 1L
 }
 
 # Equivalent to t.default(combn(n, 2)), but ~6 times faster.

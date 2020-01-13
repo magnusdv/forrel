@@ -24,9 +24,9 @@
 #'
 #' @importFrom pedmut mutationMatrix
 #' @export
-readFam = function(famfile, useDVI = NA, verbose = T) {
+readFam = function(famfile, useDVI = NA, verbose = TRUE) {
   if(!endsWith(famfile, ".fam"))
-    stop("Input file must end with '.fam'", call. = F)
+    stop("Input file must end with '.fam'", call. = FALSE)
 
   # Read entire file
   raw = readLines(famfile)
@@ -36,7 +36,7 @@ readFam = function(famfile, useDVI = NA, verbose = T) {
   checkInt = function(a, line, txt, value) {
     if(!is.na(a)) return()
     stop(sprintf('Expected line %d to be %s, but found: "%s"',
-                 line, txt, x[line]), call. = F)
+                 line, txt, x[line]), call. = FALSE)
   }
 
   # Read and print Familias version
@@ -317,7 +317,7 @@ readFam = function(famfile, useDVI = NA, verbose = T) {
 
     res = lapply(dvi.families, function(fam) {
       Familias2ped(familiasped = fam$pedigrees, datamatrix = fam$datamatrix,
-                   loci = loci, matchLoci = T)
+                   loci = loci, matchLoci = TRUE)
     })
 
     return(res)
@@ -457,7 +457,7 @@ parseFamily = function(x) {
     # Data frame of parent-child pairs
     parent.tags = which(tags == "Parent")
     po = data.frame(parent = vals[parent.tags], child = vals[parent.tags + 1],
-                    stringsAsFactors = F)
+                    stringsAsFactors = FALSE)
 
     # Add extra individuals if needed (e.g. "Missing person")
     if(length(extras <- setdiff(po$child, id))) {

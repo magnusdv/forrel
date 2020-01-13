@@ -15,12 +15,12 @@ handling pedigrees and marker data.
 
 The most important analyses currently supported by forrel are:
 
--   Pairwise relatedness inference: Estimation of IBD (kappa)
-    coefficients from marker data
--   Visualisation of IBD coefficients in the IBD triangle
 -   Likelihood ratios for relationship testing
 -   Simulation of marker genotypes and complete DNA profiles.
     Unconditional or conditional on known genotypes
+-   Pairwise relatedness inference: Estimation of IBD (kappa)
+    coefficients from marker data
+-   Visualisation of IBD coefficients in the IBD triangle
 -   Power analysis for relationship testing: Exclusion power (EP) and
     inclusion power (IP)
 -   Tailor-made functions for power analysis in family reunion cases:
@@ -54,12 +54,9 @@ unknown to us - we estimate the relatedness between the brothers using
 the simulated data. If all goes well, the estimate should be close to
 the expected value for siblings.
 
-To get going, load the `forrel` and `pedtools` packages. The latter is
-needed for pedigree creation and plotting.
-
 ``` r
-library(pedtools)
 library(forrel)
+#> Loading required package: pedtools
 ```
 
 **Create the pedigree**
@@ -96,7 +93,7 @@ x = markerSim(x, N = 100, ids = bros, alleles = 1:2, seed = 1234)
 #> 
 #> Simulation finished.
 #> Number of calls to the likelihood function: 0.
-#> Total time used: 0.14 seconds.
+#> Total time used: 0.12 seconds.
 ```
 
 Note 1: The `seed` argument is passed onto the random number generator.

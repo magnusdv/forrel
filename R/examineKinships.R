@@ -3,7 +3,7 @@
 #' This function provides a convenient way to check for pedigree errors in a
 #' linkage project or other situations where marker data is available for several
 #' members. The function calls [IBDestimate()] to estimate IBD coefficients
-#' for all indicated pairs of pedigree members and produces a color-coded plot where wrong
+#' for all indicated pairs of pedigree members and produces a colour-coded plot where wrong
 #' relationships are easy to spot.
 #'
 #' @param x A `ped` object, or a list of such.
