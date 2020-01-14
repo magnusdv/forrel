@@ -94,7 +94,7 @@ argument:
 }
 }
 \examples{
-opar = par() # store graphical parameters
+opar = par(no.readonly = TRUE) # store graphical parameters
 
 IBDtriangle()
 IBDtriangle(kinshipLines = c(0.25, 0.125), shading = NULL, cex_text = 0.8)

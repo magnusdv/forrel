@@ -77,7 +77,7 @@
 #' relationships._ Annals of Human Genetics 40.
 #'
 #' @examples
-#' opar = par() # store graphical parameters
+#' opar = par(no.readonly = TRUE) # store graphical parameters
 #'
 #' IBDtriangle()
 #' IBDtriangle(kinshipLines = c(0.25, 0.125), shading = NULL, cex_text = 0.8)
@@ -203,7 +203,7 @@ showInTriangle = function(k0, k2 = NULL, new = TRUE, col = "blue",
     stop2("When `labels` is a character, it must have the same length as `k0`")
 
   if(new) {
-    opar = par() # store graphical parameters
+    opar = par(no.readonly = TRUE) # store graphical parameters
     on.exit(par(opar))
 
     IBDtriangle(...)
