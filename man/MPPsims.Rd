@@ -94,6 +94,7 @@ simData = MPPsims(x, selections = sel, nProfiles = 2, lrSims = 2)
 # Power plot
 powerPlot(simData, type = 3)
 
+\donttest{
 ### With  mutations
 # Create inconsistent marker
 m2 = m
@@ -110,11 +111,11 @@ MPPsims(x, selections = "Father", addBaseline = FALSE, seed = 123)
 MPPsims(x, selections = "Father", addBaseline = FALSE, seed = 123,
         disableMutations = FALSE)
 
-\donttest{
+
 # Disable all mutation models. SHOULD GIVE ERROR FOR SECOND MARKER
 MPPsims(x, selections = "Father", addBaseline = FALSE, seed = 123,
         disableMutations = TRUE)
-}
+
 
 # Effect of variable number of alleles
 y = nuclearPed(father = "fa", child = "MP")
@@ -125,4 +126,5 @@ sel = rep("fa", 4)
 names(sel) = paste(2:5, "alleles")
 pows = MPPsims(peds, selections = sel, addBaseline = FALSE, lrSims = 10)
 powerPlot(pows, type = 3)
+}
 }

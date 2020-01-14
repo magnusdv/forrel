@@ -108,6 +108,8 @@ simData = MPPsims(ref, selections = sel, nProfiles = 5,
 # Power plot 1: EP vs IP
 powerPlot(simData, type = 1)
 
+\donttest{
+
 # Change shape, and modify legend order
 powerPlot(simData, type = 1, shape = c("ci", "sq", "di"), legendOrder = 3:1)
 
@@ -123,6 +125,8 @@ powerPlot(simData, type = 3, hline = log10(2), vline = 1)
 
 # Plot 4: Illustrating the general inequality ELR > 1/(1-EP)
 powerPlot(simData, type = 4)
+
+}
 
 }
 \seealso{
