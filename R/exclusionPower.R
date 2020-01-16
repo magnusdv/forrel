@@ -32,11 +32,11 @@
 #'
 #'   * A vector containing the names or indices of those markers for which
 #'   mutations should be disabled.
-#' @param exactMaxL A positive integer. Exact EPs are calculated for markers
-#'   whose number of alleles is less or equal to this; a simulation approach
-#'   will be used for the remaining markers.
+#' @param exactMaxL A positive integer, or `Inf` (default). Exact EPs are
+#'   calculated for markers whose number of alleles is less or equal to
+#'   `exactMaxL`; remaining markers are handled using a simulation.
 #' @param nsim A positive integer; the number of simulations used for markers
-#'   with many alleles (see `exactMaxL`).
+#'   whose number of alleles exceeds `exactMaxL`.
 #' @param seed A numeric seed for the random number generator (optional).
 #' @param alleles,afreq,Xchrom If these are given, they are used (together with
 #'   `knownGenotypes`) to create a marker object on the fly.
@@ -102,7 +102,7 @@
 #' claim = setMarkers(claim, list(m1, m2, m3))
 #'
 #' # Compute EP when father and child is available for genotyping
-#' exclusionPower(claim, true, ids = c(1,3), plot = FALSE)
+#' exclusionPower(claim, true, ids = c(1,3))
 #'
 #' # Suppose child is genotyped
 #' genotype(claim, marker = 1, id = 3) = c(1, 1)
@@ -110,7 +110,7 @@
 #' genotype(claim, marker = 3, id = 3) = c(1, 2)
 #'
 #' # Compute EP when father is available
-#' exclusionPower(claim, true, ids = 1, plot = FALSE)
+#' exclusionPower(claim, true, ids = 1)
 #'
 #'
 #' ############################################
@@ -128,8 +128,7 @@
 #'
 #' # Tetra-allelic marker with one major allele:
 #' PE2 = exclusionPower(claimPed = mother_daughter, truePed = sisters,
-#'                      ids = ids, alleles = 4, afreq = c(0.7, 0.1, 0.1, 0.1),
-#'                      plot = FALSE)
+#'                      ids = ids, alleles = 4, afreq = c(0.7, 0.1, 0.1, 0.1))
 #'
 #' stopifnot(all.equal(c(PE1$EPtotal, PE2$EPtotal), c(0.00405, 0.03090)))
 #'
@@ -140,16 +139,16 @@
 #'
 #' # SNP with MAF = 0.1:
 #' PE3 = exclusionPower(claimPed = mother_daughter, truePed = sisters_LOOP,
-#'                      ids = ids, alleles = 2, afreq = c(0.9, 0.1),
-#'                      plot = FALSE)
+#'                      ids = ids, alleles = 2, afreq = c(0.9, 0.1))
 #'
 #' stopifnot(all.equal(PE3$EPtotal, 0.00765))
 #'
 #' @importFrom pedprobr likelihood
 #' @export
-exclusionPower = function(claimPed, truePed, ids, markers = NULL, source = "claim", disableMutations = NA,
-                          exactMaxL = 50, nsim = 1000, seed = NULL, alleles = NULL, afreq = NULL, knownGenotypes = NULL,
-                          Xchrom = FALSE, plot = FALSE, plotMarkers = NULL, verbose = TRUE) {
+exclusionPower = function(claimPed, truePed, ids, markers = NULL, source = "claim",
+                          disableMutations = NA, exactMaxL = Inf, nsim = 1000, seed = NULL,
+                          alleles = NULL, afreq = NULL, knownGenotypes = NULL, Xchrom = FALSE,
+                          plot = FALSE, plotMarkers = NULL, verbose = TRUE) {
 
   st = Sys.time()
   ids = as.character(ids)

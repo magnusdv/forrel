@@ -11,7 +11,7 @@ exclusionPower(
   markers = NULL,
   source = "claim",
   disableMutations = NA,
-  exactMaxL = 50,
+  exactMaxL = Inf,
   nsim = 1000,
   seed = NULL,
   alleles = NULL,
@@ -54,12 +54,12 @@ markers have nonzero likelihood in both alternatives.
 mutations should be disabled.
 }}
 
-\item{exactMaxL}{A positive integer. Exact EPs are calculated for markers
-whose number of alleles is less or equal to this; a simulation approach
-will be used for the remaining markers.}
+\item{exactMaxL}{A positive integer, or \code{Inf} (default). Exact EPs are
+calculated for markers whose number of alleles is less or equal to
+\code{exactMaxL}; remaining markers are handled using a simulation.}
 
 \item{nsim}{A positive integer; the number of simulations used for markers
-with many alleles (see \code{exactMaxL}).}
+whose number of alleles exceeds \code{exactMaxL}.}
 
 \item{seed}{A numeric seed for the random number generator (optional).}
 
@@ -128,7 +128,7 @@ m3 = marker(claim, alleles = 1:2, chrom = "X")
 claim = setMarkers(claim, list(m1, m2, m3))
 
 # Compute EP when father and child is available for genotyping
-exclusionPower(claim, true, ids = c(1,3), plot = FALSE)
+exclusionPower(claim, true, ids = c(1,3))
 
 # Suppose child is genotyped
 genotype(claim, marker = 1, id = 3) = c(1, 1)
@@ -136,7 +136,7 @@ genotype(claim, marker = 2, id = 3) = c(1, 1)
 genotype(claim, marker = 3, id = 3) = c(1, 2)
 
 # Compute EP when father is available
-exclusionPower(claim, true, ids = 1, plot = FALSE)
+exclusionPower(claim, true, ids = 1)
 
 
 ############################################
@@ -154,8 +154,7 @@ PE1 = exclusionPower(claimPed = mother_daughter, truePed = sisters,
 
 # Tetra-allelic marker with one major allele:
 PE2 = exclusionPower(claimPed = mother_daughter, truePed = sisters,
-                     ids = ids, alleles = 4, afreq = c(0.7, 0.1, 0.1, 0.1),
-                     plot = FALSE)
+                     ids = ids, alleles = 4, afreq = c(0.7, 0.1, 0.1, 0.1))
 
 stopifnot(all.equal(c(PE1$EPtotal, PE2$EPtotal), c(0.00405, 0.03090)))
 
@@ -166,8 +165,7 @@ sisters_LOOP = addParents(sisters_LOOP, 102, father = 201, mother = 203)
 
 # SNP with MAF = 0.1:
 PE3 = exclusionPower(claimPed = mother_daughter, truePed = sisters_LOOP,
-                     ids = ids, alleles = 2, afreq = c(0.9, 0.1),
-                     plot = FALSE)
+                     ids = ids, alleles = 2, afreq = c(0.9, 0.1))
 
 stopifnot(all.equal(PE3$EPtotal, 0.00765))
 
