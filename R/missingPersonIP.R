@@ -112,7 +112,7 @@ missingPersonIP = function(reference, missing, markers, nsim = 1, threshold = NU
   if(verbose)
     message("done\nComputing likelihood ratios...", appendLF = FALSE)
 
-  # Compute the exclusion power of each marker
+  # Compute LR of each marker
   lrs = vapply(allsims, function(s) {
     unrelSim = transferMarkers(from = s, to = unrelatedPed)
 
