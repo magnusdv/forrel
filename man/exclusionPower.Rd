@@ -11,11 +11,14 @@ exclusionPower(
   markers = NULL,
   source = "claim",
   disableMutations = NA,
+  exactMaxL = 50,
+  nsim = 1000,
+  seed = NULL,
   alleles = NULL,
   afreq = NULL,
   knownGenotypes = NULL,
   Xchrom = FALSE,
-  plot = TRUE,
+  plot = FALSE,
   plotMarkers = NULL,
   verbose = TRUE
 )
@@ -50,6 +53,15 @@ markers have nonzero likelihood in both alternatives.
 \item A vector containing the names or indices of those markers for which
 mutations should be disabled.
 }}
+
+\item{exactMaxL}{A positive integer. Exact EPs are calculated for markers
+whose number of alleles is less or equal to this; a simulation approach
+will be used for the remaining markers.}
+
+\item{nsim}{A positive integer; the number of simulations used for markers
+with many alleles (see \code{exactMaxL}).}
+
+\item{seed}{A numeric seed for the random number generator (optional).}
 
 \item{alleles, afreq, Xchrom}{If these are given, they are used (together with
 \code{knownGenotypes}) to create a marker object on the fly.}
@@ -163,7 +175,8 @@ stopifnot(all.equal(PE3$EPtotal, 0.00765))
 \references{
 T. Egeland, N. Pinto and M.D. Vigeland, \emph{A general approach to
 power calculation for relationship testing.} Forensic Science
-International: Genetics 9 (2014): 186-190. \doi{10.1016/j.fsigen.2013.05.001}
+International: Genetics 9 (2014): 186-190.
+\doi{10.1016/j.fsigen.2013.05.001}
 }
 \author{
 Magnus Dehli Vigeland

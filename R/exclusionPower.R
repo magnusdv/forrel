@@ -32,7 +32,12 @@
 #'
 #'   * A vector containing the names or indices of those markers for which
 #'   mutations should be disabled.
-#'
+#' @param exactMaxL A positive integer. Exact EPs are calculated for markers
+#'   whose number of alleles is less or equal to this; a simulation approach
+#'   will be used for the remaining markers.
+#' @param nsim A positive integer; the number of simulations used for markers
+#'   with many alleles (see `exactMaxL`).
+#' @param seed A numeric seed for the random number generator (optional).
 #' @param alleles,afreq,Xchrom If these are given, they are used (together with
 #'   `knownGenotypes`) to create a marker object on the fly.
 #' @param knownGenotypes A list of triplets `(a, b, c)`, indicating that
@@ -73,7 +78,8 @@
 #'
 #' @references T. Egeland, N. Pinto and M.D. Vigeland, *A general approach to
 #'   power calculation for relationship testing.* Forensic Science
-#'   International: Genetics 9 (2014): 186-190. \doi{10.1016/j.fsigen.2013.05.001}
+#'   International: Genetics 9 (2014): 186-190.
+#'   \doi{10.1016/j.fsigen.2013.05.001}
 #'
 #' @examples
 #'
@@ -142,8 +148,8 @@
 #' @importFrom pedprobr likelihood
 #' @export
 exclusionPower = function(claimPed, truePed, ids, markers = NULL, source = "claim", disableMutations = NA,
-                          alleles = NULL, afreq = NULL, knownGenotypes = NULL,
-                          Xchrom = FALSE, plot = TRUE, plotMarkers = NULL, verbose = TRUE) {
+                          exactMaxL = 50, nsim = 1000, seed = NULL, alleles = NULL, afreq = NULL, knownGenotypes = NULL,
+                          Xchrom = FALSE, plot = FALSE, plotMarkers = NULL, verbose = TRUE) {
 
   st = Sys.time()
   ids = as.character(ids)
@@ -273,14 +279,14 @@ exclusionPower = function(claimPed, truePed, ids, markers = NULL, source = "clai
       message("Mutation model ", action, appendLF = FALSE)
     }
 
-    # If impossible, return NA
+    # If impossible in true, return NA
     if(trueBase[i] == 0) {
       if(verbose)
         message("INCOMPATIBLE WITH TRUE PEDIGREE! PE = NA")
       return(NA_real_)
     }
 
-    # If impossible, return NA
+    # If impossible in claim, return 1
     if(claimBase[i] == 0) {
       if(verbose)
         message("INCOMPATIBLE WITH CLAIMED PEDIGREE! PE = 1")
@@ -288,9 +294,14 @@ exclusionPower = function(claimPed, truePed, ids, markers = NULL, source = "clai
     }
 
     # Otherwise, compute EP
-    this.ep = .exclusionPowerSingleMarker(claimPed, truePed, ids, marker = i, verbose = FALSE)
+    exactCalc = nAlleles(truePed, marker = i) <= exactMaxL
+    if(exactCalc)
+      this.ep = .EPsingleMarker(claimPed, truePed, ids, marker = i, verbose = FALSE)
+    else
+      this.ep = .EPsingleMarker_simulated (claimPed, truePed, ids, marker = i, nsim = nsim, verbose = FALSE)
+
     if(verbose)
-      message("PE = ", this.ep)
+      message("PE = ", this.ep, if(!exactCalc) " (simulated)")
 
     this.ep
   }, FUN.VALUE = 0)
@@ -324,7 +335,8 @@ exclusionPower = function(claimPed, truePed, ids, markers = NULL, source = "clai
     message("Total time used: ", format(Sys.time() - st, digits = 3))
 
   # List of input parameters
-  params = list(ids = ids, markers = markers, disableMutations = disableMutations)
+  params = list(ids = ids, markers = markers, disableMutations = disableMutations,
+                exactMaxL = exactMaxL, nsim = nsim, seed = seed)
 
   structure(list(EPperMarker = ep, EPtotal = tot, expectedMismatch = expMis,
                  distribMismatch = distrib, params = params), class = "EPresult")
@@ -351,7 +363,7 @@ print.EPresult = function(x, ...) {
   ### Computations start here ###
   ###############################
 
-.exclusionPowerSingleMarker = function(claimPed, truePed, ids, marker, verbose = TRUE) {
+.EPsingleMarker = function(claimPed, truePed, ids, marker, verbose = TRUE) {
   # Step 1: Genotype combinations incompatible with "claim"
   # Step 2: Probability of incomp under `true` pedigree
 
@@ -457,4 +469,12 @@ print.EPresult = function(x, ...) {
   }
 
   sum(excl)
+}
+
+.EPsingleMarker_simulated = function(claimPed, truePed, ids, marker, nsim = 1000, verbose = TRUE) {
+  trueSims = markerSim(truePed, ids = ids, N = nsim, partialmarker = marker, verbose = FALSE)
+
+  claimSims = transferMarkers(trueSims, claimPed)
+  liks = sapply(1:nsim, function(i) pedprobr::likelihood(claimSims, marker1 = i))
+  mean(liks == 0)
 }
