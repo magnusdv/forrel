@@ -70,6 +70,8 @@
 #'   `n` is the number of nonzero elements of `EPperMarker`. The vector has
 #'   names `0:n`.
 #'
+#'   * `time`: The total computation time.
+#'
 #'   * `params`: A list containing the (processed) parameters `ids`, `markers`
 #'   and `disableMutations`.
 #'
@@ -330,15 +332,16 @@ exclusionPower = function(claimPed, truePed, ids, markers = NULL, source = "clai
   }
 
   # Timing
+  time = Sys.time() - st
   if(verbose)
-    message("Total time used: ", format(Sys.time() - st, digits = 3))
+    message("Total time used: ", format(time, digits = 3))
 
   # List of input parameters
   params = list(ids = ids, markers = markers, disableMutations = disableMutations,
                 exactMaxL = exactMaxL, nsim = nsim, seed = seed)
 
   structure(list(EPperMarker = ep, EPtotal = tot, expectedMismatch = expMis,
-                 distribMismatch = distrib, params = params), class = "EPresult")
+                 distribMismatch = distrib, time = time, params = params), class = "EPresult")
 }
 
 #' @export

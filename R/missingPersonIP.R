@@ -22,6 +22,8 @@
 #'   of `threshold`, the fraction of simulations resulting in a LR exceeding the
 #'   given number.
 #'
+#'   * `time`: The total computation time.
+#'
 #'   * `params`: A list containing the input parameters `missing`, `markers`,
 #'   `nsim`, `threshold` and `disableMutations`
 #'
@@ -138,8 +140,9 @@ missingPersonIP = function(reference, missing, markers, nsim = 1, threshold = NU
   names(IP) = threshold
 
   # Timing
+  time = Sys.time() - st
   if(verbose)
-    message("Total time used: ", format(Sys.time() - st, digits = 3))
+    message("Total time used: ", format(time, digits = 3))
 
   # Lits of input parameters
   params = list(missing = missing, markers = markers,
@@ -148,7 +151,7 @@ missingPersonIP = function(reference, missing, markers, nsim = 1, threshold = NU
 
   structure(list(LRperSim = LRperSim, meanLRperMarker = meanLRperMarker,
                  meanLR = meanLR, meanLogLR = meanLogLR, IP = IP,
-                 params = params), class = "mpIP")
+                 time = time, params = params), class = "mpIP")
 }
 
 #' @export

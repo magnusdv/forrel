@@ -95,6 +95,7 @@ computed as \code{sum(EPperMarker, na.rm = TRUE)}.
 giving exclusion. This is given as a numeric vector of length \code{n+1}, where
 \code{n} is the number of nonzero elements of \code{EPperMarker}. The vector has
 names \code{0:n}.
+\item \code{time}: The total computation time.
 \item \code{params}: A list containing the (processed) parameters \code{ids}, \code{markers}
 and \code{disableMutations}.
 }
