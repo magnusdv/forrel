@@ -3,6 +3,7 @@
 .RData
 .Ruserdata
 notes-private
+cran-comments.md
 R/examineKinships.R
 R/relationLR.R
 R/kinshipPowerSims.R
