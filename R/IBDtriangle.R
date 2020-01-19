@@ -65,7 +65,7 @@
 #' @param xlim,ylim,mar Graphical parameters; see [par()].
 #' @param keep.par A logical. If TRUE, the graphical parameters are not reset
 #'   after plotting, which may be useful for adding additional annotation.
-#' @return NULL
+#' @return None
 #' @author Magnus Dehli Vigeland
 #' @seealso [IBDestimate()]
 #' @references
@@ -160,7 +160,7 @@ IBDtriangle = function(relationships = c("UN", "PO", "MZ", "S", "H,U,G", "FC"),
 #'   `labels` is non-NULL).
 #' @param \dots Plot arguments passed on to `IBDtriangle()`.
 #'
-#' @return NULL
+#' @return None
 #' @author Magnus Dehli Vigeland
 #' @seealso [IBDestimate()]
 #'

@@ -57,6 +57,9 @@ compared to a singleton. Default: 4.}
 
 \item{...}{Extra parameters passed on to \code{\link[pedtools:plotPedList]{pedtools::plotPedList()}}.}
 }
+\value{
+None
+}
 \description{
 Visualises the competing hypotheses of a family reunion case. A plot with two
 panels is generated. The left panel shows a pedigree in which the \emph{person of

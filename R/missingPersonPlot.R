@@ -52,6 +52,7 @@
 #' @param frametitles A character of length 2, with subtitles for the two frames.
 #' @param ... Extra parameters passed on to [pedtools::plotPedList()].
 #'
+#' @return None
 #' @examples
 #' x = nuclearPed(father = "fa", mother = "mo", children = c("b1", "b2"))
 #'

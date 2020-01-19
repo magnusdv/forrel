@@ -48,6 +48,9 @@ labels.}
 \item{keep.par}{A logical. If TRUE, the graphical parameters are not reset
 after plotting, which may be useful for adding additional annotation.}
 }
+\value{
+None
+}
 \description{
 The IBD triangle is typically used to visualize the pairwise relatedness of
 non-inbred individuals. Various annotations are available, including points

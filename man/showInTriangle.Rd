@@ -39,6 +39,9 @@ default, no labels are plotted.}
 
 \item{\dots}{Plot arguments passed on to \code{IBDtriangle()}.}
 }
+\value{
+None
+}
 \description{
 Utility function for plotting points in the IBD triangle.
 }
