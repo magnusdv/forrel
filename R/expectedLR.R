@@ -75,7 +75,7 @@ expectedLR = function(numeratorPed, denominatorPed, truePed = numeratorPed, ids,
   # True pedigree
   if(identical(truePed, numeratorPed))
     true = num
-  else if(identical(true, denominatorPed))
+  else if(identical(truePed, denominatorPed))
     true = den
   else {
     truePed = transferMarkers(from = numeratorPed,
