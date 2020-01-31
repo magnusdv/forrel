@@ -1,4 +1,4 @@
-#' Inclusion power for missing person cases.
+#' Inclusion power for missing person cases
 #'
 #' @inheritParams missingPersonEP
 #' @param nsim A positive integer: the number of simulations

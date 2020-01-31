@@ -2,7 +2,7 @@
 % Please edit documentation in R/missingPersonIP.R
 \name{missingPersonIP}
 \alias{missingPersonIP}
-\title{Inclusion power for missing person cases.}
+\title{Inclusion power for missing person cases}
 \usage{
 missingPersonIP(
   reference,
@@ -66,7 +66,7 @@ given number.
 }
 }
 \description{
-Inclusion power for missing person cases.
+Inclusion power for missing person cases
 }
 \examples{
 
