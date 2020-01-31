@@ -102,8 +102,8 @@ ref = setMarkers(ref, marker(ref, alleles = 1:5))
 sel = list("fa", c("fa", "mo"))
 
 # Simulate power for each selection
-simData = MPPsims(ref, selections = sel, nProfiles = 5,
-                  lrSims = 10, thresholdIP = 2, seed = 123)
+simData = MPPsims(ref, selections = sel, nProfiles = 5, lrSims = 10,
+                  thresholdIP = 2, seed = 123, numCores = 1)
 
 # Power plot 1: EP vs IP
 powerPlot(simData, type = 1)

@@ -12,7 +12,8 @@
 #' @param addBaseline A logical. If TRUE (default) an *empty* selection, named
 #'   "Baseline", is added as the first element of `selection`.
 #' @param nProfiles The number of profile simulations for each selection.
-#' @param lrSims,thresholdIP Parameters passed onto [missingPersonIP()]
+#' @param lrSims,thresholdIP Parameters passed onto [missingPersonIP()].
+#' @param numCores The number of cores used in the parallelisation setup.
 #'
 #' @return An object of class "MPPsim", which is basically a list with one entry
 #'   for each element of `selections`. Each entry has elements `ep` and `ip`,
@@ -32,8 +33,6 @@
 #'
 #'   * `totalTime` (the total time used)
 #'
-#' @export
-#'
 #' @examples
 #' x = nuclearPed(fa = "Gf", mo = "Gm", children = c("Uncle", "Mother"), sex = 1:2)
 #' x = addChildren(x, fa = "Father", mo = "Mother", nch = 3, sex = c(1,2,1),
@@ -50,7 +49,7 @@
 #' plot(x, marker = 1, shaded = sel)
 #'
 #' # Simulate
-#' simData = MPPsims(x, selections = sel, nProfiles = 2, lrSims = 2)
+#' simData = MPPsims(x, selections = sel, nProfiles = 2, lrSims = 2, numCores = 1)
 #'
 #' # Power plot
 #' powerPlot(simData, type = 3)
@@ -88,9 +87,12 @@
 #' pows = MPPsims(peds, selections = sel, addBaseline = FALSE, lrSims = 10)
 #' powerPlot(pows, type = 3)
 #' }
+#'
+#' @importFrom parallel makeCluster stopCluster detectCores parLapply clusterEvalQ clusterExport clusterSetRNGStream
+#' @export
 MPPsims = function(reference, missing = "MP", selections, addBaseline = TRUE,
                    nProfiles = 1, lrSims = 1, thresholdIP = NULL,
-                   disableMutations = NA, seed = NULL, verbose = TRUE) {
+                   disableMutations = NA, numCores = NA, seed = NULL, verbose = TRUE) {
   st = Sys.time()
 
   if(!is.list(selections))
@@ -123,6 +125,21 @@ MPPsims = function(reference, missing = "MP", selections, addBaseline = TRUE,
 
   set.seed(seed)
 
+  # Setup parallelisation
+  if(is.na(numCores))
+    numCores = detectCores() - 1
+  if(numCores > 1) {
+    cl = makeCluster(numCores)
+    on.exit(stopCluster(cl))
+    if(verbose) {
+      message("Preparing parallelisation... ", appendLF = F)
+      print(cl)
+    }
+    clusterEvalQ(cl, library(forrel))
+    clusterExport(cl, c("missingPersonEP", "missingPersonIP"))
+    clusterSetRNGStream(cl, iseed = sample.int(1e6,1))
+  }
+
   powSims = lapply(seq_along(selections), function(i) {
     ref = reference[[i]]
     ids = selections[[i]]
@@ -140,9 +157,16 @@ MPPsims = function(reference, missing = "MP", selections, addBaseline = TRUE,
     # Simulate profile for `ids`
     sims = profileSim(ref, ids = ids, N = nProfiles)
 
+
     # Compute updated EP and IP for each profile
-    ep = lapply(sims, epfun)
-    ip = lapply(sims, ipfun)
+    if(numCores == 1) {
+      ep = lapply(sims, epfun)
+      ip = lapply(sims, ipfun)
+    }
+    else {
+      ep = parLapply(cl, sims, epfun)
+      ip = parLapply(cl, sims, ipfun)
+    }
     list(ep = ep, ip = ip)
   })
 

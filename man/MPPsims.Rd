@@ -13,6 +13,7 @@ MPPsims(
   lrSims = 1,
   thresholdIP = NULL,
   disableMutations = NA,
+  numCores = NA,
   seed = NULL,
   verbose = TRUE
 )
@@ -32,7 +33,7 @@ simple vector.}
 
 \item{nProfiles}{The number of profile simulations for each selection.}
 
-\item{lrSims, thresholdIP}{Parameters passed onto \code{\link[=missingPersonIP]{missingPersonIP()}}}
+\item{lrSims, thresholdIP}{Parameters passed onto \code{\link[=missingPersonIP]{missingPersonIP()}}.}
 
 \item{disableMutations}{This parameter determines how mutation models are
 treated. Possible values are as follows:
@@ -47,6 +48,8 @@ error if any markers are inconsistent with \code{reference}.
 \item A vector containing the names or indices of those markers for which
 mutations should be disabled.
 }}
+
+\item{numCores}{The number of cores used in the parallelisation setup.}
 
 \item{seed}{A numeric seed for the random number generator (optional)}
 
@@ -89,7 +92,7 @@ sel = list("Father", "S2", "HS", c("Gm", "Uncle"))
 plot(x, marker = 1, shaded = sel)
 
 # Simulate
-simData = MPPsims(x, selections = sel, nProfiles = 2, lrSims = 2)
+simData = MPPsims(x, selections = sel, nProfiles = 2, lrSims = 2, numCores = 1)
 
 # Power plot
 powerPlot(simData, type = 3)
@@ -127,4 +130,5 @@ names(sel) = paste(2:5, "alleles")
 pows = MPPsims(peds, selections = sel, addBaseline = FALSE, lrSims = 10)
 powerPlot(pows, type = 3)
 }
+
 }
