@@ -42,7 +42,7 @@ profileSim = function(x, N = 1, ids = NULL, markers = NULL, seed = NULL, ...){
     set.seed(seed)
 
   # Check that all `ids` are in x
-  labs = if(is.ped(x)) labels(x) else unlist(lapply(x, labels))
+  labs = if(is.ped(x)) labels(x) else unlist(labels(x))
   if(length(err <- setdiff(ids, labs)))
     stop2("Unknown ID label: ", err)
 

@@ -71,7 +71,7 @@ IBDestimate = function(x, ids = NULL, markers = NULL, start = c(0.99,0.001), tol
     markers = seq_len(nMarkers(x))
 
   if(is.null(ids))
-    ids = unlist(lapply(x, labels))
+    ids = unlist(labels(x))
   if(length(ids) < 2)
     stop2("`ids` must be either a vector of length at least 2, or a matrix/data.frame with 2 columns")
 
