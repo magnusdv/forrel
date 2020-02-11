@@ -300,26 +300,16 @@ readFam = function(famfile, useDVI = NA, verbose = TRUE) {
     if(is.na(dvi.start))
       stop2("Expected keyword '[DVI]' not found")
     dvi.lines = raw[dvi.start:length(raw)]
-    dvi.families = readDVI(dvi.lines)
+    dvi.families = readDVI(dvi.lines, verbose = verbose)
 
     if(verbose)
-      message("Returning the following families:")
-
-    famnames = names(dvi.families)
-    for(i in seq_along(dvi.families)) {
-      fam = dvi.families[[i]]
-      if(verbose) {
-        message(sprintf("%s: %d pedigrees", famnames[i], length(fam$pedigrees)))
-        for(nm in names(fam$pedigrees))
-          message("  ", nm)
-      }
-    }
-
+      message("\nConverting to `ped` format")
     res = lapply(dvi.families, function(fam) {
       Familias2ped(familiasped = fam$pedigrees, datamatrix = fam$datamatrix,
                    loci = loci, matchLoci = TRUE)
     })
-
+    if(verbose)
+      message("*** Finished DVI section ***\n")
     return(res)
   }
 
@@ -357,12 +347,12 @@ readFam = function(famfile, useDVI = NA, verbose = TRUE) {
   }
   if(!is.null(pedigrees)) {
     if(verbose)
-      message("\nReturning pedigrees with attached database.\n")
+      message("\nConverting to `ped` format\n")
     Familias2ped(familiasped = pedigrees, datamatrix = datamatrix, loci = loci)
   }
   else {
     if(verbose)
-      message("\nReturning database only.\n")
+      message("\nReturning database only\n")
     readFamiliasLoci(loci = loci)
   }
 }
@@ -388,10 +378,10 @@ asFamiliasPedigree = function(id, findex, mindex, sex) {
 ### Utilities for parsing DVI section ###
 #########################################
 
-readDVI = function(rawlines) {
+readDVI = function(rawlines, verbose = TRUE) {
   r = rawlines
   if(r[1] != "[DVI]")
-    stop("I excepted the first line of DVI part to be '[DVI]', but got '", r[1], "'")
+    stop("Expected the first line of DVI part to be '[DVI]', but got '", r[1], "'")
 
   ### Parse raw lines into nested list named `dvi`
   dvi = list()
@@ -418,36 +408,101 @@ readDVI = function(rawlines) {
       ivec = c(ivec[seq_len(br - 1)], name)
       dvi[[ivec]] = list()
     }
+
   }
 
-  family_list = dvi$DVI$`Reference Families`[-1] # remove 'nFamilies'
-  names(family_list) = sapply(family_list, function(fam) fam[[1]][2])
+  # Initialise output list
+  res = list()
 
-  lapply(family_list, parseFamily)
+  # Unidentified persons, if any
+  un = parseUnidentified(dvi$DVI$`Unidentified persons`, verbose = verbose)
+  if(!is.null(un))
+    res$`Unidentified persons` = un
+
+  # Reference families
+  refs_raw = dvi$DVI$`Reference Families`
+  refs = refs_raw[-1] # remove 'nFamilies'
+  stopifnot((nFam <- length(refs)) == as.integer(refs_raw[[c(1,2)]]))
+  if(verbose)
+    message("\nReference families: ", nFam)
+
+  names(refs) = sapply(refs, function(fam) fam[[1]][2])
+  refs = lapply(refs, parseFamily, verbose = verbose)
+
+  # Return
+  c(res, refs)
 }
 
+parseUnidentified = function(x, verbose = TRUE) {
+  if(length(x) == 0)
+    return(NULL)
+
+  nPers = x[[c(1,2)]]
+  if(verbose)
+    message("Unidentified persons: ", nPers)
+
+  if(nPers == "0")
+    return(NULL)
+
+  x = x[-1]
+
+  ### id and sex
+  id = sapply(x, function(p) p[[1]][2])
+  sex = sapply(x, function(p) p[[2]][2])
+  sex[sex == "Male"] = 1
+  sex[sex == "Female"] = 2
+  s = asFamiliasPedigree(as.character(id), 0, 0, as.integer(sex))
+
+  if(verbose)
+    for(nm in id) message("  ", nm)
+
+  ### datamatrix
+  vecs = lapply(x, function(p) dnaData2vec(p$`DNA data`))
+
+  # Remove NULLs
+  vecs = vecs[!sapply(vecs, is.null)]
+
+  # All column names
+  allnames = unique(unlist(lapply(vecs, names)))
+
+  # Ensure same order in each vector, and fill in NA's
+  vecs_ordered = lapply(vecs, function(v) structure(v[allnames], names = allnames))
+
+  # Bind to matrix
+  datamatrix = do.call(rbind, vecs_ordered)
+  rownames(datamatrix) = id[rownames(datamatrix)]
+
+  ### return
+  list(pedigrees = s, datamatrix = datamatrix)
+}
 
 # Convert a "DVI Family" into a list of `datamatrix` and `pedigrees`
-parseFamily = function(x) {
+parseFamily = function(x, verbose = TRUE) {
 
-  persons_list = x$Persons
-  if(persons_list[[c(1,1)]] == "nPersons")
-    persons_list[[1]] = NULL # remove 'nPersons' entry
+  famname = x[[c(1,2)]]
+  nPers = as.integer(x$Persons[[c(1,2)]])
+  nPeds = as.integer(x$Pedigrees[[c(1,2)]])
 
-  ### pedigrees
+  if(verbose)
+    message(sprintf("  %s (%d persons, %d pedigrees)", famname, nPers, nPeds))
 
-  # collext id and sex of each person
+  ### Persons
+  persons_list = x$Persons[-1]
+
   id = sapply(persons_list, function(p) p[[1]][2])
   sex = sapply(persons_list, function(p) p[[2]][2])
   sex[sex == "Male"] = 1
   sex[sex == "Female"] = 2
   sex = as.integer(sex)
 
-  # build pedigrees defined for the family
+  ### pedigrees
   ped_list = x$Pedigrees[-1] # remove "nPedigrees"
   names(ped_list) = sapply(ped_list, function(pd) pd[[1]][2])
 
   pedigrees = lapply(ped_list, function(pd) {
+    if(verbose)
+      message("    ", pd[[1]][2])
+
     this.id = as.character(id)
     this.sex = sex
 
