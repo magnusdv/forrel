@@ -515,20 +515,40 @@ parseFamily = function(x, verbose = TRUE) {
                     stringsAsFactors = FALSE)
 
     # Add extra individuals if needed (e.g. "Missing person")
-    if(length(extras <- setdiff(po$child, id))) {
+    extras <- setdiff(c(po$parent, po$child), id)
+    if(length(extras)) {
       this.id = c(this.id, extras)
       this.sex = c(this.sex, rep(0L, length(extras)))
     }
 
-    # Create and populate fidx and midx
-    this.fidx = this.midx = integer(length(this.id))
+    names(this.sex) = this.id
+    parent.sex = this.sex[po$parent]
+
+    # Try to fix parents with undecided sex
+    if(any(parent.sex == 0)) {
+      par.nosex = unique(po$parent[parent.sex == 0])
+      for(p in par.nosex) {
+        chi = po$child[po$parent == p] # children of him/her
+        spou = unique(setdiff(po$parent[po$child %in% chi], p))
+        if(all(this.sex[spou] == 1))
+          this.sex[p] = 2
+        else if(all(this.sex[spou] == 2))
+          this.sex[p] = 1
+        else
+          stop2("Cannot decide sex of this parent: ", p)
+      }
+
+      # Now try again
+      parent.sex = this.sex[po$parent]
+    }
 
     parent.idx = match(po$parent, this.id)
-    par.is.male = this.sex[parent.idx] == 1
-
     child.idx = match(po$child, this.id)
-    this.fidx[child.idx[par.is.male]] = parent.idx[par.is.male]
-    this.midx[child.idx[!par.is.male]] = parent.idx[!par.is.male]
+
+    # Create and populate fidx and midx
+    this.fidx = this.midx = integer(length(this.id))
+    this.fidx[child.idx[parent.sex == 1]] = parent.idx[parent.sex == 1]
+    this.midx[child.idx[parent.sex == 2]] = parent.idx[parent.sex == 2]
 
     # Return
     asFamiliasPedigree(this.id, this.fidx, this.midx, this.sex)
