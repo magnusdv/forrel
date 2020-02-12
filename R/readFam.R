@@ -447,8 +447,8 @@ parseUnidentified = function(x, verbose = TRUE) {
   x = x[-1]
 
   ### id and sex
-  id = sapply(x, function(p) p[[1]][2])
-  sex = sapply(x, function(p) p[[2]][2])
+  id = sapply(x, function(p) getValue(p[[1]], iftag = "Name", NA))
+  sex = sapply(x, function(p) getValue(p[[2]], iftag = "Gender", 0))
   sex[sex == "Male"] = 1
   sex[sex == "Female"] = 2
   s = asFamiliasPedigree(as.character(id), 0, 0, as.integer(sex))
@@ -489,15 +489,16 @@ parseFamily = function(x, verbose = TRUE) {
   ### Persons
   persons_list = x$Persons[-1]
 
-  id = sapply(persons_list, function(p) p[[1]][2])
-  sex = sapply(persons_list, function(p) p[[2]][2])
+  id = sapply(persons_list, function(p) getValue(p[[1]], iftag = "Name", NA))
+  sex = sapply(persons_list, function(p) getValue(p[[2]], iftag = "Gender", 0))
+
   sex[sex == "Male"] = 1
   sex[sex == "Female"] = 2
   sex = as.integer(sex)
 
   ### pedigrees
   ped_list = x$Pedigrees[-1] # remove "nPedigrees"
-  names(ped_list) = sapply(ped_list, function(pd) pd[[1]][2])
+  names(ped_list) = sapply(ped_list, function(pd) getValue(pd[[1]], iftag = "Name", NA))
 
   pedigrees = lapply(ped_list, function(pd) {
     if(verbose)
@@ -590,4 +591,8 @@ dnaData2vec = function(x) {
   res[2*(1:nLoc)] = val[idx + 2]
   names(res) = paste(rep(val[idx], each = 2), 1:2, sep = ".")
   res
+}
+
+getValue = function(x, iftag, default) {
+  if(x[1] == iftag) x[2] else default
 }
