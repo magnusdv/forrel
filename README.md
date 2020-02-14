@@ -15,14 +15,14 @@ handling pedigrees and marker data.
 
 The most important analyses currently supported by forrel are:
 
--   Likelihood ratios for relationship testing
--   Simulation of marker genotypes and complete DNA profiles.
-    Unconditional or conditional on known genotypes
+-   Likelihood ratio (LR) computations for relationship testing
 -   Pairwise relatedness inference: Estimation of IBD (kappa)
     coefficients from marker data
 -   Visualisation of IBD coefficients in the IBD triangle
--   Power analysis for relationship testing: Exclusion power (EP) and
-    inclusion power (IP)
+-   Simulation of marker genotypes. Unconditional or conditional on
+    known genotypes
+-   Power analysis for relationship testing: LR distributions, exclusion
+    power (EP) and inclusion power (IP)
 -   Tailor-made functions for power analysis in family reunion cases:
     -   `missingPersonPlot()`
     -   `missingPersonEP()`
@@ -35,13 +35,18 @@ The most important analyses currently supported by forrel are:
 Installation
 ------------
 
-To get the latest version, install from GitHub as follows:
+To get the current official version of forrel, install from CRAN as
+follows:
 
 ``` r
- # First install devtools if needed
-if(!require(devtools)) install.packages("devtools")
+install.packages("forrel")
+```
 
-# Install forrel from GitHub
+Alternatively, you can obtain the latest development version from
+GitHub:
+
+``` r
+# install.packages("devtools") # install devtools if needed
 devtools::install_github("magnusdv/forrel")
 ```
 
@@ -93,7 +98,7 @@ x = markerSim(x, N = 100, ids = bros, alleles = 1:2, seed = 1234)
 #> 
 #> Simulation finished.
 #> Number of calls to the likelihood function: 0.
-#> Total time used: 0.12 seconds.
+#> Total time used: 0.06 seconds.
 ```
 
 Note 1: The `seed` argument is passed onto the random number generator.
