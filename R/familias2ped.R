@@ -146,7 +146,6 @@ Familias2ped = function(familiasped, datamatrix, loci, matchLoci = FALSE) {
   locusAttributes = readFamiliasLoci(loci)
 
   ### Create ped object
-
   as.ped(p, locusAttributes = locusAttributes)
 }
 

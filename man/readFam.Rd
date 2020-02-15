@@ -4,7 +4,7 @@
 \alias{readFam}
 \title{Read \code{Familias} .fam files}
 \usage{
-readFam(famfile, useDVI = NA, verbose = TRUE)
+readFam(famfile, useDVI = NA, Xchrom = FALSE, verbose = TRUE)
 }
 \arguments{
 \item{famfile}{Path to a ".fam" file.}
@@ -12,6 +12,9 @@ readFam(famfile, useDVI = NA, verbose = TRUE)
 \item{useDVI}{A logical, indicating if the DVI section of the fam file should
 be identified and parsed. If \code{NA} (the default), the DVI section is
 included if it is present in the input file.}
+
+\item{Xchrom}{A logical. If TRUE, the \code{chrom} attribute of all markers will
+be set to "X". (Default = FALSE.)}
 
 \item{verbose}{A logical; if TRUE, various information is written to the
 screen during the parsing process.}

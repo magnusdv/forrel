@@ -8,6 +8,8 @@
 #' @param useDVI A logical, indicating if the DVI section of the fam file should
 #'   be identified and parsed. If `NA` (the default), the DVI section is
 #'   included if it is present in the input file.
+#' @param Xchrom A logical. If TRUE, the `chrom` attribute of all markers will
+#'   be set to "X". (Default = FALSE.)
 #' @param verbose A logical; if TRUE, various information is written to the
 #'   screen during the parsing process.
 #'
@@ -24,7 +26,7 @@
 #'
 #' @importFrom pedmut mutationMatrix
 #' @export
-readFam = function(famfile, useDVI = NA, verbose = TRUE) {
+readFam = function(famfile, useDVI = NA, Xchrom = FALSE, verbose = TRUE) {
   if(!endsWith(famfile, ".fam"))
     stop("Input file must end with '.fam'", call. = FALSE)
 
@@ -303,13 +305,22 @@ readFam = function(famfile, useDVI = NA, verbose = TRUE) {
     dvi.families = readDVI(dvi.lines, verbose = verbose)
 
     if(verbose)
+      message("*** Finished DVI section ***\n")
+
+    if(verbose)
       message("\nConverting to `ped` format")
     res = lapply(dvi.families, function(fam) {
       Familias2ped(familiasped = fam$pedigrees, datamatrix = fam$datamatrix,
                    loci = loci, matchLoci = TRUE)
     })
-    if(verbose)
-      message("*** Finished DVI section ***\n")
+
+    # Set all chrom attributes to X if indicated
+    if(Xchrom) {
+      if(verbose) message("Changing all chromosome attributes to `X`")
+      chrom(res, seq_along(loci)) = "X"
+    }
+
+    if(verbose) message("")
     return(res)
   }
 
@@ -345,16 +356,27 @@ readFam = function(famfile, useDVI = NA, verbose = TRUE) {
       datamatrix[, 2*i]     = als.i[dm.a2.idx[, i]]
     }
   }
+
+  # Return
   if(!is.null(pedigrees)) {
     if(verbose)
-      message("\nConverting to `ped` format\n")
-    Familias2ped(familiasped = pedigrees, datamatrix = datamatrix, loci = loci)
+      message("\nConverting to `ped` format")
+    res = Familias2ped(familiasped = pedigrees, datamatrix = datamatrix, loci = loci)
+
+    # Set all chrom attributes to X if indicated
+    if(Xchrom) {
+      if(verbose) message("Changing all chromosome attributes to `X`")
+      chrom(res, seq_along(loci)) = "X"
+    }
   }
   else {
     if(verbose)
-      message("\nReturning database only\n")
-    readFamiliasLoci(loci = loci)
+      message("\nReturning database only")
+    res = readFamiliasLoci(loci = loci)
   }
+
+  if(verbose) message("")
+  res
 }
 
 
