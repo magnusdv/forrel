@@ -3,6 +3,14 @@
 forrel <img src="man/figures/logo.png" align="right" height=140/>
 =================================================================
 
+<!-- badges: start -->
+
+[![CRAN
+status](https://www.r-pkg.org/badges/version/forrel)](https://CRAN.R-project.org/package=forrel)
+[![](https://cranlogs.r-pkg.org/badges/grand-total/forrel?color=yellow)](https://cran.r-project.org/package=forrel)
+[![](https://cranlogs.r-pkg.org/badges/last-month/forrel?color=yellow)](https://cran.r-project.org/package=forrel)
+<!-- badges: end -->
+
 Introduction
 ------------
 
@@ -98,7 +106,7 @@ x = markerSim(x, N = 100, ids = bros, alleles = 1:2, seed = 1234)
 #> 
 #> Simulation finished.
 #> Number of calls to the likelihood function: 0.
-#> Total time used: 0.06 seconds.
+#> Total time used: 0.11 seconds.
 ```
 
 Note 1: The `seed` argument is passed onto the random number generator.
