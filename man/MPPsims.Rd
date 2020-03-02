@@ -8,6 +8,8 @@ MPPsims(
   reference,
   missing = "MP",
   selections,
+  ep = TRUE,
+  ip = TRUE,
   addBaseline = TRUE,
   nProfiles = 1,
   lrSims = 1,
@@ -27,6 +29,10 @@ latter case, the list must have the same length as \code{selections}.}
 \item{selections}{A list of pedigree member subsets. In the special case that
 all subsets consist of a single individual, \code{selections} can be given as a
 simple vector.}
+
+\item{ep}{A logical: Estimate the exclusion power? (Default: TRUE)}
+
+\item{ip}{A logical: Estimate the inclusion power? (Default: TRUE)}
 
 \item{addBaseline}{A logical. If TRUE (default) an \emph{empty} selection, named
 "Baseline", is added as the first element of \code{selection}.}
@@ -61,12 +67,14 @@ for each element of \code{selections}. Each entry has elements \code{ep} and \co
 each of which is a list of length \code{nProfiles}.
 
 The output object has various attributes reflecting the input. Note that
-\code{reference} and \code{selection} may differ slightly from the original input, since they
-may be modified during the function run. (For instance, a "Baseline" entry
-is added to \code{selection} if \code{addBaseline} is TRUE.) The crucial point is
-that the output attributes correspond exactly to the output data.
+\code{reference} and \code{selection} may differ slightly from the original input,
+since they may be modified during the function run. (For instance, a
+"Baseline" entry is added to \code{selection} if \code{addBaseline} is TRUE.) The
+crucial point is that the output attributes correspond exactly to the
+output data.
 \itemize{
-\item \code{reference} (always a list, of the same length as the \code{selections} attribute
+\item \code{reference} (always a list, of the same length as the \code{selections}
+attribute
 \item \code{selections}
 \item \code{nProfiles},\code{lrSims},\code{thresholdIP},\code{seed} (as in the input)
 \item \code{totalTime} (the total time used)

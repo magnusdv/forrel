@@ -9,6 +9,8 @@
 #' @param selections A list of pedigree member subsets. In the special case that
 #'   all subsets consist of a single individual, `selections` can be given as a
 #'   simple vector.
+#' @param ep A logical: Estimate the exclusion power? (Default: TRUE)
+#' @param ip A logical: Estimate the inclusion power? (Default: TRUE)
 #' @param addBaseline A logical. If TRUE (default) an *empty* selection, named
 #'   "Baseline", is added as the first element of `selection`.
 #' @param nProfiles The number of profile simulations for each selection.
@@ -20,12 +22,14 @@
 #'   each of which is a list of length `nProfiles`.
 #'
 #'   The output object has various attributes reflecting the input. Note that
-#'   `reference` and `selection` may differ slightly from the original input, since they
-#'   may be modified during the function run. (For instance, a "Baseline" entry
-#'   is added to `selection` if `addBaseline` is TRUE.) The crucial point is
-#'   that the output attributes correspond exactly to the output data.
+#'   `reference` and `selection` may differ slightly from the original input,
+#'   since they may be modified during the function run. (For instance, a
+#'   "Baseline" entry is added to `selection` if `addBaseline` is TRUE.) The
+#'   crucial point is that the output attributes correspond exactly to the
+#'   output data.
 #'
-#'   * `reference` (always a list, of the same length as the `selections` attribute
+#'   * `reference` (always a list, of the same length as the `selections`
+#'   attribute
 #'
 #'   * `selections`
 #'
@@ -88,10 +92,11 @@
 #' powerPlot(pows, type = 3)
 #' }
 #'
-#' @importFrom parallel makeCluster stopCluster detectCores parLapply clusterEvalQ clusterExport clusterSetRNGStream
+#' @importFrom parallel makeCluster stopCluster detectCores parLapply
+#'   clusterEvalQ clusterExport clusterSetRNGStream
 #' @export
-MPPsims = function(reference, missing = "MP", selections, addBaseline = TRUE,
-                   nProfiles = 1, lrSims = 1, thresholdIP = NULL,
+MPPsims = function(reference, missing = "MP", selections, ep = TRUE, ip = TRUE,
+                   addBaseline = TRUE, nProfiles = 1, lrSims = 1, thresholdIP = NULL,
                    disableMutations = NA, numCores = NA, seed = NULL, verbose = TRUE) {
   st = Sys.time()
 
@@ -136,7 +141,7 @@ MPPsims = function(reference, missing = "MP", selections, addBaseline = TRUE,
       print(cl)
     }
     clusterEvalQ(cl, library(forrel))
-    clusterExport(cl, c("missingPersonEP", "missingPersonIP"))
+    clusterExport(cl, c("missingPersonEP", "missingPersonIP", "lrSims", "thresholdIP"), envir = environment())
     clusterSetRNGStream(cl, iseed = sample.int(1e6,1))
   }
 
@@ -149,8 +154,8 @@ MPPsims = function(reference, missing = "MP", selections, addBaseline = TRUE,
 
     # Baseline
     if(is.null(ids)) {
-      ep0 = epfun(ref)
-      ip0 = ipfun(ref)
+      ep0 = if(ep) epfun(ref) else NULL
+      ip0 = if(ip) ipfun(ref) else NULL
       return(list(ep = ep0, ip = ip0))
     }
 
@@ -160,14 +165,14 @@ MPPsims = function(reference, missing = "MP", selections, addBaseline = TRUE,
 
     # Compute updated EP and IP for each profile
     if(numCores == 1) {
-      ep = lapply(sims, epfun)
-      ip = lapply(sims, ipfun)
+      epRes = if(ep) lapply(sims, epfun) else NULL
+      ipRes = if(ip) lapply(sims, ipfun) else NULL
     }
     else {
-      ep = parLapply(cl, sims, epfun)
-      ip = parLapply(cl, sims, ipfun)
+      epRes = if(ep) parLapply(cl, sims, epfun) else NULL
+      ipRes = if(ip) parLapply(cl, sims, ipfun) else NULL
     }
-    list(ep = ep, ip = ip)
+    list(ep = epRes, ip = ipRes)
   })
 
   names(powSims) = names(selections)
