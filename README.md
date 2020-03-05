@@ -17,11 +17,11 @@ Introduction
 The goal of `forrel` is to provide forensic pedigree computations and
 relatedness inference from genetic marker data. Some of its
 functionality is derived from `paramlink`, which is no longer actively
-developed. ‘forrel’ is part of the *ped suite*, a collection of packages
+developed. `forrel` is part of the *ped suite*, a collection of packages
 for pedigree analysis with `pedtools` as the central package for
 handling pedigrees and marker data.
 
-The most important analyses currently supported by forrel are:
+The most important analyses currently supported by `forrel` are:
 
 -   Likelihood ratio (LR) computations for relationship testing
 -   Pairwise relatedness inference: Estimation of IBD (kappa)
@@ -43,7 +43,7 @@ The most important analyses currently supported by forrel are:
 Installation
 ------------
 
-To get the current official version of forrel, install from CRAN as
+To get the current official version of `forrel`, install from CRAN as
 follows:
 
 ``` r
@@ -106,7 +106,7 @@ x = markerSim(x, N = 100, ids = bros, alleles = 1:2, seed = 1234)
 #> 
 #> Simulation finished.
 #> Number of calls to the likelihood function: 0.
-#> Total time used: 0.11 seconds.
+#> Total time used: 0.13 seconds.
 ```
 
 Note 1: The `seed` argument is passed onto the random number generator.
