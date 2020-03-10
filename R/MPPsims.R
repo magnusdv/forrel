@@ -188,3 +188,17 @@ MPPsims = function(reference, missing = "MP", selections, ep = TRUE, ip = TRUE,
             seed = seed, totalTime = totalTime, class = "MPPsim")
 }
 
+
+#' @export
+`[.MPPsim` = function(x, i) {
+  structure(unclass(x)[i],
+            reference = attr(x, 'reference'),
+            selections = attr(x, 'selections')[i],
+            nProfiles = attr(x, 'nProfiles'),
+            lrSims = attr(x, 'lrSims'),
+            thresholdIP = attr(x, 'thresholdIP'),
+            seed = "NA (order changed)",
+            totalTime = attr(x, 'totalTime'),
+            class = "MPPsim")
+
+}
