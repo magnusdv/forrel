@@ -15,27 +15,27 @@
 #'
 #' `type = 4`: x = Exclusion power; y = average LR
 #'
-#' For each `EPresult` object in `ep`, and the corresponding element of `ip`,
-#' the relevant data is extracted from each, producing a single point the final
-#' plot.
 #'
 #' In the most general case `ep` (and similarly for `ip`) can be a list of lists
-#' of `EPresult` objects. To simplify the discussion we refer to the inner lists
-#' as "groups". A group may consist of a single point, or several (typically
-#' many simulations of the same situation). Points within the same group are
-#' always drawn with the same colour and shape.
+#' of `EPresult` objects. We refer to the inner lists as "groups". A group may
+#' consist of a single output, or several (typically many simulations of the
+#' same situation). Points within the same group are always drawn with the same
+#' colour and shape.
 #'
-#' When plotting several groups, two sets of points are drawn:
+#' When plotting several groups, two sets of points are drawn by default:
 #'
 #' * Major points: Group means.
 #'
-#' * Minor points: Individual points in groups with more than one element.
+#' * Minor points: Individual points in groups with more than one element. These
+#' can be skipped by setting `minorpoints = FALSE`.
 #'
 #' @param ep,ip Lists of equal length, with outputs from one or more runs of
 #'   [missingPersonEP()] and [missingPersonIP()] respectively. Alternatively,
 #'   `ep` can be a single output from [MPPsims()], in which case `ip` should be
 #'   NULL. See Examples.
 #' @param type Plot type; either 1, 2, 3 or 4.
+#' @param minorpoints A logical indicating whether "minor" points should be
+#'   drawn (see Details).
 #' @param ellipse A logical. If TRUE, data ellipsis are drawn for each group
 #'   containing more than 1 element. NB: This fails with a warning if all points
 #'   in a group fall on a line.
@@ -47,8 +47,8 @@
 #'   "triangleDown", determining the shapes of both minor and major points.
 #' @param size Point size.
 #' @param hline,vline Single numbers indicating positions for
-#'   horizontal/vertical "threshold" lines. When `type = 1`, these determine the
-#'   shaded vertical regions, by default starting at 0.95.
+#'   horizontal/vertical "threshold" lines. If NULL (default), no lines are
+#'   drawn.
 #' @param xlim,ylim Axis limits; automatically chosen if NULL.
 #' @param xlab,ylab Axis labels; automatically chosen if NULL.
 #' @param legendOrder A permutation of `1,2,...,L`, where `L = length(ep)`.
@@ -65,18 +65,19 @@
 #' sel = list("fa", c("fa", "mo"))
 #'
 #' # Simulate power for each selection
-#' simData = MPPsims(ref, selections = sel, nProfiles = 5, lrSims = 10,
+#' simData = MPPsims(ref, selections = sel, nProfiles = 3, lrSims = 5,
 #'                   thresholdIP = 2, seed = 123, numCores = 1)
 #'
 #' # Power plot 1: EP vs IP
 #' powerPlot(simData, type = 1)
+#' powerPlot(simData, type = 1, minorpoints = FALSE, hline = 0.8)
 #'
 #' \donttest{
 #'
 #' # Change shape, and modify legend order
 #' powerPlot(simData, type = 1, shape = c("ci", "sq", "di"), legendOrder = 3:1)
 #'
-#' # Zoom in, and adjust the blue strips
+#' # Zoom in, and add threshold lines
 #' powerPlot(simData, type = 1, xlim = c(0.4, 1), ylim = c(0.4, 1),
 #'           hline = 0.8, vline = 0.8)
 #'
@@ -93,8 +94,9 @@
 #'
 #' @importFrom stats aggregate
 #' @export
-powerPlot = function(ep, ip, type = 1, ellipse = FALSE, col = NULL, labs = NULL, alpha = 1,
-                     shape = "circle", size = 2, hline = NULL, vline = NULL, xlim = NULL, ylim = NULL,
+powerPlot = function(ep, ip, type = 1, minorpoints = TRUE, ellipse = FALSE, col = NULL,
+                     labs = NULL, alpha = 1, shape = "circle", size = 2,
+                     hline = NULL, vline = NULL, xlim = NULL, ylim = NULL,
                      xlab = NULL, ylab = NULL, legendOrder = NULL) {
   if(!requireNamespace("ggplot2", quietly = TRUE))
     stop2("Package `ggplot2` is not installed. Please install this and try again.")
@@ -221,8 +223,13 @@ powerPlot = function(ep, ip, type = 1, ellipse = FALSE, col = NULL, labs = NULL,
   ### Plot
   p = ggplot2::ggplot() +
     ggplot2::aes(x = ep, y = ip) +
-    ggplot2::geom_point(data = minor, ggplot2::aes(colour = group), size = size,
-                        shape = shapeMapMinor[minor$group], alpha = alpha) +
+    ggplot2::geom_hline(yintercept = hline, linetype = 2) +
+    ggplot2::geom_vline(xintercept = vline, linetype = 2) +
+    {if(minorpoints)
+      ggplot2::geom_point(data = minor, ggplot2::aes(colour = group), size = size,
+                        shape = shapeMapMinor[minor$group], alpha = alpha)} +
+    {if(ellipse)
+      ggplot2::stat_ellipse(data = minor, ggplot2::aes(colour = group), na.rm = TRUE)} +
     ggplot2::geom_point(data = major, ggplot2::aes(fill = group, shape = group),
                         size = 2*size, colour = "black", stroke = 1.5) +
     ggplot2::labs(x = xlab, y = ylab, fill = NULL, colour = NULL) +
@@ -238,27 +245,6 @@ powerPlot = function(ep, ip, type = 1, ellipse = FALSE, col = NULL, labs = NULL,
     ggplot2::coord_cartesian(clip = 'off') +
     ggplot2::theme_bw(base_size = 14)
 
-  if(ellipse) {
-    p = p + ggplot2::stat_ellipse(data = minor, ggplot2::aes(colour = group), na.rm = TRUE)
-  }
-
-  if(type == 1) {
-    xmin = xlim[1]; if(is.na(xmin) || xmin > 0) xmin = -Inf
-    ymin = ylim[1]; if(is.na(ymin) || ymin > 0) ymin = -Inf
-    ethresh = if(is.null(vline)) 0.95 else vline
-    ithresh = if(is.null(hline)) 0.95 else hline
-    np = length(p$layers)
-    p = p +
-      ggplot2::annotate("rect", xmin = ethresh, xmax = 1, ymin = ymin, ymax = 1,  fill = "lightblue", alpha = 0.3) +
-      ggplot2::annotate("rect", xmin = xmin, xmax = 1, ymin = ithresh, ymax = 1,  fill = "lightblue", alpha = 0.3)
-    p$layers[] = p$layers[c(np + 1:2, 1:np)]
-  }
-  if(type == 2) {
-    # Nothing to do
-  }
-  if(type == 3) {
-    # Nothing to do
-  }
   if(type == 4) {
     epvec = seq(xlim[1], xlim[2], length = 100)[-100]
     asympt = data.frame(ep = epvec, ip = 1/(1 - epvec))
@@ -269,19 +255,6 @@ powerPlot = function(ep, ip, type = 1, ellipse = FALSE, col = NULL, labs = NULL,
       #                  hjust = -0.05, vjust = -0.5, parse = TRUE)
       p$layers[] = p$layers[c(np + 1, 1:np)]
     p = suppressMessages(p + ggplot2::scale_y_log10())
-  }
-
-  if(type > 1) {
-    if(!is.null(hline)) {
-      np = length(p$layers)
-      p = p + ggplot2::geom_hline(yintercept = hline, linetype = 2, size = 1)
-      p$layers[] = p$layers[c(np + 1, 1:np)]
-    }
-    if(!is.null(vline)) {
-      np = length(p$layers)
-      p = p + ggplot2::geom_vline(xintercept = vline, linetype = 2, size = 1)
-      p$layers[] = p$layers[c(np + 1, 1:np)]
-    }
   }
 
   p
