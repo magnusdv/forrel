@@ -94,6 +94,9 @@ readFam = function(famfile, useDVI = NA, Xchrom = FALSE, verbose = TRUE) {
 
   ### Fixed relations
 
+  # Storage for twins
+  twins = list()
+
   kr.line = id.line
   if(x[kr.line] != "Known relations")
     stop2(sprintf('Expected line %d to be "Known relations", but found: "%s"', id.line, x[id.line]))
@@ -151,12 +154,24 @@ readFam = function(famfile, useDVI = NA, Xchrom = FALSE, verbose = TRUE) {
       fidx.i = c(fidx, integer(nFem.i + nMal.i))
       midx.i = c(midx, integer(nFem.i + nMal.i))
 
+      # Print summary
+      if(verbose)
+        message(sprintf(" Pedigree '%s' (%d extra females, %d extra males)", ped.name, nFem.i, nMal.i))
+
       # Add fixed relations
       nRel.i = as.integer(x[ped.line + 4])
       rel.line = ped.line + 5
       for(i in seq_len(nRel.i)) {
         par.idx = as.integer(x[rel.line]) + 1
         child.idx = as.integer(x[rel.line+1]) + 1
+        if(is.na(par.idx)) {
+          if(grepl("Direct", x[rel.line])) {
+            par.idx = as.integer(substring(x[rel.line], 1, 1)) + 1
+            twins = c(twins, list(par.idx, child.idx))
+            if(verbose) message("  Twins: ", toString(id[c(par.idx, child.idx)]))
+            stop2("File contains twins - this is not supported yet")
+          }
+        }
         if(sex[par.idx] == 1)
           fidx.i[child.idx] = par.idx
         else
@@ -165,9 +180,6 @@ readFam = function(famfile, useDVI = NA, Xchrom = FALSE, verbose = TRUE) {
         rel.line = rel.line + 2
       }
 
-      # Print summary
-      if(verbose)
-        message(sprintf(" Pedigree '%s': %d extra females, %d extra males", ped.name, nFem.i, nMal.i))
 
       # Convert to familiaspedigree and insert in list
       pedigrees[[ped.idx]] = asFamiliasPedigree(id.i, fidx.i, midx.i, sex.i)
