@@ -137,7 +137,7 @@ MPPsims = function(reference, missing = "MP", selections, ep = TRUE, ip = TRUE,
     cl = makeCluster(numCores)
     on.exit(stopCluster(cl))
     if(verbose) {
-      message("Preparing parallelisation... ", appendLF = F)
+      message("Preparing parallelisation... ", appendLF = FALSE)
       print(cl)
     }
     clusterEvalQ(cl, library(forrel))
