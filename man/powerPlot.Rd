@@ -8,6 +8,7 @@ powerPlot(
   ep,
   ip,
   type = 1,
+  majorpoints = TRUE,
   minorpoints = TRUE,
   ellipse = FALSE,
   col = NULL,
@@ -20,8 +21,7 @@ powerPlot(
   xlim = NULL,
   ylim = NULL,
   xlab = NULL,
-  ylab = NULL,
-  legendOrder = NULL
+  ylab = NULL
 )
 }
 \arguments{
@@ -31,6 +31,9 @@ powerPlot(
 NULL. See Examples.}
 
 \item{type}{Plot type; either 1, 2, 3 or 4.}
+
+\item{majorpoints}{A logical indicating whether "major" points should be
+drawn (see Details).}
 
 \item{minorpoints}{A logical indicating whether "minor" points should be
 drawn (see Details).}
@@ -58,8 +61,6 @@ drawn.}
 \item{xlim, ylim}{Axis limits; automatically chosen if NULL.}
 
 \item{xlab, ylab}{Axis labels; automatically chosen if NULL.}
-
-\item{legendOrder}{A permutation of \verb{1,2,...,L}, where \code{L = length(ep)}.}
 }
 \value{
 A \code{ggplot2} plot object.
@@ -90,9 +91,11 @@ colour and shape.
 When plotting several groups, two sets of points are drawn by default:
 \itemize{
 \item Major points: Group means.
-\item Minor points: Individual points in groups with more than one element. These
-can be skipped by setting \code{minorpoints = FALSE}.
+\item Minor points: Individual points in groups with more than one element.
 }
+
+The parameters \code{majorpoints} and \code{minorpoints} control which of the above
+points are included.
 }
 \examples{
 
@@ -113,7 +116,7 @@ powerPlot(simData, type = 1, minorpoints = FALSE, hline = 0.8)
 \donttest{
 
 # Change shape, and modify legend order
-powerPlot(simData, type = 1, shape = c("ci", "sq", "di"), legendOrder = 3:1)
+powerPlot(simData[3:1], type = 1, shape = c("ci", "sq", "di"))
 
 # Zoom in, and add threshold lines
 powerPlot(simData, type = 1, xlim = c(0.4, 1), ylim = c(0.4, 1),

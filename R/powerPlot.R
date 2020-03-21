@@ -26,14 +26,18 @@
 #'
 #' * Major points: Group means.
 #'
-#' * Minor points: Individual points in groups with more than one element. These
-#' can be skipped by setting `minorpoints = FALSE`.
+#' * Minor points: Individual points in groups with more than one element.
+#'
+#' The parameters `majorpoints` and `minorpoints` control which of the above
+#' points are included.
 #'
 #' @param ep,ip Lists of equal length, with outputs from one or more runs of
 #'   [missingPersonEP()] and [missingPersonIP()] respectively. Alternatively,
 #'   `ep` can be a single output from [MPPsims()], in which case `ip` should be
 #'   NULL. See Examples.
 #' @param type Plot type; either 1, 2, 3 or 4.
+#' @param majorpoints A logical indicating whether "major" points should be
+#'   drawn (see Details).
 #' @param minorpoints A logical indicating whether "minor" points should be
 #'   drawn (see Details).
 #' @param ellipse A logical. If TRUE, data ellipsis are drawn for each group
@@ -51,7 +55,6 @@
 #'   drawn.
 #' @param xlim,ylim Axis limits; automatically chosen if NULL.
 #' @param xlab,ylab Axis labels; automatically chosen if NULL.
-#' @param legendOrder A permutation of `1,2,...,L`, where `L = length(ep)`.
 #'
 #' @return A `ggplot2` plot object.
 #' @seealso [MPPsims()], [missingPersonEP()], [missingPersonEP()]
@@ -75,7 +78,7 @@
 #' \donttest{
 #'
 #' # Change shape, and modify legend order
-#' powerPlot(simData, type = 1, shape = c("ci", "sq", "di"), legendOrder = 3:1)
+#' powerPlot(simData[3:1], type = 1, shape = c("ci", "sq", "di"))
 #'
 #' # Zoom in, and add threshold lines
 #' powerPlot(simData, type = 1, xlim = c(0.4, 1), ylim = c(0.4, 1),
@@ -94,10 +97,10 @@
 #'
 #' @importFrom stats aggregate
 #' @export
-powerPlot = function(ep, ip, type = 1, minorpoints = TRUE, ellipse = FALSE, col = NULL,
-                     labs = NULL, alpha = 1, shape = "circle", size = 2,
-                     hline = NULL, vline = NULL, xlim = NULL, ylim = NULL,
-                     xlab = NULL, ylab = NULL, legendOrder = NULL) {
+powerPlot = function(ep, ip, type = 1, majorpoints = TRUE, minorpoints = TRUE,
+                     ellipse = FALSE, col = NULL, labs = NULL, alpha = 1,
+                     shape = "circle", size = 2, hline = NULL, vline = NULL,
+                     xlim = NULL, ylim = NULL, xlab = NULL, ylab = NULL) {
   if(!requireNamespace("ggplot2", quietly = TRUE))
     stop2("Package `ggplot2` is not installed. Please install this and try again.")
 
@@ -128,9 +131,7 @@ powerPlot = function(ep, ip, type = 1, minorpoints = TRUE, ellipse = FALSE, col 
   ### Group labels legend ordering
   if(is.null(labs))
     labs = seq_along(L)
-  if(is.null(legendOrder))
-    legendOrder = seq_along(labs)
-  group = factor(rep(labs, times = L), levels = labs[legendOrder])
+  group = factor(rep(labs, times = L), levels = labs)
 
   ### COlours
   if(is.null(col)) {
@@ -230,8 +231,9 @@ powerPlot = function(ep, ip, type = 1, minorpoints = TRUE, ellipse = FALSE, col 
                         shape = shapeMapMinor[minor$group], alpha = alpha)} +
     {if(ellipse)
       ggplot2::stat_ellipse(data = minor, ggplot2::aes(colour = group), na.rm = TRUE)} +
-    ggplot2::geom_point(data = major, ggplot2::aes(fill = group, shape = group),
-                        size = 2*size, colour = "black", stroke = 1.5) +
+    {if(majorpoints)
+      ggplot2::geom_point(data = major, ggplot2::aes(fill = group, shape = group),
+                        size = 2*size, colour = "black", stroke = 1.5)} +
     ggplot2::labs(x = xlab, y = ylab, fill = NULL, colour = NULL) +
     ggplot2::scale_colour_manual(values = col) +
     ggplot2::scale_fill_manual(values = col) +
