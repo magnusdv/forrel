@@ -4,6 +4,7 @@
 .Ruserdata
 notes-private
 cran-comments.md
+CRAN-RELEASE
 R/examineKinships.R
 R/relationLR.R
 R/kinshipPowerSims.R
