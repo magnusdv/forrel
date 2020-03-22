@@ -183,7 +183,7 @@ markerSim = function(x, N = 1, ids = NULL, alleles = NULL, afreq = NULL,
     orig_ids = labels(x)
     x = breakLoops(setMarkers(x, m), loop_breakers = loopBreakers, verbose = verbose)
     m = x$MARKERS[[1]]
-    loopBreakers = labels(x)[x$LOOP_BREAKERS[, 1]] # NB: LOOP_BREAKERS are internal ints
+    loopBreakers = labels(x)[x$LOOP_BREAKERS[, 'orig']] # NB: LOOP_BREAKERS are internal ints
     gridlist = gridlist[sort.int(match(c(orig_ids, loopBreakers), orig_ids))]
   }
 
@@ -194,8 +194,12 @@ markerSim = function(x, N = 1, ids = NULL, alleles = NULL, afreq = NULL,
   FOU = founders(x, internal = TRUE)
   NONFOU = nonfounders(x, internal = TRUE)
 
+  lb_int = x$LOOP_BREAKERS[, "orig"]  # NULL if no loops
+  lb_copy_int = x$LOOP_BREAKERS[, "copy"]
+
   ### Determine simulation strategy
-  # Note: Using original x and m in this section (i.e. before loop breaking)
+  # Note: Using xorig and morig in this section (i.e. before loop breaking)
+  # Note2: Internal IDs are obtained from x, not xorig
 
   # Individuals that are typed (or forced - see above). Simulations condition on these.
   typedTF = (morig[, 1] != 0 | morig[, 2] != 0)
@@ -236,9 +240,16 @@ markerSim = function(x, N = 1, ids = NULL, alleles = NULL, afreq = NULL,
   simple.founders_int = intersect(simpledrop_int, FOU)
   simple.nonfounders_int = intersect(simpledrop_int, NONFOU)
 
+  # Ensure sensible ordering of nonfounders (for gene dropping)
   if (length(simple.nonfounders_int) > 0) {
-    # Ensure sensible ordering of nonfounders (for gene dropping)
-    done = c(internalID(x, typed), joint_int, bruteforce_int, simple.founders_int)
+    typed_int = internalID(x, typed)
+    done = c(typed_int, joint_int, bruteforce_int, simple.founders_int)
+
+    if(loops) {
+      done_copies_int = lb_copy_int[lb_int %in% done]
+      done = c(done, done_copies_int)
+    }
+
     v = simple.nonfounders_int
     v.ordered = numeric()
     while (length(v) > 0) {
@@ -247,6 +258,8 @@ markerSim = function(x, N = 1, ids = NULL, alleles = NULL, afreq = NULL,
         stop2("Could not determine sensible order for gene dropping.")
       v.ordered = c(v.ordered, v[i])
       done = c(done, v[i])
+      if(loops)
+        done = c(done, lb_copy_int[match(v[i], lb_int)])
       v = v[-i]
     }
     simple.nonfounders_int = v.ordered
@@ -312,9 +325,6 @@ markerSim = function(x, N = 1, ids = NULL, alleles = NULL, afreq = NULL,
   }
 
   if (length(simpledrop) > 0) {
-    loopbr_int = internalID(x, x$LOOP_BREAKERS[, 1])  # integer(0) if no loops
-    loopbr_dup_int = internalID(x, x$LOOP_BRREAKERS[, 2])
-
     # HW sampling of founders
     if (!Xchrom) {
       markers[simple.founders_int, ] = sample.int(nall, size = 2 * N * length(simple.founders_int),
@@ -335,7 +345,8 @@ markerSim = function(x, N = 1, ids = NULL, alleles = NULL, afreq = NULL,
       markers[simple.founders_int[i], odd[copy] + 1] = markers[simple.founders_int[i], odd[copy]]
     }
 
-    markers[loopbr_dup_int, ] = markers[loopbr_int, ]  # Genotypes of the duplicated individuals. Some of these may be ungenotyped...save time by excluding these?
+    # Genotypes of the duplicated individuals. Some of these may be ungenotyped...save time by excluding these?
+    markers[lb_copy_int, ] = markers[lb_int, ]
 
     for (id in simple.nonfounders_int) {
       if (!Xchrom) {

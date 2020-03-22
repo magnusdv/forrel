@@ -1,7 +1,5 @@
 context("Marker simulation")
 
-library(pedtools)
-
 test_that("simpleSim() runs in trivial example", {
   x = nuclearPed(1)
   y = simpleSim(x, N=1, alleles=1:2, verbose=F)
@@ -74,8 +72,8 @@ expect_identical(genotype(y, id = 1, marker = 1), c("1", "2"))
 test_that("markerSim() works in looped pedigree 1", {
   x = addChildren(linearPed(2), 5,2,1)
   x = setMarkers(x, marker(x, "5" = 1, alleles = 1:2, afreq = c(0.001, 0.999)))
-  set.seed(123)
-  y = markerSim(x, partialmarker = 1, verbose = FALSE)
+
+  y = markerSim(x, partialmarker = 1, verbose = FALSE, seed = 123)
   expect_identical(genotype(y, id = 3, marker = 1), c("1", "2"))
   expect_identical(genotype(y, id = 4, marker = 1), c("1", "2"))
 })
@@ -95,4 +93,16 @@ test_that("markerSim() works in looped pedigree 2", {
 
   y3 = markerSim(x, partialmarker = 1, loopBreaker = "5", verbose = FALSE)
   expect_identical(genotype(y3, id = 2, marker = 1), c("1", "2")) # Forced!
+})
+
+test_that("markerSim() works in looped pedigree 3", {
+  x = cousinPed(0, child = T)
+  x = relabel(x, letters[1:5])
+  x = setMarkers(x, marker(x, c = 1:2))
+
+  y1 = markerSim(x, partial = 1, verbose = F, loopBreaker = "c", seed = 1234)
+  expect_equal(as.numeric(getAlleles(y1)), c(1,2,1,2,1,2,2,2,2,2))
+
+  y2 = markerSim(x, partial = 1, verbose = F, loopBreaker = "d", seed = 1234)
+  expect_equal(as.numeric(getAlleles(y2)), c(2,1,1,2,2,2,1,2,1,1))
 })
