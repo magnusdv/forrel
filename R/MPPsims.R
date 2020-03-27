@@ -15,7 +15,7 @@
 #'   "Baseline", is added as the first element of `selection`.
 #' @param nProfiles The number of profile simulations for each selection.
 #' @param lrSims,thresholdIP Parameters passed onto [missingPersonIP()].
-#' @param numCores The number of cores used in the parallelisation setup.
+#' @param numCores The number of cores used for parallelisation.
 #'
 #' @return An object of class "MPPsim", which is basically a list with one entry
 #'   for each element of `selections`. Each entry has elements `ep` and `ip`,
@@ -132,13 +132,13 @@ MPPsims = function(reference, missing = "MP", selections, ep = TRUE, ip = TRUE,
 
   # Setup parallelisation
   if(is.na(numCores))
-    numCores = detectCores() - 1
+    numCores = max(detectCores() - 1, 1)
+
   if(numCores > 1) {
     cl = makeCluster(numCores)
     on.exit(stopCluster(cl))
     if(verbose) {
-      message("Preparing parallelisation... ", appendLF = FALSE)
-      print(cl)
+      message("Preparing parallelisation using ", length(cl), " cores")
     }
     clusterEvalQ(cl, library(forrel))
     clusterExport(cl, c("missingPersonEP", "missingPersonIP", "lrSims", "thresholdIP"), envir = environment())
@@ -160,7 +160,7 @@ MPPsims = function(reference, missing = "MP", selections, ep = TRUE, ip = TRUE,
     }
 
     # Simulate profile for `ids`
-    sims = profileSim(ref, ids = ids, N = nProfiles)
+    sims = profileSim(ref, ids = ids, N = nProfiles, numCores = 1, verbose = FALSE)
 
 
     # Compute updated EP and IP for each profile

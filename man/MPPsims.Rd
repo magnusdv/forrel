@@ -55,7 +55,7 @@ error if any markers are inconsistent with \code{reference}.
 mutations should be disabled.
 }}
 
-\item{numCores}{The number of cores used in the parallelisation setup.}
+\item{numCores}{The number of cores used for parallelisation.}
 
 \item{seed}{A numeric seed for the random number generator (optional)}
 
