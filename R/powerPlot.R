@@ -99,7 +99,7 @@
 #' @export
 powerPlot = function(ep, ip, type = 1, majorpoints = TRUE, minorpoints = TRUE,
                      ellipse = FALSE, col = NULL, labs = NULL, alpha = 1,
-                     shape = "circle", size = 2, hline = NULL, vline = NULL,
+                     shape = "circle", size = 1, hline = NULL, vline = NULL,
                      xlim = NULL, ylim = NULL, xlab = NULL, ylab = NULL) {
   if(!requireNamespace("ggplot2", quietly = TRUE))
     stop2("Package `ggplot2` is not installed. Please install this and try again.")
@@ -144,8 +144,13 @@ powerPlot = function(ep, ip, type = 1, majorpoints = TRUE, minorpoints = TRUE,
 
   col = setNames(rep_len(col, length(labs)), labs)
 
-  ### Point shapes of minor and major points
+  ### Point sizes
+  if(length(size) == 1)
+    size = c(size, 2*size)
+  minorSize = size[1]
+  majorSize = size[2]
 
+  ### Point shapes
   majorShapes = c(circle=21, square=22, diamond=23, triangleUp=24, triangleDown=25)
   minorShapes = c(circle=1, square=0, diamond=5, triangleUp=2, triangleDown=6)
   shapeIdx = pmatch(shape, names(majorShapes), duplicates.ok = TRUE)
@@ -227,13 +232,13 @@ powerPlot = function(ep, ip, type = 1, majorpoints = TRUE, minorpoints = TRUE,
     ggplot2::geom_hline(yintercept = hline, linetype = 2) +
     ggplot2::geom_vline(xintercept = vline, linetype = 2) +
     {if(minorpoints)
-      ggplot2::geom_point(data = minor, ggplot2::aes(colour = group), size = size,
+      ggplot2::geom_point(data = minor, ggplot2::aes(colour = group), size = minorSize,
                         shape = shapeMapMinor[minor$group], alpha = alpha)} +
     {if(ellipse)
       ggplot2::stat_ellipse(data = minor, ggplot2::aes(colour = group), na.rm = TRUE)} +
     {if(majorpoints)
       ggplot2::geom_point(data = major, ggplot2::aes(fill = group, shape = group),
-                        size = 2*size, colour = "black", stroke = 1.5)} +
+                        size = majorSize, colour = "black", stroke = 1.5)} +
     ggplot2::labs(x = xlab, y = ylab, fill = NULL, colour = NULL) +
     ggplot2::scale_colour_manual(values = col) +
     ggplot2::scale_fill_manual(values = col) +

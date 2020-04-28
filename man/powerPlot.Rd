@@ -15,7 +15,7 @@ powerPlot(
   labs = NULL,
   alpha = 1,
   shape = "circle",
-  size = 2,
+  size = 1,
   hline = NULL,
   vline = NULL,
   xlim = NULL,
