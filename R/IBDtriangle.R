@@ -62,7 +62,7 @@
 #' @param axes A logical: Draw surrounding axis box?
 #' @param xlab,ylab Axis labels
 #' @param cex_lab A number controlling the font size for the axis labels.
-#' @param xlim,ylim,mar Graphical parameters; see [par()].
+#' @param xlim,ylim,mar,xpd Graphical parameters; see [par()].
 #' @param keep.par A logical. If TRUE, the graphical parameters are not reset
 #'   after plotting, which may be useful for adding additional annotation.
 #' @return None
@@ -93,9 +93,8 @@ IBDtriangle = function(relationships = c("UN", "PO", "MZ", "S", "H,U,G", "FC"),
                        pch = 16, cex_points = 1.2, cex_text = 1.2, axes = FALSE,
                        xlim = c(0, 1), ylim = c(0, 1),
                        xlab = expression(kappa[0]), ylab = expression(kappa[2]),
-                       cex_lab = cex_text, mar = c(3.1, 3.1, 1, 1), keep.par = TRUE) {
+                       cex_lab = cex_text, mar = c(3.1, 3.1, 1, 1), xpd = TRUE, keep.par = TRUE) {
 
-    xpd = all(c(xlim, ylim) == c(0,1,0,1))
     opar = par(xpd = xpd, mar = mar, pty = "s")
     if (!keep.par)
       on.exit(par(opar))

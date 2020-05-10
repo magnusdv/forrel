@@ -18,6 +18,7 @@ IBDtriangle(
   ylab = expression(kappa[2]),
   cex_lab = cex_text,
   mar = c(3.1, 3.1, 1, 1),
+  xpd = TRUE,
   keep.par = TRUE
 )
 }
@@ -39,7 +40,7 @@ labels.}
 
 \item{axes}{A logical: Draw surrounding axis box?}
 
-\item{xlim, ylim, mar}{Graphical parameters; see \code{\link[=par]{par()}}.}
+\item{xlim, ylim, mar, xpd}{Graphical parameters; see \code{\link[=par]{par()}}.}
 
 \item{xlab, ylab}{Axis labels}
 
