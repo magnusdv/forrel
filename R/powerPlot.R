@@ -46,6 +46,7 @@
 #' @param col A colour vector, recycle to match the top level length of `ep`.
 #' @param labs A character of the same length as `ep`. If NULL, the names of
 #'   `ep` are used, if present.
+#' @param stroke Border width for major points (see Details).
 #' @param alpha Transparency for minor points (see Details).
 #' @param shape Either "circle", "square", "diamond", "triangleUp" or
 #'   "triangleDown", determining the shapes of both minor and major points.
@@ -97,14 +98,25 @@
 #'
 #' @importFrom stats aggregate
 #' @export
-powerPlot = function(ep, ip, type = 1, majorpoints = TRUE, minorpoints = TRUE,
-                     ellipse = FALSE, col = NULL, labs = NULL, alpha = 1,
+powerPlot = function(ep, ip = NULL, type = 1, majorpoints = TRUE, minorpoints = TRUE,
+                     ellipse = FALSE, col = NULL, labs = NULL, alpha = 1, stroke = 1.5,
                      shape = "circle", size = 1, hline = NULL, vline = NULL,
                      xlim = NULL, ylim = NULL, xlab = NULL, ylab = NULL) {
   if(!requireNamespace("ggplot2", quietly = TRUE))
     stop2("Package `ggplot2` is not installed. Please install this and try again.")
 
+  # TODO: simplify
   if(inherits(ep, "MPPsim")) {
+    if(all(c("ep","ip") %in% names(ep))) {
+      ip = ep$ip
+      ep = ep$ep
+    }
+    else {
+      ip = lapply(ep, "[[", "ip")
+      ep = lapply(ep, "[[", "ep")
+    }
+  }
+  if(inherits(ep, "MPPsim2")) {
     ip = lapply(ep, "[[", "ip")
     ep = lapply(ep, "[[", "ep")
   }
@@ -135,7 +147,7 @@ powerPlot = function(ep, ip, type = 1, majorpoints = TRUE, minorpoints = TRUE,
 
   ### COlours
   if(is.null(col)) {
-    col = c("lightgreen", "firebrick1", "deepskyblue", "#FFFF33", "gray70", "#F781BF", "cyan", "wheat", "#FF7F00")
+    col = c("lightgreen", "firebrick1", "deepskyblue", "#FFFF33", "gray70", "#F781BF", "wheat", "cyan", "#FF7F00")
 
     # Use white for "Baseline", if present
     if(!is.na(baseIdx <- match("Baseline", labs)))
@@ -146,9 +158,15 @@ powerPlot = function(ep, ip, type = 1, majorpoints = TRUE, minorpoints = TRUE,
 
   ### Point sizes
   if(length(size) == 1)
-    size = c(size, 2*size)
-  minorSize = size[1]
-  majorSize = size[2]
+    size = c(2*size, size)
+  majorSize = size[1]
+  minorSize = size[2]
+
+  ### Alphas
+  if(length(alpha) == 1)
+    alpha = c(alpha, alpha)
+  majorAlpha = alpha[1]
+  minorAlpha = alpha[2]
 
   ### Point shapes
   majorShapes = c(circle=21, square=22, diamond=23, triangleUp=24, triangleDown=25)
@@ -233,12 +251,12 @@ powerPlot = function(ep, ip, type = 1, majorpoints = TRUE, minorpoints = TRUE,
     ggplot2::geom_vline(xintercept = vline, linetype = 2) +
     {if(minorpoints)
       ggplot2::geom_point(data = minor, ggplot2::aes(colour = group), size = minorSize,
-                        shape = shapeMapMinor[minor$group], alpha = alpha)} +
+                        shape = shapeMapMinor[minor$group], alpha = minorAlpha)} +
     {if(ellipse)
       ggplot2::stat_ellipse(data = minor, ggplot2::aes(colour = group), na.rm = TRUE)} +
     {if(majorpoints)
       ggplot2::geom_point(data = major, ggplot2::aes(fill = group, shape = group),
-                        size = majorSize, colour = "black", stroke = 1.5)} +
+                        size = majorSize, alpha = majorAlpha, colour = "black", stroke = stroke)} +
     ggplot2::labs(x = xlab, y = ylab, fill = NULL, colour = NULL) +
     ggplot2::scale_colour_manual(values = col) +
     ggplot2::scale_fill_manual(values = col) +

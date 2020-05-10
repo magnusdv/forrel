@@ -6,7 +6,7 @@
 \usage{
 powerPlot(
   ep,
-  ip,
+  ip = NULL,
   type = 1,
   majorpoints = TRUE,
   minorpoints = TRUE,
@@ -14,6 +14,7 @@ powerPlot(
   col = NULL,
   labs = NULL,
   alpha = 1,
+  stroke = 1.5,
   shape = "circle",
   size = 1,
   hline = NULL,
@@ -48,6 +49,8 @@ in a group fall on a line.}
 \code{ep} are used, if present.}
 
 \item{alpha}{Transparency for minor points (see Details).}
+
+\item{stroke}{Border width for major points (see Details).}
 
 \item{shape}{Either "circle", "square", "diamond", "triangleUp" or
 "triangleDown", determining the shapes of both minor and major points.}
