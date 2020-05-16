@@ -4,10 +4,10 @@
 \alias{kinshipLR}
 \title{Likelihood ratios for kinship testing}
 \usage{
-kinshipLR(x, ref = NULL, markers = NULL, verbose = FALSE)
+kinshipLR(..., ref = NULL, markers = NULL, verbose = FALSE)
 }
 \arguments{
-\item{x}{A list of pedigree alternatives. Each alternative should be either a
+\item{...}{A list of pedigree alternatives. Each alternative should be either a
 single \code{ped} object or a list of such.}
 
 \item{ref}{A single integer, indicating the index (in the list \code{x}) of the
@@ -42,11 +42,10 @@ sibs = simpleSim(sibs, N = 5, alleles = 1:4, ids = c("A", "B"), seed = 123)
 
 # Create two alternative hypotheses
 halfsibs = relabel(halfSibPed(), old = 4:5, new = c("A", "B"))
-
 unrel = list(singleton("A"), singleton("B"))
 
-# Compute LR with 'unrelated' as reference
-res = kinshipLR(list(sibs, halfsibs, unrel), ref = 3)
+# Compute LR with 'unrel' as reference (by default, the last ped is used)
+res = kinshipLR(sibs, halfsibs, unrel)
 res
 
 # Detailed results

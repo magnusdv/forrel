@@ -2,8 +2,11 @@ context("LR calculations")
 
 test_that("kinshipLR() catches input errors", {
   s = singleton(1)
-  expect_error(kinshipLR(list(s), ref = 1), "The input must contain at least two pedigrees")
-  expect_error(kinshipLR(list(s, s), ref = 1), "None of the pedigrees")
+  expect_error(kinshipLR(s), "The input must contain at least two pedigrees")
+  expect_error(kinshipLR(list(s)), "The input must contain at least two pedigrees")
+  expect_error(kinshipLR(list(s, 1)), "The input is not a list of pedigrees")
+  expect_error(kinshipLR(list(s, s)), "None of the pedigrees")
+  expect_error(kinshipLR(s, s), "None of the pedigrees")
 })
 
 test_that("kinshipLR() computes correctly in paternity case", {
@@ -13,6 +16,6 @@ test_that("kinshipLR() computes correctly in paternity case", {
   m = marker(H1, fa = "A/A", ch = "A/A", afreq = c(A=0.05, B=0.95))
   H1 = setMarkers(H1, m)
 
-  lr = kinshipLR(list(H1, H2))$LRtotal[[1]]
+  lr = kinshipLR(H1, H2)$LRtotal[[1]]
   expect_equal(lr, 20)
 })

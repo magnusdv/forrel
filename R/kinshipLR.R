@@ -5,7 +5,7 @@
 #' pedigrees is the 'reference', which will be used in the denominator in each
 #' LR.
 #'
-#' @param x A list of pedigree alternatives. Each alternative should be either a
+#' @param ... A list of pedigree alternatives. Each alternative should be either a
 #'   single `ped` object or a list of such.
 #' @param ref A single integer, indicating the index (in the list `x`) of the
 #'   reference alternative. This is used in the denominator of each LR. If NULL
@@ -36,22 +36,28 @@
 #'
 #' # Create two alternative hypotheses
 #' halfsibs = relabel(halfSibPed(), old = 4:5, new = c("A", "B"))
-#'
 #' unrel = list(singleton("A"), singleton("B"))
 #'
-#' # Compute LR with 'unrelated' as reference
-#' res = kinshipLR(list(sibs, halfsibs, unrel), ref = 3)
+#' # Compute LR with 'unrel' as reference (by default, the last ped is used)
+#' res = kinshipLR(sibs, halfsibs, unrel)
 #' res
 #'
 #' # Detailed results
 #' res$LRperMarker
 #' res$likelihoodsPerMarker
 #' @export
-kinshipLR = function(x, ref = NULL, markers = NULL, verbose = FALSE) {
+kinshipLR = function(..., ref = NULL, markers = NULL, verbose = FALSE) {
   st = proc.time()
 
+  x = list(...)
   if(length(x) == 1)
+    x = x[[1]]
+
+  if(is.ped(x) || length(x) == 1)
     stop2("The input must contain at least two pedigrees")
+
+  if(!all(sapply(x, function(ped) is.ped(ped) || is.pedList(ped))))
+    stop2("The input is not a list of pedigrees")
 
   if(is.null(ref))
     ref = length(x)
