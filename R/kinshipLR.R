@@ -8,9 +8,11 @@
 #' @param x A list of pedigree alternatives. Each alternative should be either a
 #'   single `ped` object or a list of such.
 #' @param ref A single integer, indicating the index (in the list `x`) of the
-#'   reference alternative. This is used in the denominator of each LR.
+#'   reference alternative. This is used in the denominator of each LR. If NULL
+#'   (the default), the last pedigree is used as reference.
 #' @param markers A vector of integers, indexing which markers should be
 #'   included. If NULL (the default) all markers are used.
+#' @param verbose A logical.
 #'
 #' @seealso [LRpower()], [pedtools::transferMarkers()]
 #'
@@ -22,23 +24,20 @@
 #'
 #'   * `likelihoodsPerMarker` : Likelihoods for each marker
 #'
-#'   * `time` user system and elapsed time
+#'   * `time` : Elapsed time
 #'
 #' @author Magnus Dehli Vigeland and Thore Egeland
 #'
 #' @examples
 #'
 #' # Simulate 5 markers for a pair of full sibs
-#' set.seed(123)
 #' sibs = nuclearPed(children = c("A", "B"))
-#' sibs = simpleSim(sibs, N = 5, alleles = 1:4, ids = c("A", "B"))
+#' sibs = simpleSim(sibs, N = 5, alleles = 1:4, ids = c("A", "B"), seed = 123)
 #'
-#' # Create two alternative hypotheses and transfer the simulated genotypes to them
+#' # Create two alternative hypotheses
 #' halfsibs = relabel(halfSibPed(), old = 4:5, new = c("A", "B"))
-#' halfsibs = transferMarkers(sibs, halfsibs)
 #'
 #' unrel = list(singleton("A"), singleton("B"))
-#' unrel = transferMarkers(sibs, unrel)
 #'
 #' # Compute LR with 'unrelated' as reference
 #' res = kinshipLR(list(sibs, halfsibs, unrel), ref = 3)
@@ -48,16 +47,51 @@
 #' res$LRperMarker
 #' res$likelihoodsPerMarker
 #' @export
-kinshipLR = function(x, ref, markers) {
+kinshipLR = function(x, ref = NULL, markers = NULL, verbose = FALSE) {
   st = proc.time()
 
-  # get marker names
-  y = if(is.ped(x[[1]])) x[[1]] else x[[1]][[1]]
-  if(missing(markers))
-    markers = seq_len(nMarkers(y))
-  markernames = sapply(y$MARKERS[markers], attr, "name")
-  NAnames = is.na(markernames)
-  if(any(NAnames)) markernames[NAnames] = paste0("M", which(NAnames))
+  if(length(x) == 1)
+    stop2("The input must contain at least two pedigrees")
+
+  if(is.null(ref))
+    ref = length(x)
+
+  if(verbose)
+    message("Using pedigree ", ref, " as reference")
+
+  # Number of attached markers for each pedigree
+  nm = vapply(x, nMarkers, FUN.VALUE = 1)
+
+  # Are any of the pedigrees without marker data?
+  empty = nm == 0
+
+  if(all(empty))
+    stop2("None of the pedigrees has attached marker data")
+
+  # For those that are empty, transfer from the first that has data
+  if(any(empty)) {
+    srcIdx = which(!empty)[1]
+    if(verbose)
+      message(sprintf("Transfering marker data from pedigree %d to empty pedigrees: ", srcIdx), which(empty))
+    src = x[[srcIdx]]
+    for(i in which(empty))
+      x[[i]] = transferMarkers(from = src, to = x[[i]])
+  }
+
+  # Update marker counts
+  nm = vapply(x, nMarkers, FUN.VALUE = 1)
+
+  # Marker names
+  if(missing(markers)) {
+    if(!all(nm == nm[1]))
+      stop2("The pedigrees have different number of markers: ", nm)
+    markers = seq_len(nm[1])
+  }
+  markernames = name(x[[1]], markers)
+
+  # Fix NA names
+  if(any(NAnames <- is.na(markernames)))
+    markernames[NAnames] = paste0("M", which(NAnames))
 
   # break all loops (NB: would use rapply, but doesnt work since is.list(ped) = TRUE
   breaklp = function(a) {
@@ -96,7 +130,7 @@ kinshipLR = function(x, ref, markers) {
     LRtotal = LRtotal,
     LRperMarker = LRperMarker,
     likelihoodsPerMarker = likelihoodsPerMarker,
-    time = proc.time()-st),
+    time = proc.time() - st),
     class = "LRresult")
 }
 

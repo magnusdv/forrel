@@ -4,17 +4,20 @@
 \alias{kinshipLR}
 \title{Likelihood ratios for kinship testing}
 \usage{
-kinshipLR(x, ref, markers)
+kinshipLR(x, ref = NULL, markers = NULL, verbose = FALSE)
 }
 \arguments{
 \item{x}{A list of pedigree alternatives. Each alternative should be either a
 single \code{ped} object or a list of such.}
 
 \item{ref}{A single integer, indicating the index (in the list \code{x}) of the
-reference alternative. This is used in the denominator of each LR.}
+reference alternative. This is used in the denominator of each LR. If NULL
+(the default), the last pedigree is used as reference.}
 
 \item{markers}{A vector of integers, indexing which markers should be
 included. If NULL (the default) all markers are used.}
+
+\item{verbose}{A logical.}
 }
 \value{
 A \code{LRresult}object, which is essentially a list with entries
@@ -22,7 +25,7 @@ A \code{LRresult}object, which is essentially a list with entries
 \item \code{LRtotal} : Total likelihood ratios
 \item \code{LRperMarker} : Likelihood ratios for each marker
 \item \code{likelihoodsPerMarker} : Likelihoods for each marker
-\item \code{time} user system and elapsed time
+\item \code{time} : Elapsed time
 }
 }
 \description{
@@ -34,16 +37,13 @@ LR.
 \examples{
 
 # Simulate 5 markers for a pair of full sibs
-set.seed(123)
 sibs = nuclearPed(children = c("A", "B"))
-sibs = simpleSim(sibs, N = 5, alleles = 1:4, ids = c("A", "B"))
+sibs = simpleSim(sibs, N = 5, alleles = 1:4, ids = c("A", "B"), seed = 123)
 
-# Create two alternative hypotheses and transfer the simulated genotypes to them
+# Create two alternative hypotheses
 halfsibs = relabel(halfSibPed(), old = 4:5, new = c("A", "B"))
-halfsibs = transferMarkers(sibs, halfsibs)
 
 unrel = list(singleton("A"), singleton("B"))
-unrel = transferMarkers(sibs, unrel)
 
 # Compute LR with 'unrelated' as reference
 res = kinshipLR(list(sibs, halfsibs, unrel), ref = 3)
