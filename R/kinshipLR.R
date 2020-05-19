@@ -61,23 +61,31 @@ kinshipLR = function(..., ref = NULL, source = NULL, markers = NULL, verbose = F
   if(length(x) == 1)
     x = x[[1]]
 
-  if(is.ped(x) || length(x) == 1)
+  if(length(x) < 2 || is.ped(x))
     stop2("The input must contain at least two pedigrees")
 
   if(!all(sapply(x, function(ped) is.ped(ped) || is.pedList(ped))))
     stop2("The input is not a list of pedigrees")
 
+  # Check `ref`
   if(is.null(ref))
-    ref = length(x)
-
+    refIdx = length(x)
+  else if(is_number(ref, 1, length(x)))
+    refIdx = as.integer(ref)
+  else if(is.character(ref) && ref %in% names(x))
+    refIdx = match(ref, names(x))
+  else
+    stop2("Invalid value for `ref`: ", ref)
   if(verbose)
-    message("Using pedigree ", ref, " as reference")
+    message("Using pedigree ", refIdx, " as reference")
 
   # If explicit source given, transfer to all
   if(!is.null(source)) {
     if(verbose)
       message("Transfering marker data from pedigree ", source, " to all others")
     srcPed = x[[source]]
+    if(is.null(srcPed))
+      stop2("Unknown source pedigree: ", source)
     if(nMarkers(srcPed) == 0)
       stop2("The source pedigree has no attached markers")
     if(!is.null(markers))

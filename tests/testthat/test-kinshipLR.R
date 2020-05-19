@@ -11,6 +11,10 @@ test_that("kinshipLR() catches input errors", {
   expect_error(kinshipLR(list(s, s), source = 1), "The source pedigree has no attached markers")
 
   s1 = setMarkers(s, marker(s))
+  expect_error(kinshipLR(s1, s1, ref = 3), "Invalid value for `ref`")
+  expect_error(kinshipLR(s1, s1, ref = 0), "Invalid value for `ref`")
+  expect_error(kinshipLR(s1, s1, ref = "unrel"), "Invalid value for `ref`")
+
   s2 = setMarkers(s, list(marker(s), marker(s)))
   expect_error(kinshipLR(s1, s2), "When `markers = NULL`, all pedigrees must have the same number of attached markers")
 })
