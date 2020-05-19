@@ -172,10 +172,6 @@ kinshipLR = function(..., ref = NULL, source = NULL, markers = NULL, verbose = F
     class = "LRresult")
 }
 
-# Alias
-LR = kinshipLR
-
-
 #' @export
 print.LRresult = function(x, ...) {
   cat("Total LR:\n")
