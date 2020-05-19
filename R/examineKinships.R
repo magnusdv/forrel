@@ -107,7 +107,7 @@ examineKinships = function(x, who = "all", interfam = c("founders", "none", "all
         showInTriangle(u$k0, u$k2, new = FALSE, col = group_col["unrelated"], pch = pch, ...)
     }
     if ("other" %in% use_groups) {
-        rest = t(combn(x$available, 2))
+        rest = .comb2(x$available)
         taken = rbind(P, U, S, G, CO)
         D = rest[!(rest[, 1] * 1000 + rest[, 2]) %in% (taken[, 1] * 1000 + taken[, 2]), , drop = FALSE]
         d = IBDestimate(x, D)

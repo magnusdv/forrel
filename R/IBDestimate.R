@@ -59,7 +59,6 @@
 #'
 #'
 #' @importFrom maxLik maxLik
-#' @importFrom utils combn
 #' @export
 IBDestimate = function(x, ids = NULL, markers = NULL, start = c(0.99,0.001), tol = 1e-7) {
   if(is.ped(x))
@@ -76,7 +75,7 @@ IBDestimate = function(x, ids = NULL, markers = NULL, start = c(0.99,0.001), tol
     stop2("`ids` must be either a vector of length at least 2, or a matrix/data.frame with 2 columns")
 
   if(is.vector(ids))
-    ids = t.default(combn(ids, 2))
+    ids = .comb2(ids)
   else if(is.data.frame(ids))
     ids = as.matrix(ids)
 

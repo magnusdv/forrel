@@ -30,14 +30,24 @@ pluralise = function(noun, n) {
   sample.int(2, size = n, replace = TRUE) - 1L
 }
 
-# Equivalent to t.default(combn(n, 2)), but ~6 times faster.
-.comb2 = function(n) {
+
+# Faster version of t.default(combn(n, 2, simplify = T))
+.comb2 = function(n, vec = length(n) > 1){
+  if(vec) {
+    v = n
+    n = length(v)
+  }
   if (n < 2)
     return(matrix(nrow = 0, ncol = 2))
-  v1 = rep.int(seq_len(n - 1), (n - 1):1)
-  v2 = NULL
-  for (i in 2:n) v2 = c(v2, i:n)
-  cbind(v1, v2, deparse.level = 0)
+
+  x = rep.int(seq_len(n - 1), (n - 1):1)
+  o = c(0, cumsum((n-2):1))
+  y = seq_along(x) + 1 - o[x]
+
+  if(vec)
+    cbind(v[x], v[y], deparse.level = 0)
+  else
+    cbind(x, y, deparse.level = 0)
 }
 
 isEP = function(x) {
