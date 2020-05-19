@@ -46,18 +46,29 @@ LR.
 \examples{
 
 # Simulate 5 markers for a pair of full sibs
-sibs = nuclearPed(children = c("A", "B"))
-sibs = simpleSim(sibs, N = 5, alleles = 1:4, ids = c("A", "B"), seed = 123)
+ids = c("A", "B")
+sibs = nuclearPed(children = ids)
+sibs = simpleSim(sibs, N = 5, alleles = 1:4, ids = ids, seed = 123)
 
 # Create two alternative hypotheses
-halfsibs = relabel(halfSibPed(), old = 4:5, new = c("A", "B"))
+halfsibs = relabel(halfSibPed(), old = 4:5, new = ids)
 unrel = list(singleton("A"), singleton("B"))
 
-# Compute LR with 'unrel' as reference (by default, the last ped is used)
-res = kinshipLR(sibs, halfsibs, unrel)
-res
+# Compute LRs. By default, the last ped is used as reference
+kinshipLR(sibs, halfsibs, unrel)
+
+# Input pedigrees can be named, reflected in output
+kinshipLR(S = sibs, H = halfsibs, U = unrel)
+
+# Select non-default reference (by index or name)
+kinshipLR(S = sibs, H = halfsibs, U = unrel, ref = "H")
+
+# Alternative syntax: List input
+peds = list(S = sibs, H = halfsibs, U = unrel)
+kinshipLR(peds, ref = "H", source = "S", verbose = TRUE)
 
 # Detailed results
+res = kinshipLR(peds)
 res$LRperMarker
 res$likelihoodsPerMarker
 }
