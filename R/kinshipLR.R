@@ -121,9 +121,19 @@ kinshipLR = function(..., ref = NULL, source = NULL, markers = NULL, verbose = F
   # Extract names of selected markers
   markernames = name(x[[1]], markers)
 
-  # Fix NA names
+  # Fix missing marker names
   if(any(NAnames <- is.na(markernames)))
     markernames[NAnames] = paste0("M", which(NAnames))
+
+  # Fix hypothesis names
+  hypnames = names(x)
+  if(is.null(hypnames))
+    hypnames = paste0("H", seq_along(x))
+  else {
+    unnamed = hypnames == "" | is.na(hypnames)
+    hypnames[unnamed] = paste0("H", which(unnamed))
+  }
+  names(x) = hypnames
 
   # Break all loops (NB: would use rapply, but doesnt work since is.list(ped) = TRUE
   breaklp = function(a) {
@@ -143,15 +153,10 @@ kinshipLR = function(..., ref = NULL, source = NULL, markers = NULL, verbose = F
   likelihoodsPerMarker = do.call(cbind, liks)
 
   # LR per marker and total
-  LRperMarker = do.call(cbind, lapply(1:length(x), function(j) liks[[j]]/liks[[ref]]))
+  LRperMarker = do.call(cbind, lapply(1:length(x), function(j) liks[[j]]/liks[[refIdx]]))
 
-  # Ensure output has labels for the hypotheses
-  hypnames = colnames(likelihoodsPerMarker)
-  if(is.null(hypnames)) {
-    hypnames = paste("Hyp", seq_along(x))
-    colnames(likelihoodsPerMarker) = hypnames
-  }
-  colnames(LRperMarker) = hypnames
+  # Create names for LR comparisons
+  colnames(LRperMarker) = paste0(hypnames, ":", hypnames[refIdx])
 
   # total LR
   LRtotal = apply(LRperMarker, 2, prod)
