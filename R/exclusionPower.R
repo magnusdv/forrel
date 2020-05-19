@@ -34,7 +34,7 @@
 #'   mutations should be disabled.
 #' @param exactMaxL A positive integer, or `Inf` (default). Exact EPs are
 #'   calculated for markers whose number of alleles is less or equal to
-#'   `exactMaxL`; remaining markers are handled using a simulation.
+#'   `exactMaxL`; remaining markers are handled by simulation.
 #' @param nsim A positive integer; the number of simulations used for markers
 #'   whose number of alleles exceeds `exactMaxL`.
 #' @param seed A numeric seed for the random number generator (optional).
@@ -172,7 +172,7 @@ exclusionPower = function(claimPed, truePed, ids, markers = NULL, source = "clai
     }
 
     # If `alleles` is single integer, convert to sequence
-    if(length(alleles) == 1 && is.numeric(alleles))
+    if(is_number(alleles))
       alleles = seq_len(alleles)
 
     # Create and attach locus to both pedigrees
@@ -181,6 +181,7 @@ exclusionPower = function(claimPed, truePed, ids, markers = NULL, source = "clai
     truePed = setMarkers(truePed, alleleMatrix = am, locusAttributes = locus)
 
     markers = 1
+    typed = typedMembers(truePed)
     hasMut = FALSE
     disableMutations = FALSE # don't do anything
   }

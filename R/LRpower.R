@@ -107,7 +107,7 @@ LRpower = function(numeratorPed, denominatorPed, truePed = numeratorPed, ids, ma
     }
 
     # If `alleles` is single integer, convert to sequence
-    if(length(alleles) == 1 && is.numeric(alleles))
+    if(is_number(alleles))
       alleles = seq_len(alleles)
 
     # Create and attach locus to both pedigrees
@@ -116,10 +116,10 @@ LRpower = function(numeratorPed, denominatorPed, truePed = numeratorPed, ids, ma
 
     markers = 1
     typed = typedMembers(truePed)
-    #hasMut = FALSE
     disableMutations = FALSE # don't do anything
   }
   else {
+    source = match.arg(source, c("true", "numerator", "denominator"))
     sourcePed = switch(source, true = truePed, numerator = numeratorPed, denominator = denominatorPed,
                        stop2("`source` must be either 'true', 'numerator' or 'denominator': ", source))
 

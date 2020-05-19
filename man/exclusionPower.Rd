@@ -56,7 +56,7 @@ mutations should be disabled.
 
 \item{exactMaxL}{A positive integer, or \code{Inf} (default). Exact EPs are
 calculated for markers whose number of alleles is less or equal to
-\code{exactMaxL}; remaining markers are handled using a simulation.}
+\code{exactMaxL}; remaining markers are handled by simulation.}
 
 \item{nsim}{A positive integer; the number of simulations used for markers
 whose number of alleles exceeds \code{exactMaxL}.}

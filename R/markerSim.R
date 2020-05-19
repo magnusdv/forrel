@@ -111,7 +111,7 @@ markerSim = function(x, N = 1, ids = NULL, alleles = NULL, afreq = NULL,
     if (is.null(alleles))
       stop2("Marker alleles must be specified")
 
-    if (is.numeric(alleles) && length(alleles) == 1)
+    if (is_number(alleles))
       alleles = seq_len(alleles)
     m = marker(x, alleles = alleles, afreq = afreq, mutmod = mutmod, rate = rate)
   }
