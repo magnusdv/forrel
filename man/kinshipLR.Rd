@@ -23,25 +23,33 @@ marker data is transferred to those, using the first nonempty pedigree as
 source.}
 
 \item{markers}{A vector of marker names or indices indicating which markers
-should be included. If NULL (the default) all markers
-are used.}
+should be included. If NULL (the default) all markers are used.}
 
 \item{verbose}{A logical.}
 }
 \value{
-A \code{LRresult}object, which is essentially a list with entries
+A \code{LRresult} object, which is essentially a list with entries
 \itemize{
-\item \code{LRtotal} : Total likelihood ratios
-\item \code{LRperMarker} : Likelihood ratios for each marker
-\item \code{likelihoodsPerMarker} : Likelihoods for each marker
+\item \code{LRtotal} : A vector of length \code{L}, where \code{L} is the number of input
+pedigrees. The i'th entry is the total LR (i.e., the product over all
+markers) comparing pedigree \code{i} to the reference pedigree. The entry
+corresponding to the reference will always be 1.
+\item \code{LRperMarker} : A numerical matrix, where the i'th column contains the
+marker-wise LR values comparing pedigree \code{i} to the reference. The product
+of all entries in a column should equal the corresponding entry in
+\code{LRtotal}.
+\item \code{likelihoodsPerMarker} : A numerical matrix of the same dimensions as
+\code{LRperMarker}, but where the entries are likelihood of each pedigree for
+each marker.
 \item \code{time} : Elapsed time
 }
 }
 \description{
-This function computes likelihood ratios (LRs) for a given a list of
-pedigrees with attached markers. The user must indicate which of the
-pedigrees is the 'reference', which will be used in the denominator in each
-LR.
+This function computes likelihood ratios (LRs) for a list of pedigrees. One
+of the pedigrees (the last one, by default) is designated as 'reference', to
+be used in the denominator in all LR calculations. To ensure that all
+pedigrees use the same data set, one of the pedigrees may be chosen as
+'source', from which data is transferred to all the other pedigrees.
 }
 \examples{
 
@@ -73,7 +81,7 @@ res$LRperMarker
 res$likelihoodsPerMarker
 }
 \seealso{
-\code{\link[=LRpower]{LRpower()}}, \code{\link[pedtools:transferMarkers]{pedtools::transferMarkers()}}
+\code{\link[=LRpower]{LRpower()}}
 }
 \author{
 Magnus Dehli Vigeland and Thore Egeland

@@ -1,9 +1,10 @@
 #' Likelihood ratios for kinship testing
 #'
-#' This function computes likelihood ratios (LRs) for a given a list of
-#' pedigrees with attached markers. The user must indicate which of the
-#' pedigrees is the 'reference', which will be used in the denominator in each
-#' LR.
+#' This function computes likelihood ratios (LRs) for a list of pedigrees. One
+#' of the pedigrees (the last one, by default) is designated as 'reference', to
+#' be used in the denominator in all LR calculations. To ensure that all
+#' pedigrees use the same data set, one of the pedigrees may be chosen as
+#' 'source', from which data is transferred to all the other pedigrees.
 #'
 #' @param ... A list of pedigree alternatives. Each alternative should be either
 #'   a single `ped` object or a list of such.
@@ -18,19 +19,26 @@
 #'   marker data is transferred to those, using the first nonempty pedigree as
 #'   source.
 #' @param markers A vector of marker names or indices indicating which markers
-#'   should be included. If NULL (the default) all markers
-#'   are used.
+#'   should be included. If NULL (the default) all markers are used.
 #' @param verbose A logical.
 #'
-#' @seealso [LRpower()], [pedtools::transferMarkers()]
+#' @seealso [LRpower()]
 #'
-#' @return A `LRresult`object, which is essentially a list with entries
+#' @return A `LRresult` object, which is essentially a list with entries
 #'
-#'   * `LRtotal` : Total likelihood ratios
+#'   * `LRtotal` : A vector of length `L`, where `L` is the number of input
+#'   pedigrees. The i'th entry is the total LR (i.e., the product over all
+#'   markers) comparing pedigree `i` to the reference pedigree. The entry
+#'   corresponding to the reference will always be 1.
 #'
-#'   * `LRperMarker` : Likelihood ratios for each marker
+#'   * `LRperMarker` : A numerical matrix, where the i'th column contains the
+#'   marker-wise LR values comparing pedigree `i` to the reference. The product
+#'   of all entries in a column should equal the corresponding entry in
+#'   `LRtotal`.
 #'
-#'   * `likelihoodsPerMarker` : Likelihoods for each marker
+#'   * `likelihoodsPerMarker` : A numerical matrix of the same dimensions as
+#'   `LRperMarker`, but where the entries are likelihood of each pedigree for
+#'   each marker.
 #'
 #'   * `time` : Elapsed time
 #'
