@@ -7,6 +7,12 @@ test_that("kinshipLR() catches input errors", {
   expect_error(kinshipLR(list(s, 1)), "The input is not a list of pedigrees")
   expect_error(kinshipLR(list(s, s)), "None of the pedigrees")
   expect_error(kinshipLR(s, s), "None of the pedigrees")
+  expect_error(kinshipLR(s, s, source = 1), "The source pedigree has no attached markers")
+  expect_error(kinshipLR(list(s, s), source = 1), "The source pedigree has no attached markers")
+
+  s1 = setMarkers(s, marker(s))
+  s2 = setMarkers(s, list(marker(s), marker(s)))
+  expect_error(kinshipLR(s1, s2), "When `markers = NULL`, all pedigrees must have the same number of attached markers")
 })
 
 test_that("kinshipLR() computes correctly in paternity case", {

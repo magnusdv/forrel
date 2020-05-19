@@ -4,18 +4,27 @@
 \alias{kinshipLR}
 \title{Likelihood ratios for kinship testing}
 \usage{
-kinshipLR(..., ref = NULL, markers = NULL, verbose = FALSE)
+kinshipLR(..., ref = NULL, source = NULL, markers = NULL, verbose = FALSE)
 }
 \arguments{
-\item{...}{A list of pedigree alternatives. Each alternative should be either a
-single \code{ped} object or a list of such.}
+\item{...}{A list of pedigree alternatives. Each alternative should be either
+a single \code{ped} object or a list of such.}
 
-\item{ref}{A single integer, indicating the index (in the list \code{x}) of the
-reference alternative. This is used in the denominator of each LR. If NULL
-(the default), the last pedigree is used as reference.}
+\item{ref}{An index or name indicating which of the input pedigrees should be
+used as "reference pedigree", i.e., used in the denominator of each LR. If
+NULL (the default), the last pedigree is used as reference.}
 
-\item{markers}{A vector of integers, indexing which markers should be
-included. If NULL (the default) all markers are used.}
+\item{source}{An index or name designating one of the input pedigrees as
+source for marker data. If given, marker data is transferred from this to
+all the other pedigrees (replacing any existing markers). The default
+action (\code{source = NULL}) is as follows: If all pedigrees already have
+attached markers, no transfers are done. If some pedigrees are empty,
+marker data is transferred to those, using the first nonempty pedigree as
+source.}
+
+\item{markers}{A vector of marker names or indices indicating which markers
+should be included. If NULL (the default) all markers
+are used.}
 
 \item{verbose}{A logical.}
 }

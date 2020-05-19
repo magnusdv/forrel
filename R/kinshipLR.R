@@ -5,13 +5,21 @@
 #' pedigrees is the 'reference', which will be used in the denominator in each
 #' LR.
 #'
-#' @param ... A list of pedigree alternatives. Each alternative should be either a
-#'   single `ped` object or a list of such.
-#' @param ref A single integer, indicating the index (in the list `x`) of the
-#'   reference alternative. This is used in the denominator of each LR. If NULL
-#'   (the default), the last pedigree is used as reference.
-#' @param markers A vector of integers, indexing which markers should be
-#'   included. If NULL (the default) all markers are used.
+#' @param ... A list of pedigree alternatives. Each alternative should be either
+#'   a single `ped` object or a list of such.
+#' @param ref An index or name indicating which of the input pedigrees should be
+#'   used as "reference pedigree", i.e., used in the denominator of each LR. If
+#'   NULL (the default), the last pedigree is used as reference.
+#' @param source An index or name designating one of the input pedigrees as
+#'   source for marker data. If given, marker data is transferred from this to
+#'   all the other pedigrees (replacing any existing markers). The default
+#'   action (`source = NULL`) is as follows: If all pedigrees already have
+#'   attached markers, no transfers are done. If some pedigrees are empty,
+#'   marker data is transferred to those, using the first nonempty pedigree as
+#'   source.
+#' @param markers A vector of marker names or indices indicating which markers
+#'   should be included. If NULL (the default) all markers
+#'   are used.
 #' @param verbose A logical.
 #'
 #' @seealso [LRpower()], [pedtools::transferMarkers()]
@@ -46,7 +54,7 @@
 #' res$LRperMarker
 #' res$likelihoodsPerMarker
 #' @export
-kinshipLR = function(..., ref = NULL, markers = NULL, verbose = FALSE) {
+kinshipLR = function(..., ref = NULL, source = NULL, markers = NULL, verbose = FALSE) {
   st = proc.time()
 
   x = list(...)
@@ -65,41 +73,51 @@ kinshipLR = function(..., ref = NULL, markers = NULL, verbose = FALSE) {
   if(verbose)
     message("Using pedigree ", ref, " as reference")
 
-  # Number of attached markers for each pedigree
-  nm = vapply(x, nMarkers, FUN.VALUE = 1)
-
-  # Are any of the pedigrees without marker data?
-  empty = nm == 0
-
-  if(all(empty))
-    stop2("None of the pedigrees has attached marker data")
-
-  # For those that are empty, transfer from the first that has data
-  if(any(empty)) {
-    srcIdx = which(!empty)[1]
+  # If explicit source given, transfer to all
+  if(!is.null(source)) {
     if(verbose)
-      message(sprintf("Transfering marker data from pedigree %d to empty pedigrees: ", srcIdx), which(empty))
-    src = x[[srcIdx]]
-    for(i in which(empty))
-      x[[i]] = transferMarkers(from = src, to = x[[i]])
+      message("Transfering marker data from pedigree ", source, " to all others")
+    srcPed = x[[source]]
+    if(nMarkers(srcPed) == 0)
+      stop2("The source pedigree has no attached markers")
+    if(!is.null(markers))
+      srcPed = selectMarkers(srcPed, markers)
+    x = lapply(x, transferMarkers, from = srcPed)
+  }
+  else {
+    # Any empty pedigrees?
+    empty = !sapply(x, hasMarkers)
+
+    if(all(empty))
+      stop2("None of the pedigrees has attached marker data")
+
+    if(any(empty)) {
+      source = which(!empty)[1] # use first non-empty as source
+      srcPed = x[[source]]
+      if(!is.null(markers))
+        srcPed = selectMarkers(srcPed, markers)
+      if(verbose)
+        message("Transfering marker data from pedigree ", source, " to empty pedigree(s): ", toString(which(empty)))
+      x[empty] = lapply(x[empty], transferMarkers, from = srcPed)
+    }
   }
 
-  # Update marker counts
-  nm = vapply(x, nMarkers, FUN.VALUE = 1)
-
-  # Marker names
-  if(missing(markers)) {
+  # By default, use all markers
+  if(is.null(markers)) {
+    nm = vapply(x, nMarkers, FUN.VALUE = 1)
     if(!all(nm == nm[1]))
-      stop2("The pedigrees have different number of markers: ", nm)
+      stop2("When `markers = NULL`, all pedigrees must have the same number of attached markers: ", nm)
     markers = seq_len(nm[1])
   }
+
+  # Extract names of selected markers
   markernames = name(x[[1]], markers)
 
   # Fix NA names
   if(any(NAnames <- is.na(markernames)))
     markernames[NAnames] = paste0("M", which(NAnames))
 
-  # break all loops (NB: would use rapply, but doesnt work since is.list(ped) = TRUE
+  # Break all loops (NB: would use rapply, but doesnt work since is.list(ped) = TRUE
   breaklp = function(a) {
     if(is.pedList(a))
       return(lapply(a, breaklp))
@@ -111,14 +129,15 @@ kinshipLR = function(..., ref = NULL, markers = NULL, verbose = FALSE) {
   x_loopfree = lapply(x, breaklp)
 
   # compute likelihoods
-  liks = lapply(x_loopfree, function(xx) vapply(markers, function(i)
-      likelihood(xx, marker1 = i), FUN.VALUE = 1))
+  liks = lapply(x_loopfree,
+                function(xx) vapply(markers, function(i) likelihood(xx, marker1 = i),
+                                    FUN.VALUE = 1))
   likelihoodsPerMarker = do.call(cbind, liks)
 
   # LR per marker and total
   LRperMarker = do.call(cbind, lapply(1:length(x), function(j) liks[[j]]/liks[[ref]]))
 
-  # ensure output has labels for the hypotheses
+  # Ensure output has labels for the hypotheses
   hypnames = colnames(likelihoodsPerMarker)
   if(is.null(hypnames)) {
     hypnames = paste("Hyp", seq_along(x))
