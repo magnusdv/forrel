@@ -6,8 +6,11 @@
 #' pedigrees use the same data set, one of the pedigrees may be chosen as
 #' 'source', from which data is transferred to all the other pedigrees.
 #'
-#' @param ... A list of pedigree alternatives. Each alternative should be either
-#'   a single `ped` object or a list of such.
+#' @param ... Pedigree alternatives. Each argument should be either a single
+#'   `ped` object or a list of such. The pedigrees may be named; otherwise they
+#'   are assigned names "H1", "H2", ... automatically.
+#'
+#'   It is also possible to pass a single `list` containing all the pedigrees.
 #' @param ref An index or name indicating which of the input pedigrees should be
 #'   used as "reference pedigree", i.e., used in the denominator of each LR. If
 #'   NULL (the default), the last pedigree is used as reference.
@@ -58,7 +61,7 @@
 #' # Compute LRs. By default, the last ped is used as reference
 #' kinshipLR(sibs, halfsibs, unrel)
 #'
-#' # Input pedigrees can be named, reflected in output
+#' # Input pedigrees can be named, reflected in the output
 #' kinshipLR(S = sibs, H = halfsibs, U = unrel)
 #'
 #' # Select non-default reference (by index or name)
@@ -141,8 +144,8 @@ kinshipLR = function(..., ref = NULL, source = NULL, markers = NULL, verbose = F
   markernames = name(x[[1]], markers)
 
   # Fix missing marker names
-  if(any(NAnames <- is.na(markernames)))
-    markernames[NAnames] = paste0("M", which(NAnames))
+  #if(any(NAnames <- is.na(markernames)))
+  #  markernames[NAnames] = paste0("M", which(NAnames))
 
   # Fix hypothesis names
   hypnames = names(x)
@@ -152,6 +155,9 @@ kinshipLR = function(..., ref = NULL, source = NULL, markers = NULL, verbose = F
     unnamed = hypnames == "" | is.na(hypnames)
     hypnames[unnamed] = paste0("H", which(unnamed))
   }
+  if(dup <- anyDuplicated(hypnames))
+    stop2("Duplicated hypothesis name: ", hypnames[dup])
+
   names(x) = hypnames
 
   # Break all loops (NB: would use rapply, but doesnt work since is.list(ped) = TRUE
@@ -181,7 +187,7 @@ kinshipLR = function(..., ref = NULL, source = NULL, markers = NULL, verbose = F
   LRtotal = apply(LRperMarker, 2, prod)
 
   # output
-  rownames(likelihoodsPerMarker) = rownames(LRperMarker) = markernames
+  #rownames(likelihoodsPerMarker) = rownames(LRperMarker) = markernames
 
   structure(list(
     LRtotal = LRtotal,
@@ -193,6 +199,6 @@ kinshipLR = function(..., ref = NULL, source = NULL, markers = NULL, verbose = F
 
 #' @export
 print.LRresult = function(x, ...) {
-  cat("Total LR:\n")
+  #cat("Total LR:\n")
   print(x$LRtotal)
 }

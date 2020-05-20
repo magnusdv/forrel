@@ -7,8 +7,11 @@
 kinshipLR(..., ref = NULL, source = NULL, markers = NULL, verbose = FALSE)
 }
 \arguments{
-\item{...}{A list of pedigree alternatives. Each alternative should be either
-a single \code{ped} object or a list of such.}
+\item{...}{Pedigree alternatives. Each argument should be either a single
+\code{ped} object or a list of such. The pedigrees may be named; otherwise they
+are assigned names "H1", "H2", ... automatically.
+
+It is also possible to pass a single \code{list} containing all the pedigrees.}
 
 \item{ref}{An index or name indicating which of the input pedigrees should be
 used as "reference pedigree", i.e., used in the denominator of each LR. If
@@ -65,7 +68,7 @@ unrel = list(singleton("A"), singleton("B"))
 # Compute LRs. By default, the last ped is used as reference
 kinshipLR(sibs, halfsibs, unrel)
 
-# Input pedigrees can be named, reflected in output
+# Input pedigrees can be named, reflected in the output
 kinshipLR(S = sibs, H = halfsibs, U = unrel)
 
 # Select non-default reference (by index or name)

@@ -15,6 +15,9 @@ test_that("kinshipLR() catches input errors", {
   expect_error(kinshipLR(s1, s1, ref = 0), "Invalid value for `ref`")
   expect_error(kinshipLR(s1, s1, ref = "unrel"), "Invalid value for `ref`")
 
+  expect_error(kinshipLR(a=s, a=s1), "Duplicated hypothesis name")
+  expect_error(kinshipLR(s, H1=s1), "Duplicated hypothesis name")
+
   s2 = setMarkers(s, list(marker(s), marker(s)))
   expect_error(kinshipLR(s1, s2), "When `markers = NULL`, all pedigrees must have the same number of attached markers")
 })
