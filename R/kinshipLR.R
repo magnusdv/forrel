@@ -140,13 +140,6 @@ kinshipLR = function(..., ref = NULL, source = NULL, markers = NULL, verbose = F
     markers = seq_len(nm[1])
   }
 
-  # Extract names of selected markers
-  markernames = name(x[[1]], markers)
-
-  # Fix missing marker names
-  #if(any(NAnames <- is.na(markernames)))
-  #  markernames[NAnames] = paste0("M", which(NAnames))
-
   # Fix hypothesis names
   hypnames = names(x)
   if(is.null(hypnames))
@@ -183,12 +176,16 @@ kinshipLR = function(..., ref = NULL, source = NULL, markers = NULL, verbose = F
   # Create names for LR comparisons
   colnames(LRperMarker) = paste0(hypnames, ":", hypnames[refIdx])
 
-  # total LR
+  # Total LR
   LRtotal = apply(LRperMarker, 2, prod)
 
-  # output
-  #rownames(likelihoodsPerMarker) = rownames(LRperMarker) = markernames
+  # Use marker names in output
+  markernames = name(x[[1]], markers)
+  if(any(NAnames <- is.na(markernames)))
+    markernames[NAnames] = sprintf("<%d>", which(NAnames))
+  rownames(likelihoodsPerMarker) = rownames(LRperMarker) = markernames
 
+  # Output `LRresult` object
   structure(list(
     LRtotal = LRtotal,
     LRperMarker = LRperMarker,
@@ -199,6 +196,5 @@ kinshipLR = function(..., ref = NULL, source = NULL, markers = NULL, verbose = F
 
 #' @export
 print.LRresult = function(x, ...) {
-  #cat("Total LR:\n")
   print(x$LRtotal)
 }
