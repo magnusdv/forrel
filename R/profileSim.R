@@ -41,6 +41,9 @@
 profileSim = function(x, N = 1, ids = NULL, markers = NULL, seed = NULL,
                       numCores = NA, verbose = TRUE, ...){
 
+  if(!is.ped(x) && !is.pedList(x))
+    stop2("The first argument must be a `ped` object or a list of such")
+
   # Set seed once (instead of passing it to markerSim)
   if(!is.null(seed))
     set.seed(seed)
