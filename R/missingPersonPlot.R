@@ -33,10 +33,11 @@
 #'
 #' @param reference A [pedtools::ped()] object.
 #' @param missing The ID label of the missing pedigree member.
-#' @param id.labels A character vector with labels for the pedigree members. See
-#'   [pedtools::plot.ped()].
 #' @param MP.label The label of the missing member. Default: "MP".
 #' @param POI.label The label of the person of interest. Default: "POI".
+#' @param POI.sex The sex of POI. This defaults to that of the missing person,
+#'   but may be set explicitly. This is particularly useful when the missing
+#'   person has unknown sex.
 #' @param marker Optional vector of marker indices to be included in the plot.
 #' @param shaded A vector of ID labels indicating who should appear with shaded
 #'   symbols. By default, all typed members.
@@ -49,10 +50,15 @@
 #'   specifically this number is the relative width of the reference pedigree,
 #'   compared to a singleton. Default: 4.
 #' @param newdev A logical: If TRUE the plot is created in a new plot window.
-#' @param frametitles A character of length 2, with subtitles for the two frames.
+#' @param frametitles A character of length 2, with subtitles for the two
+#'   frames.
+#' @param labs A character vector with labels for the pedigree members. See
+#'   [pedtools::plot.ped()].
+#' @param id.labels Deprecated; use `labs` instead
 #' @param ... Extra parameters passed on to [pedtools::plotPedList()].
 #'
 #' @return None
+#'
 #' @examples
 #' x = nuclearPed(father = "fa", mother = "mo", children = c("b1", "b2"))
 #'
@@ -72,13 +78,18 @@
 #'
 #' @importFrom stats setNames
 #' @export
-missingPersonPlot = function(reference, missing, id.labels = labels(reference),
-                             MP.label = "MP", POI.label = "POI", marker = NULL,
-                             shaded = "typed", POI.col = "red", POI.shaded = FALSE,
-                             POI.height = 8, width = 4, newdev = TRUE,
+missingPersonPlot = function(reference, missing, MP.label = "MP", POI.label = "POI",
+                             POI.sex = getSex(reference, missing), marker = NULL,
+                             shaded = typedMembers(reference), POI.col = "red",
+                             POI.shaded = FALSE, POI.height = 8, width = 4, newdev = TRUE,
                              frametitles = c(expression(H[1] * ": POI is MP"),
-                                           expression(H[2] * ": POI unrelated")),
-                             ...) {
+                                             expression(H[2] * ": POI unrelated")),
+                             labs = labels(reference), id.labels = NULL, ...) {
+
+  if(!is.null(id.labels)) {
+    message("The `id.labels` argument is deprecated in favor of `labs`, and will be removed in a future version")
+    labs = id.labels
+  }
 
   if(!is.ped(reference))
     stop2("Expecting a connected pedigree as H1")
@@ -88,28 +99,29 @@ missingPersonPlot = function(reference, missing, id.labels = labels(reference),
     stop2("`width` must be a number larger than 1")
 
   nInd = pedsize(reference)
-  if(identical(id.labels, "num")) {
-    id.labels = labels(reference)
-    names(id.labels) = as.character(1:nInd)
+  if(identical(labs, "num")) {
+    labs = labels(reference)
+    names(labs) = as.character(1:nInd)
   }
-
-  # Shading
-  if(identical(shaded, "typed"))
-    shaded = typedMembers(reference)
 
   ### Hypothesis 1: Related
   ped_related = reference
 
-  # Labels
-  mp_poi = if(MP.label != "") paste(MP.label, "=", POI.label) else POI.label
-  mp_label = setNames(missing, mp_poi)
-  if (is.null(id.labels) || identical(id.labels, ""))
-    labs = mp_label
-  else
-    labs = c(mp_label, id.labels[id.labels != missing])
+  # Ensure MP has same sex as POI (relevant if MP has unknown sex)
+  ped_related = setSex(ped_related, ids = missing, sex = POI.sex)
 
-  # Colour MP = POI red
-  col1 = list(red = missing)
+  # Labels
+  mp_poi = if(MP.label != "") sprintf("%s (=%s)", POI.label, MP.label) else POI.label
+  mp_label = setNames(missing, mp_poi)
+  if (is.null(labs) || identical(labs, ""))
+    labs1 = mp_label
+  else
+    labs1 = c(mp_label, labs[labs != missing])
+
+  # Colour of POI/MP in first ped
+  vec = as.character(missing)
+  names(vec) = POI.col
+  col1 = list(vec)
 
   # Shading
   shaded1 = shaded
@@ -117,19 +129,17 @@ missingPersonPlot = function(reference, missing, id.labels = labels(reference),
     shaded1 = c(shaded1, missing)
 
   # Build plot 1
-  plot1 = list(ped_related, id.labels = labs, col = col1, shaded = shaded1)
+  plot1 = list(ped_related, labs = labs1, col = col1, shaded = shaded1)
 
 
   ### Hypothesis 2: Unrelated
+
   # First part
-
-  # MP label: Either full vector or
-  names(labs)[match(missing, labs)] = MP.label
-
-  plot2 = list(reference, id.labels = labs, shaded = shaded)
+  names(labs)[match(missing, labs)] = MP.label  # fix MP label
+  plot2 = list(reference, labs = labs, shaded = shaded)
 
   # Second part: POI singleton
-  s = singleton(id = missing, sex = getSex(reference, missing))
+  s = singleton(id = missing, sex = POI.sex)
 
   if(!is.null(marker))
     s = transferMarkers(from = reference, to = s)

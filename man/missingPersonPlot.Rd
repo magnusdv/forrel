@@ -7,11 +7,11 @@
 missingPersonPlot(
   reference,
   missing,
-  id.labels = labels(reference),
   MP.label = "MP",
   POI.label = "POI",
+  POI.sex = getSex(reference, missing),
   marker = NULL,
-  shaded = "typed",
+  shaded = typedMembers(reference),
   POI.col = "red",
   POI.shaded = FALSE,
   POI.height = 8,
@@ -19,6 +19,8 @@ missingPersonPlot(
   newdev = TRUE,
   frametitles = c(expression(H[1] * ": POI is MP"), expression(H[2] *
     ": POI unrelated")),
+  labs = labels(reference),
+  id.labels = NULL,
   ...
 )
 }
@@ -27,12 +29,13 @@ missingPersonPlot(
 
 \item{missing}{The ID label of the missing pedigree member.}
 
-\item{id.labels}{A character vector with labels for the pedigree members. See
-\code{\link[pedtools:plot.ped]{pedtools::plot.ped()}}.}
-
 \item{MP.label}{The label of the missing member. Default: "MP".}
 
 \item{POI.label}{The label of the person of interest. Default: "POI".}
+
+\item{POI.sex}{The sex of POI. This defaults to that of the missing person,
+but may be set explicitly. This is particularly useful when the missing
+person has unknown sex.}
 
 \item{marker}{Optional vector of marker indices to be included in the plot.}
 
@@ -53,7 +56,13 @@ compared to a singleton. Default: 4.}
 
 \item{newdev}{A logical: If TRUE the plot is created in a new plot window.}
 
-\item{frametitles}{A character of length 2, with subtitles for the two frames.}
+\item{frametitles}{A character of length 2, with subtitles for the two
+frames.}
+
+\item{labs}{A character vector with labels for the pedigree members. See
+\code{\link[pedtools:plot.ped]{pedtools::plot.ped()}}.}
+
+\item{id.labels}{Deprecated; use \code{labs} instead}
 
 \item{...}{Extra parameters passed on to \code{\link[pedtools:plotPedList]{pedtools::plotPedList()}}.}
 }
