@@ -119,9 +119,7 @@ missingPersonPlot = function(reference, missing, MP.label = "MP", POI.label = "P
     labs1 = c(mp_label, labs[labs != missing])
 
   # Colour of POI/MP in first ped
-  vec = as.character(missing)
-  names(vec) = POI.col
-  col1 = list(vec)
+  col1 = setNames(list(as.character(missing)), POI.col)
 
   # Shading
   shaded1 = shaded
