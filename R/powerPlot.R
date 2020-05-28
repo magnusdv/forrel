@@ -82,7 +82,7 @@
 #' powerPlot(simData[3:1], type = 1, shape = c("ci", "sq", "di"))
 #'
 #' # Zoom in, and add threshold lines
-#' powerPlot(simData, type = 1, xlim = c(0.4, 1), ylim = c(0.4, 1),
+#' powerPlot(simData, type = 1, xlim = c(0.2, 1), ylim = c(0.5, 1),
 #'           hline = 0.8, vline = 0.8)
 #'
 #' # Power plot 3: Expected number of exclusions vs E[log LR]
