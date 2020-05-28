@@ -116,26 +116,30 @@ x = setMarkers(x, list(m, m2))
 mutmod(x, 1:2) = list("equal", rate = 0.1)
 
 # By default mutations are disabled for consistent markers
-MPPsims(x, selections = "Father", addBaseline = FALSE, seed = 123)
+MPPsims(x, selections = "Father", addBaseline = FALSE, numCores = 1)
 
 # Don't disable anything
-MPPsims(x, selections = "Father", addBaseline = FALSE, seed = 123,
+MPPsims(x, selections = "Father", addBaseline = FALSE, numCores = 1,
         disableMutations = FALSE)
 
 
 # Disable all mutation models. SHOULD GIVE ERROR FOR SECOND MARKER
-MPPsims(x, selections = "Father", addBaseline = FALSE, seed = 123,
-        disableMutations = TRUE)
+# MPPsims(x, selections = "Father", addBaseline = FALSE, numCores = 1,
+#          disableMutations = TRUE)
 
 
-# Effect of variable number of alleles
+### Effect of variable number of alleles
 y = nuclearPed(father = "fa", child = "MP")
-mlist = lapply(2:5, function(k) marker(y, alleles = 1:k))
-y = setMarkers(y, mlist)
-peds = lapply(1:nMarkers(y), function(i) selectMarkers(y, i))
-sel = rep("fa", 4)
-names(sel) = paste(2:5, "alleles")
-pows = MPPsims(peds, selections = sel, addBaseline = FALSE, lrSims = 10)
+
+peds = list(
+  setMarkers(y, marker(y, alleles = 1:2)),
+  setMarkers(y, marker(y, alleles = 1:3)),
+  setMarkers(y, marker(y, alleles = 1:4)),
+  setMarkers(y, marker(y, alleles = 1:4)))
+
+sel = setNames(c("fa", "fa", "fa", "fa"), paste(2:5, "alleles"))
+
+pows = MPPsims2(peds, selections = sel, addBaseline = FALSE, lrSims = 100, numCores = 1)
 powerPlot(pows, type = 3)
 }
 
