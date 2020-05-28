@@ -89,7 +89,7 @@ markerSim = function(x, N = 1, ids = NULL, alleles = NULL, afreq = NULL,
   if(!is.null(m)) {
 
     if (!is.null(alleles) || !is.null(afreq))
-      stop2("When `partialmarker` is given, both 'alleles' and 'afreq' must be NULL.")
+      stop2("When `partialmarker` is given, both `alleles` and `afreq` must be NULL.")
 
     if(is.marker(m)) { # TODO (fix/export from pedtools
       # validateMarker(m)
@@ -104,7 +104,7 @@ markerSim = function(x, N = 1, ids = NULL, alleles = NULL, afreq = NULL,
     if (!allowsMutations(m)) {
       err = mendelianCheck(setMarkers(x, m), verbose = FALSE)
       if (length(err) > 0)
-        stop2("Mendelian error in the given partial marker.")
+        stop2("The given marker data has a Mendelian error")
     }
   }
   else {
