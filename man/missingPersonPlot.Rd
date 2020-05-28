@@ -16,11 +16,11 @@ missingPersonPlot(
   POI.shaded = FALSE,
   POI.height = 8,
   width = 4,
-  newdev = TRUE,
   frametitles = c(expression(H[1] * ": POI is MP"), expression(H[2] *
     ": POI unrelated")),
   labs = labels(reference),
   id.labels = NULL,
+  newdev = interactive(),
   ...
 )
 }
@@ -54,8 +54,6 @@ singleton (in the right panel).}
 specifically this number is the relative width of the reference pedigree,
 compared to a singleton. Default: 4.}
 
-\item{newdev}{A logical: If TRUE the plot is created in a new plot window.}
-
 \item{frametitles}{A character of length 2, with subtitles for the two
 frames.}
 
@@ -63,6 +61,8 @@ frames.}
 \code{\link[pedtools:plot.ped]{pedtools::plot.ped()}}.}
 
 \item{id.labels}{Deprecated; use \code{labs} instead}
+
+\item{newdev}{A logical: If TRUE the plot is created in a new plot window.}
 
 \item{...}{Extra parameters passed on to \code{\link[pedtools:plotPedList]{pedtools::plotPedList()}}.}
 }

@@ -81,10 +81,11 @@
 missingPersonPlot = function(reference, missing, MP.label = "MP", POI.label = "POI",
                              POI.sex = getSex(reference, missing), marker = NULL,
                              shaded = typedMembers(reference), POI.col = "red",
-                             POI.shaded = FALSE, POI.height = 8, width = 4, newdev = TRUE,
+                             POI.shaded = FALSE, POI.height = 8, width = 4,
                              frametitles = c(expression(H[1] * ": POI is MP"),
                                              expression(H[2] * ": POI unrelated")),
-                             labs = labels(reference), id.labels = NULL, ...) {
+                             labs = labels(reference), id.labels = NULL,
+                             newdev = interactive(), ...) {
 
   if(!is.null(id.labels)) {
     message("The `id.labels` argument is deprecated in favor of `labs`, and will be removed in a future version")
