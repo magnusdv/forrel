@@ -180,17 +180,24 @@ showInTriangle = function(k0, k2 = NULL, new = TRUE, col = "blue",
       stop2("When the first argument is a data.frame, `k2` must be NULL")
 
     df = k0
-    if(!all(c("k0", "k2") %in% names(df)))
+    nms = names(df)
+    if(all(c("k0", "k2") %in% nms)) {
+      k2 = df$k2
+      k0 = df$k0
+    }
+    else if(all(c("kappa0", "kappa2") %in% nms)) {
+      k2 = df$kappa2
+      k0 = df$kappa0
+    }
+    else
       stop2("When the first argument is a data.frame, it must contain columns named `k0` and `k2`")
 
-    k2 = df$k2
-    k0 = df$k0 # k0 changes here!
-
     if(isTRUE(labels)) {
-      if(!all(c("ID1", "ID2") %in% names(df)))
-        stop2("Trying to create labels, but cannot find necessary column: ",
-              setdiff(c("ID1", "ID2"), names(df)))
-      labels = paste(df$ID1, df$ID2, sep = "-")
+      id1 = if("ID1" %in% nms) df$ID1 else if ("id1" %in% nms) df$id1 else NULL
+      id2 = if("ID2" %in% nms) df$ID2 else if ("id2" %in% nms) df$id2 else NULL
+      if(is.null(id1) || is.null(id2))
+        stop2("Trying to create labels, but cannot find column `id1` and `id2`")
+      labels = paste(id1, id2, sep = "-")
     }
   }
   else {
