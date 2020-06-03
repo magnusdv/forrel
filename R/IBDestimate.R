@@ -80,7 +80,7 @@
 #' @importFrom maxLik maxLik
 #' @importFrom graphics contour
 #' @export
-IBDestimate = function(x, ids = NULL, markers = NULL,
+IBDestimate = function(x, ids = typedMembers(x), markers = NULL,
                        start = c(0.99,0.001), tol = 1e-7,
                        contourPlot = FALSE, levels = NULL) {
 

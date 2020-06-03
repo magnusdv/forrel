@@ -6,7 +6,7 @@
 \usage{
 IBDestimate(
   x,
-  ids = NULL,
+  ids = typedMembers(x),
   markers = NULL,
   start = c(0.99, 0.001),
   tol = 1e-07,
