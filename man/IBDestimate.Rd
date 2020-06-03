@@ -42,8 +42,8 @@ NULL (default), levels are chosen automatically. (This option is ignored
 unless \code{contourPlot = TRUE}.)}
 }
 \value{
-A data frame with 6 columns: \code{ID1}, \code{ID2}, \code{N} (the number of markers
-with no missing alleles), \code{k0}, \code{k1} and \code{k2}.
+A data frame with 6 columns: \code{id1}, \code{id2}, \code{N} (the number of markers
+with no missing alleles), \code{kappa0}, \code{kappa1} and \code{kappa2}.
 }
 \description{
 Estimate the pairwise IBD coefficients \eqn{(\kappa_0, \kappa_1,
@@ -100,7 +100,7 @@ Statistics. Volume 6.
 }
 }
 \seealso{
-\code{\link[maxLik:maxLik]{maxLik::maxLik()}}, \code{\link[=showInTriangle]{showInTriangle()}}
+\code{\link[maxLik:maxLik]{maxLik::maxLik()}}, \code{\link[=showInTriangle]{showInTriangle()}}, \code{\link[=checkPairwise]{checkPairwise()}}
 }
 \author{
 Magnus Dehli Vigeland

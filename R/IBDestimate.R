@@ -31,10 +31,11 @@
 #'   NULL (default), levels are chosen automatically. (This option is ignored
 #'   unless `contourPlot = TRUE`.)
 #'
-#' @return A data frame with 6 columns: `ID1`, `ID2`, `N` (the number of markers
-#'   with no missing alleles), `k0`, `k1` and `k2`.
+#' @return A data frame with 6 columns: `id1`, `id2`, `N` (the number of markers
+#'   with no missing alleles), `kappa0`, `kappa1` and `kappa2`.
+#'
 #' @author Magnus Dehli Vigeland
-#' @seealso [maxLik::maxLik()], [showInTriangle()]
+#' @seealso [maxLik::maxLik()], [showInTriangle()], [checkPairwise()]
 #'
 #' @references
 #'
@@ -118,12 +119,12 @@ IBDestimate = function(x, ids = NULL, markers = NULL,
     # Optimise
     ML = maxLik(loglik_FUN, start = start, constraints = constraints, tol = tol)
     est = ML$estimate
-    data.frame(ID1 = pair[1],
-               ID2 = pair[2],
+    data.frame(id1 = pair[1],
+               id2 = pair[2],
                N = ncol(amat),
-               k0 = est[1],
-               k1 = 1 - sum(est),
-               k2 = est[2],
+               kappa0 = est[1],
+               kappa1 = 1 - sum(est),
+               kappa2 = est[2],
                stringsAsFactors = FALSE)
   })
 
