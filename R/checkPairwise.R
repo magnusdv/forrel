@@ -30,19 +30,19 @@
 #'
 #' checkPairwise(x)
 #'
-#' ### Create sample swap between 3 and 7
+#' ### Create sample swap between 1 and 3
 #' als = getAlleles(x)
-#' als[c(2,5), ] = als[c(5,2), ]
+#' als[c(1,3), ] = als[c(3,1), ]
 #' y = setAlleles(x, alleles = als)
 #'
 #' checkPairwise(y)
 #'
 #' \donttest{
-#' # Nice plot of pedigree + triangle
+#' # Combined plot of pedigree and IBD estimates
 #' dev.new(height = 5, width = 8, noRStudioGD = TRUE)
 #' layout(rbind(1:2), widths = 2:3)
-#' plot(y, margins = c(4,2,4,2))
-#' checkPairwise(y)
+#' plot(x, margins = c(4,2,4,2))
+#' checkPairwise(x, labels = TRUE)
 #' }
 #'
 #' @importFrom ribd kappaIBD
