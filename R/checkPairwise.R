@@ -84,6 +84,7 @@ checkPairwise = function(x, plot = TRUE, labels = FALSE, LRthreshold = 1000) {
     levels(kFac)[levels(kFac) == "0.5-0"] = "Half/Uncle/Grand"
     levels(kFac)[levels(kFac) == "0.75-0"] = "First cousins"
     levels(kFac)[levels(kFac) == "1-0"] = "Unrelated"
+    levels(kFac)[levels(kFac) == "NA-NA"] = "NA (inbred)"
 
     cols = pchs = as.integer(kFac) + 1
     nlev = nlevels(kFac)
@@ -96,7 +97,7 @@ checkPairwise = function(x, plot = TRUE, labels = FALSE, LRthreshold = 1000) {
     # Test for large LRs
     err = kMerge$LR > LRthreshold
 
-    if(any(err)) {
+    if(any(err, na.rm = T)) {
       legcol = c(legcol, NA, 1)
       legpch = c(legpch, NA, 1)
       legcex = c(legcex, NA, 3)
