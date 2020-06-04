@@ -238,9 +238,9 @@ IBDestimate = function(x, ids = typedMembers(x), markers = NULL,
   .c = alleleMat[3,]
   .d = alleleMat[4,]
   pa = freqMat[1,]
-  pb = freqMat[1,]
-  pc = freqMat[1,]
-  pd = freqMat[1,]
+  pb = freqMat[2,]
+  pc = freqMat[3,]
+  pd = freqMat[4,]
 
   homoz1 = .a == .b
   homoz2 = .c == .d
