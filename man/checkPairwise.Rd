@@ -2,7 +2,7 @@
 % Please edit documentation in R/checkPairwise.R
 \name{checkPairwise}
 \alias{checkPairwise}
-\title{Check pedigree for relationship errors}
+\title{Check pedigree data for relationship errors}
 \usage{
 checkPairwise(x, plot = TRUE, labels = FALSE, LRthreshold = 1000)
 }
@@ -15,12 +15,15 @@ the IBD estimates in the IBD triangle.}
 \item{labels}{A logical (default: FALSE). If TRUE, labels are included in the
 IBD triangle plot.}
 
-\item{LRthreshold}{A positive number (default: 1000). Estimates whose LR
-(compared to the pedigree) exceeds}
+\item{LRthreshold}{A positive number (default: 1000). IBD estimates whose LR
+exceed this, when compared to the coefficients implied by the pedigree, are
+encircled in the plot.}
 }
 \value{
 A data frame containing both the estimated and pedigree-based IBD
-coefficients for each pair of typed individuals.
+coefficients for each pair of typed individuals. The last column contains
+the likelihood ratio comparing the estimated coefficients to the
+pedigree-based ones.
 }
 \description{
 This function provides a convenient way to check for pedigree errors, given

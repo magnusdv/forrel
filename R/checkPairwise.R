@@ -1,4 +1,4 @@
-#' Check pedigree for relationship errors
+#' Check pedigree data for relationship errors
 #'
 #' This function provides a convenient way to check for pedigree errors, given
 #' the available marker data. The function calls [IBDestimate()] to estimate IBD
@@ -12,11 +12,15 @@
 #'   the IBD estimates in the IBD triangle.
 #' @param labels A logical (default: FALSE). If TRUE, labels are included in the
 #'   IBD triangle plot.
-#' @param LRthreshold A positive number (default: 1000). Estimates whose LR
-#'   (compared to the pedigree) exceeds
+#' @param LRthreshold A positive number (default: 1000). IBD estimates whose LR
+#'   exceed this, when compared to the coefficients implied by the pedigree, are
+#'   encircled in the plot.
+#'
 #'
 #' @return A data frame containing both the estimated and pedigree-based IBD
-#'   coefficients for each pair of typed individuals.
+#'   coefficients for each pair of typed individuals. The last column contains
+#'   the likelihood ratio comparing the estimated coefficients to the
+#'   pedigree-based ones.
 #'
 #' @author Magnus Dehli Vigeland
 #' @seealso [IBDestimate()], [IBDtriangle()], [showInTriangle()]
