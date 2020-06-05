@@ -15,12 +15,17 @@
 #'   simulated.
 #' @param ids A vector containing ID labels of those pedigree members whose
 #'   genotypes should be simulated. By default, all individuals are included.
-#' @param alleles A vector containing the alleles for the marker to be
-#'   simulation. If a single integer is given, this is interpreted as the number
-#'   of alleles, and the actual alleles as `1:alleles`. Must be NULL if
-#'   `partialmarker` is non-NULL.
-#' @param afreq A vector containing the population frequencies for
-#'   the marker alleles. Must be NULL if `partialmarker` is non-NULL.
+#' @param alleles (Only if `partialmarker` is NULL.) A vector with allele
+#'   labels. If NULL, the following are tried in order:
+#'
+#'   * `names(afreq)`
+#'
+#'   * `seq_along(afreq)'
+#'
+#'   * `1:2` (Fallback if both `alleles` and `afreq` are NULL.)
+#'
+#' @param afreq (Only if `partialmarker` is NULL.) A numeric vector with allele
+#'   frequencies, possibly named with allele labels.
 #' @param mutmod,rate Arguments specifying a mutation model, passed on to
 #'   [pedtools::marker()] (see there for explanations).
 #' @param partialmarker Either NULL (resulting in unconditional simulation), a
@@ -464,15 +469,14 @@ markerSim = function(x, N = 1, ids = NULL, alleles = NULL, afreq = NULL,
 #'
 #' @param x a `ped` object
 #' @param N a positive integer: the number of markers to be simulated
-#' @param alleles a vector containing the allele names. If missing, the alleles
-#'   are taken to be `seq_along(afreq)`.
-#' @param afreq a vector of length 2 containing the population frequencies for
-#'   the alleles. If missing, the alleles are assumed equifrequent.
+#' @param alleles a vector with allele labels.
+#' @param afreq a numeric vector of allele frequencies. If missing, the alleles
+#'   are assumed to be equi-frequent.
 #' @param ids a vector containing ID labels of those pedigree members whose
 #'   genotypes should be simulated.
 #' @param Xchrom a logical: X linked markers or not?
-#' @param mutmod a [pedmut::mutationModel()] object, i.e., list of mutation matrices named
-#'   'female' and 'male'.
+#' @param mutmod a [pedmut::mutationModel()] object, i.e., list of mutation
+#'   matrices named 'female' and 'male'.
 #' @param seed NULL, or a numeric seed for the random number generator.
 #' @param verbose a logical.
 #' @return a `ped` object equal to `x` in all respects except its `MARKERS`

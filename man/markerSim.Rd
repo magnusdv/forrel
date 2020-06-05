@@ -28,13 +28,16 @@ simulated.}
 \item{ids}{A vector containing ID labels of those pedigree members whose
 genotypes should be simulated. By default, all individuals are included.}
 
-\item{alleles}{A vector containing the alleles for the marker to be
-simulation. If a single integer is given, this is interpreted as the number
-of alleles, and the actual alleles as \code{1:alleles}. Must be NULL if
-\code{partialmarker} is non-NULL.}
+\item{alleles}{(Only if \code{partialmarker} is NULL.) A vector with allele
+labels. If NULL, the following are tried in order:
+\itemize{
+\item \code{names(afreq)}
+\item `seq_along(afreq)'
+\item \code{1:2} (Fallback if both \code{alleles} and \code{afreq} are NULL.)
+}}
 
-\item{afreq}{A vector containing the population frequencies for
-the marker alleles. Must be NULL if \code{partialmarker} is non-NULL.}
+\item{afreq}{(Only if \code{partialmarker} is NULL.) A numeric vector with allele
+frequencies, possibly named with allele labels.}
 
 \item{mutmod, rate}{Arguments specifying a mutation model, passed on to
 \code{\link[pedtools:marker]{pedtools::marker()}} (see there for explanations).}
