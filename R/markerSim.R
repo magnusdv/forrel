@@ -485,7 +485,6 @@ markerSim = function(x, N = 1, ids = NULL, alleles = NULL, afreq = NULL,
 #' @seealso [markerSim()]
 #'
 #' @examples
-#' library(pedtools)
 #' x = nuclearPed(1)
 #' simpleSim(x, N = 3, afreq = c(0.5, 0.5))
 #'

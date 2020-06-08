@@ -21,19 +21,18 @@ simpleSim(
 
 \item{N}{a positive integer: the number of markers to be simulated}
 
-\item{alleles}{a vector containing the allele names. If missing, the alleles
-are taken to be \code{seq_along(afreq)}.}
+\item{alleles}{a vector with allele labels.}
 
-\item{afreq}{a vector of length 2 containing the population frequencies for
-the alleles. If missing, the alleles are assumed equifrequent.}
+\item{afreq}{a numeric vector of allele frequencies. If missing, the alleles
+are assumed to be equi-frequent.}
 
 \item{ids}{a vector containing ID labels of those pedigree members whose
 genotypes should be simulated.}
 
 \item{Xchrom}{a logical: X linked markers or not?}
 
-\item{mutmod}{a \code{\link[pedmut:mutationModel]{pedmut::mutationModel()}} object, i.e., list of mutation matrices named
-'female' and 'male'.}
+\item{mutmod}{a \code{\link[pedmut:mutationModel]{pedmut::mutationModel()}} object, i.e., list of mutation
+matrices named 'female' and 'male'.}
 
 \item{seed}{NULL, or a numeric seed for the random number generator.}
 
