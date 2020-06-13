@@ -17,13 +17,23 @@ showInTriangle(
   cex_labels = 0.8,
   pos = 1,
   adj = NULL,
+  keep.par = TRUE,
   ...
 )
 }
 \arguments{
 \item{k0, k2}{Numerical vectors giving coordinates for points to be plotted in
-the IBD triangle. Alternatively, \code{k0} may be a data.frame containing columns
-named \code{k0} and \code{k2}.}
+the IBD triangle. Alternatively, \code{k0} may be a matrix or data frame
+containing columns named either:
+\itemize{
+\item \code{k0} and \code{k2}
+\item \code{kappa0} and \code{kappa2}
+\item \code{ibd0} and \code{ibd2}
+}
+
+If \code{k0} is a list (and not a data frame) an attempt is made to
+bind the elements row-wise. (This is useful e.g. when estimates are
+produces by a call to \code{lapply}.)}
 
 \item{new}{Logical indicating if a new IBDtriangle should be drawn.}
 
@@ -36,6 +46,9 @@ default, no labels are plotted.}
 
 \item{col_labels, cex_labels, pos, adj}{Parameters passed onto \code{\link[=text]{text()}} (if
 \code{labels} is non-NULL).}
+
+\item{keep.par}{A logical. If TRUE, the graphical parameters are not reset
+after plotting, which may be useful for adding additional annotation.}
 
 \item{\dots}{Plot arguments passed on to \code{IBDtriangle()}.}
 }

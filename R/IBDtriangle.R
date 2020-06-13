@@ -143,13 +143,25 @@ IBDtriangle = function(relationships = c("UN", "PO", "MZ", "S", "H,U,G", "FC"),
     }
 }
 
+
+
 #' Add points to the IBD triangle
 #'
 #' Utility function for plotting points in the IBD triangle.
 #'
 #' @param k0,k2 Numerical vectors giving coordinates for points to be plotted in
-#'   the IBD triangle. Alternatively, `k0` may be a data.frame containing columns
-#'   named `k0` and `k2`.
+#'   the IBD triangle. Alternatively, `k0` may be a matrix or data frame
+#'   containing columns named either:
+#'
+#'   * `k0` and `k2`
+#'
+#'   * `kappa0` and `kappa2`
+#'
+#'   * `ibd0` and `ibd2`
+#'
+#'   If `k0` is a list (and not a data frame) an attempt is made to
+#'   bind the elements row-wise. (This is useful e.g. when estimates are
+#'   produces by a call to `lapply`.)
 #' @param new Logical indicating if a new IBDtriangle should be drawn.
 #' @param col,cex,pch,lwd Parameters passed onto [points()].
 #' @param labels A character of same length as `k0` and `k2`, or a single
@@ -158,6 +170,8 @@ IBDtriangle = function(relationships = c("UN", "PO", "MZ", "S", "H,U,G", "FC"),
 #'   default, no labels are plotted.
 #' @param col_labels,cex_labels,pos,adj Parameters passed onto [text()] (if
 #'   `labels` is non-NULL).
+#' @param keep.par A logical. If TRUE, the graphical parameters are not reset
+#'   after plotting, which may be useful for adding additional annotation.
 #' @param \dots Plot arguments passed on to `IBDtriangle()`.
 #'
 #' @return None
@@ -171,27 +185,32 @@ IBDtriangle = function(relationships = c("UN", "PO", "MZ", "S", "H,U,G", "FC"),
 showInTriangle = function(k0, k2 = NULL, new = TRUE, col = "blue",
                           cex = 1, pch = 4, lwd = 2, labels = FALSE,
                           col_labels = col, cex_labels = 0.8,
-                          pos = 1, adj = NULL, ...) {
+                          pos = 1, adj = NULL, keep.par = TRUE, ...) {
 
   if(is.matrix(k0))
     k0 = as.data.frame(k0)
+  else if(is.list(k0) && !is.data.frame(k0))
+    k0 = do.call(rbind, k0)
 
   if(is.data.frame(k0)) {
-    if(!is.null(k2))
-      stop2("When the first argument is a data.frame, `k2` must be NULL")
-
     df = k0
+
+    if(!is.null(k2))
+      stop2("When the first argument is a data.frame/matrix/list, `k2` must be NULL")
+
     nms = names(df)
-    if(all(c("k0", "k2") %in% nms)) {
-      k2 = df$k2
-      k0 = df$k0
+    allowedColnames = list(c("k0", "k2"),
+                           c("kappa0", "kappa2"),
+                           c("ibd0", "ibd2"))
+    for (colnms in allowedColnames) {
+      if(all(colnms %in% nms)) {
+        k0 = df[[colnms[1]]]
+        k2 = df[[colnms[2]]]
+        break
+      }
     }
-    else if(all(c("kappa0", "kappa2") %in% nms)) {
-      k2 = df$kappa2
-      k0 = df$kappa0
-    }
-    else
-      stop2("When the first argument is a data.frame, it must contain columns named `k0` and `k2`")
+    if(is.null(k2))
+      stop2("Columns names not recognised.")
 
     if(isTRUE(labels)) {
       id1 = if("ID1" %in% nms) df$ID1 else if ("id1" %in% nms) df$id1 else NULL
@@ -210,8 +229,10 @@ showInTriangle = function(k0, k2 = NULL, new = TRUE, col = "blue",
     stop2("When `labels` is a character, it must have the same length as `k0`")
 
   if(new) {
-    opar = par(no.readonly = TRUE) # store graphical parameters
-    on.exit(par(opar))
+    if(!keep.par) {
+      opar = par(no.readonly = TRUE) # store graphical parameters
+      on.exit(par(opar))
+    }
 
     IBDtriangle(...)
   }
