@@ -97,21 +97,18 @@
 #' # Truth: 1 and 3 are unrelated
 #' true = list(singleton(id = 1), singleton(id = 3, sex = 2))
 #'
-#' # Attach 3 markers
+#' # Attach two markers
 #' m1 = marker(claim, alleles = 1:2)
 #' m2 = marker(claim, alleles = 1:3)
-#' m3 = marker(claim, alleles = 1:2, chrom = "X")
-#' claim = setMarkers(claim, list(m1, m2, m3))
+#' claim = setMarkers(claim, list(m1, m2))
 #'
 #' # Compute EP when father and child is available for genotyping
 #' exclusionPower(claim, true, ids = c(1,3))
 #'
-#' # Suppose child is genotyped
+#' # Suppose child is already genotyped
 #' genotype(claim, marker = 1, id = 3) = c(1, 1)
 #' genotype(claim, marker = 2, id = 3) = c(1, 1)
-#' genotype(claim, marker = 3, id = 3) = c(1, 2)
 #'
-#' # Compute EP when father is available
 #' exclusionPower(claim, true, ids = 1)
 #'
 #'
