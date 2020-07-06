@@ -87,8 +87,13 @@ LRpower = function(numeratorPed, denominatorPed, truePed = numeratorPed, ids, ma
                    alleles = NULL, afreq = NULL, Xchrom = FALSE, knownGenotypes = NULL,
                    plot = FALSE, plotMarkers = NULL, seed = NULL, verbose = TRUE) {
   st = Sys.time()
-  ids = as.character(ids)
-  source = match.arg(source, c("true", "numerator", "denominator"))
+  if(is.list(ids)) {
+    ids = lapply(ids, as.character)
+    allids = unique.default(unlist(ids))
+  }
+  else {
+    allids = as.character(ids)
+  }
 
   ### Input option 1: Single marker with attributes given directly
   if(!is.null(alleles) || !is.null(afreq)) {
@@ -107,7 +112,7 @@ LRpower = function(numeratorPed, denominatorPed, truePed = numeratorPed, ids, ma
     }
 
     # If `alleles` is single integer, convert to sequence
-    if(is_number(alleles))
+    if(isNumber(alleles))
       alleles = seq_len(alleles)
 
     # Create and attach locus to both pedigrees
@@ -138,7 +143,7 @@ LRpower = function(numeratorPed, denominatorPed, truePed = numeratorPed, ids, ma
 
     # Check for already typed members. TODO: Support for partially typed members
     typed = typedMembers(sourcePed)
-    if(length(bad <- intersect(ids, typed)))
+    if(length(bad <- intersect(allids, typed)))
       stop2("Individual is already genotyped: ", toString(bad))
 
     # Select markers from source and transfer to truePed (if neccessary)
@@ -167,8 +172,8 @@ LRpower = function(numeratorPed, denominatorPed, truePed = numeratorPed, ids, ma
     }
 
     plotPedList(peds, newdev = TRUE, frametitles = frms,
-                shaded = function(p) c(ids, typedMembers(p)),
-                col = list(red = ids),
+                shaded = function(p) c(allids, typedMembers(p)),
+                col = list(red = allids),
                 marker = match(plotMarkers, markers))
 
     if (plot == "plotOnly")
@@ -182,16 +187,49 @@ LRpower = function(numeratorPed, denominatorPed, truePed = numeratorPed, ids, ma
   if(verbose)
     message("Simulating ", nsim, " profiles from true pedigree...", appendLF = FALSE)
 
-  allsims = profileSim(truePed, N = nsim, ids = ids, numCores = 1, verbose = FALSE)
+  allsims = profileSim(truePed, N = nsim, ids = allids, numCores = 1, verbose = FALSE)
 
   if(verbose)
-    message("done\nComputing likelihood ratios...", appendLF = FALSE)
+    message("done")
 
-  # Compute the exclusion power of each marker
-  lrs = vapply(allsims, function(s) {
-    numerSim = transferMarkers(from = s, to = numeratorPed)
-    denomSim = transferMarkers(from = s, to = denominatorPed)
+  # List of input parameters
+  params = list(markers = markers, nsim = nsim, threshold = threshold, seed = seed,
+                disableMutations = disableMutations, typed = typed, allids = allids)
 
+  if(is.list(ids))
+    res = lapply(ids, function(idvec) lrPowerCompute(allsims, numeratorPed, denominatorPed,
+                                                     idvec, params = params, verbose = verbose))
+  else
+    res = lrPowerCompute(allsims, numeratorPed, denominatorPed, ids,
+                         params = params, verbose = verbose)
+
+  # Timing
+  time = Sys.time() - st
+  if(verbose)
+    message("Total time used: ", format(time, digits = 3))
+
+  # Return results
+  res
+}
+
+
+lrPowerCompute = function(sims, numeratorPed, denominatorPed, ids, params, verbose = TRUE) {
+
+  if(verbose)
+    message("Computing LR distribution for individuals ", toString(ids), "...", appendLF = FALSE)
+
+  markers = params$markers
+  threshold = params$threshold
+
+  # Target individuals: Pre-typed and simulated
+  targetsIds = c(params$typed, ids)
+
+  # Trans
+  # Compute LR distribution using the ids individuals only
+  lrs = vapply(sims, function(s) {
+    numerSim = transferMarkers(from = s, to = numeratorPed, ids = targetsIds)
+    denomSim = transferMarkers(from = s, to = denominatorPed, ids = targetsIds)
+    #print(numerSim);print(denomSim)
     lr = kinshipLR(list(numerSim, denomSim), ref = 2)
     lr$LRperMarker[,1]
   }, FUN.VALUE = numeric(length(markers)))
@@ -213,23 +251,16 @@ LRpower = function(numeratorPed, denominatorPed, truePed = numeratorPed, ids, ma
   IP = sapply(threshold, function(thr) mean(LRperSim >= thr))
   names(IP) = threshold
 
-  # Timing
-  time = Sys.time() - st
-  if(verbose)
-    message("Total time used: ", format(time, digits = 3))
-
-  # Lits of input parameters
-  params = list(ids = ids, markers = markers,
-                nsim = nsim, threshold = threshold, seed = seed,
-                disableMutations = disableMutations)
-
+  params$ids = ids
   structure(list(LRperSim = LRperSim, meanLRperMarker = meanLRperMarker,
                  meanLR = meanLR, meanLogLR = meanLogLR, IP = IP,
-                 time = time, params = params), class = "LRpowerResult")
+                 params = params), class = "LRpowerResult")
+
 }
 
 #' @export
 print.LRpowerResult = function(x, ...) {
+  cat("LR power analysis using individuals ", toString(x$params$ids), ".\n", sep = "")
   cat("Mean total LR:", round(x$meanLR, 3), "\n")
   cat("Mean total log10(LR):", round(x$meanLogLR, 3), "\n")
   ip = x$IP
