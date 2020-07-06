@@ -92,7 +92,7 @@ kinshipLR = function(..., ref = NULL, source = NULL, markers = NULL, verbose = F
   # Check `ref`
   if(is.null(ref))
     ref = length(x)
-  if(is_number(ref, 1, length(x)))
+  if(isNumber(ref, 1, length(x)))
     refIdx = as.integer(ref)
   else if(is.character(ref) && ref %in% names(x))
     refIdx = match(ref, names(x))
@@ -165,9 +165,7 @@ kinshipLR = function(..., ref = NULL, source = NULL, markers = NULL, verbose = F
   x_loopfree = lapply(x, breaklp)
 
   # compute likelihoods
-  liks = lapply(x_loopfree,
-                function(xx) vapply(markers, function(i) likelihood(xx, marker1 = i),
-                                    FUN.VALUE = 1))
+  liks = lapply(x_loopfree, function(xx) likelihood(xx, markers))
   likelihoodsPerMarker = do.call(cbind, liks)
 
   # LR per marker and total

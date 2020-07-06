@@ -289,7 +289,7 @@ markerSim = function(x, N = 1, ids = NULL, alleles = NULL, afreq = NULL,
     jointp = apply(allgenos_row_grid, 2, function(rownrs) {
       partial = m
       partial[joint_int, ] = allgenos[rownrs, ]
-      pedprobr::likelihood(x, marker1 = partial, eliminate = eliminate)
+      likelihood(x, markers = partial, eliminate = eliminate)
     })
     likel_counter = likel_counter + length(jointp)
     if (identical(sum(jointp), 0))
@@ -310,7 +310,7 @@ markerSim = function(x, N = 1, ids = NULL, alleles = NULL, afreq = NULL,
         partial[] = markers[, c(mi - 1, mi)]  # preserves all attributes of the m.
         probs = unlist(lapply(gridi, function(r) {
           partial[i, ] = allgenos[r, ]
-          likelihood(x, marker1 = partial, eliminate = eliminate)
+          likelihood(x, markers = partial, eliminate = eliminate)
         }))
         if (sum(probs) == 0) {
           print(partial)

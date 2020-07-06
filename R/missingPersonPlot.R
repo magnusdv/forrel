@@ -96,7 +96,7 @@ missingPersonPlot = function(reference, missing, MP.label = "MP", POI.label = "P
     stop2("Expecting a connected pedigree as H1")
   if(length(POI.label) != 1 || POI.label == "")
     stop2("`POI.label` must be a non-empty character string")
-  if(!is_number(width, minimum = 1))
+  if(!isNumber(width, minimum = 1))
     stop2("`width` must be a number larger than 1")
 
   nInd = pedsize(reference)
@@ -154,6 +154,6 @@ missingPersonPlot = function(reference, missing, MP.label = "MP", POI.label = "P
               frames = list(1, 2:3),
               frametitles = frametitles,
               marker = marker,
-              skip.empty.genotypes = TRUE,
+              skipEmptyGenotypes = TRUE,
               newdev = newdev, ...)
 }

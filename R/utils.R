@@ -5,7 +5,7 @@ stop2 = function(...) {
 }
 
 # Test that input is a single number, with optional range constraints
-is_number = function(x, minimum = NA, maximum = NA) {
+isNumber = function(x, minimum = NA, maximum = NA) {
   isTRUE(length(x) == 1 &&
            is.numeric(x) &&
            (is.na(minimum) || x >= minimum) &&
@@ -63,14 +63,14 @@ isIP = function(x) {
 consistentMarkers = function(x, markers = seq_len(nMarkers(x))) {
 
   # `marker` may be numeric, character or logical
-  x = selectMarkers(x, markers)
-  nMark = if(is.logical(markers)) sum(markers) else length(markers)
+  y = selectMarkers(x, markers)
+  nMark = nMarkers(y)
 
-  # Compute likelihoods with no mutation model
-  liks = vapply(seq_len(nMark), function(i) {
-    mutmod(x, i) = NULL
-    pedprobr::likelihood(x, i)
-  }, FUN.VALUE = 0)
+  if(!nMark)
+    return(TRUE)
+
+  mutmod(y, 1:nMark) = NULL
+  liks = likelihood(y, 1:nMark)
 
   # Return TRUE if likelihood is nonzero
   liks > 0

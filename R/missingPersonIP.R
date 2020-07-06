@@ -75,7 +75,7 @@ missingPersonIP = function(reference, missing, markers, nsim = 1, threshold = NU
   else if(disGOOD) { # disable only if consistent
     refNoMut = reference
     mutmod(refNoMut, markers[hasMut]) = NULL
-    liksNoMut = vapply(markers[hasMut], function(i) pedprobr::likelihood(refNoMut, i), 0)
+    liksNoMut = likelihood(refNoMut, markers[hasMut])
     disable = markers[hasMut][liksNoMut > 0]
   }
   else if(disSELECT)
@@ -97,7 +97,7 @@ missingPersonIP = function(reference, missing, markers, nsim = 1, threshold = NU
   unrelatedPed = list(reference, singleton(poiLabel, sex = getSex(reference, missing)))
 
   # Raise error if impossible markers
-  liks = sapply(midx, function(i) pedprobr::likelihood(reference, i))
+  liks = likelihood(reference, midx)
   if(any(liks == 0))
     stop2("Marker incompatible with reference pedigree: ", markers[liks == 0],
           "\nThis makes conditional simulations impossible. Exclude the marker from the computation or add a mutation model")
