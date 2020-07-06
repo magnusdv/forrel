@@ -1,7 +1,5 @@
 context("Founder inbreeding")
 
-library(pedtools)
-
 test_that("simpleSim() works on inbred singleton", {
   x = singleton(1)
   founderInbreeding(x, 1) = 1

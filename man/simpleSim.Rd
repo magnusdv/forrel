@@ -52,7 +52,6 @@ for each non-founder a random allele is selected from each of the parents).
 Finally the genotypes of any individuals not included in \code{ids} are removed.
 }
 \examples{
-library(pedtools)
 x = nuclearPed(1)
 simpleSim(x, N = 3, afreq = c(0.5, 0.5))
 
