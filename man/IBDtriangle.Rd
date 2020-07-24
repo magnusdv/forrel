@@ -72,10 +72,10 @@ corresponds to a point in the triangle in the \eqn{(\kappa_0,
 and is not significant (other authors have used different views of the
 triangle).
 
-As shown in (Thompson, 1976) points in the subset of the triangle defined by
+As shown by Thompson (1976), points in the subset of the triangle defined by
 \eqn{4\kappa_0\kappa_2 > \kappa_1^2}{4*\kappa0*\kappa2 > \kappa1^2} are
 unattainable for pairwise relationships. By default this region in shaded in
-a 'lightgray' colour.
+a 'light grey' colour, but this can be modified with the \code{shading} argument.
 
 The IBD coefficients are linearly related to the kinship coefficient
 \eqn{\phi} by the formula \deqn{\phi = 0.25\kappa_1 + 0.5\kappa_2.}{\phi =

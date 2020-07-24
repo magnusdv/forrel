@@ -49,7 +49,7 @@
 #' checkPairwise(x, labels = TRUE)
 #' }
 #'
-#' @importFrom ribd kappaIBD
+#' @importFrom ribd kappaIBD ibdTriangle
 #' @export
 checkPairwise = function(x, plot = TRUE, labels = FALSE, LRthreshold = 1000) {
   kEst = IBDestimate(x)
@@ -108,7 +108,7 @@ checkPairwise = function(x, plot = TRUE, labels = FALSE, LRthreshold = 1000) {
       legtxt = c(legtxt, NA, sprintf("LR > %d", LRthreshold))
     }
 
-    IBDtriangle()
+    ribd::ibdTriangle()
     showInTriangle(kEst, col = cols, pch = pchs, labels = labels, new = FALSE)
     points(k0est[err], k2est[err], pch = 1, lwd = 2, cex = 3)
 

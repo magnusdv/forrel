@@ -77,6 +77,7 @@
 #' IBDestimate(y, ids = 1:2)
 #'
 #'
+#' @importFrom ribd ibdTriangle
 #' @importFrom maxLik maxLik
 #' @importFrom graphics contour
 #' @export
@@ -104,7 +105,7 @@ IBDestimate = function(x, ids = typedMembers(x), markers = NULL,
   # Convert to list of pairs
   pairs = lapply(1:nrow(ids), function(i) ids[i, ])
 
-  # Optimisation constaints: IBD triangle
+  # Optimisation constraints: IBD triangle
   constraints = list(ineqA = matrix(c(1,0,-1,0,1,-1), nrow = 3, ncol = 2),
                      ineqB = c(0,0,1))
 
@@ -148,7 +149,7 @@ IBDestimate = function(x, ids = typedMembers(x), markers = NULL,
       levels = unique.default(c(floor(mx), floor(mx) + .5, levels)) # include closest integer
     }
 
-    IBDtriangle()
+    ribd::ibdTriangle()
     showInTriangle(res.df, new = FALSE)
     contour(k0, k2, z = logliks, add = TRUE, levels = levels)
   }
