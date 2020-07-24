@@ -127,7 +127,8 @@ kinshipLR = function(..., ref = NULL, source = NULL, markers = NULL, verbose = F
       if(!is.null(markers))
         srcPed = selectMarkers(srcPed, markers)
       if(verbose)
-        message("Transfering marker data from pedigree ", source, " to empty pedigree(s): ", toString(which(empty)))
+        message("Transfering marker data from pedigree ", source,
+                " to empty pedigree(s): ", toString(which(empty)))
       x[empty] = lapply(x[empty], transferMarkers, from = srcPed)
     }
   }
@@ -139,6 +140,9 @@ kinshipLR = function(..., ref = NULL, source = NULL, markers = NULL, verbose = F
       stop2("When `markers = NULL`, all pedigrees must have the same number of attached markers: ", nm)
     markers = seq_len(nm[1])
   }
+
+  if(verbose)
+    message("Number of markers: ", length(markers))
 
   # Fix hypothesis names
   hypnames = names(x)
