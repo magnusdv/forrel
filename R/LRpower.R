@@ -60,24 +60,26 @@
 #' afr = runif(5)
 #' afr = afr/sum(afr)
 #'
-#' pow1 = LRpower(claim, unrel, truth, ids = ids, nsim = nsim, threshold = thresh,
-#'                alleles = als, afreq = afr, seed = 123)
+#' pow1 = LRpower(claim, unrel, truth, ids = ids, nsim = nsim,
+#'                threshold = thresh, alleles = als, afreq = afr,
+#'                seed = 123)
 #' pow1
 #'
 #' # Simulation 2: Same, but using an attached marker
 #' m = marker(truth, alleles = als, afreq = afr)
 #' truth = setMarkers(truth, m)
 #'
-#' pow2 = LRpower(claim, unrel, truth, ids = ids, nsim = nsim, threshold = thresh,
-#'                markers = 1, seed = 123)
+#' pow2 = LRpower(claim, unrel, truth, ids = ids, nsim = nsim,
+#'                threshold = thresh, markers = 1, seed = 123)
+#'
 #' stopifnot(identical(pow1$LRperSim, pow2$LRperSim))
 #'
 #' \donttest{
 #' # Founder inbreeding in true pedigree
 #' founderInbreeding(truth, founders(truth)) = 0.5
 #' truth
-#' pow3 = LRpower(claim, unrel, truth, ids = ids, nsim = nsim, threshold = thresh,
-#'                markers = 1, seed = 123, plot = TRUE)
+#' pow3 = LRpower(claim, unrel, truth, ids = ids, nsim = nsim,
+#'                threshold = thresh, markers = 1, seed = 123, plot = TRUE)
 #' pow3
 #' }
 #'
@@ -171,7 +173,7 @@ LRpower = function(numeratorPed, denominatorPed, truePed = numeratorPed, ids, ma
       frms = c("Numerator", "Denominator", "True")
     }
 
-    plotPedList(peds, newdev = TRUE, frametitles = frms,
+    plotPedList(peds, newdev = TRUE, titles = frms,
                 shaded = function(p) c(allids, typedMembers(p)),
                 col = list(red = allids),
                 marker = match(plotMarkers, markers))

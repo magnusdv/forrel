@@ -151,8 +151,8 @@ missingPersonPlot = function(reference, missing, MP.label = "MP", POI.label = "P
   ### Plot
   plotPedList(list(plot1, plot2, plot3),
               widths = c(width, width, 1),
-              frames = list(1, 2:3),
-              frametitles = frametitles,
+              groups = list(1, 2:3),
+              titles = frametitles,
               marker = marker,
               skipEmptyGenotypes = TRUE,
               newdev = newdev, ...)
