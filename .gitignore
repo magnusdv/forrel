@@ -5,6 +5,7 @@
 notes-private
 cran-comments.md
 CRAN-RELEASE
+Rprof.out
 R/examineKinships.R
 R/relationLR.R
 R/kinshipPowerSims.R
