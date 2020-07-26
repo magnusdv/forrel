@@ -108,6 +108,6 @@ test_that("markerSim() works in looped pedigree 3", {
   expect_equal(as.numeric(getAlleles(y1)), c(1,2,1,2,1,2,2,2,2,2))
 
   y2 = mSim(x, partial = 1, loopBreaker = "d", seed = 1234)
-  expect_equal(as.numeric(getAlleles(y2)), c(2,1,1,2,2,2,1,2,1,1))
+  expect_equal(as.numeric(getAlleles(y2)), c(2,1,1,1,1,2,1,2,2,2))
 })
 

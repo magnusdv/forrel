@@ -48,7 +48,7 @@ marker object (on which the simulation should be conditioned) or the name
 
 \item{loopBreakers}{A numeric containing IDs of individuals to be used as
 loop breakers. Relevant only if the pedigree has loops, and only if
-\code{partialmarker} is non-NULL. See \code{\link[pedtools:breakLoops]{pedtools::breakLoops()}}.}
+\code{partialmarker} is non-NULL. See \code{\link[pedtools:inbreedingLoops]{pedtools::breakLoops()}}.}
 
 \item{eliminate}{A non-negative integer, indicating the number of iterations
 in the internal genotype-compatibility algorithm. Positive values can save

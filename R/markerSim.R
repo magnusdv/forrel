@@ -387,25 +387,38 @@ markerSim = function(x, N = 1, ids = NULL, alleles = NULL, afreq = NULL,
   attrib = attributes(morig)
   attrib$name = NA_character_
 
-  markerdata_list = lapply(seq_len(N), function(k) {
-    mk = markers[, c(2 * k - 1, 2 * k)]
+  # Odd column numbers (needed below)
+  odd = seq_len(N) * 2 - 1
+
+  # Sort genotypes
+  a1 = markers[, odd]
+  a2 = markers[, odd + 1]
+  swap = a1 > a2
+
+  markers[, odd][swap] = a2[swap]
+  markers[, odd + 1][swap] = a1[swap]
+
+  # List of marker objects
+  mlist = lapply(odd, function(k) {
+    mk = markers[, c(k, k + 1)]
     attributes(mk) = attrib
     mk
   })
-  class(markerdata_list) = "MARKERS"
-  x = setMarkers(x, markerdata_list)
+
+  # Attach markers
+  class(mlist) = "markerList"
+  x = setMarkers(x, mlist, checkCons = FALSE)
 
   # If ped was reordered, revert to original
-  if(reorder) {
+  if(reorder)
     x = reorderPed(x, internalID(x, ORIGINAL_ORDER))
-  }
 
   if (verbose) {
     seconds = (proc.time() - starttime)[["elapsed"]]
     print(glue::glue("
       Simulation finished
       ===================
-      Number of calls to the likelihood function: {likel_counter}
+      Calls to `likelihood()`: {likel_counter}
       Total time used: {round(seconds, 2)} seconds
       \n"))
   }
@@ -452,10 +465,6 @@ markerSim = function(x, N = 1, ids = NULL, alleles = NULL, afreq = NULL,
   }
   return(opt)
 }
-
-
-
-
 
 
 #' Unconditional marker simulation
@@ -562,30 +571,46 @@ simpleSim = function(x, N, alleles, afreq, ids, Xchrom = FALSE,
   else
     m = .genedrop_AUT(x, N, nall, afreq, mutmod, seed)
 
+  # Remove genotypes for individuals not in `ids`
+  m[!labels(x) %in% ids, ] = 0L
+
+  # Odd column numbers (needed several times below)
   odd = seq_len(N) * 2 - 1
 
-  m[!labels(x) %in% ids, ] = 0L
+  # Sort genotypes
+  a1 = m[, odd]
+  a2 = m[, odd + 1]
+  swap = a1 > a2
+
+  m[, odd][swap] = a2[swap]
+  m[, odd + 1][swap] = a1[swap]
+
+  # Create marker objects
   if (variableSNPfreqs) {
+    frqs = as.vector(rbind(afreq, 1 - afreq))
     attrib = attributes(marker(x, alleles = alleles, afreq = NULL,
                                chrom = NA, mutmod = mutmod))
-    frqs = as.vector(rbind(afreq, 1 - afreq))
-    markerdata_list = lapply(odd, function(k) {
+    mlist = lapply(odd, function(k) {
       mk = m[, c(k, k + 1)]
       atr = attrib
       atr$afreq = frqs[c(k, k + 1)]
       attributes(mk) = atr
       mk
     })
-  } else {
+  }
+  else {
     attrib = attributes(marker(x, alleles = alleles, afreq = afreq,
                                chrom = ifelse(Xchrom, 23, NA), mutmod = mutmod))
-    markerdata_list = lapply(odd, function(k) {
+    mlist = lapply(odd, function(k) {
         mk = m[, c(k, k + 1)]
         attributes(mk) = attrib
         mk
     })
   }
-  x = setMarkers(x, structure(markerdata_list, class = "MARKERS"))
+
+  # Attach markers
+  class(mlist) = "markerList"
+  x = setMarkers(x, mlist, checkCons = FALSE)
 
   # If ped was reordered, revert to original
   if(reorder) {
@@ -596,7 +621,7 @@ simpleSim = function(x, N, alleles, afreq, ids, Xchrom = FALSE,
     seconds = (proc.time() - starttime)[["elapsed"]]
     print(glue::glue("
       Simulation finished.
-      Number of calls to the likelihood function: 0.
+      Calls to `likelihood()`: 0.
       Total time used: {round(seconds, 2)} seconds.
       "))
   }
