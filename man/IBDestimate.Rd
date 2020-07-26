@@ -43,13 +43,13 @@ unless \code{contourPlot = TRUE}.)}
 }
 \value{
 A data frame with 6 columns: \code{id1}, \code{id2}, \code{N} (the number of markers
-with no missing alleles), \code{kappa0}, \code{kappa1} and \code{kappa2}.
+with no missing alleles), \code{k0}, \code{k1} and \code{k2}.
 }
 \description{
-Estimate the pairwise IBD coefficients \eqn{(\kappa_0, \kappa_1,
-\kappa_2)}{(\kappa0, \kappa1, \kappa2)} for specified pairs of pedigree
-members, using maximum likelihood methods. The optimisation machinery is
-imported from the \code{maxLik} package.
+Estimate the IBD coefficients \eqn{\kappa = (\kappa_0, \kappa_1,
+\kappa_2)}{(\kappa0, \kappa1, \kappa2)} between a pair (or several pairs) of
+pedigree members, using maximum likelihood methods. The optimisation
+machinery is imported from the \code{maxLik} package.
 }
 \details{
 This function optimises the log-likelihood function first described by
@@ -57,6 +57,11 @@ Thompson (1975). Optimisation is done in the \eqn{(\kappa_0,
 \kappa_2)}{(\kappa0, \kappa2)}-plane and restricted to the probability
 triangle defined by \deqn{\kappa_0 \ge 0, \kappa_2 \ge 0, \kappa_0 + \kappa_2
 \le 1.}{\kappa0 \ge 0, \kappa2 \ge 0, \kappa0 + \kappa2 \le 1.}
+
+It should be noted that this procedure estimates the \emph{realised} coefficients
+of each specific pair, i.e., the actual fractions of the autosomes where the
+individuals share 0,1,2 alleles IBD respectively. These may deviate from the
+pedigree coefficients.
 }
 \examples{
 
@@ -73,7 +78,7 @@ x = markerSim(x, N = 100, alleles = 1:4, seed = 123, verbose = FALSE)
 est = IBDestimate(x, ids = ids)
 
 # Show the result in the IBD triangle
-showInTriangle(est, labels = TRUE)
+ribd::showInTriangle(est, labels = TRUE)
 
 # Contour plot (just a few markers to save time)
 IBDestimate(x, ids = ids, markers = 1:10,
@@ -100,7 +105,7 @@ Statistics. Volume 6.
 }
 }
 \seealso{
-\code{\link[maxLik:maxLik]{maxLik::maxLik()}}, \code{\link[=showInTriangle]{showInTriangle()}}, \code{\link[=checkPairwise]{checkPairwise()}}
+\code{\link[=checkPairwise]{checkPairwise()}}, \code{\link[ribd:showInTriangle]{ribd::showInTriangle()}}, \code{\link[maxLik:maxLik]{maxLik::maxLik()}}
 }
 \author{
 Magnus Dehli Vigeland

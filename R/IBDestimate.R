@@ -1,15 +1,20 @@
 #' Relatedness estimation
 #'
-#' Estimate the pairwise IBD coefficients \eqn{(\kappa_0, \kappa_1,
-#' \kappa_2)}{(\kappa0, \kappa1, \kappa2)} for specified pairs of pedigree
-#' members, using maximum likelihood methods. The optimisation machinery is
-#' imported from the `maxLik` package.
+#' Estimate the IBD coefficients \eqn{\kappa = (\kappa_0, \kappa_1,
+#' \kappa_2)}{(\kappa0, \kappa1, \kappa2)} between a pair (or several pairs) of
+#' pedigree members, using maximum likelihood methods. The optimisation
+#' machinery is imported from the `maxLik` package.
 #'
 #' This function optimises the log-likelihood function first described by
 #' Thompson (1975). Optimisation is done in the \eqn{(\kappa_0,
 #' \kappa_2)}{(\kappa0, \kappa2)}-plane and restricted to the probability
 #' triangle defined by \deqn{\kappa_0 \ge 0, \kappa_2 \ge 0, \kappa_0 + \kappa_2
 #' \le 1.}{\kappa0 \ge 0, \kappa2 \ge 0, \kappa0 + \kappa2 \le 1.}
+#'
+#' It should be noted that this procedure estimates the *realised* coefficients
+#' of each specific pair, i.e., the actual fractions of the autosomes where the
+#' individuals share 0,1,2 alleles IBD respectively. These may deviate from the
+#' pedigree coefficients.
 #'
 #' @param x A `ped` object or a list of such.
 #' @param ids Either a vector with ID labels, or a data frame/matrix with two
@@ -32,10 +37,10 @@
 #'   unless `contourPlot = TRUE`.)
 #'
 #' @return A data frame with 6 columns: `id1`, `id2`, `N` (the number of markers
-#'   with no missing alleles), `kappa0`, `kappa1` and `kappa2`.
+#'   with no missing alleles), `k0`, `k1` and `k2`.
 #'
 #' @author Magnus Dehli Vigeland
-#' @seealso [maxLik::maxLik()], [showInTriangle()], [checkPairwise()]
+#' @seealso [checkPairwise()], [ribd::showInTriangle()], [maxLik::maxLik()]
 #'
 #' @references
 #'
@@ -61,7 +66,7 @@
 #' est = IBDestimate(x, ids = ids)
 #'
 #' # Show the result in the IBD triangle
-#' showInTriangle(est, labels = TRUE)
+#' ribd::showInTriangle(est, labels = TRUE)
 #'
 #' # Contour plot (just a few markers to save time)
 #' IBDestimate(x, ids = ids, markers = 1:10,
@@ -77,7 +82,7 @@
 #' IBDestimate(y, ids = 1:2)
 #'
 #'
-#' @importFrom ribd ibdTriangle
+#' @importFrom ribd ibdTriangle showInTriangle
 #' @importFrom maxLik maxLik
 #' @importFrom graphics contour
 #' @export
@@ -123,9 +128,9 @@ IBDestimate = function(x, ids = typedMembers(x), markers = NULL,
     data.frame(id1 = pair[1],
                id2 = pair[2],
                N = ncol(amat),
-               kappa0 = est[1],
-               kappa1 = 1 - sum(est),
-               kappa2 = est[2],
+               k0 = est[1],
+               k1 = 1 - sum(est),
+               k2 = est[2],
                stringsAsFactors = FALSE)
   })
 
@@ -150,7 +155,7 @@ IBDestimate = function(x, ids = typedMembers(x), markers = NULL,
     }
 
     ribd::ibdTriangle()
-    showInTriangle(res.df, new = FALSE)
+    ribd::showInTriangle(res.df, new = FALSE)
     contour(k0, k2, z = logliks, add = TRUE, levels = levels)
   }
 

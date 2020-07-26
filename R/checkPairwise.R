@@ -16,7 +16,6 @@
 #'   exceed this, when compared to the coefficients implied by the pedigree, are
 #'   encircled in the plot.
 #'
-#'
 #' @return A data frame containing both the estimated and pedigree-based IBD
 #'   coefficients for each pair of typed individuals. The last column contains
 #'   the likelihood ratio comparing the estimated coefficients to the
@@ -28,6 +27,7 @@
 #' @examples
 #'
 #' ### Example with realistic data
+#'
 #' x = addSon(nuclearPed(nch = 2), parent = 4)
 #' x = setMarkers(x, locus = NorwegianFrequencies)
 #' x = profileSim(x, N = 1, numCores = 1, seed = 1729)[[1]]
@@ -49,10 +49,13 @@
 #' checkPairwise(x, labels = TRUE)
 #' }
 #'
-#' @importFrom ribd kappaIBD ibdTriangle
+#' @importFrom ribd kappaIBD ibdTriangle showInTriangle
 #' @export
 checkPairwise = function(x, plot = TRUE, labels = FALSE, LRthreshold = 1000) {
+  # Estimated coefficients
   kEst = IBDestimate(x)
+
+  # Pedigree coefficients
   if(is.ped(x)) {
     kTrue = kappaIBD(x)
   } else { #TODO: fix in ribd
@@ -64,25 +67,27 @@ checkPairwise = function(x, plot = TRUE, labels = FALSE, LRthreshold = 1000) {
                                         kappa0 = 1, kappa1 = 0, kappa2 = 0,
                                         stringsAsFactors = FALSE))
   }
-  kMerge = merge(kEst, kTrue, by = 1:2, suffixes = c(".est", ".ped")) # Ensure same pairing
+
+  # Merge (to ensure same pairing)
+  kMerge = merge(kEst, kTrue, by = 1:2)
+  k0 = kMerge$k0
+  k2 = kMerge$k2
+  kappa0 = kMerge$kappa0
+  kappa2 = kMerge$kappa2
 
   # LR comparing estimate against pedigree claim
-  k0est = kMerge$kappa0.est
-  k2est = kMerge$kappa2.est
-  k0ped = kMerge$kappa0.ped
-  k2ped = kMerge$kappa2.ped
   kMerge$LR = vapply(1:nrow(kMerge), function(i) {
     ids = kMerge[i, 1:2]
-    loglik1 = .IBDlikelihood(x, ids = ids, kappa = c(k0est[i], k2est[i]), log = TRUE)
-    loglik2 = .IBDlikelihood(x, ids = ids, kappa = c(k0ped[i], k2ped[i]), log = TRUE)
+    loglik1 = .IBDlikelihood(x, ids = ids, kappa = c(k0[i], k2[i]), log = TRUE)
+    loglik2 = .IBDlikelihood(x, ids = ids, kappa = c(kappa0[i], kappa2[i]), log = TRUE)
     exp(loglik1 - loglik2)
   }, FUN.VALUE = 1)
 
 
   if(plot) {
     # Factor defining colours
-    kStr = paste(k0ped, k2ped, sep = "-")
-    kFac = factor(kStr, levels = unique(kStr[order(k0ped, k2ped)]))
+    kStr = paste(kappa0, kappa2, sep = "-")
+    kFac = factor(kStr, levels = unique(kStr[order(kappa0, kappa2)]))
     levels(kFac)[levels(kFac) == "0-0"] = "Parent-offspring"
     levels(kFac)[levels(kFac) == "0.25-0.25"] = "Full siblings"
     levels(kFac)[levels(kFac) == "0.5-0"] = "Half/Uncle/Grand"
@@ -109,8 +114,8 @@ checkPairwise = function(x, plot = TRUE, labels = FALSE, LRthreshold = 1000) {
     }
 
     ribd::ibdTriangle()
-    showInTriangle(kEst, col = cols, pch = pchs, labels = labels, new = FALSE)
-    points(k0est[err], k2est[err], pch = 1, lwd = 2, cex = 3)
+    ribd::showInTriangle(kEst, col = cols, pch = pchs, labels = labels, new = FALSE)
+    points(k0[err], k2[err], pch = 1, lwd = 2, cex = 3)
 
     legend("topright", title = " According to pedigree", title.adj = 0,
            bg = "whitesmoke", legend = legtxt, col = legcol, pch = legpch,
