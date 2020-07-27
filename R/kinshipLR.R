@@ -86,8 +86,21 @@ kinshipLR = function(..., ref = NULL, source = NULL, markers = NULL, verbose = F
   if(length(x) < 2 || is.ped(x))
     stop2("The input must contain at least two pedigrees")
 
-  if(!all(sapply(x, function(ped) is.ped(ped) || is.pedList(ped))))
-    stop2("The input is not a list of pedigrees")
+  # Check that all ... are pedigrees. NB: Abbrev args will end up there!
+  if(!all(sapply(x, function(ped) is.ped(ped) || is.pedList(ped)))) {
+    msg = NULL
+
+    if(!is.null(nms <- names(x))) {
+      if(any(err <- startsWith(nms, "verb")))
+        msg = sprintf("Did you accidentally write `%s` instead of `verbose`?", nms[err][1])
+      else if(any(err <- startsWith(nms, "mark")))
+        msg = sprintf("Did you accidentally write `%s` instead of `markers`?", nms[err][1])
+
+      if(!is.null(msg))
+        msg = paste("\n\nThis function disallows abbreviated argument names.", msg)
+    }
+    stop2("The input is not a list of pedigrees", msg)
+  }
 
   # Check `ref`
   if(is.null(ref))
