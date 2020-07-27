@@ -17,10 +17,10 @@
 #' @param source An index or name designating one of the input pedigrees as
 #'   source for marker data. If given, marker data is transferred from this to
 #'   all the other pedigrees (replacing any existing markers). The default
-#'   action (`source = NULL`) is as follows: If all pedigrees already have
-#'   attached markers, no transfers are done. If some pedigrees are empty,
-#'   marker data is transferred to those, using the first nonempty pedigree as
-#'   source.
+#'   action (`source = NULL`) is as follows: If all pedigree have attached
+#'   markers, no transfers are done. If exactly one of the pedigrees have
+#'   attached markers, these are transferred to the others. all other cases give
+#'   an error.
 #' @param markers A vector of marker names or indices indicating which markers
 #'   should be included. If NULL (the default) all markers are used.
 #' @param verbose A logical.
@@ -101,8 +101,23 @@ kinshipLR = function(..., ref = NULL, source = NULL, markers = NULL, verbose = F
   if(verbose)
     message("Using pedigree ", ref, " as reference")
 
-  # If explicit source given, transfer to all
+  if(is.null(source)) {
+    # Identity peds without marker data
+    empty = !sapply(x, hasMarkers)
+
+    if(all(empty))
+      stop2("None of the pedigrees has attached marker data")
+
+    if(sum(!empty) == 1)
+      source = which(!empty)
+    else if(any(empty))
+      stop2("Data transfer needed, but more than one possible source. Please specify `source`")
+  }
+
+  # If source given, transfer to all
   if(!is.null(source)) {
+    if(length(source) != 1)
+      stop2("`source` must have length 1: ", source)
     if(verbose)
       message("Transfering marker data from pedigree ", source, " to all others")
     srcPed = x[[source]]
@@ -110,27 +125,11 @@ kinshipLR = function(..., ref = NULL, source = NULL, markers = NULL, verbose = F
       stop2("Unknown source pedigree: ", source)
     if(nMarkers(srcPed) == 0)
       stop2("The source pedigree has no attached markers")
-    if(!is.null(markers))
+    if(!is.null(markers)) {
       srcPed = selectMarkers(srcPed, markers)
-    x = lapply(x, transferMarkers, from = srcPed)
-  }
-  else {
-    # Any empty pedigrees?
-    empty = !sapply(x, hasMarkers)
-
-    if(all(empty))
-      stop2("None of the pedigrees has attached marker data")
-
-    if(any(empty)) {
-      source = which(!empty)[1] # use first non-empty as source
-      srcPed = x[[source]]
-      if(!is.null(markers))
-        srcPed = selectMarkers(srcPed, markers)
-      if(verbose)
-        message("Transfering marker data from pedigree ", source,
-                " to empty pedigree(s): ", toString(which(empty)))
-      x[empty] = lapply(x[empty], transferMarkers, from = srcPed)
+      markers = NULL # important!
     }
+    x = lapply(x, transferMarkers, from = srcPed)
   }
 
   # By default, use all markers

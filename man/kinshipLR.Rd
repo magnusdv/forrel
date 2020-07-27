@@ -20,10 +20,10 @@ NULL (the default), the last pedigree is used as reference.}
 \item{source}{An index or name designating one of the input pedigrees as
 source for marker data. If given, marker data is transferred from this to
 all the other pedigrees (replacing any existing markers). The default
-action (\code{source = NULL}) is as follows: If all pedigrees already have
-attached markers, no transfers are done. If some pedigrees are empty,
-marker data is transferred to those, using the first nonempty pedigree as
-source.}
+action (\code{source = NULL}) is as follows: If all pedigree have attached
+markers, no transfers are done. If exactly one of the pedigrees have
+attached markers, these are transferred to the others. all other cases give
+an error.}
 
 \item{markers}{A vector of marker names or indices indicating which markers
 should be included. If NULL (the default) all markers are used.}
