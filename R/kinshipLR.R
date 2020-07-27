@@ -99,7 +99,7 @@ kinshipLR = function(..., ref = NULL, source = NULL, markers = NULL, verbose = F
   else
     stop2("Invalid value for `ref`: ", ref)
   if(verbose)
-    message("Using pedigree ", ref, " as reference")
+    message("Reference pedigree: ", ref)
 
   if(is.null(source)) {
     # Identity peds without marker data
@@ -119,7 +119,7 @@ kinshipLR = function(..., ref = NULL, source = NULL, markers = NULL, verbose = F
     if(length(source) != 1)
       stop2("`source` must have length 1: ", source)
     if(verbose)
-      message("Transfering marker data from pedigree ", source, " to all others")
+      message("Source pedigree: ", source)
     srcPed = x[[source]]
     if(is.null(srcPed))
       stop2("Unknown source pedigree: ", source)
