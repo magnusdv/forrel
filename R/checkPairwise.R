@@ -114,7 +114,7 @@ checkPairwise = function(x, plot = TRUE, labels = FALSE, LRthreshold = 1000) {
     }
 
     ribd::ibdTriangle()
-    ribd::showInTriangle(kEst, col = cols, pch = pchs, labels = labels, new = FALSE)
+    ribd::showInTriangle(kMerge[1:6], col = cols, pch = pchs, labels = labels, new = FALSE)
     points(k0[err], k2[err], pch = 1, lwd = 2, cex = 3)
 
     legend("topright", title = " According to pedigree", title.adj = 0,
