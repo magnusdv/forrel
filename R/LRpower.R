@@ -174,7 +174,7 @@ LRpower = function(numeratorPed, denominatorPed, truePed = numeratorPed, ids, ma
     }
 
     plotPedList(peds, newdev = TRUE, titles = frms,
-                shaded = function(p) c(allids, typedMembers(p)),
+                hatched = function(p) c(allids, typedMembers(p)),
                 col = list(red = allids),
                 marker = match(plotMarkers, markers))
 

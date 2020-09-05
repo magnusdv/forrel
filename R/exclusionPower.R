@@ -230,7 +230,7 @@ exclusionPower = function(claimPed, truePed, ids, markers = NULL, source = "clai
     plotPedList(list(claimPed, truePed),
                 newdev = TRUE,
                 titles = c("Claim", "True"),
-                shaded = function(p) c(allids, typedMembers(p)),
+                hatched = function(p) c(allids, typedMembers(p)),
                 col = list(red = allids),
                 marker = match(plotMarkers, markers))
 
