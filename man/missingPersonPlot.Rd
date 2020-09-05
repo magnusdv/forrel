@@ -62,7 +62,7 @@ compared to a singleton. Default: 4.}
 
 \item{newdev}{A logical: If TRUE the plot is created in a new plot window.}
 
-\item{id.labels}{Deprecated; use \code{labs} instead}
+\item{frametitles, id.labels}{Deprecated arguments.}
 
 \item{...}{Extra parameters passed on to \code{\link[pedtools:plotPedList]{pedtools::plotPedList()}}.}
 }

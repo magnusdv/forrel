@@ -54,7 +54,7 @@
 #'   specifically this number is the relative width of the reference pedigree,
 #'   compared to a singleton. Default: 4.
 #' @param newdev A logical: If TRUE the plot is created in a new plot window.
-#' @param id.labels Deprecated; use `labs` instead
+#' @param frametitles,id.labels Deprecated arguments.
 #' @param ... Extra parameters passed on to [pedtools::plotPedList()].
 #'
 #' @return None
