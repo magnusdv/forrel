@@ -268,7 +268,7 @@ print.LRpowerResult = function(x, ...) {
   ip = x$IP
   cat("Estimated inclusion power:", if(!length(ip)) NA, "\n")
   for(i in seq_along(ip))
-    cat(sprintf("  P(LR > %s) = %.3g\n", names(ip)[i], ip[i]))
+    cat(sprintf("  P(LR >= %s) = %.3g\n", names(ip)[i], ip[i]))
 }
 
 
