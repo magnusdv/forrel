@@ -262,11 +262,10 @@ lrPowerCompute = function(sims, numeratorPed, denominatorPed, ids, params, verbo
 
 #' @export
 print.LRpowerResult = function(x, ...) {
-  cat("LR power analysis using individuals ", toString(x$params$ids), ".\n", sep = "")
-  cat("Mean total LR:", round(x$meanLR, 3), "\n")
-  cat("Mean total log10(LR):", round(x$meanLogLR, 3), "\n")
+  cat("Mean LR:", round(x$meanLR, 3), "\n")
+  cat("Mean log10(LR):", round(x$meanLogLR, 3), "\n")
   ip = x$IP
-  cat("Estimated inclusion power:", if(!length(ip)) NA, "\n")
+  cat("Estimated power:", if(!length(ip)) NA, "\n")
   for(i in seq_along(ip))
     cat(sprintf("  P(LR >= %s) = %.3g\n", names(ip)[i], ip[i]))
 }

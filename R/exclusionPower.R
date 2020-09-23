@@ -401,11 +401,12 @@ print.EPresult = function(x, ...) {
 
   expMis = round(x$expectedMismatch, 3)
 
-  cat("Exclusion power with individuals ", toString(x$params$ids), ".\n", sep = "")
-  cat("Total EP:", round(x$EPtotal, 3), "\n")
-  cat("Markers inconsistent with pedigree:", sum(incons), incons_names, "\n")
-  cat("Markers with potential mismatch:", nPoss, poss_names, "\n")
-  cat("Expected number of mismatches:", expMis, "\n")
+  if(sum(incons) > 0)
+    cat("Impossible markers:", sum(incons), incons_names, "\n")
+  cat("Potential mismatches:", nPoss, poss_names, "\n")
+  cat("Expected mismatches:", expMis, "\n")
+  cat("P(at least 1 mismatch):", round(x$EPtotal, 3), "\n")
+
 }
 
   ###############################

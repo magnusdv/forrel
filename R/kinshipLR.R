@@ -112,7 +112,7 @@ kinshipLR = function(..., ref = NULL, source = NULL, markers = NULL, verbose = F
   else
     stop2("Invalid value for `ref`: ", ref)
   if(verbose)
-    message("Reference pedigree: ", ref)
+    cat("Reference pedigree: ", ref, "\n")
 
   if(is.null(source)) {
     # Identity peds without marker data
@@ -132,7 +132,7 @@ kinshipLR = function(..., ref = NULL, source = NULL, markers = NULL, verbose = F
     if(length(source) != 1)
       stop2("`source` must have length 1: ", source)
     if(verbose)
-      message("Source pedigree: ", source)
+      cat("Source pedigree: ", source, "\n")
     srcPed = x[[source]]
     if(is.null(srcPed))
       stop2("Unknown source pedigree: ", source)
@@ -154,7 +154,7 @@ kinshipLR = function(..., ref = NULL, source = NULL, markers = NULL, verbose = F
   }
 
   if(verbose)
-    message("Number of markers: ", length(markers))
+    cat("Number of markers: ", length(markers), "\n")
 
   # Fix hypothesis names
   hypnames = names(x)

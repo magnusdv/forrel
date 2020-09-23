@@ -144,24 +144,14 @@ missingPersonIP = function(reference, missing, markers, nsim = 1, threshold = NU
   if(verbose)
     message("Total time used: ", format(time, digits = 3))
 
-  # Lits of input parameters
+  # List of input parameters
   params = list(missing = missing, markers = markers,
                 nsim = nsim, threshold = threshold, seed = seed,
                 disableMutations = disableMutations)
 
   structure(list(LRperSim = LRperSim, meanLRperMarker = meanLRperMarker,
                  meanLR = meanLR, meanLogLR = meanLogLR, IP = IP,
-                 time = time, params = params), class = "mpIP")
-}
-
-#' @export
-print.mpIP = function(x, ...) {
-  cat("Mean total LR:", round(x$meanLR, 3), "\n")
-  cat("Mean total log10(LR):", round(x$meanLogLR, 3), "\n")
-  ip = x$IP
-  cat("Estimated inclusion powers:", if(!length(ip)) NA, "\n")
-  for(i in seq_along(ip))
-    cat(sprintf("  P(LR > %s) = %.3g\n", names(ip)[i], ip[i]))
+                 time = time, params = params), class = "LRpowerResult")
 }
 
 

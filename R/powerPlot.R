@@ -141,11 +141,12 @@ powerPlot = function(ep, ip = NULL, type = 1, majorpoints = TRUE, minorpoints = 
     stop2("Arguments `ep` and `ip` are incompatible")
 
   ### Group labels legend ordering
+  nolegend = is.null(labs) && L == 1
   if(is.null(labs))
     labs = seq_along(L)
   group = factor(rep(labs, times = L), levels = labs)
 
-  ### COlours
+  ### Colours
   if(is.null(col)) {
     col = c("lightgreen", "firebrick1", "deepskyblue", "#FFFF33", "gray70", "#F781BF", "wheat", "cyan", "#FF7F00")
 
@@ -264,8 +265,8 @@ powerPlot = function(ep, ip = NULL, type = 1, majorpoints = TRUE, minorpoints = 
     ggplot2::scale_x_continuous(limits = xlim) +
     ggplot2::scale_y_continuous(limits = ylim) +
     ggplot2::guides(colour = FALSE,
-                    fill = ggplot2::guide_legend(title = "", reverse = TRUE),
-                    shape = ggplot2::guide_legend(title = "", reverse = TRUE)
+                    fill = if(nolegend) FALSE else ggplot2::guide_legend(title = "", reverse = TRUE),
+                    shape = if(nolegend) FALSE else ggplot2::guide_legend(title = "", reverse = TRUE)
                     ) +
     ggplot2::coord_cartesian(clip = 'off') +
     ggplot2::theme_bw(base_size = 14)
