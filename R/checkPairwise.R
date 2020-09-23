@@ -15,6 +15,7 @@
 #' @param LRthreshold A positive number (default: 1000). IBD estimates whose LR
 #'   exceed this, when compared to the coefficients implied by the pedigree, are
 #'   encircled in the plot.
+#' @param ... further parameters passed on to [ribd::ibdTriangle()].
 #'
 #' @return A data frame containing both the estimated and pedigree-based IBD
 #'   coefficients for each pair of typed individuals. The last column contains
@@ -22,7 +23,7 @@
 #'   pedigree-based ones.
 #'
 #' @author Magnus Dehli Vigeland
-#' @seealso [IBDestimate()], [IBDtriangle()], [showInTriangle()]
+#' @seealso [IBDestimate()]
 #'
 #' @examples
 #'
@@ -51,7 +52,7 @@
 #'
 #' @importFrom ribd kappaIBD ibdTriangle showInTriangle
 #' @export
-checkPairwise = function(x, plot = TRUE, labels = FALSE, LRthreshold = 1000) {
+checkPairwise = function(x, plot = TRUE, labels = FALSE, LRthreshold = 1000, ...) {
   # Estimated coefficients
   kEst = IBDestimate(x)
 
@@ -113,7 +114,7 @@ checkPairwise = function(x, plot = TRUE, labels = FALSE, LRthreshold = 1000) {
       legtxt = c(legtxt, NA, sprintf("LR > %d", LRthreshold))
     }
 
-    ribd::ibdTriangle()
+    ribd::ibdTriangle(...)
     ribd::showInTriangle(kMerge[1:6], col = cols, pch = pchs, labels = labels, new = FALSE)
     points(k0[err], k2[err], pch = 1, lwd = 2, cex = 3)
 

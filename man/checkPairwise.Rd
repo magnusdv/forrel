@@ -4,7 +4,7 @@
 \alias{checkPairwise}
 \title{Check pedigree data for relationship errors}
 \usage{
-checkPairwise(x, plot = TRUE, labels = FALSE, LRthreshold = 1000)
+checkPairwise(x, plot = TRUE, labels = FALSE, LRthreshold = 1000, ...)
 }
 \arguments{
 \item{x}{A \code{ped} object or a list of such.}
@@ -18,6 +18,8 @@ IBD triangle plot.}
 \item{LRthreshold}{A positive number (default: 1000). IBD estimates whose LR
 exceed this, when compared to the coefficients implied by the pedigree, are
 encircled in the plot.}
+
+\item{...}{further parameters passed on to \code{\link[ribd:ibdTriangle]{ribd::ibdTriangle()}}.}
 }
 \value{
 A data frame containing both the estimated and pedigree-based IBD
@@ -60,7 +62,7 @@ checkPairwise(x, labels = TRUE)
 
 }
 \seealso{
-\code{\link[=IBDestimate]{IBDestimate()}}, \code{\link[=IBDtriangle]{IBDtriangle()}}, \code{\link[=showInTriangle]{showInTriangle()}}
+\code{\link[=IBDestimate]{IBDestimate()}}
 }
 \author{
 Magnus Dehli Vigeland
