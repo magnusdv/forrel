@@ -102,7 +102,10 @@ profileSim = function(x, N = 1, ids = NULL, markers = NULL, seed = NULL,
     }
     clusterEvalQ(cl, library(forrel))
     clusterExport(cl, c("markerSim", "N", "ids"), envir = environment())
-    clusterSetRNGStream(cl, iseed = sample.int(1e6,1))
+
+    # Random number seed for cluster. NB: Keep this outside of function call
+    iseed = sample.int(1e6,1)
+    clusterSetRNGStream(cl, iseed = iseed)
 
     # Iterate over the loci, make N simulations of each.
     sims_markerwise = parLapply(cl, markers, function(pm)
