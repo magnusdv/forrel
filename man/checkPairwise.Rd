@@ -41,7 +41,7 @@ where unlikely relationships are easy to spot.
 
 x = addSon(nuclearPed(nch = 2), parent = 4)
 x = setMarkers(x, locus = NorwegianFrequencies)
-x = profileSim(x, N = 1, numCores = 1, seed = 1729)[[1]]
+x = profileSim(x, N = 1, seed = 1729)[[1]]
 
 checkPairwise(x)
 

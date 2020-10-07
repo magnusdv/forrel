@@ -15,7 +15,7 @@
 #'   "Baseline", is added as the first element of `selection`.
 #' @param nProfiles The number of profile simulations for each selection.
 #' @param lrSims,thresholdIP Parameters passed onto [missingPersonIP()].
-#' @param numCores The number of cores used for parallelisation.
+#' @param numCores The number of cores used for parallelisation, by default 1.
 #'
 #' @return An object of class "MPPsim", which is basically a list with one entry
 #'   for each element of `selections`. Each entry has elements `ep` and `ip`,
@@ -50,10 +50,10 @@
 #' # Alternatives for additional genotyping
 #' sel = list("Father", "S2", "HS", c("Gm", "Uncle"))
 #'
-#' plot(x, marker = 1, shaded = sel)
+#' plot(x, marker = 1, hatched = sel)
 #'
 #' # Simulate
-#' simData = MPPsims(x, selections = sel, nProfiles = 2, lrSims = 2, numCores = 1)
+#' simData = MPPsims(x, selections = sel, nProfiles = 2, lrSims = 2)
 #'
 #' # Power plot
 #' powerPlot(simData, type = 3)
@@ -69,16 +69,16 @@
 #' mutmod(x, 1:2) = list("equal", rate = 0.1)
 #'
 #' # By default mutations are disabled for consistent markers
-#' MPPsims(x, selections = "Father", addBaseline = FALSE, numCores = 1)
+#' MPPsims(x, selections = "Father", addBaseline = FALSE)
 #'
 #' # Don't disable anything
-#' MPPsims(x, selections = "Father", addBaseline = FALSE, numCores = 1,
+#' MPPsims(x, selections = "Father", addBaseline = FALSE,
 #'         disableMutations = FALSE)
 #'
 #'
 #' # Disable all mutation models. SHOULD GIVE ERROR FOR SECOND MARKER
-#' # MPPsims(x, selections = "Father", addBaseline = FALSE, numCores = 1,
-#' #          disableMutations = TRUE)
+#' # MPPsims(x, selections = "Father", addBaseline = FALSE,
+#' #         disableMutations = TRUE)
 #'
 #'
 #' ### Effect of variable number of alleles

@@ -9,13 +9,13 @@
 #' @param ids A character (or coercible to character) with ID labels indicating
 #'   whose genotypes should be simulated.
 #' @param markers A list of marker objects, or a vector containing names or
-#'   indices referring to markers attached to `x`. By default (`markers = NULL`)
-#'   all attached markers are used. The simulations will be conditional on the
-#'   locus attributes (allele frequencies, mutation models a.s.o.) and any
-#'   existing genotypes in the indicated markers.
+#'   indices referring to markers attached to `x`. By default (`NULL`), all
+#'   attached markers are used. The simulations will be conditional on the locus
+#'   attributes (allele frequencies, mutation models a.s.o.) and any existing
+#'   genotypes in the indicated markers.
 #' @param seed NULL, or a numeric seed for the random number generator.
-#' @param numCores The number of cores used for parallelisation.
-#' @param verbose A logical.
+#' @param numCores The number of cores used for parallelisation, by default 1.
+#' @param verbose A logical, by default TRUE.
 #' @param ... Further arguments passed on to [markerSim()].
 #'
 #' @return A list of `N` objects similar to `x`, but with simulated genotypes.
@@ -33,13 +33,13 @@
 #' x = setMarkers(x, list(m1, m2))
 #'
 #' # Simulate 3 profiles of B2 conditional on the above
-#' profileSim(x, N = 3, ids = "B2", numCores = 1)
+#' profileSim(x, N = 3, ids = "B2")
 #'
 #' @importFrom parallel makeCluster stopCluster detectCores parLapply
 #'   clusterEvalQ clusterExport clusterSetRNGStream
 #' @export
 profileSim = function(x, N = 1, ids = NULL, markers = NULL, seed = NULL,
-                      numCores = NA, verbose = TRUE, ...){
+                      numCores = 1, verbose = TRUE, ...){
 
   if(!is.ped(x) && !is.pedList(x))
     stop2("The first argument must be a `ped` object or a list of such")

@@ -36,14 +36,14 @@ x = relabel(linearPed(2), old = 5, new = "MP")
 
 # Simulate reference data for grandmother (5 STR markers)
 x = setMarkers(x, locusAttributes = NorwegianFrequencies[1:5])
-x = profileSim(x, N = 1, ids = 2, numCores = 1)[[1]]
+x = profileSim(x, N = 1, ids = 2)[[1]]
 
 ### Person of interest 1: Unrelated
 poi1 = singleton("poi1")
 
 # Transfer (empty) markers and simulate genotypes
 poi1 = transferMarkers(from = x, to = poi1)
-poi1 = profileSim(poi1, N = 1, numCores = 1)[[1]]
+poi1 = profileSim(poi1, N = 1)[[1]]
 
 # Compute LR
 lr1 = missingPersonLR(x, missing = "MP", poi = poi1)
@@ -54,7 +54,7 @@ lr1$LRperMarker
 ### Person of interest 2: The true MP
 
 # Simulate MP conditional on reference, and extract as singleton
-poi2 = profileSim(x, N = 1, ids = "MP", numCores = 1)[[1]]
+poi2 = profileSim(x, N = 1, ids = "MP")[[1]]
 
 # Extract MP as singleton
 poi2 = subset(poi2, "MP")

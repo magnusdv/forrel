@@ -109,7 +109,7 @@ missingPersonIP = function(reference, missing, markers, nsim = 1, threshold = NU
   if(verbose)
     message("Simulating ", nsim, " profiles...", appendLF = FALSE)
 
-  allsims = profileSim(relatedPed, ids = "_POI_", N = nsim, markers = midx, numCores = 1, verbose = FALSE)
+  allsims = profileSim(relatedPed, ids = "_POI_", N = nsim, markers = midx, verbose = FALSE)
 
   if(verbose)
     message("done\nComputing likelihood ratios...", appendLF = FALSE)
