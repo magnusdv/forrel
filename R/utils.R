@@ -12,6 +12,10 @@ isNumber = function(x, minimum = NA, maximum = NA) {
            (is.na(maximum) || x <= maximum))
 }
 
+`%||%` = function(x, y) {
+  if(is.null(x)) y else x
+}
+
 pluralise = function(noun, n) {
   if(n == 1) noun else sprintf("%ss", noun)
 }
