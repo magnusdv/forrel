@@ -93,7 +93,7 @@ IBDestimate = function(x, ids = typedMembers(x), markers = NULL,
   if(!is.null(markers))
     x = selectMarkers(x, markers)
 
-  # ARgument `ids` should be either a vector or a matrix-like with 2 columns
+  # Argument `ids` should be either a vector or a matrix-like with 2 columns
   if(is.null(ids))
     ids = unlist(labels(x))
   if(length(ids) < 2)
@@ -163,6 +163,7 @@ IBDestimate = function(x, ids = typedMembers(x), markers = NULL,
 }
 
 
+# For now used only in contour plot feature
 .IBDlikelihood = function(x, ids, kappa, log = TRUE, total = TRUE) {
   if(length(ids) != 2)
     stop2("`ids` must have length 2")
@@ -199,6 +200,7 @@ IBDestimate = function(x, ids = typedMembers(x), markers = NULL,
   pednr = getComponent(x, ids, checkUnique = TRUE)
   pednr1 = pednr[1]
   pednr2 = pednr[2]
+  # TODO: use afreq() to extract frqs. This checks consistency across components!
 
   if(pednr1 == pednr2) {
     ped = if(is.ped(x)) x else x[[pednr1]]
