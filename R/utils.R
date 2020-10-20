@@ -110,3 +110,32 @@ disableMutationModels = function(x, disable, verbose = FALSE) {
   # Return the modified object
   x
 }
+
+
+# TODO: Move to pedtools
+fixAllelesAndFreqs = function(alleles = NULL, afreq = NULL,
+                              observed = NULL, NAstrings = c(0, "", NA, "-")) {
+
+  if(!is.null(alleles) && !is.null(names(afreq)))
+    stop2("Argument `alleles` should not be used when `afreq` has names")
+  if(is.null(alleles) && !is.null(afreq) && is.null(names(afreq)))
+    stop2("When `alleles` is NULL, `afreq` must be named")
+
+  # If alleles are NULL, take from afreq names, otherwise from supplied genos
+  als = alleles %||% names(afreq) %||% .mysetdiff(observed, NAstrings)
+  if(length(als) == 0)
+    als = 1:2
+
+  ### Frequencies
+  afreq = afreq %||% {rep_len(1, length(als))/length(als)}
+  names(afreq) = names(afreq) %||% als
+
+  # Sort alleles and frequencies (numerical sorting if appropriate)
+  if (!is.numeric(als) && !anyNA(suppressWarnings(as.numeric(als))))
+    ord = order(as.numeric(als))
+  else
+    ord = order(als)
+
+  # Return ordered, named frequencies
+  afreq[ord]
+}
