@@ -1,7 +1,7 @@
 #' Simulate marker data given IBD coefficients
 #'
 #' This function simulates genotypes for two individuals given their IBD
-#' distribution and a set of marker allele frequencies.
+#' distribution, for N identical markers.
 #'
 #' Exactly one of `kappa`, `delta` and `states` must be given; the other two
 #' should remain NULL.
@@ -23,7 +23,7 @@
 #'   identity coefficients (Jacquard coefficients).
 #' @param states An integer vector of length `N`, with entries in 1-9. Each
 #'   entry gives the identity state of the corresponding marker. (See details.)
-#' @param N A positive integer: the number of (independent) markers to be simulated.
+#' @param N A positive integer: the number of independent markers to be simulated.
 #' @param alleles A vector with allele labels. If NULL, the following are tried in order:
 #'
 #'   * `names(afreq)`
@@ -86,10 +86,12 @@ markerSimParametric = function(kappa = NULL, delta = NULL, states = NULL, N = 1,
     states = sample(9:7, size = N, replace = T, prob = kappa)
   else if(useDelta)
     states = sample(1:9, size = N, replace = T, prob = delta)
+  else if(length(states) == 1)
+    states = rep_len(states, N)
   else if(length(states) != N)
-    stop2("`states` does not have length ", N)
+    stop2("`states` must have length 1 or ", N)
 
-  # Modify .c and .d such that each marker satisfy its assigned state
+  # Modify b, c, d such that each marker satisfy its assigned state
   S1 = states == 1 # All equal
   .b[S1] = .c[S1] = .d[S1] = .a[S1]
 
@@ -118,43 +120,56 @@ markerSimParametric = function(kappa = NULL, delta = NULL, states = NULL, N = 1,
 
 
   # Return
-  retval = match.arg(returnValue)
-  if(retval == "singletons")
-    setMarkers(x = list(singleton(1), singleton(2)),
-               alleleMatrix = matrix(rbind(.a, .c, .b, .d), nrow = 2,
-                                     dimnames = list(1:2, NULL)),
-               locusAttributes = list(afreq = afreq))
-  else if(retval == "alleles")
-    list(a = .a, b = .b, c = .c, d = .d)
-  else
-    list(paste(.a, .b, sep="/"), paste(.c, .d, sep="/"))
+  switch(match.arg(returnValue),
+    singletons = setMarkers(x = list(singleton(1), singleton(2)),
+                            alleleMatrix = matrix(rbind(.a, .c, .b, .d), nrow = 2, dimnames = list(1:2, NULL)),
+                            locusAttributes = list(afreq = afreq)),
+    genotypes = list(paste(.a, .b, sep="/"), paste(.c, .d, sep="/")),
+    alleles = list(a = .a, b = .b, c = .c, d = .d))
 }
 
 
 
-profileSimParametric = function(kappa = NULL, delta = NULL, states = NULL, N = 1, afreqList = NULL, seed = NULL) {
-  # Simulate profiles for two non-inbred individuals related as described
-  # by kappa or delta. Assumes independent markers.
-  # Input:
-  #   kappa = (k0, k1, k2)  # NB all three!
-  #   delta = (d1, ..., d9)
-  #   N = number of markers
-  #
-  # Ouput: List of allele vectors a,b,c,d. The genotypes are paste(a,b) and paste(c,d).
-
+#' Simulate complete DNA profiles given IBD coefficients
+#'
+#' This function generalises [markerSimParametric()] in the same way that
+#' [profileSim()] generalises [markerSim()].
+#'
+#' @inheritParams markerSimParametric
+#' @param N A positive integer: the number of complete profiles to be simulated
+#' @param afreqList A list of numeric vectors. Each vector is the allele
+#'   frequencies of a marker.
+#'
+#' @return A list of length `N`, whose entries are determined by `returnValue`,
+#'   as explained in [markerSimParametric()].
+#'
+#' @examples
+#' # A single profile with 9 markers, each with a forced identity state
+#' profileSimParametric(states = 1:9, afreqList = NorwegianFrequencies[1:9])
+#'
+#' @export
+profileSimParametric = function(kappa = NULL, delta = NULL, states = NULL, N = 1, afreqList = NULL, seed = NULL,
+                                returnValue = c("singletons", "alleles", "genotypes")) {
   if(!is.null(seed))
     set.seed(seed)
 
   # Iterate over loci, make N simulations of each. For each locus, store sims as matrix (4 * Nsim) for simplicity later
-  sims_markerwise = lapply(afreqList, function(m) {
-    sim_m = markerSimParametric(kappa = kappa, delta = delta, states = states, N = N, afreq = m,
-                                returnValue = "alleles")
-    do.call(rbind, sim_m)
+  sims_markerwise = lapply(seq_along(afreqList), function(i) {
+    markeri = markerSimParametric(kappa = kappa, delta = delta, states = states[i],
+                                N = N, afreq = afreqList[[i]], returnValue = "alleles")
+    do.call(rbind, markeri)
   })
 
   # For each sim, extract corresponding column from each locus. Output each sim as list of 4 vectors (as markerSimParametric)
   sims = lapply(1:N, function(i)
-    sapply(sims_markerwise, function(locsim) locsim[, i]))
+    vapply(sims_markerwise, function(locsim) locsim[, i], FUN.VALUE = character(4)))
 
-  sims
+  # Return
+  switch(match.arg(returnValue),
+    singletons = lapply(sims, function(s)
+        setMarkers(list(singleton(1), singleton(2)),
+                   alleleMatrix = matrix(s[c(1,3,2,4), ], nrow = 2, dimnames = list(1:2, NULL)),
+                   locusAttributes = afreqList)),
+    genotypes = lapply(sims, function(s) paste(s[1,], s[2,], sep="/"), paste(s[3,], s[4,], sep="/")),
+    alleles = lapply(sims, function(s) list(a = s[1,], b = s[2,], c = s[3,], d = s[4,])))
 }

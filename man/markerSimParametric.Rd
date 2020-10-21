@@ -25,7 +25,7 @@ identity coefficients (Jacquard coefficients).}
 \item{states}{An integer vector of length \code{N}, with entries in 1-9. Each
 entry gives the identity state of the corresponding marker. (See details.)}
 
-\item{N}{A positive integer: the number of (independent) markers to be simulated.}
+\item{N}{A positive integer: the number of independent markers to be simulated.}
 
 \item{alleles}{A vector with allele labels. If NULL, the following are tried in order:
 \itemize{
@@ -55,7 +55,7 @@ returned when \code{returnValue == "alleles"}.
 }
 \description{
 This function simulates genotypes for two individuals given their IBD
-distribution and a set of marker allele frequencies.
+distribution, for N identical markers.
 }
 \details{
 Exactly one of \code{kappa}, \code{delta} and \code{states} must be given; the other two
