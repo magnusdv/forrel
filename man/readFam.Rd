@@ -16,7 +16,7 @@ included if it is present in the input file.}
 \item{Xchrom}{A logical. If TRUE, the \code{chrom} attribute of all markers will
 be set to "X". (Default = FALSE.)}
 
-\item{verbose}{A logical; if TRUE, various information is written to the
+\item{verbose}{A logical. If TRUE, various information is written to the
 screen during the parsing process.}
 }
 \value{

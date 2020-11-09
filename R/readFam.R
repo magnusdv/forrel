@@ -10,7 +10,7 @@
 #'   included if it is present in the input file.
 #' @param Xchrom A logical. If TRUE, the `chrom` attribute of all markers will
 #'   be set to "X". (Default = FALSE.)
-#' @param verbose A logical; if TRUE, various information is written to the
+#' @param verbose A logical. If TRUE, various information is written to the
 #'   screen during the parsing process.
 #'
 #' @return If the .fam file only contains a database, the output is a list of
