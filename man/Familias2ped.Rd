@@ -70,7 +70,7 @@ Familias2ped(famPed, datamatrix, loci = famLoc, matchLoci = TRUE)
 
 }
 \references{
-Familias is freely available from \url{http://familias.name}.
+Familias is freely available from \url{https://familias.name}.
 }
 \seealso{
 \code{\link[=readFam]{readFam()}}

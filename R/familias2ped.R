@@ -32,7 +32,7 @@
 #'
 #' @seealso [readFam()]
 #'
-#' @references Familias is freely available from <http://familias.name>.
+#' @references Familias is freely available from <https://familias.name>.
 #' @examples
 #'
 #' famPed = structure(
