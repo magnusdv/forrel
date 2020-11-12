@@ -1,7 +1,9 @@
 library(pedprobr)
 
-if(!checkMerlin())
-  skip("Merlin not installed")
+skip("Await next version")
+
+#if(!checkMerlin())
+#  skip("Merlin not installed")
 
 test_that("kinshipLR() works with two linked markers", {
   x = linearPed(2)

@@ -43,7 +43,7 @@
 #'                 id = c("S1", "S2", "MP"))
 #' x = addSon(x, "Father", id = "HS")
 #'
-#' # Brother S1 is already genotyped with a marker with 5 alleles
+#' # Brother S1 is already genotyped with a marker with 4 alleles
 #' m = marker(x, S1 = 1:2, alleles = 1:4)
 #' x = setMarkers(x, m)
 #'
@@ -69,31 +69,17 @@
 #' mutmod(x, 1:2) = list("equal", rate = 0.1)
 #'
 #' # By default mutations are disabled for consistent markers
-#' MPPsims(x, selections = "Father", addBaseline = FALSE)
+#' # MPPsims(x, selections = "Father", addBaseline = FALSE)
 #'
 #' # Don't disable anything
-#' MPPsims(x, selections = "Father", addBaseline = FALSE,
-#'         disableMutations = FALSE)
+#' # MPPsims(x, selections = "Father", addBaseline = FALSE,
+#' #       disableMutations = FALSE)
 #'
 #'
 #' # Disable all mutation models. SHOULD GIVE ERROR FOR SECOND MARKER
 #' # MPPsims(x, selections = "Father", addBaseline = FALSE,
 #' #         disableMutations = TRUE)
 #'
-#'
-#' ### Effect of variable number of alleles
-#' y = nuclearPed(father = "fa", child = "MP")
-#'
-#' peds = list(
-#'   setMarkers(y, marker(y, alleles = 1:2)),
-#'   setMarkers(y, marker(y, alleles = 1:3)),
-#'   setMarkers(y, marker(y, alleles = 1:4)),
-#'   setMarkers(y, marker(y, alleles = 1:4)))
-#'
-#' sel = setNames(c("fa", "fa", "fa", "fa"), paste(2:5, "alleles"))
-#'
-#' pows = MPPsims2(peds, selections = sel, addBaseline = FALSE, lrSims = 100, numCores = 1)
-#' powerPlot(pows, type = 3)
 #' }
 #'
 #' @importFrom parallel makeCluster stopCluster detectCores parLapply
@@ -101,7 +87,7 @@
 #' @export
 MPPsims = function(reference, missing = "MP", selections, ep = TRUE, ip = TRUE,
                    addBaseline = TRUE, nProfiles = 1, lrSims = 1, thresholdIP = NULL,
-                   disableMutations = NA, numCores = NA, seed = NULL, verbose = TRUE) {
+                   disableMutations = NA, numCores = 1, seed = NULL, verbose = TRUE) {
   st = Sys.time()
 
   if(!is.list(selections))

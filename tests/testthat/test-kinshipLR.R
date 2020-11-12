@@ -32,3 +32,4 @@ test_that("kinshipLR() computes correctly in paternity case", {
   lr = kinshipLR(H1, H2)$LRtotal[[1]]
   expect_equal(lr, 20)
 })
+

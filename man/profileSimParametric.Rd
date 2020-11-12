@@ -42,7 +42,7 @@ This function generalises \code{\link[=markerSimParametric]{markerSimParametric(
 \code{\link[=profileSim]{profileSim()}} generalises \code{\link[=markerSim]{markerSim()}}.
 }
 \examples{
-# A single profile with 9 markers, each with a forced identity state
+# A single profile with 9 markers, each with forced identity state
 profileSimParametric(states = 1:9, afreqList = NorwegianFrequencies[1:9])
 
 }

@@ -6,10 +6,6 @@
 #' pedigrees use the same data set, one of the pedigrees may be chosen as
 #' 'source', from which data is transferred to all the other pedigrees.
 #'
-#' By default, all markers are assumed to be unlinked. To accommodate linkage, a
-#' genetic map should be supplied with the argument `linkageMap`. This requires
-#' the software MERLIN to be installed.
-#'
 #' @param ... Pedigree alternatives. Each argument should be either a single
 #'   `ped` object or a list of such. The pedigrees may be named; otherwise they
 #'   are assigned names "H1", "H2", ... automatically.
@@ -27,13 +23,9 @@
 #'   an error.
 #' @param markers A vector of marker names or indices indicating which markers
 #'   should be included. If NULL (the default) all markers are used.
-#' @param linkageMap Either NULL (default), or a data frame with three columns:
-#'   chromosome; marker name; centiMorgan position. If given, it signifies to
-#'   the program that the markers are linked and invokes MERLIN for computing
-#'   the likelihoods.
 #' @param verbose A logical.
 #'
-#' @seealso [LRpower()], [pedprobr::likelihoodMerlin()]
+#' @seealso [LRpower()]
 #'
 #' @return A `LRresult` object, which is essentially a list with entries
 #'
@@ -83,10 +75,8 @@
 #' res = kinshipLR(peds)
 #' res$LRperMarker
 #' res$likelihoodsPerMarker
-#'
-#'
 #' @export
-kinshipLR = function(..., ref = NULL, source = NULL, markers = NULL, linkageMap = NULL, verbose = FALSE) {
+kinshipLR = function(..., ref = NULL, source = NULL, markers = NULL, verbose = FALSE) {
   st = proc.time()
 
   x = list(...)
@@ -122,7 +112,7 @@ kinshipLR = function(..., ref = NULL, source = NULL, markers = NULL, linkageMap 
   else
     stop2("Invalid value for `ref`: ", ref)
   if(verbose)
-    cat("Reference pedigree: ", ref, "\n")
+    message("Reference pedigree: ", ref)
 
   if(is.null(source)) {
     # Identity peds without marker data
@@ -142,7 +132,7 @@ kinshipLR = function(..., ref = NULL, source = NULL, markers = NULL, linkageMap 
     if(length(source) != 1)
       stop2("`source` must have length 1: ", source)
     if(verbose)
-      cat("Source pedigree: ", source, "\n")
+      message("Source pedigree: ", source)
     srcPed = x[[source]]
     if(is.null(srcPed))
       stop2("Unknown source pedigree: ", source)
@@ -164,7 +154,7 @@ kinshipLR = function(..., ref = NULL, source = NULL, markers = NULL, linkageMap 
   }
 
   if(verbose)
-    cat("Number of markers: ", length(markers), "\n")
+    message("Number of markers: ", length(markers))
 
   # Fix hypothesis names
   hypnames = names(x)
@@ -179,28 +169,7 @@ kinshipLR = function(..., ref = NULL, source = NULL, markers = NULL, linkageMap 
 
   names(x) = hypnames
 
-  ### Linked markers: call MERLIN
-  if(!is.null(linkageMap)) {
-    if(!checkMerlin())
-      stop2("Kinship analysis with linked markers requires MERLIN to be installed")
-
-    xLumped = lapply(x, lumpAlleles, verbose = verbose)
-
-    lnLik = vapply(xLumped, function(hyp)
-      likelihoodMerlin(hyp, markers = markers, linkageMap = linkageMap,
-                       logbase = exp(1), verbose = FALSE),
-      FUN.VALUE = 1)
-
-    LRtotal = exp(lnLik - lnLik[[refIdx]])
-    LRtotal = signif(LRtotal, 3)
-    names(LRtotal) = paste0(hypnames, ":", hypnames[refIdx])
-
-    return(structure(
-      list(LRtotal = LRtotal, lnLik = lnLik),
-      class = "LRresult"))
-  }
-
-  # Break all loops (NB: rapply() doesn't work here, since is.list(ped) = TRUE)
+  # Break all loops (NB: would use rapply, but doesnt work since is.list(ped) = TRUE
   breaklp = function(a) {
     if(is.pedList(a))
       return(lapply(a, breaklp))

@@ -4,14 +4,7 @@
 \alias{kinshipLR}
 \title{Likelihood ratios for kinship testing}
 \usage{
-kinshipLR(
-  ...,
-  ref = NULL,
-  source = NULL,
-  markers = NULL,
-  linkageMap = NULL,
-  verbose = FALSE
-)
+kinshipLR(..., ref = NULL, source = NULL, markers = NULL, verbose = FALSE)
 }
 \arguments{
 \item{...}{Pedigree alternatives. Each argument should be either a single
@@ -34,11 +27,6 @@ an error.}
 
 \item{markers}{A vector of marker names or indices indicating which markers
 should be included. If NULL (the default) all markers are used.}
-
-\item{linkageMap}{Either NULL (default), or a data frame with three columns:
-chromosome; marker name; centiMorgan position. If given, it signifies to
-the program that the markers are linked and invokes MERLIN for computing
-the likelihoods.}
 
 \item{verbose}{A logical.}
 }
@@ -65,11 +53,6 @@ of the pedigrees (the last one, by default) is designated as 'reference', to
 be used in the denominator in all LR calculations. To ensure that all
 pedigrees use the same data set, one of the pedigrees may be chosen as
 'source', from which data is transferred to all the other pedigrees.
-}
-\details{
-By default, all markers are assumed to be unlinked. To accommodate linkage, a
-genetic map should be supplied with the argument \code{linkageMap}. This requires
-the software MERLIN to be installed.
 }
 \examples{
 
@@ -99,11 +82,9 @@ kinshipLR(peds, ref = "H", source = "S", verbose = TRUE)
 res = kinshipLR(peds)
 res$LRperMarker
 res$likelihoodsPerMarker
-
-
 }
 \seealso{
-\code{\link[=LRpower]{LRpower()}}, \code{\link[pedprobr:merlin]{pedprobr::likelihoodMerlin()}}
+\code{\link[=LRpower]{LRpower()}}
 }
 \author{
 Magnus Dehli Vigeland and Thore Egeland
