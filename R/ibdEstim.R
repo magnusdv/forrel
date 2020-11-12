@@ -127,7 +127,6 @@ ibdEstim = function(x, ids = typedMembers(x), param = c("kappa", "delta"),
   res
 }
 
-#' @importFrom stats constrOptim
 .kappaEstim = function(dat, start, reltol, returnArgs = FALSE, ...) {
   pair = names(dat)
 
@@ -146,36 +145,21 @@ ibdEstim = function(x, ids = typedMembers(x), param = c("kappa", "delta"),
   weiRed = wei[c(1,3), ] - rep(wei[2, ], each = 2)
   grad = function(p) weiRed %*% (1/.pairwiseLikelihood(p, wei, param = "kappa"))
 
-  # Start point
-  if(is.null(start))
-    start = c(1/3, 1/3)
-  else if(length(start) == 3)
-    start = start[c(1,3)]
-  else if(length(start) != 2)
-    stop2("`start` must have length 2 or 3")
-  names(start) = c("k0", "k2")
+  # Optimise
+  ML = .maxlik(loglik, grad, param = "kappa", start = start, reltol = reltol, ...)
+  par = ML$res$par
 
-  # Optimise in IBD triangle
-  ui = rbind(diag(2), -1)
-  ci = c(0,0,-1)
-  ML = constrOptim(theta = start, f = loglik, grad = grad, ui = ui, ci = ci,
-                   control = list(fnscale = -1, maxit = 1000, reltol = reltol), ...)
+  df = data.frame(id1 = pair[1], id2 = pair[2], N = sum(keep),
+                   k0 = par[['k0']], k1 = 1 - sum(par), k2 = par[['k2']],
+                   convergence = ML$res$message %||% "OK")
 
-  res = data.frame(id1 = pair[1], id2 = pair[2], N = sum(keep),
-                   k0 = ML$par[['k0']], k1 = 1 - sum(ML$par), k2 = ML$par[['k2']],
-                   convergence = ML$message %||% "OK")
-
-  if(returnArgs) {
-    args = list(theta = start, f = loglik, grad = grad, ui = ui, ci = ci,
-                control = list(fnscale = -1, maxit = 1000, reltol = reltol), ...)
-    res = list(res = res, args = args)
-  }
-
-  res
+  if(returnArgs)
+    list(res = df, args = ML$args)
+  else
+    df
 }
 
 
-#' @importFrom stats constrOptim
 .deltaEstim = function(dat, start, reltol, returnArgs = FALSE, ...) {
   pair = names(dat)
 
@@ -194,32 +178,18 @@ ibdEstim = function(x, ids = typedMembers(x), param = c("kappa", "delta"),
   weiRed = wei[1:8, ] - rep(wei[9, ], each = 8)
   grad = function(p) weiRed %*% (1/.pairwiseLikelihood(p, wei, param = "delta"))
 
-  # Start point
-  if(is.null(start))
-    start = rep(1/9, 8)
-  else if(length(start) == 9)
-    start = start[1:8]
-  else if(length(start) != 9)
-    stop2("`start` must have length 8 or 9")
-  names(start) = paste0("d", 1:8)
+  # Optimise (returns list(res, args))
+  ML = .maxlik(loglik, grad, param = "delta", start = start, reltol = reltol, ...)
+  par = ML$res$par
 
-  # Optimise in unit simplex in R8
-  ui = rbind(diag(8), -1)
-  ci = c(rep(0, 8), -1)
-  ML = constrOptim(theta = start, f = loglik, grad = grad, ui = ui, ci = ci,
-                   control = list(fnscale = -1, maxit = 1000, reltol = reltol), ...)
+  df = data.frame(id1 = pair[1], id2 = pair[2], N = sum(keep),
+                   rbind(par), d9 = 1 - sum(par),
+                   convergence = ML$res$message %||% "OK")
 
-  res = data.frame(id1 = pair[1], id2 = pair[2], N = sum(keep),
-                   rbind(ML$par), d9 = 1 - sum(ML$par),
-                   convergence = ML$message %||% "OK")
-
-  if(returnArgs) {
-    args = list(theta = start, f = loglik, grad = grad, ui = ui, ci = ci,
-                control = list(fnscale = -1, maxit = 1000, reltol = reltol), ...)
-    res = list(res = res, args = args)
-  }
-
-  res
+  if(returnArgs)
+    list(res = df, args = ML$args)
+  else
+    df
 }
 
 
@@ -344,11 +314,55 @@ ibdEstim = function(x, ids = typedMembers(x), param = c("kappa", "delta"),
   w
 }
 
+#' @importFrom stats constrOptim
+.maxlik = function(loglik, grad, start, param = c("kappa", "delta"),
+                   reltol, ...) {
+  param = match.arg(param)
+
+  if(param == "kappa") {
+
+    if(is.null(start))
+      start = c(1/3, 1/3)
+    else if(length(start) == 3)
+      start = start[c(1,3)]
+    else if(length(start) != 2)
+      stop2("`start` must have length 2 or 3")
+    names(start) = c("k0", "k2")
+
+    # Region: Triangle
+    ui = rbind(diag(2), -1)
+    ci = c(0,0,-1)
+  }
+  else {
+    # Start point
+    if(is.null(start))
+      start = rep(1/9, 8)
+    else if(length(start) == 9)
+      start = start[1:8]
+    else if(length(start) != 8)
+      stop2("`start` must have length 8 or 9")
+    names(start) = paste0("d", 1:8)
+
+    # Region: unit simplex in R^8
+    ui = rbind(diag(8), -1)
+    ci = c(rep(0, 8), -1)
+  }
+
+  args = list(theta = start, f = loglik, grad = grad, ui = ui, ci = ci,
+              control = list(fnscale = -1, maxit = 1000, reltol = reltol), ...)
+
+  res = do.call(constrOptim, args)
+
+  list(res = res, args = args)
+}
+
+
+
 # NOT YET USED
 # This function would be needed to implement the "projected gradient method",
 # for optimising over the probability simplex.
 # Project any vector in R^D onto the probability simplex.
-# Algorithm found in Wang & ?? (2013): Projection onto the probability simplex.
+# Algorithm found in Wang et al. (2013): Projection onto the probability simplex.
 simplexProject = function(y) {
   D = length(y)
   u = sort.default(y, decreasing = TRUE, method = "shell")
