@@ -144,7 +144,7 @@ markerSimParametric = function(kappa = NULL, delta = NULL, states = NULL, N = 1,
 #'   as explained in [markerSimParametric()].
 #'
 #' @examples
-#' # A single profile with 9 markers, each with a forced identity state
+#' # A single profile with 9 markers, each with forced identity state
 #' profileSimParametric(states = 1:9, afreqList = NorwegianFrequencies[1:9])
 #'
 #' @export
@@ -170,6 +170,6 @@ profileSimParametric = function(kappa = NULL, delta = NULL, states = NULL, N = 1
         setMarkers(list(singleton(1), singleton(2)),
                    alleleMatrix = matrix(s[c(1,3,2,4), ], nrow = 2, dimnames = list(1:2, NULL)),
                    locusAttributes = afreqList)),
-    genotypes = lapply(sims, function(s) paste(s[1,], s[2,], sep="/"), paste(s[3,], s[4,], sep="/")),
+    genotypes = lapply(sims, function(s) list(paste(s[1,], s[2,], sep="/"), paste(s[3,], s[4,], sep="/"))),
     alleles = lapply(sims, function(s) list(a = s[1,], b = s[2,], c = s[3,], d = s[4,])))
 }

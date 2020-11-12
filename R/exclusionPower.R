@@ -323,7 +323,7 @@ exclusionPower = function(claimPed, truePed, ids, markers = NULL, source = "clai
 
       this.ep = unlist(lapply(ids, function(idvec) {
         claimSims = transferMarkers(trueSims, claimPed, ids = c(typed, idvec))
-        liks = likelihood(claimSims, markers = 1:nsim)
+        liks = likelihood(claimSims, 1:nsim)
         mean(liks == 0)
       }))
     }
