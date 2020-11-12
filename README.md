@@ -14,18 +14,16 @@ status](https://www.r-pkg.org/badges/version/forrel)](https://CRAN.R-project.org
 Introduction
 ------------
 
-The goal of `forrel` is to provide forensic pedigree computations and
-relatedness inference from genetic marker data. Some of its
-functionality is derived from `paramlink`, which is no longer actively
-developed. `forrel` is part of the *ped suite*, a collection of packages
-for pedigree analysis with `pedtools` as the central package for
-handling pedigrees and marker data.
+The goal of **forrel** is to provide forensic pedigree computations and
+relatedness inference from genetic marker data. The **forrel** package
+is part of the **ped suite**, a collection of R packages for pedigree
+analysis.
 
-The most important analyses currently supported by `forrel` are:
+The most important analyses currently supported by **forrel** are:
 
 -   Likelihood ratio (LR) computations for relationship testing
--   Pairwise relatedness inference: Estimation of IBD (kappa)
-    coefficients from marker data
+-   Pairwise relatedness inference: Estimation of IBD coefficients (both
+    *κ* and *Δ*) from marker data
 -   Visualisation of IBD coefficients in the IBD triangle
 -   Simulation of marker genotypes. Unconditional or conditional on
     known genotypes
@@ -43,7 +41,7 @@ The most important analyses currently supported by `forrel` are:
 Installation
 ------------
 
-To get the current official version of `forrel`, install from CRAN as
+To get the current official version of **forrel**, install from CRAN as
 follows:
 
 ``` r
@@ -105,8 +103,8 @@ x = markerSim(x, N = 100, ids = bros, alleles = 1:2, seed = 1234)
 #> Mutation model: No 
 #> 
 #> Simulation finished.
-#> Number of calls to the likelihood function: 0.
-#> Total time used: 0.13 seconds.
+#> Calls to `likelihood()`: 0.
+#> Total time used: 0.06 seconds.
 ```
 
 Note 1: The `seed` argument is passed onto the random number generator.
@@ -122,9 +120,9 @@ x
 #>    id fid mid sex <1> <2> <3> <4> <5>
 #>     1   *   *   1 -/- -/- -/- -/- -/-
 #>     2   *   *   2 -/- -/- -/- -/- -/-
-#>  bro1   1   2   1 1/1 1/2 1/1 2/1 2/2
-#>  bro2   1   2   1 1/1 2/1 1/1 2/1 2/2
-#> Only 5 (out of 100) markers are shown. See `?print.ped` for options.
+#>  bro1   1   2   1 1/1 1/2 1/1 1/2 2/2
+#>  bro2   1   2   1 1/1 1/2 1/1 1/2 2/2
+#> Only 5 (out of 100) markers are shown.
 ```
 
 **Estimation of IBD coefficients**
@@ -136,7 +134,7 @@ available marker data.
 ``` r
 k = IBDestimate(x, ids = bros)
 k
-#>    ID1  ID2   N        k0        k1        k2
+#>    id1  id2   N        k0        k1        k2
 #> 1 bro1 bro2 100 0.1484924 0.5513491 0.3001585
 ```
 

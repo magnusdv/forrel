@@ -24,12 +24,12 @@ knitr::opts_chunk$set(
 
 
 ## Introduction
-The goal of `forrel` is to provide forensic pedigree computations and relatedness inference from genetic marker data. Some of its functionality is derived from `paramlink`, which is no longer actively developed. `forrel` is part of the _ped suite_, a collection of packages for pedigree analysis with `pedtools` as the central package for handling pedigrees and marker data.
+The goal of **forrel** is to provide forensic pedigree computations and relatedness inference from genetic marker data. The **forrel** package is part of the **ped suite**, a collection of R packages for pedigree analysis.
 
-The most important analyses currently supported by `forrel` are:
+The most important analyses currently supported by **forrel** are:
 
 * Likelihood ratio (LR) computations for relationship testing
-* Pairwise relatedness inference: Estimation of IBD (kappa) coefficients from marker data
+* Pairwise relatedness inference: Estimation of IBD coefficients (both $\kappa$ and $\Delta$) from marker data
 * Visualisation of IBD coefficients in the IBD triangle
 * Simulation of marker genotypes. Unconditional or conditional on known genotypes
 * Power analysis for relationship testing: LR distributions, exclusion power (EP) and inclusion power (IP)
@@ -42,7 +42,7 @@ The most important analyses currently supported by `forrel` are:
 * Import of pedigree data and frequency databases from the `Familias` software.
 
 ## Installation
-To get the current official version of `forrel`, install from CRAN as follows:
+To get the current official version of **forrel**, install from CRAN as follows:
 ```{r, eval = FALSE}
 install.packages("forrel")
 ```
