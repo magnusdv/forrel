@@ -28,9 +28,9 @@ Encoding: UTF-8
 Language: en-GB
 LazyData: true
 Depends: R (>= 3.1.0),
-    pedtools (>= 0.9.3)
+    pedtools (>= 0.9.5.9000)
 Imports:
-    pedprobr (>= 0.3),
+    pedprobr (>= 0.4),
     ribd,
     pedmut,
     maxLik,
