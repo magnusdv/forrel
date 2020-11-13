@@ -41,11 +41,11 @@
 #' x = addMarkers(x, badMarker)
 #'
 #' # Compute exclusion power statistics
-#' # missingPersonEP(x, missing = 6)
+#' missingPersonEP(x, missing = 6)
 #'
 #' # With marker names:
 #' name(x, 1:5) = paste0("M", 1:5)
-#' # missingPersonEP(x, missing = 6)
+#' missingPersonEP(x, missing = 6)
 #'
 #' @importFrom pedprobr likelihood
 #' @export

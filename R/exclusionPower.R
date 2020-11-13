@@ -103,13 +103,13 @@
 #' claim = setMarkers(claim, list(m1, m2))
 #'
 #' # Compute EP when father and child is available for genotyping
-#' # exclusionPower(claim, true, ids = c(1,3))
+#' exclusionPower(claim, true, ids = c(1,3))
 #'
 #' # Suppose child is already genotyped
 #' genotype(claim, marker = 1, id = 3) = c(1, 1)
 #' genotype(claim, marker = 2, id = 3) = c(1, 1)
 #'
-#' # exclusionPower(claim, true, ids = 1)
+#' exclusionPower(claim, true, ids = 1)
 #'
 #'
 #' ############################################

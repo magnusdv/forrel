@@ -116,11 +116,11 @@ x = setMarkers(x, list(m, m2))
 mutmod(x, 1:2) = list("equal", rate = 0.1)
 
 # By default mutations are disabled for consistent markers
-# MPPsims(x, selections = "Father", addBaseline = FALSE)
+MPPsims(x, selections = "Father", addBaseline = FALSE)
 
 # Don't disable anything
-# MPPsims(x, selections = "Father", addBaseline = FALSE,
-#       disableMutations = FALSE)
+MPPsims(x, selections = "Father", addBaseline = FALSE,
+        disableMutations = FALSE)
 
 
 # Disable all mutation models. SHOULD GIVE ERROR FOR SECOND MARKER
