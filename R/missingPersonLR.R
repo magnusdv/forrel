@@ -1,7 +1,7 @@
 #' Likelihood ratio calculation for missing person identification
 #'
 #' This is a wrapper function for [kinshipLR()] for the special case of missing
-#' person identification. A person of interest (POI) is mathced against a
+#' person identification. A person of interest (POI) is matched against a
 #' reference dataset containing genotypes of relatives of the missing person.
 #'
 #' @param reference A `ped` object with attached markers.

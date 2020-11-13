@@ -21,7 +21,7 @@ trivial \code{H2:H2} comparison.
 }
 \description{
 This is a wrapper function for \code{\link[=kinshipLR]{kinshipLR()}} for the special case of missing
-person identification. A person of interest (POI) is mathced against a
+person identification. A person of interest (POI) is matched against a
 reference dataset containing genotypes of relatives of the missing person.
 }
 \examples{
