@@ -107,6 +107,11 @@ excluding a claimed relationship, given the true relationship.
 \details{
 This function implements the formula for exclusion power as defined and
 discussed in (Egeland et al., 2014).
+
+It should be noted that \code{claimPed} and \code{truePed} may be any (lists of)
+pedigrees, as long as they both contain the individuals specified by \code{ids}.
+In particular, either alternative may have inbred founders (with the same or
+different coefficients), but this must be set individually for each.
 }
 \examples{
 

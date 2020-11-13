@@ -6,6 +6,11 @@
 #' This function implements the formula for exclusion power as defined and
 #' discussed in (Egeland et al., 2014).
 #'
+#' It should be noted that `claimPed` and `truePed` may be any (lists of)
+#' pedigrees, as long as they both contain the individuals specified by `ids`.
+#' In particular, either alternative may have inbred founders (with the same or
+#' different coefficients), but this must be set individually for each.
+#'
 #' @param claimPed A `ped` object (or a list of such), describing the claimed
 #'   relationship. If a list, the sets of ID labels must be disjoint, that is,
 #'   all ID labels must be unique.
