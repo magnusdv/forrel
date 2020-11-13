@@ -271,8 +271,8 @@ exclusionPower = function(claimPed, truePed, ids, markers = NULL, source = "clai
   }
 
   ### Baseline likelihoods
-  trueBase = likelihood(truePed, marker1 = seq_len(nMark))
-  claimBase = likelihood(claimPed, seq_len(nMark))
+  trueBase = likelihood(truePed, markers = seq_len(nMark))
+  claimBase = likelihood(claimPed, markers = seq_len(nMark))
 
   ### Compute the exclusion power of each marker.
   # The result is rectangular, with nMark columns and NI rows
@@ -323,7 +323,7 @@ exclusionPower = function(claimPed, truePed, ids, markers = NULL, source = "clai
 
       this.ep = unlist(lapply(ids, function(idvec) {
         claimSims = transferMarkers(trueSims, claimPed, ids = c(typed, idvec))
-        liks = likelihood(claimSims, 1:nsim)
+        liks = likelihood(claimSims, markers = 1:nsim)
         mean(liks == 0)
       }))
     }

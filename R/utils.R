@@ -74,7 +74,7 @@ consistentMarkers = function(x, markers = seq_len(nMarkers(x))) {
     return(TRUE)
 
   mutmod(y, 1:nMark) = NULL
-  liks = likelihood(y, 1:nMark)
+  liks = likelihood(y, markers = 1:nMark)
 
   # Return TRUE if likelihood is nonzero
   liks > 0
