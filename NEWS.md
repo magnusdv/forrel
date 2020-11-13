@@ -1,3 +1,24 @@
+# forrel 1.1.0
+
+## New features
+
+* Implement parallelisation in `profileSim()`.
+
+* Partial rewrite of `kinshipLR()`, including new argument `source`.
+
+* Added the `NorwegianFrequencies` dataset, containing allele frequencies for 35 STR markers.
+
+* New function `missingPersonLR()`.
+
+* New function `checkPairwise()` replaces the (long obsolete) `examineKinships()`.
+
+* New functions `markerSimParametric()` and `profileSimParametric()` for simulating marker data for two individuals with given kappa (or condensed identity) coefficients.
+
+## Bug fixes
+
+* In `profileSim()`, fix bug resulting in identical seeds given to each parallel cluster.
+
+
 # forrel 1.0.1
 
 ## New features
