@@ -1,4 +1,3 @@
-context("Marker simulation")
 
 mSim = function(...) markerSim(..., verbose = FALSE)
 pSim = function(...) profileSim(..., numCores = 1, verbose = FALSE)

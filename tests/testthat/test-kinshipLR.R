@@ -1,4 +1,3 @@
-context("LR calculations")
 
 test_that("kinshipLR() catches input errors", {
   s = singleton(1)

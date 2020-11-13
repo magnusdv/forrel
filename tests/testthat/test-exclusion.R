@@ -1,4 +1,3 @@
-context("Exclusion power")
 
 quickEP = function(claim, true, ids, afreq = NULL, ...) {
   als = if(is.null(afreq)) NULL else seq_along(afreq)

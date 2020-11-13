@@ -1,4 +1,3 @@
-context("Familias conversion")
 
 test_that("connectedComponents() works", {
   w = data.frame(id = 1:7, fid = c(0,0,1,0,0,0,0), mid = c(0,0,2,0,0,7,0))

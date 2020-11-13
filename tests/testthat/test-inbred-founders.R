@@ -1,4 +1,3 @@
-context("Founder inbreeding")
 
 test_that("simpleSim() works on inbred singleton", {
   x = singleton(1)
