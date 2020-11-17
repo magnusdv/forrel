@@ -23,15 +23,14 @@ columns, where each row contains the ID labels of two individuals. The
 entries are coerced to characters, and must match uniquely against the ID
 labels of \code{x}. By default, all pairs of members of \code{x} are included.}
 
-\item{param}{Either "kappa" (default) or "delta"; indicating which set of coefficients should be estimated.}
+\item{param}{Either "kappa" (default) or "delta"; indicating which set of
+coefficients should be estimated.}
 
 \item{markers}{A vector with names or indices of markers attached to x,
 indicating which markers to include. If NULL (default), all markers are
 used.}
 
-\item{start}{Numeric of length 3 (if \code{param = "kappa"}) or 9 (if \code{param = "delta"}), indicating an initial value of for the optimisation. This must
-be in the interior of the probability simplex, i.e., all elements must be
-strictly positive and sum to 1. (The resulting estimate can still be on the border.)}
+\item{start}{Numeric of length 3 (if \code{param = "kappa"}) or 9 (if \code{param = "delta"}), indicating an initial value of for the optimisation.}
 
 \item{reltol}{Relative convergence tolerance; passed on to \code{constrOptim()}.
 Defaults to 1e-12,}
