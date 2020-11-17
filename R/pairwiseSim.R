@@ -137,7 +137,7 @@ markerSimParametric = function(kappa = NULL, delta = NULL, states = NULL, N = 1,
 #'
 #' @inheritParams markerSimParametric
 #' @param N A positive integer: the number of complete profiles to be simulated
-#' @param afreqList A list of numeric vectors. Each vector is the allele
+#' @param freqList A list of numeric vectors. Each vector is the allele
 #'   frequencies of a marker.
 #'
 #' @return A list of length `N`, whose entries are determined by `returnValue`,
@@ -145,18 +145,18 @@ markerSimParametric = function(kappa = NULL, delta = NULL, states = NULL, N = 1,
 #'
 #' @examples
 #' # A single profile with 9 markers, each with forced identity state
-#' profileSimParametric(states = 1:9, afreqList = NorwegianFrequencies[1:9])
+#' profileSimParametric(states = 1:9, freqList = NorwegianFrequencies[1:9])
 #'
 #' @export
-profileSimParametric = function(kappa = NULL, delta = NULL, states = NULL, N = 1, afreqList = NULL, seed = NULL,
+profileSimParametric = function(kappa = NULL, delta = NULL, states = NULL, N = 1, freqList = NULL, seed = NULL,
                                 returnValue = c("singletons", "alleles", "genotypes")) {
   if(!is.null(seed))
     set.seed(seed)
 
   # Iterate over loci, make N simulations of each. For each locus, store sims as matrix (4 * Nsim) for simplicity later
-  sims_markerwise = lapply(seq_along(afreqList), function(i) {
+  sims_markerwise = lapply(seq_along(freqList), function(i) {
     markeri = markerSimParametric(kappa = kappa, delta = delta, states = states[i],
-                                N = N, afreq = afreqList[[i]], returnValue = "alleles")
+                                N = N, afreq = freqList[[i]], returnValue = "alleles")
     do.call(rbind, markeri)
   })
 
@@ -169,7 +169,7 @@ profileSimParametric = function(kappa = NULL, delta = NULL, states = NULL, N = 1
     singletons = lapply(sims, function(s)
         setMarkers(list(singleton(1), singleton(2)),
                    alleleMatrix = matrix(s[c(1,3,2,4), ], nrow = 2, dimnames = list(1:2, NULL)),
-                   locusAttributes = afreqList)),
+                   locusAttributes = freqList)),
     genotypes = lapply(sims, function(s) list(paste(s[1,], s[2,], sep="/"), paste(s[3,], s[4,], sep="/"))),
     alleles = lapply(sims, function(s) list(a = s[1,], b = s[2,], c = s[3,], d = s[4,])))
 }

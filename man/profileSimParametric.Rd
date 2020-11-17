@@ -9,7 +9,7 @@ profileSimParametric(
   delta = NULL,
   states = NULL,
   N = 1,
-  afreqList = NULL,
+  freqList = NULL,
   seed = NULL,
   returnValue = c("singletons", "alleles", "genotypes")
 )
@@ -26,7 +26,7 @@ entry gives the identity state of the corresponding marker. (See details.)}
 
 \item{N}{A positive integer: the number of complete profiles to be simulated}
 
-\item{afreqList}{A list of numeric vectors. Each vector is the allele
+\item{freqList}{A list of numeric vectors. Each vector is the allele
 frequencies of a marker.}
 
 \item{seed}{NULL, or a numeric seed for the random number generator.}
@@ -43,6 +43,6 @@ This function generalises \code{\link[=markerSimParametric]{markerSimParametric(
 }
 \examples{
 # A single profile with 9 markers, each with forced identity state
-profileSimParametric(states = 1:9, afreqList = NorwegianFrequencies[1:9])
+profileSimParametric(states = 1:9, freqList = NorwegianFrequencies[1:9])
 
 }
