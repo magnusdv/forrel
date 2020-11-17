@@ -127,7 +127,7 @@ ibdEstim = function(x, ids = typedMembers(x), param = c("kappa", "delta"),
 }
 
 .kappaEstim = function(dat, start, reltol, returnArgs = FALSE, ...) {
-  pair = names(dat)
+  pair = names(dat) %||% c("_1", "_2")
 
   # Remove missing
   keep = !is.na(dat[[1]]$f1) & !is.na(dat[[2]]$f2)
@@ -160,7 +160,7 @@ ibdEstim = function(x, ids = typedMembers(x), param = c("kappa", "delta"),
 
 
 .deltaEstim = function(dat, start, reltol, returnArgs = FALSE, ...) {
-  pair = names(dat)
+  pair = names(dat) %||% c("_1", "_2")
 
   # Remove missing
   keep = !is.na(dat[[1]]$f1) & !is.na(dat[[2]]$f2)
