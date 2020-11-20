@@ -141,7 +141,7 @@ ibdEstim = function(x, ids = typedMembers(x), param = c("kappa", "delta"),
   loglik = function(p) sum(log(.pairwiseLikelihood(p, wei, param = "kappa")))
 
   # Gradient
-  weiRed = wei[c(1,3), ] - rep(wei[2, ], each = 2)
+  weiRed = wei[c(1,3), , drop = FALSE] - rep(wei[2, ], each = 2)
   grad = function(p) weiRed %*% (1/.pairwiseLikelihood(p, wei, param = "kappa"))
 
   # Optimise
