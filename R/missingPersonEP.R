@@ -1,29 +1,18 @@
 #' Exclusion power for missing person cases
 #'
-#' This is a wrapper of [exclusionPower()] for the special case of a reference
-#' family with a single missing member. Some reference members should already be
-#' genotyped. The function computes the power to exclude an unrelated
-#' individual, i.e. the probability of observing (in a truly unrelated
-#' individual) a genotype incompatible with the reference.
+#' This is a special case of [exclusionPower()] for use in missing person cases.
+#' The function computes the probability that a random person is genetically
+#' incompatible with the typed relatives of the missing person.
+#'
+#' This function is identical to [randomPersonEP()], but with different argument
+#' names. This makes it consistent with [missingPersonIP()] and the other
+#' missing person functions.
 #'
 #' @param reference A `ped` object with attached markers.
 #' @param missing The ID label of the missing pedigree member.
-#' @param disableMutations This parameter determines how mutation models are
-#'   treated. Possible values are as follows:
 #'
-#'   * `NA` (the default): Mutations are disabled only for those markers whose
-#'   known genotypes are consistent with `reference`. This is determined by
-#'   temporarily removing all mutation models and checking which markers have
-#'   nonzero likelihood.
-#'
-#'   * `TRUE`: Mutations are disabled for all markers. This will result in an
-#'   error if any markers are inconsistent with `reference`.
-#'
-#'   * `FALSE`: No action is done to disable mutations.
-#'
-#'   * A vector containing the names or indices of those markers for which
-#'   mutations should be disabled.
-#' @inheritParams exclusionPower
+#' @inheritParams randomPersonEP
+#' @seealso [randomPersonEP()], [exclusionPower()]
 #'
 #' @return The `EPresult` object returned by [exclusionPower()].
 #'
@@ -36,15 +25,11 @@
 #' x = markerSim(x, N = 4, ids = 3:5, alleles = 1:3, seed = 577, verbose = FALSE)
 #'
 #' # Add marker with inconsistency in reference genotypes
-#' # (this should be ignored by `missingPersonEP()`)
+#' # (by default this is ignored by `missingPersonEP()`)
 #' badMarker = marker(x, `3` = 1, `4` = 2, `5` = 3)
 #' x = addMarkers(x, badMarker)
 #'
 #' # Compute exclusion power statistics
-#' missingPersonEP(x, missing = 6)
-#'
-#' # With marker names:
-#' name(x, 1:5) = paste0("M", 1:5)
 #' missingPersonEP(x, missing = 6)
 #'
 #' @importFrom pedprobr likelihood

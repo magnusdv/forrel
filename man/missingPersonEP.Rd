@@ -26,11 +26,11 @@ parameter is ignored.}
 treated. Possible values are as follows:
 \itemize{
 \item \code{NA} (the default): Mutations are disabled only for those markers whose
-known genotypes are consistent with \code{reference}. This is determined by
+known genotypes are consistent with the pedigree. This is determined by
 temporarily removing all mutation models and checking which markers have
 nonzero likelihood.
 \item \code{TRUE}: Mutations are disabled for all markers. This will result in an
-error if any markers are inconsistent with \code{reference}.
+error if any markers are inconsistent.
 \item \code{FALSE}: No action is done to disable mutations.
 \item A vector containing the names or indices of those markers for which
 mutations should be disabled.
@@ -42,11 +42,14 @@ mutations should be disabled.
 The \code{EPresult} object returned by \code{\link[=exclusionPower]{exclusionPower()}}.
 }
 \description{
-This is a wrapper of \code{\link[=exclusionPower]{exclusionPower()}} for the special case of a reference
-family with a single missing member. Some reference members should already be
-genotyped. The function computes the power to exclude an unrelated
-individual, i.e. the probability of observing (in a truly unrelated
-individual) a genotype incompatible with the reference.
+This is a special case of \code{\link[=exclusionPower]{exclusionPower()}} for use in missing person cases.
+The function computes the probability that a random person is genetically
+incompatible with the typed relatives of the missing person.
+}
+\details{
+This function is identical to \code{\link[=randomPersonEP]{randomPersonEP()}}, but with different argument
+names. This makes it consistent with \code{\link[=missingPersonIP]{missingPersonIP()}} and the other
+missing person functions.
 }
 \examples{
 
@@ -57,15 +60,14 @@ x = nuclearPed(4)
 x = markerSim(x, N = 4, ids = 3:5, alleles = 1:3, seed = 577, verbose = FALSE)
 
 # Add marker with inconsistency in reference genotypes
-# (this should be ignored by `missingPersonEP()`)
+# (by default this is ignored by `missingPersonEP()`)
 badMarker = marker(x, `3` = 1, `4` = 2, `5` = 3)
 x = addMarkers(x, badMarker)
 
 # Compute exclusion power statistics
 missingPersonEP(x, missing = 6)
 
-# With marker names:
-name(x, 1:5) = paste0("M", 1:5)
-missingPersonEP(x, missing = 6)
-
+}
+\seealso{
+\code{\link[=randomPersonEP]{randomPersonEP()}}, \code{\link[=exclusionPower]{exclusionPower()}}
 }
