@@ -49,7 +49,7 @@ incompatible with the typed relatives of the missing person.
 \details{
 This function is identical to \code{\link[=randomPersonEP]{randomPersonEP()}}, but with different argument
 names. This makes it consistent with \code{\link[=missingPersonIP]{missingPersonIP()}} and the other
-missing person functions.
+'missing person' functions.
 }
 \examples{
 

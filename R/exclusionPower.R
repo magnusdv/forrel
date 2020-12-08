@@ -296,14 +296,14 @@ exclusionPower = function(claimPed, truePed, ids, markers = NULL, source = "clai
     # If impossible in true, return NA
     if(trueBase[i] == 0) {
       if(verbose)
-        message("  *** INCOMPATIBLE WITH TRUE PEDIGREE ***\n  -> EP = NA")
+        message("*** INCOMPATIBLE WITH TRUE PEDIGREE ***\nEP = NA")
       return(rep(NA_real_, NI))
     }
 
     # If impossible in claim, return 1
     if(claimBase[i] == 0) {
       if(verbose)
-        message("  *** INCOMPATIBLE WITH CLAIMED PEDIGREE ***\n  -> EP = 1")
+        message("*** INCOMPATIBLE WITH CLAIMED PEDIGREE ***\nEP = 1")
       return(rep(1, NI))
     }
 
@@ -325,7 +325,7 @@ exclusionPower = function(claimPed, truePed, ids, markers = NULL, source = "clai
     }
 
     if(verbose)
-      message("  -> EP = ", paste(round(this.ep, 3), collapse = " "))
+      message("EP = ", paste(round(this.ep, 3), collapse = " "))
 
     this.ep
   }, FUN.VALUE = numeric(NI))

@@ -42,7 +42,7 @@
 randomPersonEP = function(x, id, markers = NULL, disableMutations = NA, verbose = TRUE) {
 
   if(!is.ped(x))
-    stop2("Expecting `x` to be a connected pedigree")
+    stop2("Expecting a connected pedigree")
 
   claimPed = relabel(x, old = id, new = "RAN")
   truePed = list(x, singleton("RAN", sex = getSex(x, id)))

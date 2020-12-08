@@ -6,7 +6,7 @@
 #'
 #' This function is identical to [randomPersonEP()], but with different argument
 #' names. This makes it consistent with [missingPersonIP()] and the other
-#' missing person functions.
+#' 'missing person' functions.
 #'
 #' @param reference A `ped` object with attached markers.
 #' @param missing The ID label of the missing pedigree member.
@@ -36,21 +36,7 @@
 #' @export
 missingPersonEP = function(reference, missing, markers = NULL, disableMutations = NA, verbose = TRUE) {
 
-  if(!is.ped(reference))
-    stop2("Expecting a connected pedigree as H1")
-
-  poiLabel = "_POI_"
-
-  relatedPed = relabel(reference, old = missing, new = poiLabel)
-  unrelatedPed = list(reference, singleton(poiLabel, sex = getSex(reference, missing)))
-
-  ep = exclusionPower(claimPed = relatedPed, truePed = unrelatedPed, ids = poiLabel,
-                      markers = markers, source = "claim", disableMutations = disableMutations,
-                      plot = FALSE, verbose = verbose)
-
-  # Change the `ids` entry from "_POI_" to `missing`
-  ep$params$ids = missing
-
-  ep
+  randomPersonEP(x = reference, id = missing, markers = markers,
+               disableMutations = disableMutations, verbose = verbose)
 }
 
