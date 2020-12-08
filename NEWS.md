@@ -1,3 +1,20 @@
+# forrel 1.2.0
+
+## New features
+
+* `kinshipLR()` now handles linked markers by wrapping MERLIN.
+
+* New functions `kappaBootstrap()` and `deltaBootstrap()` for assessing the uncertainty of pairwise relatedness estimates.
+
+* New function `randomPersonEP()` handling a common special case of `exclusionPower()`.
+
+## Other changes
+
+* forrel now depends on pedtools version 0.9.6.
+
+* Deprecated arguments `id.labels`and `frametitles` in `missingPersonPlot()` has been removed.
+
+
 # forrel 1.1.0
 
 ## New features
@@ -23,8 +40,7 @@
 
 ## New features
 
-* `readFam()` now has a parameter `Xchrom` which can be used to indicate that
-the markers included in the file are on the X chromosome
+* `readFam()` now has a parameter `Xchrom` which can be used to indicate that the markers included in the file are on the X chromosome
 
 * `MPPsims()` is more flexible, and allows subsetting of its output.
 
@@ -32,9 +48,7 @@ the markers included in the file are on the X chromosome
 
 ## Bug fixes
 
-* Fixed several glitches in `readFam()`. It is more robust now, and fails 
-gracefully in certain situations which cannot currently be handled (e.g. if 
-the file contains twins).
+* Fixed several glitches in `readFam()`. It is more robust now, and fails gracefully in certain situations which cannot currently be handled (e.g. if the file contains twins).
 
 
 # forrel 1.0.0
