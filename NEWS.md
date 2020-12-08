@@ -1,3 +1,6 @@
+# dev version
+
+
 # forrel 1.2.0
 
 ## New features
@@ -10,9 +13,9 @@
 
 ## Other changes
 
-* forrel now depends on pedtools version 0.9.6.
+* forrel now depends on version 0.9.6 (or later) of pedtools.
 
-* Deprecated arguments `id.labels`and `frametitles` in `missingPersonPlot()` has been removed.
+* Deprecated arguments `id.labels` and `frametitles` in `missingPersonPlot()` has been removed.
 
 
 # forrel 1.1.0
