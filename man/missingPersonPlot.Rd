@@ -19,8 +19,6 @@ missingPersonPlot(
   titles = c(expression(H[1] * ": POI = MP"), expression(H[2] * ": POI unrelated")),
   width = 4,
   newdev = interactive(),
-  id.labels = NULL,
-  frametitles = NULL,
   ...
 )
 }
@@ -61,8 +59,6 @@ specifically this number is the relative width of the reference pedigree,
 compared to a singleton. Default: 4.}
 
 \item{newdev}{A logical: If TRUE the plot is created in a new plot window.}
-
-\item{frametitles, id.labels}{Deprecated arguments.}
 
 \item{...}{Extra parameters passed on to \code{\link[pedtools:plotPedList]{pedtools::plotPedList()}}.}
 }

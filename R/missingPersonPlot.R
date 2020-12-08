@@ -54,7 +54,6 @@
 #'   specifically this number is the relative width of the reference pedigree,
 #'   compared to a singleton. Default: 4.
 #' @param newdev A logical: If TRUE the plot is created in a new plot window.
-#' @param frametitles,id.labels Deprecated arguments.
 #' @param ... Extra parameters passed on to [pedtools::plotPedList()].
 #'
 #' @return None
@@ -86,18 +85,7 @@ missingPersonPlot = function(reference, missing, labs = labels(reference),
                              POI.height = 8,
                              titles = c(expression(H[1] * ": POI = MP"),
                                         expression(H[2] * ": POI unrelated")),
-                             width = 4, newdev = interactive(),
-                             id.labels = NULL, frametitles = NULL, ...) {
-
-  if(!is.null(id.labels)) {
-    message("The `id.labels` argument is deprecated in favor of `labs`, and will be removed in a future version")
-    labs = id.labels
-  }
-
-  if(!is.null(frametitles)) {
-    message("The `frametitles` argument has been renamed to `titles`; please use this in new code.")
-    titles = frametitles
-  }
+                             width = 4, newdev = interactive(), ...) {
 
   if(!is.ped(reference))
     stop2("Expecting a connected pedigree as H1")
