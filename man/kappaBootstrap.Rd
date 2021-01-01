@@ -5,9 +5,9 @@
 \alias{deltaBootstrap}
 \title{Bootstrap estimation of IBD coefficients}
 \usage{
-kappaBootstrap(kappa, N, freqList, plot = TRUE)
+kappaBootstrap(kappa, N, freqList, plot = TRUE, seed = NULL)
 
-deltaBootstrap(delta, N, freqList)
+deltaBootstrap(delta, N, freqList, seed = NULL)
 }
 \arguments{
 \item{kappa, delta}{A probability vector of length 3 (kappa) or 9 (delta): The
@@ -20,6 +20,8 @@ each marker.}
 
 \item{plot}{A logical. If TRUE, the bootstrap kappa estimates are plotted in
 the IBD triangle.}
+
+\item{seed}{An integer seed for the random number generator (optional).}
 }
 \value{
 A data frame with \code{N} rows containing the bootstrap estimates. The

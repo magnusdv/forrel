@@ -15,6 +15,7 @@
 #'   each marker.
 #' @param plot A logical. If TRUE, the bootstrap kappa estimates are plotted in
 #'   the IBD triangle.
+#' @param seed An integer seed for the random number generator (optional).
 #'
 #' @return A data frame with `N` rows containing the bootstrap estimates. The
 #'   last column (`dist`) gives the euclidean distance to the input, viewed as a
@@ -43,14 +44,15 @@
 #' mean(boot2$dist)
 #'
 #' @export
-kappaBootstrap = function(kappa, N, freqList, plot = TRUE) {
+kappaBootstrap = function(kappa, N, freqList, plot = TRUE, seed = NULL) {
 
   # Insert default allele labels (1,2,3,...) where needed
   noNames = vapply(freqList, function(fr) is.null(names(fr)), logical(1))
   freqList[noNames] = lapply(freqList[noNames], function(fr) {names(fr) = seq_along(fr); fr})
 
   # Simulate genotypes
-  sims = profileSimParametric(kappa = kappa, N = N, freqList = freqList, returnValue = "alleles")
+  sims = profileSimParametric(kappa = kappa, N = N, freqList = freqList,
+                              seed = seed, returnValue = "alleles")
 
   # Bootstrap estimates
   boots = do.call(rbind, lapply(sims, function(als)
@@ -76,14 +78,14 @@ kappaBootstrap = function(kappa, N, freqList, plot = TRUE) {
 
 #' @rdname kappaBootstrap
 #' @export
-deltaBootstrap = function(delta, N, freqList) {
+deltaBootstrap = function(delta, N, freqList, seed = NULL) {
 
   # Insert default allele labels (1,2,3,...) where needed
   noNames = vapply(freqList, function(fr) is.null(names(fr)), logical(1))
   freqList[noNames] = lapply(freqList[noNames], function(fr) {names(fr) = seq_along(fr); fr})
 
   # Simulate genotypes
-  sims = profileSimParametric(delta = delta, N = N, freqList = freqList, returnValue = "alleles")
+  sims = profileSimParametric(delta = delta, N = N, freqList = freqList, seed = seed, returnValue = "alleles")
 
   # Bootstrap estimates
   boots = do.call(rbind, lapply(sims, function(als)
