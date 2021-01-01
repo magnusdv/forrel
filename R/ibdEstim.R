@@ -183,7 +183,7 @@ ibdEstim = function(x, ids = typedMembers(x), param = c("kappa", "delta"),
 
   df = data.frame(id1 = pair[1], id2 = pair[2], N = sum(keep),
                    rbind(par), d9 = 1 - sum(par),
-                   convergence = ML$res$message %||% "OK")
+                   convergence = ML$res$message %||% "OK", row.names = NULL)
 
   if(returnArgs)
     list(res = df, args = ML$args)
