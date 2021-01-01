@@ -44,7 +44,7 @@ error if any markers are inconsistent.
 mutations should be disabled.
 }}
 
-\item{seed}{A numeric seed for the random number generator (optional)}
+\item{seed}{An integer seed for the random number generator (optional).}
 
 \item{verbose}{A logical.}
 }

@@ -54,7 +54,7 @@ loop breakers. Relevant only if the pedigree has loops, and only if
 in the internal genotype-compatibility algorithm. Positive values can save
 time if \code{partialmarker} is non-NULL and the number of alleles is large.}
 
-\item{seed}{NULL, or a numeric seed for the random number generator.}
+\item{seed}{An integer seed for the random number generator (optional).}
 
 \item{verbose}{A logical.}
 }

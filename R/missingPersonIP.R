@@ -4,7 +4,7 @@
 #' @param nsim A positive integer: the number of simulations
 #' @param threshold A numeric vector with one or more positive numbers used as
 #'   the likelihood ratio thresholds for inclusion
-#' @param seed A numeric seed for the random number generator (optional)
+#' @param seed An integer seed for the random number generator (optional).
 #'
 #' @return A `mpIP` object, which is essentially a list with the following
 #'   entries:

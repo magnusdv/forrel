@@ -57,7 +57,7 @@ mutations should be disabled.
 
 \item{numCores}{The number of cores used for parallelisation, by default 1.}
 
-\item{seed}{A numeric seed for the random number generator (optional)}
+\item{seed}{An integer seed for the random number generator (optional).}
 
 \item{verbose}{A logical.}
 }

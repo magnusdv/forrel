@@ -39,7 +39,7 @@ in order:
 \item{afreq}{A numeric vector with allele frequencies, possibly named with
 allele labels.}
 
-\item{seed}{NULL, or a numeric seed for the random number generator.}
+\item{seed}{An integer seed for the random number generator (optional).}
 
 \item{returnValue}{Either "singleton" (default) or "alleles". (see Value).}
 }

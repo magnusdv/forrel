@@ -34,7 +34,7 @@ genotypes should be simulated.}
 \item{mutmod}{a \code{\link[pedmut:mutationModel]{pedmut::mutationModel()}} object, i.e., list of mutation
 matrices named 'female' and 'male'.}
 
-\item{seed}{NULL, or a numeric seed for the random number generator.}
+\item{seed}{An integer seed for the random number generator (optional).}
 
 \item{verbose}{a logical.}
 }

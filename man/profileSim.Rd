@@ -29,7 +29,7 @@ attached markers are used. The simulations will be conditional on the locus
 attributes (allele frequencies, mutation models a.s.o.) and any existing
 genotypes in the indicated markers.}
 
-\item{seed}{NULL, or a numeric seed for the random number generator.}
+\item{seed}{An integer seed for the random number generator (optional).}
 
 \item{numCores}{The number of cores used for parallelisation, by default 1.}
 

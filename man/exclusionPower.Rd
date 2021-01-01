@@ -61,7 +61,7 @@ calculated for markers whose number of alleles is less or equal to
 \item{nsim}{A positive integer; the number of simulations used for markers
 whose number of alleles exceeds \code{exactMaxL}.}
 
-\item{seed}{A numeric seed for the random number generator (optional).}
+\item{seed}{An integer seed for the random number generator (optional).}
 
 \item{alleles, afreq, Xchrom}{If these are given, they are used (together with
 \code{knownGenotypes}) to create a marker object on the fly.}

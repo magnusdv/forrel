@@ -37,7 +37,7 @@
 #' @param eliminate A non-negative integer, indicating the number of iterations
 #'   in the internal genotype-compatibility algorithm. Positive values can save
 #'   time if `partialmarker` is non-NULL and the number of alleles is large.
-#' @param seed NULL, or a numeric seed for the random number generator.
+#' @param seed An integer seed for the random number generator (optional).
 #' @param verbose A logical.
 #' @return A `ped` object equal to `x` except its `MARKERS` entry, which
 #'   consists of the `N` simulated markers.
@@ -487,7 +487,7 @@ markerSim = function(x, N = 1, ids = NULL, alleles = NULL, afreq = NULL,
 #' @param Xchrom a logical: X linked markers or not?
 #' @param mutmod a [pedmut::mutationModel()] object, i.e., list of mutation
 #'   matrices named 'female' and 'male'.
-#' @param seed NULL, or a numeric seed for the random number generator.
+#' @param seed An integer seed for the random number generator (optional).
 #' @param verbose a logical.
 #' @return a `ped` object equal to `x` in all respects except its `MARKERS`
 #'   entry, which consists of the `N` simulated markers.

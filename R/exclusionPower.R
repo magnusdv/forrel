@@ -42,7 +42,7 @@
 #'   `exactMaxL`; remaining markers are handled by simulation.
 #' @param nsim A positive integer; the number of simulations used for markers
 #'   whose number of alleles exceeds `exactMaxL`.
-#' @param seed A numeric seed for the random number generator (optional).
+#' @param seed An integer seed for the random number generator (optional).
 #' @param alleles,afreq,Xchrom If these are given, they are used (together with
 #'   `knownGenotypes`) to create a marker object on the fly.
 #' @param knownGenotypes A list of triplets `(a, b, c)`, indicating that

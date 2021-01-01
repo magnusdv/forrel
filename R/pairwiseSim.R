@@ -36,7 +36,7 @@
 #'
 #' @param afreq A numeric vector with allele frequencies, possibly named with
 #'   allele labels.
-#' @param seed NULL, or a numeric seed for the random number generator.
+#' @param seed An integer seed for the random number generator (optional).
 #' @param returnValue Either "singleton" (default) or "alleles". (see Value).
 #'
 #'

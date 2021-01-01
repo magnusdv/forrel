@@ -20,7 +20,7 @@
 #' @param disableMutations Not implemented yet.
 #' @param alleles,afreq,Xchrom If these are given, they are used (together with
 #'   `knownGenotypes`) to create a marker object on the fly.
-#' @param seed A numeric seed for the random number generator (optional).
+#' @param seed An integer seed for the random number generator (optional).
 #'
 #' @return A `LRpowerResult` object, which is essentially a list with the
 #'   following entries:

@@ -61,7 +61,7 @@ plot is drawn, but no further computations are done.}
 \item{plotMarkers}{A vector of marker names or indices whose genotypes are to
 be included in the plot.}
 
-\item{seed}{A numeric seed for the random number generator (optional).}
+\item{seed}{An integer seed for the random number generator (optional).}
 
 \item{verbose}{A logical.}
 }
