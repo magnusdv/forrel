@@ -181,7 +181,7 @@ markerSim = function(x, N = 1, ids = NULL, alleles = NULL, afreq = NULL,
 
   if (loops <- x$UNBROKEN_LOOPS) {
     orig_ids = labels(x)
-    x = breakLoops(setMarkers(x, m), loop_breakers = loopBreakers, verbose = verbose)
+    x = breakLoops(setMarkers(x, m), loopBreakers = loopBreakers, verbose = verbose)
     m = x$MARKERS[[1]]
     loopBreakers = labels(x)[x$LOOP_BREAKERS[, 'orig']] # NB: LOOP_BREAKERS are internal ints
     gridlist = gridlist[sort.int(match(c(orig_ids, loopBreakers), orig_ids))]
