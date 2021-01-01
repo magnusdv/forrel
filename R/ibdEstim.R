@@ -329,7 +329,7 @@ ibdEstim = function(x, ids = typedMembers(x), param = c("kappa", "delta"),
       stop2("`start` must have length 2 or 3")
 
     # If necessary, pull inside
-    if(any(start < 1-6))
+    if(any(start < 1e-6))
       start = (1 - 1e-6) * start + 1e-6 * c(1/3, 1/3, 1/3)
 
     # Project to 2-dim and fix names
