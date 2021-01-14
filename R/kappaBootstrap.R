@@ -5,21 +5,24 @@
 #' individuals) and the 9 condensed identity coefficients are supported.
 #'
 #' In each replication, profiles for two individuals are simulated under the
-#' input coefficients, and their relationship is re-estimated with [ibdEstim()].
+#' input coefficients, and their relationship is re-estimated with
+#' [ibdEstimate()].
 #'
-#'
-#' @param kappa,delta A probability vector of length 3 (kappa) or 9 (delta): The
-#'   coefficients under which simulations are performed.
+#' @param kappa,delta Probability vectors of length 3 (kappa) or 9 (delta): The
+#'   coefficients under which simulations are performed. Either `kappa` or
+#'   `delta` (but not both) must be given.
 #' @param N The number of simulations.
 #' @param freqList A list of probability vectors: The allele frequencies for
 #'   each marker.
-#' @param plot A logical. If TRUE, the bootstrap kappa estimates are plotted in
-#'   the IBD triangle.
+#' @param plot A logical, only relevant if `kappa` is non-NULL. If TRUE, the
+#'   bootstrap estimates are plotted in the IBD triangle.
 #' @param seed An integer seed for the random number generator (optional).
 #'
 #' @return A data frame with `N` rows containing the bootstrap estimates. The
 #'   last column (`dist`) gives the euclidean distance to the input, viewed as a
 #'   point in R^3 (kappa) or R^9 (delta).
+#'
+#' @seealso [ibdEstimate()]
 #'
 #' @examples
 #'
@@ -30,7 +33,7 @@
 #' N = 5
 #'
 #' # Bootstrap estimates for kappa of full siblings
-#' boot1 = kappaBootstrap(c(0.25, .5, .25), N = N, freqList = freqList)
+#' boot1 = ibdBootstrap(kappa = c(0.25, .5, .25), N = N, freqList = freqList)
 #' boot1
 #'
 #' # Mean deviation
@@ -38,7 +41,7 @@
 #'
 #' # Same, but with the 9 identity coefficients.
 #' delta = c(0, 0, 0, 0, 0, 0, .25, .5, .25)
-#' boot2 = deltaBootstrap(delta, N = N, freqList = freqList)
+#' boot2 = ibdBootstrap(delta = delta, N = N, freqList = freqList)
 #'
 #' # Mean deviation
 #' mean(boot2$dist)
@@ -56,7 +59,7 @@ kappaBootstrap = function(kappa, N, freqList, plot = TRUE, seed = NULL) {
 
   # Bootstrap estimates
   boots = do.call(rbind, lapply(sims, function(als)
-    .ibdEstimFromAlleles(als, freqList, param = "kappa", start = kappa)))
+    .ibdEstimFromAlleles_OLD(als, freqList, param = "kappa", start = kappa)))
 
   # Plot
   if(plot) showInTriangle(boots)
@@ -89,7 +92,7 @@ deltaBootstrap = function(delta, N, freqList, seed = NULL) {
 
   # Bootstrap estimates
   boots = do.call(rbind, lapply(sims, function(als)
-    .ibdEstimFromAlleles(als, freqList, param = "delta", start = delta)))
+    .ibdEstimFromAlleles_OLD(als, freqList, param = "delta", start = delta)))
 
   coeffCols = boots[paste0("d", 1:9)]
 
@@ -106,7 +109,7 @@ deltaBootstrap = function(delta, N, freqList, seed = NULL) {
   res
 }
 
-.ibdEstimFromAlleles = function(als, freqList, param, start = NULL) {
+.ibdEstimFromAlleles_OLD = function(als, freqList, param, start = NULL) {
   # NB: als is a list of 4 vectors with true (not internal) alleles
   # Therefore: Need the allele names in each freqList vector
 
@@ -121,9 +124,61 @@ deltaBootstrap = function(delta, N, freqList, seed = NULL) {
   dat = list(list(a1 = als$a, a2 = als$b, f1 = freqMat[1, ], f2 = freqMat[2, ]),
              list(a1 = als$c, a2 = als$d, f1 = freqMat[3, ], f2 = freqMat[4, ]))
 
-  if(param == "kappa")
+   if(param == "kappa")
     .kappaEstim(dat, start = start, reltol = 1e-12)
-  else
+   else
     .deltaEstim(dat, start = start, reltol = 1e-12)
+}
+
+
+
+### NY
+#' @rdname kappaBootstrap
+#' @export
+ibdBootstrap = function(kappa = NULL, delta = NULL, N, freqList, plot = TRUE, seed = NULL) {
+
+  coefs = kappa %||% delta
+  param = if(!is.null(kappa)) "kappa" else "delta"
+
+  # Insert default allele labels (1,2,3,...) where needed
+  noNames = vapply(freqList, function(fr) is.null(names(fr)), logical(1))
+  freqList[noNames] = lapply(freqList[noNames], function(fr) {names(fr) = seq_along(fr); fr})
+
+  # Simulate genotypes
+  sims = profileSimParametric(kappa = kappa, delta = delta, N = N, freqList = freqList,
+                              seed = seed, returnValue = "alleles")
+
+  # Bootstrap estimates
+  boots = do.call(rbind, lapply(sims, function(als)
+    .ibdEstimFromAlleles(als, freqList, param = param, start = coefs)))
+
+  # Plot
+  if(plot && !is.null(kappa)) showInTriangle(boots)
+
+  coeffCols = boots[-(1:3)]
+
+  # Euclidean distance from given coeffs
+  dist = sqrt(colSums((t.default(as.matrix(coeffCols)) - coefs)^2))
+
+  # Build output
+  res = cbind(coeffCols, dist = dist)
+
+  res
+}
+
+.ibdEstimFromAlleles = function(als, freqList, param, start = NULL) {
+  # NB: als is a list of 4 vectors with true (not internal) alleles
+  # Therefore: Need the allele names in each freqList vector
+
+  alsMat = do.call(rbind, als)
+  freqMat = vapply(seq_along(freqList),
+                   function(i) freqList[[i]][alsMat[, i]],
+                   FUN.VALUE = numeric(4))
+
+  # Same format as .getAlleleData2()
+  dat = list(list(a1 = als$a, a2 = als$b, f1 = freqMat[1, ], f2 = freqMat[2, ]),
+             list(a1 = als$c, a2 = als$d, f1 = freqMat[3, ], f2 = freqMat[4, ]))
+
+  .PGD(dat, param = param, start = start)$estimate
 }
 

@@ -3,23 +3,27 @@
 \name{kappaBootstrap}
 \alias{kappaBootstrap}
 \alias{deltaBootstrap}
+\alias{ibdBootstrap}
 \title{Bootstrap estimation of IBD coefficients}
 \usage{
 kappaBootstrap(kappa, N, freqList, plot = TRUE, seed = NULL)
 
 deltaBootstrap(delta, N, freqList, seed = NULL)
+
+ibdBootstrap(kappa = NULL, delta = NULL, N, freqList, plot = TRUE, seed = NULL)
 }
 \arguments{
-\item{kappa, delta}{A probability vector of length 3 (kappa) or 9 (delta): The
-coefficients under which simulations are performed.}
+\item{kappa, delta}{Probability vectors of length 3 (kappa) or 9 (delta): The
+coefficients under which simulations are performed. Either \code{kappa} or
+\code{delta} (but not both) must be given.}
 
 \item{N}{The number of simulations.}
 
 \item{freqList}{A list of probability vectors: The allele frequencies for
 each marker.}
 
-\item{plot}{A logical. If TRUE, the bootstrap kappa estimates are plotted in
-the IBD triangle.}
+\item{plot}{A logical, only relevant if \code{kappa} is non-NULL. If TRUE, the
+bootstrap estimates are plotted in the IBD triangle.}
 
 \item{seed}{An integer seed for the random number generator (optional).}
 }
@@ -35,7 +39,8 @@ individuals) and the 9 condensed identity coefficients are supported.
 }
 \details{
 In each replication, profiles for two individuals are simulated under the
-input coefficients, and their relationship is re-estimated with \code{\link[=ibdEstim]{ibdEstim()}}.
+input coefficients, and their relationship is re-estimated with
+\code{\link[=ibdEstimate]{ibdEstimate()}}.
 }
 \examples{
 
@@ -46,7 +51,7 @@ freqList = NorwegianFrequencies[1:15]
 N = 5
 
 # Bootstrap estimates for kappa of full siblings
-boot1 = kappaBootstrap(c(0.25, .5, .25), N = N, freqList = freqList)
+boot1 = ibdBootstrap(kappa = c(0.25, .5, .25), N = N, freqList = freqList)
 boot1
 
 # Mean deviation
@@ -54,9 +59,12 @@ mean(boot1$dist)
 
 # Same, but with the 9 identity coefficients.
 delta = c(0, 0, 0, 0, 0, 0, .25, .5, .25)
-boot2 = deltaBootstrap(delta, N = N, freqList = freqList)
+boot2 = ibdBootstrap(delta = delta, N = N, freqList = freqList)
 
 # Mean deviation
 mean(boot2$dist)
 
+}
+\seealso{
+\code{\link[=ibdEstimate]{ibdEstimate()}}
 }
