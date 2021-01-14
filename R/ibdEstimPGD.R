@@ -137,8 +137,8 @@ ibdEstimate = function(x, ids = typedMembers(x), param = c("kappa", "delta"),
   res
 }
 
-.PGD = function(dat = NULL, param, start, tol = sqrt(.Machine$double.eps), verbose = FALSE,
-                beta = 0.5, sigma = 0.5, maxit = 500, x = NULL, ids = NULL) {
+.PGD = function(dat = NULL, param, start, tol = sqrt(.Machine$double.eps),
+                beta = 0.5, sigma = 0.5, maxit = 500, x = NULL, ids = NULL, verbose = FALSE) {
   if(is.null(dat))
     dat = .getAlleleData2(x, ids = ids)
 
