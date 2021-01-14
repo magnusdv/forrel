@@ -209,8 +209,9 @@ ibdEstim = function(x, ids = typedMembers(x), param = c("kappa", "delta"),
     else if(L != 9)
       stop2("`p` must have length 8 or 9 when `param = 'delta'`")
   }
+  res = as.numeric(p %*% likelMat)
 
-  as.numeric(p %*% likelMat)
+  res
 }
 
 # Prepare data for fast computation of IBD likelihood
@@ -314,7 +315,7 @@ ibdEstim = function(x, ids = typedMembers(x), param = c("kappa", "delta"),
 }
 
 #' @importFrom stats constrOptim
-.maxlik = function(loglik, grad, start, param = c("kappa", "delta"),
+.maxlik = function(loglik, grad, start = NULL, param = c("kappa", "delta"),
                    reltol, ...) {
   param = match.arg(param)
 
@@ -362,29 +363,11 @@ ibdEstim = function(x, ids = typedMembers(x), param = c("kappa", "delta"),
     ci = c(rep(0, 8), -1)
   }
 
-  args = list(theta = start, f = loglik, grad = grad, ui = ui, ci = ci,
+  arg = list(theta = start, f = loglik, grad = grad, ui = ui, ci = ci,
               control = list(fnscale = -1, maxit = 1000, reltol = reltol), ...)
 
-  res = do.call(constrOptim, args)
+  res = do.call(constrOptim, arg)
 
-  list(res = res, args = args)
-}
-
-
-
-# NOT YET USED
-# This function would be needed to implement the "projected gradient method",
-# for optimising over the probability simplex.
-# Project any vector in R^D onto the probability simplex.
-# Algorithm found in Wang et al. (2013): Projection onto the probability simplex.
-simplexProject = function(y) {
-  D = length(y)
-  u = sort.default(y, decreasing = TRUE, method = "shell")
-  v = u + 1/seq_len(D) * (1 - cumsum(u))
-  p = match(T, v <= 0, nomatch = D+1) - 1
-  lambda = 1/p * (1 - sum(u[1:p]))
-  x = y + lambda
-  x[x < 0] = 0
-  x
+  list(res = res, args = arg)
 }
 
