@@ -23,7 +23,7 @@
 #'   pedigree-based ones.
 #'
 #' @author Magnus Dehli Vigeland
-#' @seealso [IBDestimate()]
+#' @seealso [ibdEstimate()]
 #'
 #' @examples
 #'
@@ -54,7 +54,7 @@
 #' @export
 checkPairwise = function(x, plot = TRUE, labels = FALSE, LRthreshold = 1000, ...) {
   # Estimated coefficients
-  kEst = IBDestimate(x)
+  kEst = ibdEstimate(x)
 
   # Pedigree coefficients
   if(is.ped(x)) {

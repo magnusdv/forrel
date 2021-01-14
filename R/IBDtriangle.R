@@ -67,7 +67,7 @@
 #'   after plotting, which may be useful for adding additional annotation.
 #' @return None
 #' @author Magnus Dehli Vigeland
-#' @seealso [IBDestimate()]
+#' @seealso [ibdEstimate()]
 #' @references
 #'
 #' * E. A. Thompson (1975). _The estimation of pairwise relationships._ Annals

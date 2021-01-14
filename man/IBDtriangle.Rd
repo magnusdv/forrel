@@ -115,7 +115,7 @@ relationships.} Annals of Human Genetics 40.
 }
 }
 \seealso{
-\code{\link[=IBDestimate]{IBDestimate()}}
+\code{\link[=ibdEstimate]{ibdEstimate()}}
 }
 \author{
 Magnus Dehli Vigeland

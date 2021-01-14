@@ -62,7 +62,7 @@ checkPairwise(x, labels = TRUE)
 
 }
 \seealso{
-\code{\link[=IBDestimate]{IBDestimate()}}
+\code{\link[=ibdEstimate]{ibdEstimate()}}
 }
 \author{
 Magnus Dehli Vigeland
