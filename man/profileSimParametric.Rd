@@ -11,7 +11,7 @@ profileSimParametric(
   N = 1,
   freqList = NULL,
   seed = NULL,
-  returnValue = c("singletons", "alleles", "genotypes")
+  returnValue = c("singletons", "alleles", "genotypes", "internal")
 )
 }
 \arguments{

@@ -221,7 +221,7 @@ ibdEstimate = function(x, ids = typedMembers(x), param = c("kappa", "delta"),
         ak.try = ak/beta
         if(verbose) message("Increasing ak to ", ak.try)
         y.try = simplexProject(xk + ak.try * gr)
-        if(!isTRUE(ARMIJO(y.try)))
+        if(all(abs(y.try - y) < tol) || !isTRUE(ARMIJO(y.try)))
           break
         ak = ak.try
         y = y.try
@@ -260,12 +260,13 @@ ibdEstimate = function(x, ids = typedMembers(x), param = c("kappa", "delta"),
   list(estimate = res, iter = k, loglik = LL$loglik)
 }
 
-stationary = function(x, grad, tol) {
-  #print(grad,digits = 12);print(max(sapply(seq_along(x), function(i) {xi = x; xi[i] = x[i] - 1; grad %*% xi})))
-  for(i in seq_along(x)) {
-    xi = x
-    xi[i] = x[i] - 1
-    if(grad %*% xi < -tol)
+stationary = function(p, grad, tol) {
+  # print(grad,digits = 12)
+  # print(sapply(seq_along(p), function(i) {pi = p; pi[i] = p[i] - 1; grad %*% pi}))
+  for(i in seq_along(p)) {
+    pi = p
+    pi[i] = p[i] - 1
+    if(grad %*% pi < -tol)
       return(FALSE)
   }
   TRUE

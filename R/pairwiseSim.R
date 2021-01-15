@@ -65,7 +65,7 @@
 #' @export
 markerSimParametric = function(kappa = NULL, delta = NULL, states = NULL,
                                N = 1, alleles = NULL, afreq = NULL, seed = NULL,
-                               returnValue = c("singletons", "alleles", "genotypes")) {
+                               returnValue = c("singletons", "alleles", "genotypes", "internal")) {
   if(!is.null(seed))
     set.seed(seed)
 
@@ -129,7 +129,9 @@ markerSimParametric = function(kappa = NULL, delta = NULL, states = NULL,
                                                   dimnames = list(1:2, NULL)),
                             locusAttributes = list(afreq = afreq)),
     genotypes = list(paste(.a, .b, sep="/"), paste(.c, .d, sep="/")),
-    alleles = list(a = .a, b = .b, c = .c, d = .d))
+    alleles = list(a = .a, b = .b, c = .c, d = .d),
+    internal = list(a = match(.a, alleles), b = match(.b, alleles),
+                    c = match(.c, alleles), d = match(.d, alleles)))
 }
 
 
@@ -154,30 +156,35 @@ markerSimParametric = function(kappa = NULL, delta = NULL, states = NULL,
 #' @export
 profileSimParametric = function(kappa = NULL, delta = NULL, states = NULL,
                                 N = 1, freqList = NULL, seed = NULL,
-                                returnValue = c("singletons", "alleles", "genotypes")) {
+                                returnValue = c("singletons", "alleles", "genotypes", "internal")) {
   if(!is.null(seed))
     set.seed(seed)
 
+  returnValue = match.arg(returnValue)
+
   # Iterate over loci, make N simulations of each. For each locus,
   # store sims as matrix (4 * Nsim) for simplicity later
+  retval = if(returnValue %in% c("singletons", "genotypes")) "alleles" else returnValue
   sims_markerwise = lapply(seq_along(freqList), function(i) {
     markeri = markerSimParametric(kappa = kappa, delta = delta, states = states[i],
-                                N = N, afreq = freqList[[i]], returnValue = "alleles")
+                                N = N, afreq = freqList[[i]], returnValue = retval)
     do.call(rbind, markeri)
   })
 
   # For each sim, extract corresponding column from each locus.
   # Output each sim as list of 4 vectors (as markerSimParametric)
   sims = lapply(1:N, function(i)
-    vapply(sims_markerwise, function(locsim) locsim[, i], FUN.VALUE = character(4)))
+    vapply(sims_markerwise, function(locsim) locsim[, i],
+           FUN.VALUE = if(returnValue == "internal") integer(4) else character(4)))
 
   # Return
-  switch(match.arg(returnValue),
+  switch(returnValue,
     singletons = lapply(sims, function(s)
         setMarkers(list(singleton(1), singleton(2)),
                    alleleMatrix = matrix(s[c(1,3,2,4), ], nrow = 2, dimnames = list(1:2, NULL)),
                    locusAttributes = freqList)),
     genotypes = lapply(sims, function(s) list(paste(s[1,], s[2,], sep = "/"),
                                               paste(s[3,], s[4,], sep = "/"))),
-    alleles = lapply(sims, function(s) list(a = s[1,], b = s[2,], c = s[3,], d = s[4,])))
+    alleles =,
+    internal = lapply(sims, function(s) list(a = s[1,], b = s[2,], c = s[3,], d = s[4,])))
 }

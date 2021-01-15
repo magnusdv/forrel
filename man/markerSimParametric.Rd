@@ -12,7 +12,7 @@ markerSimParametric(
   alleles = NULL,
   afreq = NULL,
   seed = NULL,
-  returnValue = c("singletons", "alleles", "genotypes")
+  returnValue = c("singletons", "alleles", "genotypes", "internal")
 )
 }
 \arguments{

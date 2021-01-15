@@ -146,7 +146,7 @@ ibdBootstrap = function(kappa = NULL, delta = NULL, N, freqList, plot = TRUE, se
 
   # Simulate genotypes
   sims = profileSimParametric(kappa = kappa, delta = delta, N = N, freqList = freqList,
-                              seed = seed, returnValue = "alleles")
+                              seed = seed, returnValue = "internal")
 
   # Bootstrap estimates
   boots = do.call(rbind, lapply(sims, function(als)
