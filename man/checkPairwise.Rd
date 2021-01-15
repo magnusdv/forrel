@@ -29,7 +29,7 @@ pedigree-based ones.
 }
 \description{
 This function provides a convenient way to check for pedigree errors, given
-the available marker data. The function calls \code{\link[=IBDestimate]{IBDestimate()}} to estimate IBD
+the available marker data. The function calls \code{\link[=ibdEstimate]{ibdEstimate()}} to estimate IBD
 coefficients for all pairs of typed pedigree members, and computes the
 likelihood ratio (LR) comparing each estimate to the coefficients implied by
 the pedigree. By default, the estimates are shown in a colour-coded plot
