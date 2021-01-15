@@ -15,7 +15,7 @@
 #' @param LRthreshold A positive number (default: 1000). IBD estimates whose LR
 #'   exceed this, when compared to the coefficients implied by the pedigree, are
 #'   encircled in the plot.
-#' @param ... further parameters passed on to [ribd::ibdTriangle()].
+#' @param ... Further parameters passed on to [ribd::ibdTriangle()].
 #'
 #' @return A data frame containing both the estimated and pedigree-based IBD
 #'   coefficients for each pair of typed individuals. The last column contains

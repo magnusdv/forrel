@@ -19,7 +19,7 @@ IBD triangle plot.}
 exceed this, when compared to the coefficients implied by the pedigree, are
 encircled in the plot.}
 
-\item{...}{further parameters passed on to \code{\link[ribd:ibdTriangle]{ribd::ibdTriangle()}}.}
+\item{...}{Further parameters passed on to \code{\link[ribd:ibdTriangle]{ribd::ibdTriangle()}}.}
 }
 \value{
 A data frame containing both the estimated and pedigree-based IBD
