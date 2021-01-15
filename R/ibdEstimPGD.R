@@ -18,7 +18,7 @@
 #' R^8, using the first 8 coefficients.
 #'
 #' The implementation optimises the log-likelihood using a projected gradient
-#' descent with Armijo line search.
+#' descent algorithm, combined with a version of Armijo line search.
 #'
 #' @param x A `ped` object or a list of such.
 #' @param ids Either a vector with ID labels, or a data frame/matrix with two
@@ -35,8 +35,13 @@
 #'   the initial value of for the optimisation. By default, `start` is set to
 #'   `(1/3, 1/3, 1/3)` if `param = "kappa"` and `(1/9, ..., 1/9)` if `param =
 #'   "delta"`.
-#' @param tol,beta,sigma Control parameters for the optimisation routine. These
-#'   can usually be left untouched.
+#' @param tol,beta,sigma Control parameters for the optimisation routine; can
+#'   usually be left untouched.
+#' @param contourPlot A logical. If TRUE, contours of the log-likelihood
+#'   function are plotted overlaying the IBD triangle.
+#' @param levels (Only relevant if `contourPlot = TRUE`.) A numeric vector of
+#'   levels at which to draw contour lines. If NULL (default), the levels are
+#'   chosen automatically.
 #' @param verbose A logical.
 #'
 #' @return If `param = "kappa"`: A data frame with 6 columns: `id1`, `id2`, `N`
@@ -66,9 +71,11 @@
 #' # Simulate 100 markers
 #' x = markerSim(x, N = 100, alleles = 1:4, seed = 123, verbose = FALSE)
 #'
-#' # Estimate Delta (expectation = (0,0,0,0,0,0,1/4,1/2,1/4))
+#' # Estimate kappa (expectation: (0.25, 0.5, 0.25)
 #' ibdEstimate(x, ids = 3:4)
 #'
+#' # Plot contours of the log-likelihood function
+#' ibdEstimate(x, ids = 3:4, contourPlot = TRUE)
 #'
 #' ### Example 2: Full sib mating
 #' y = fullSibMating(1)
@@ -83,7 +90,8 @@
 #' @export
 ibdEstimate = function(x, ids = typedMembers(x), param = c("kappa", "delta"),
                        markers = NULL, start = NULL, tol = sqrt(.Machine$double.eps),
-                       beta = 0.5, sigma = 0.5, verbose = FALSE) {
+                       beta = 0.5, sigma = 0.5, contourPlot = FALSE, levels = NULL,
+                       verbose = FALSE) {
   st = Sys.time()
   param = match.arg(param)
 
@@ -121,14 +129,24 @@ ibdEstimate = function(x, ids = typedMembers(x), param = c("kappa", "delta"),
 
   # Estimate each pair
   res = lapply(pairs, function(pair) {
-    if(verbose) message(sprintf("  %s: ", paste(pair, collapse = " vs. ")), appendLF = FALSE)
+    if(verbose)
+      message(sprintf("  %s: ", paste(pair, collapse = " vs. ")), appendLF = FALSE)
+
     est = .PGD(alleleData[pair], param = param, start = start, tol = tol, beta = beta, sigma = sigma)
+
     if(verbose)
       message(sprintf("%d iterations; estimate = (%s)", est$iter, rst(est$estimate[-(1:3)], 3)))
+
     est$estimate
   })
 
   res = do.call(rbind, res)
+
+  if(contourPlot) {
+    if(param == "delta")
+      stop2("Contour plot is available only for 'kappa' estimation")
+    contoursKappaML(x, allids, levels = levels)
+  }
 
   if(verbose)
     message("Total time: ", format(Sys.time() - st, digits = 3))
@@ -139,9 +157,10 @@ ibdEstimate = function(x, ids = typedMembers(x), param = c("kappa", "delta"),
 
 .PGD = function(dat = NULL, param, start, tol = sqrt(.Machine$double.eps),
                 beta = 0.5, sigma = 0.5, maxit = 500, x = NULL, ids = NULL, verbose = FALSE) {
+
+  # Simplify running this function on its own, with `x` and `ids` (for debugging purposes)
   if(is.null(dat))
     dat = .getAlleleData2(x, ids = ids)
-
 
   pair = names(dat) %||% c("_1", "_2")
 
@@ -153,7 +172,7 @@ ibdEstimate = function(x, ids = typedMembers(x), param = c("kappa", "delta"),
   # Coordinate-wise likelihoods: P(G_j | IBD = i)
   wei = .likelihoodWeights(dat, param = param)
 
-  # Log-likelihood function: Input (k0, k2)
+  # Log-likelihood function: Input full-dimensional kappa or delta
   loglik = function(p, grad = FALSE) {
     liks = as.numeric(p %*% wei)
     if(!grad)
@@ -183,11 +202,10 @@ ibdEstimate = function(x, ids = typedMembers(x), param = c("kappa", "delta"),
     ARMIJO = function(y) {
       LHS = loglik(y)
       RHS = ll + sigma * as.numeric(gr %*% (y - xk))
-      if(verbose) message("Armijo: y = ", rst(y,5), "; LHS = ", rst(LHS,5),
-                          "; Diff = ", LHS - RHS)
+      if(verbose)
+        message("Armijo: y = ", rst(y,5), "; LHS = ", rst(LHS,5), "; Diff = ", LHS - RHS)
       if(abs(LHS - RHS) < tol)
         return(NA)
-
       LHS > RHS
     }
 
@@ -203,7 +221,7 @@ ibdEstimate = function(x, ids = typedMembers(x), param = c("kappa", "delta"),
         ak.try = ak/beta
         if(verbose) message("Increasing ak to ", ak.try)
         y.try = simplexProject(xk + ak.try * gr)
-        if(!isTRUE(ARMIJO(y.try)))  # all(abs(y.try - y) < tol) ||
+        if(!isTRUE(ARMIJO(y.try)))
           break
         ak = ak.try
         y = y.try
@@ -216,7 +234,6 @@ ibdEstimate = function(x, ids = typedMembers(x), param = c("kappa", "delta"),
         ak = ak * beta
         if(verbose) message("Decreasing ak to ", ak)
         y = simplexProject(xk + ak * gr)
-        #a = loglik(y); print(ll-a)
         if(!isFALSE(ARMIJO(y)))
           break
       }
@@ -267,6 +284,67 @@ simplexProject = function(y) {
   x
 }
 
+# Plot contour lines for the ML function when estimating kappa.
+# This function is (optionally) called from within `ibdEstimate()`.
+#' @importFrom stats quantile
+contoursKappaML = function(x, ids, peak = NA, levels = NULL) {
+  ids = as.character(ids)
+  if(length(ids) != 2)
+    stop2("Contour plots require `ids` to be a single pair of individuals")
+
+  dat = .getAlleleData2(x, ids = ids)
+
+  if(isTRUE(is.na(peak))) {
+    peak = ibdEstimate(x, ids, param = "kappa", verbose = FALSE)
+    peak = c(peak$k0, peak$k2)
+  }
+
+  # Remove missing
+  keep = !is.na(dat[[1]]$f1) & !is.na(dat[[2]]$f2)
+  if(!all(keep))
+    dat = list(lapply(dat[[1]], `[`, keep), lapply(dat[[2]], `[`, keep))
+
+  # Coordinate-wise likelihoods: P(G_j | IBD = i)
+  wei = .likelihoodWeights(dat, param = "kappa")
+
+  # Log-likelihood function: Input full-dimensional kappa
+  loglik = function(k0, k2) sum(log(as.numeric(c(k0, 1 - k0 - k2, k2) %*% wei)))
+
+  n = 51
+  k0 = seq(0, 1, length.out = n)
+  k2 = seq(0, 1, length.out = n)
+
+  loglikMat = matrix(NA_real_, ncol = n, nrow = n)
+  for(i in 1:n) for(j in seq_len(n-i))
+    loglikMat[i,j] = loglik(k0[i], k2[j])
+
+  if(is.null(levels)) {
+    ll = as.numeric(loglikMat)
+    ll = ll[ll > -Inf & !is.na(ll)]
+
+    # nice set of quantiles
+    levs = quantile(ll, c(0.10, 0.23, 0.36, 0.49, 0.62, 0.75, 0.88, 0.945, 0.985))
+
+    # round maximally without distorting diffs too much
+    d = 6
+    while(TRUE) {
+      rlevs = unique.default(round(levs, d))
+      if(length(rlevs) < length(levs))
+        break
+      diffchange = (diff(rlevs) - diff(levs))/diff(levs)
+      if(any(abs(diffchange) > 0.1))
+        break
+      d = d - 1
+    }
+
+    levels = unique.default(round(levs, d+1))
+  }
+
+  ribd::ibdTriangle()
+  contour(k0, k2, z = loglikMat, add = TRUE, levels = levels)
+  if(!is.null(peak))
+    ribd::showInTriangle(peak, new = FALSE)
+}
 
 add = function(v, col = 2, pch = 16) points(v[1], v[3], col = col, pch = pch)
 

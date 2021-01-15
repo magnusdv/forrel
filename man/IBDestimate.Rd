@@ -13,6 +13,8 @@ ibdEstimate(
   tol = sqrt(.Machine$double.eps),
   beta = 0.5,
   sigma = 0.5,
+  contourPlot = FALSE,
+  levels = NULL,
   verbose = FALSE
 )
 }
@@ -36,8 +38,15 @@ of length 3 (if \code{param = "kappa"}) or 9 (if \code{param = "delta"}), indica
 the initial value of for the optimisation. By default, \code{start} is set to
 \verb{(1/3, 1/3, 1/3)} if \code{param = "kappa"} and \verb{(1/9, ..., 1/9)} if \code{param = "delta"}.}
 
-\item{tol, beta, sigma}{Control parameters for the optimisation routine. These
-can usually be left untouched.}
+\item{tol, beta, sigma}{Control parameters for the optimisation routine; can
+usually be left untouched.}
+
+\item{contourPlot}{A logical. If TRUE, contours of the log-likelihood
+function are plotted overlaying the IBD triangle.}
+
+\item{levels}{(Only relevant if \code{contourPlot = TRUE}.) A numeric vector of
+levels at which to draw contour lines. If NULL (default), the levels are
+chosen automatically.}
 
 \item{verbose}{A logical.}
 }
@@ -68,7 +77,7 @@ Thompson (1975). Optimisation of \eqn{\kappa} is done in the \eqn{(\kappa_0,
 R^8, using the first 8 coefficients.
 
 The implementation optimises the log-likelihood using a projected gradient
-descent with Armijo line search.
+descent algorithm, combined with a version of Armijo line search.
 }
 \examples{
 
@@ -78,9 +87,11 @@ x = nuclearPed(2)
 # Simulate 100 markers
 x = markerSim(x, N = 100, alleles = 1:4, seed = 123, verbose = FALSE)
 
-# Estimate Delta (expectation = (0,0,0,0,0,0,1/4,1/2,1/4))
+# Estimate kappa (expectation: (0.25, 0.5, 0.25)
 ibdEstimate(x, ids = 3:4)
 
+# Plot contours of the log-likelihood function
+ibdEstimate(x, ids = 3:4, contourPlot = TRUE)
 
 ### Example 2: Full sib mating
 y = fullSibMating(1)
