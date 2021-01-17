@@ -128,31 +128,45 @@ ibdEstimate = function(x, ids = typedMembers(x), param = c("kappa", "delta"),
   }
 
   # Estimate each pair
-  res = lapply(pairs, function(pair) {
+  resList = lapply(pairs, function(pair) {
     if(verbose)
       message(sprintf("  %s: ", paste(pair, collapse = " vs. ")), appendLF = FALSE)
 
     est = .PGD(alleleData[pair], param = param, start = start, tol = tol, beta = beta, sigma = sigma)
 
     if(verbose)
-      message(sprintf("%d iterations; estimate = (%s)", est$iter, rst(est$estimate[-(1:3)], 3)))
+      message(sprintf("estimate = (%s), iterations = %d", rst(est$estimate, 3), est$iterations))
 
-    est$estimate
+    est
   })
 
-  res = do.call(rbind, res)
+  coefs = do.call(rbind, lapply(resList, function(r) r$estimate))
+  ids = do.call(rbind, lapply(resList, function(r) r$ids))
+  N = unlist(lapply(resList, function(r) r$nMarkers))
+
+  res = structure(data.frame(ids, N, coefs),
+                  names = c("id1", "id2", "N", if(param == "kappa") paste0("k", 0:2) else paste0("d", 1:9)),
+                  class = c("ibdRes", "data.frame"))
 
   if(contourPlot) {
     if(param == "delta")
       stop2("Contour plot is available only for 'kappa' estimation")
+    if(verbose)
+      message("Preparing contour plot")
     contoursKappaML(x, allids, levels = levels)
   }
 
   if(verbose)
     message("Total time: ", format(Sys.time() - st, digits = 3))
 
-  # Return data frame
   res
+}
+
+#' @export
+print.ibdEst = function(x, digits = 5, ...) {
+  coefCols = 4:ncol(x)
+  x[coefCols] = round(x[coefCols], digits = digits)
+  print.data.frame(x, ...)
 }
 
 .PGD = function(dat = NULL, param, start, tol = sqrt(.Machine$double.eps),
@@ -252,12 +266,13 @@ ibdEstimate = function(x, ids = typedMembers(x), param = c("kappa", "delta"),
     LL = newLL
   }
 
-  if(verbose) message("Iterations: ", k)
+  if(verbose)
+    message("Iterations: ", k)
 
-  res = data.frame(id1 = pair[1], id2 = pair[2], N = sum(keep), rbind(xk), row.names = NULL)
-  names(res)[-(1:3)] = switch(param, kappa = paste0("k", 0:2), delta = paste0("d", 1:9))
+  #res = data.frame(id1 = pair[1], id2 = pair[2], N = sum(keep), rbind(xk), row.names = NULL)
+  #names(res)[-(1:3)] = switch(param, kappa = paste0("k", 0:2), delta = paste0("d", 1:9))
 
-  list(estimate = res, iter = k, loglik = LL$loglik)
+  list(estimate = xk, loglik = LL$loglik, iterations = k, ids = pair, nMarkers = sum(keep))
 }
 
 stationary = function(p, grad, tol) {
