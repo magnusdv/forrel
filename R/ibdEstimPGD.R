@@ -91,7 +91,7 @@
 ibdEstimate = function(x, ids = typedMembers(x), param = c("kappa", "delta"),
                        markers = NULL, start = NULL, tol = sqrt(.Machine$double.eps),
                        beta = 0.5, sigma = 0.5, contourPlot = FALSE, levels = NULL,
-                       verbose = FALSE) {
+                       verbose = TRUE) {
   st = Sys.time()
   param = match.arg(param)
 

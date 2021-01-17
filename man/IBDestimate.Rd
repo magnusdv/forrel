@@ -15,7 +15,7 @@ ibdEstimate(
   sigma = 0.5,
   contourPlot = FALSE,
   levels = NULL,
-  verbose = FALSE
+  verbose = TRUE
 )
 }
 \arguments{
