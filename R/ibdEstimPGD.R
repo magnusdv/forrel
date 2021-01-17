@@ -276,13 +276,23 @@ stationary = function(p, grad, tol) {
 # Algorithm found in Wang et al. (2013): Projection onto the probability simplex.
 simplexProject = function(y) {
   D = length(y)
-  u = sort.int(y, decreasing = TRUE, method = "shell")
+  if(D == 3)
+    u = .sort3(y)
+  else
+    u = sort.int(y, decreasing = TRUE, method = "shell")
   v = u + 1/seq_len(D) * (1 - cumsum(u))
-  p = match(T, v <= 0, nomatch = D+1) - 1
+  p = match(TRUE, v <= 0, nomatch = D + 1) - 1
   lambda = 1/p * (1 - sum(u[1:p]))
   x = y + lambda
   x[x < 0] = 0
   x
+}
+
+.sort3 = function(y) {
+  if(y[1] < y[2]) {tmp = y[1]; y[1] = y[2]; y[2] = tmp}
+  if(y[2] < y[3]) {tmp = y[2]; y[2] = y[3]; y[3] = tmp}
+  if(y[1] < y[2]) {tmp = y[1]; y[1] = y[2]; y[2] = tmp}
+  y
 }
 
 # Plot contour lines for the ML function when estimating kappa.
