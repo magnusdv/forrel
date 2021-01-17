@@ -54,7 +54,7 @@
 #' @export
 checkPairwise = function(x, plot = TRUE, labels = FALSE, LRthreshold = 1000, ...) {
   # Estimated coefficients
-  kEst = ibdEstimate(x)
+  kEst = ibdEstimate(x, verbose = FALSE)
 
   # Pedigree coefficients
   if(is.ped(x)) {
