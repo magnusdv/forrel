@@ -146,7 +146,7 @@ ibdEstimate = function(x, ids = typedMembers(x), param = c("kappa", "delta"),
 
   res = structure(data.frame(ids, N, coefs),
                   names = c("id1", "id2", "N", if(param == "kappa") paste0("k", 0:2) else paste0("d", 1:9)),
-                  class = c("ibdRes", "data.frame"))
+                  class = c("ibdEst", "data.frame"))
 
   if(contourPlot) {
     if(param == "delta")
