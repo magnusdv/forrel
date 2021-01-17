@@ -40,17 +40,24 @@
 #' @param returnValue Either "singleton" (default) or "alleles". (see Value).
 #'
 #'
-#' @return If `returnValue == "singletons"`, a list of two singletons with the
-#'   simulated marker data attached.
+#' @return The output depends on the value of the `returnValue` parameter:
 #'
-#'   If `returnValue == "alleles"`, a list of four vectors of length `N`, named
-#'   `a`, `b`, `c` and  `d`. These contain the simulated alleles, where a/b and
-#'   c/d are the genotypes of the to individuals.
+#'   * "singletons": a list of two singletons with the simulated marker data
+#'   attached.
 #'
-#'   If `returnValue == "genotypes"`, a list of two vectors of length `N`,
-#'   containing the simulated genotypes. Identical to `paste(a, b, sep = "/")`
-#'   and `paste(c, d, sep = "/")`, where `a`, `b`, `c`, `d` are the vectors
-#'   returned when `returnValue == "alleles"`.
+#'   * "alleles": a list of four vectors of length `N`, named `a`, `b`, `c` and
+#'   `d`. These contain the simulated alleles, where a/b and c/d are the
+#'   genotypes of the to individuals.
+#'
+#'   * "genotypes": a list of two vectors of length `N`, containing the
+#'   simulated genotypes. Identical to `paste(a, b, sep = "/")` and `paste(c, d,
+#'   sep = "/")`, where `a`, `b`, `c`, `d` are the vectors returned when
+#'   `returnValue == "alleles"`.
+#'
+#'   * "internal": similar to "alleles", but using the index integer of each
+#'   allele. (This option is mostly for internal use.)
+#'
+#'
 #'
 #' @examples
 #' # MZ twins
@@ -162,12 +169,14 @@ profileSimParametric = function(kappa = NULL, delta = NULL, states = NULL,
 
   returnValue = match.arg(returnValue)
 
+  # Return value in the marker-wise step
+  retval0 = if(returnValue %in% c("singletons", "genotypes")) "alleles" else returnValue
+
   # Iterate over loci, make N simulations of each. For each locus,
   # store sims as matrix (4 * Nsim) for simplicity later
-  retval = if(returnValue %in% c("singletons", "genotypes")) "alleles" else returnValue
   sims_markerwise = lapply(seq_along(freqList), function(i) {
     markeri = markerSimParametric(kappa = kappa, delta = delta, states = states[i],
-                                N = N, afreq = freqList[[i]], returnValue = retval)
+                                N = N, afreq = freqList[[i]], returnValue = retval0)
     do.call(rbind, markeri)
   })
 

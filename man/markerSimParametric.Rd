@@ -44,17 +44,19 @@ allele labels.}
 \item{returnValue}{Either "singleton" (default) or "alleles". (see Value).}
 }
 \value{
-If \code{returnValue == "singletons"}, a list of two singletons with the
-simulated marker data attached.
-
-If \code{returnValue == "alleles"}, a list of four vectors of length \code{N}, named
-\code{a}, \code{b}, \code{c} and  \code{d}. These contain the simulated alleles, where a/b and
-c/d are the genotypes of the to individuals.
-
-If \code{returnValue == "genotypes"}, a list of two vectors of length \code{N},
-containing the simulated genotypes. Identical to \code{paste(a, b, sep = "/")}
-and \code{paste(c, d, sep = "/")}, where \code{a}, \code{b}, \code{c}, \code{d} are the vectors
-returned when \code{returnValue == "alleles"}.
+The output depends on the value of the \code{returnValue} parameter:
+\itemize{
+\item "singletons": a list of two singletons with the simulated marker data
+attached.
+\item "alleles": a list of four vectors of length \code{N}, named \code{a}, \code{b}, \code{c} and
+\code{d}. These contain the simulated alleles, where a/b and c/d are the
+genotypes of the to individuals.
+\item "genotypes": a list of two vectors of length \code{N}, containing the
+simulated genotypes. Identical to \code{paste(a, b, sep = "/")} and \code{paste(c, d,   sep = "/")}, where \code{a}, \code{b}, \code{c}, \code{d} are the vectors returned when
+\code{returnValue == "alleles"}.
+\item "internal": similar to "alleles", but using the index integer of each
+allele. (This option is mostly for internal use.)
+}
 }
 \description{
 This function simulates genotypes for two individuals given their IBD
