@@ -15,7 +15,7 @@ ibdEstimate(
   sigma = 0.5,
   contourPlot = FALSE,
   levels = NULL,
-  verbose = TRUE
+  verbose = FALSE
 )
 }
 \arguments{
@@ -51,11 +51,10 @@ chosen automatically.}
 \item{verbose}{A logical.}
 }
 \value{
-If \code{param = "kappa"}: A data frame with 6 columns: \code{id1}, \code{id2}, \code{N}
-(the number of markers with no missing alleles), \code{k0}, \code{k1} and \code{k2}.
-
-If \code{param = "delta"}: A data frame with 12 columns: \code{id1}, \code{id2}, \code{N} (the
-number of markers with no missing alleles), \code{d1}, \code{d2}, ... \code{d9}.
+An object of class \code{ibdEst}, which is basically a dataframe with
+either 6 columns (if \code{param = "kappa"}) or 12 columns (if \code{param = "delta"}). The first three columns are \code{id1} (label of first individual),
+\code{id2} (label of second individual) and \code{N} (the number of markers with no
+missing alleles). The remaining columns contain the coefficient estimates.
 }
 \description{
 Estimate the IBD coefficients \eqn{\kappa = (\kappa_0, \kappa_1,

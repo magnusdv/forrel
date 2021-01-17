@@ -63,13 +63,13 @@
 #' x = markerSim(x, N = 100, alleles = 1:4, seed = 123, verbose = FALSE)
 #'
 #' # Estimate IBD coefficients (exact = (0.25, 0.5, 0.25))
-#' est = IBDestimate(x, ids = ids)
+#' est = IBDestimateOLD(x, ids = ids)
 #'
 #' # Show the result in the IBD triangle
 #' ribd::showInTriangle(est, labels = TRUE)
 #'
 #' # Contour plot (just a few markers to save time)
-#' IBDestimate(x, ids = ids, markers = 1:10,
+#' IBDestimateOLD(x, ids = ids, markers = 1:10,
 #'             contourPlot = TRUE, levels = -(43:50))
 #'
 #' ### Example 2: Unrelated singletons
@@ -79,14 +79,14 @@
 #' y = markerSim(y, N = 200, alleles = 1:2, verbose = FALSE)
 #'
 #' # Estimate
-#' IBDestimate(y, ids = 1:2)
+#' IBDestimateOLD(y, ids = 1:2)
 #'
 #'
 #' @importFrom ribd ibdTriangle showInTriangle
 #' @importFrom maxLik maxLik
 #' @importFrom graphics contour
 #' @export
-IBDestimate = function(x, ids = typedMembers(x), markers = NULL,
+IBDestimateOLD = function(x, ids = typedMembers(x), markers = NULL,
                        start = c(0.99,0.001), tol = 1e-7,
                        contourPlot = FALSE, levels = NULL) {
 

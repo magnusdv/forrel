@@ -44,11 +44,11 @@
 #'   chosen automatically.
 #' @param verbose A logical.
 #'
-#' @return If `param = "kappa"`: A data frame with 6 columns: `id1`, `id2`, `N`
-#'   (the number of markers with no missing alleles), `k0`, `k1` and `k2`.
-#'
-#'   If `param = "delta"`: A data frame with 12 columns: `id1`, `id2`, `N` (the
-#'   number of markers with no missing alleles), `d1`, `d2`, ... `d9`.
+#' @return An object of class `ibdEst`, which is basically a dataframe with
+#'   either 6 columns (if `param = "kappa"`) or 12 columns (if `param =
+#'   "delta"`). The first three columns are `id1` (label of first individual),
+#'   `id2` (label of second individual) and `N` (the number of markers with no
+#'   missing alleles). The remaining columns contain the coefficient estimates.
 #'
 #' @author Magnus Dehli Vigeland
 #'
