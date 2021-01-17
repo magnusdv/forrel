@@ -139,6 +139,7 @@ ibdBootstrap = function(kappa = NULL, delta = NULL, N, freqList, plot = TRUE, se
 
   coefs = kappa %||% delta
   param = if(!is.null(kappa)) "kappa" else "delta"
+  coefNms = if(param == "kappa") paste0("k", 0:2) else paste0("d", 1:9)
 
   # Insert default allele labels (1,2,3,...) where needed
   noNames = vapply(freqList, function(fr) is.null(names(fr)), logical(1))
@@ -149,19 +150,24 @@ ibdBootstrap = function(kappa = NULL, delta = NULL, N, freqList, plot = TRUE, se
                               seed = seed, returnValue = "internal")
 
   # Bootstrap estimates
-  boots = do.call(rbind, lapply(sims, function(als)
-    .ibdEstimFromAlleles(als, freqList, param = param, start = coefs)))
+  boots = lapply(sims, function(s)
+    .ibdEstimFromAlleles(s, freqList, param = param, start = coefs))
+
+  # Wide matrix - makes "dist" calulation below simpler
+  resWide = matrix(unlist(boots, use.names = FALSE), ncol = N,  # faster than do.call(cbind, boots)
+                   dimnames = list(coefNms, NULL))
+
+  # Transpose and convert to data.frame
+  res = as.data.frame(t.default(resWide))
+
+  # Add column with Euclidean distance from given coefs
+  res$dist = sqrt(colSums((resWide - coefs)^2))
 
   # Plot
-  if(plot && !is.null(kappa)) showInTriangle(boots)
-
-  coeffCols = boots[-(1:3)]
-
-  # Euclidean distance from given coeffs
-  dist = sqrt(colSums((t.default(as.matrix(coeffCols)) - coefs)^2))
-
-  # Build output
-  res = cbind(coeffCols, dist = dist)
+  if(plot && !is.null(kappa)) {
+    showInTriangle(res, lwd = 1, pch = 1, col = 4)
+    showInTriangle(kappa, new = FALSE, col = "red", pch = 4, lwd = 4, cex = 2.2)
+  }
 
   res
 }
