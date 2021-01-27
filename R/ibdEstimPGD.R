@@ -169,6 +169,12 @@ print.ibdEst = function(x, digits = 5, ...) {
   print.data.frame(x, ...)
 }
 
+# Note: This makes `as.numeric()` work!
+#' @export
+as.double.ibdEst = function(x, ...) {
+  unlist(as.list(x)[-(1:3)])
+}
+
 .PGD = function(dat = NULL, param, start, tol = sqrt(.Machine$double.eps),
                 beta = 0.5, sigma = 0.5, maxit = 500, x = NULL, ids = NULL, verbose = FALSE) {
 
