@@ -136,6 +136,11 @@ deltaBootstrap = function(delta, N, freqList, seed = NULL) {
 #' @rdname kappaBootstrap
 #' @export
 ibdBootstrap = function(kappa = NULL, delta = NULL, N, freqList, plot = TRUE, seed = NULL) {
+  # Allow inputs directly from `ibdEstimate()`
+  if(inherits(kappa, "ibdEst"))
+    kappa = as.numeric(kappa)
+  if(inherits(delta, "ibdEst"))
+    delta = as.numeric(delta)
 
   coefs = kappa %||% delta
   param = if(!is.null(kappa)) "kappa" else "delta"
@@ -164,7 +169,7 @@ ibdBootstrap = function(kappa = NULL, delta = NULL, N, freqList, plot = TRUE, se
   res$dist = sqrt(colSums((resWide - coefs)^2))
 
   # Plot
-  if(plot && !is.null(kappa)) {
+  if(plot && param == "kappa") {
     showInTriangle(res, lwd = 1, pch = 1, col = 4)
     showInTriangle(kappa, new = FALSE, col = "red", pch = 4, lwd = 4, cex = 2.2)
   }
@@ -188,3 +193,36 @@ ibdBootstrap = function(kappa = NULL, delta = NULL, N, freqList, plot = TRUE, se
   .PGD(dat, param = param, start = start)$estimate
 }
 
+
+#' @export
+nonParamBoot = function(x, ids, param = "kappa", N, plot = TRUE, seed = NULL) {
+
+  coefs = as.numeric(ibdEstimate(x, ids = ids, param = param, verbose = FALSE))
+  coefNms = names(coefs)
+
+  nMark = nMarkers(x)
+
+  boots = replicate(N, simplify = FALSE, {
+    markers = sample.int(nMark, replace = TRUE)
+    bs = ibdEstimate(x, ids = ids, param = param, markers = markers, verbose = FALSE)
+    as.numeric(bs)
+  })
+
+  # Wide matrix - makes "dist" calulation below simpler
+  resWide = matrix(unlist(boots, use.names = FALSE),
+                   ncol = N, dimnames = list(coefNms, NULL))
+
+  # Transpose and convert to data.frame
+  res = as.data.frame(t.default(resWide))
+
+  # Add column with Euclidean distance from given coefs
+  res$dist = sqrt(colSums((resWide - coefs)^2))
+
+  # Plot
+  if(plot && param == "kappa") {
+    showInTriangle(res, lwd = 1, pch = 1, col = 4)
+    showInTriangle(coefs, new = FALSE, col = "red", pch = 4, lwd = 4, cex = 2.2)
+  }
+
+  res
+}
