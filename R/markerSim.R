@@ -162,7 +162,6 @@ markerSim = function(x, N = 1, ids = NULL, alleles = NULL, afreq = NULL,
 
   # Forced genotypes:
   forcedTF = (m[, 1] == 0 | m[, 2] == 0) & (lengths(gridlist) == 1)
-  m.unforced = m  # saving a copy for use in verbose output below
   for (id in (1:pedsize(x))[forcedTF])
     m[id, ] = allgenos[gridlist[[id]], ]
 
@@ -633,7 +632,6 @@ simpleSim = function(x, N, alleles, afreq, ids, Xchrom = FALSE,
 .genedrop_AUT = function(x, N, nall, afreq, mutmod, seed) {
   FIDX = x$FIDX
   MIDX = x$MIDX
-  SEX = x$SEX
   FOU = founders(x, internal = TRUE)
   NONFOU = nonfounders(x, internal = TRUE)
   mutations = !is.null(mutmod)

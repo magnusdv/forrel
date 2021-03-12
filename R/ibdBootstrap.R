@@ -22,8 +22,8 @@
 #'   Exactly one of `param`, `kappa` and `delta` must be non-NULL. If `kappa`
 #'   and `delta` are both NULL, the appropriate set of coefficients is computed
 #'   as `ibdEstimate(x, ids, param)`.
-#' @param method Either "parametric" or "nonparametric" (abbreviations are
-#'   allowed). see Details.
+#' @param method Either "parametric" (default) or "nonparametric". Abbreviations
+#'   are allowed. see Details for more information about each method.
 #' @param N The number of simulations.
 #' @param freqList A list of probability vectors: The allele frequencies for
 #'   each marker.
@@ -174,36 +174,3 @@ ibdBootstrap = function(x = NULL, ids = NULL, param = NULL, kappa = NULL, delta 
   .PGD(dat, param = param, start = start)$estimate
 }
 
-
-#' @export
-nonParamBoot = function(x, ids, param = "kappa", N, plot = TRUE, seed = NULL) {
-
-  coefs = as.numeric(ibdEstimate(x, ids = ids, param = param, verbose = FALSE))
-  coefNms = names(coefs)
-
-  nMark = nMarkers(x)
-
-  boots = replicate(N, simplify = FALSE, {
-    markers = sample.int(nMark, replace = TRUE)
-    bs = ibdEstimate(x, ids = ids, param = param, markers = markers, verbose = FALSE)
-    as.numeric(bs)
-  })
-
-  # Wide matrix - makes "dist" calculation below simpler
-  resWide = matrix(unlist(boots, use.names = FALSE),
-                   ncol = N, dimnames = list(coefNms, NULL))
-
-  # Transpose and convert to data.frame
-  res = as.data.frame(t.default(resWide))
-
-  # Add column with Euclidean distance from given coefs
-  res$dist = sqrt(colSums((resWide - coefs)^2))
-
-  # Plot
-  if(plot && param == "kappa") {
-    showInTriangle(res, lwd = 1, pch = 1, col = 4)
-    showInTriangle(coefs, new = FALSE, col = "red", pch = 4, lwd = 4, cex = 2.2)
-  }
-
-  res
-}

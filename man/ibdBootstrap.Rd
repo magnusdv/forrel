@@ -33,8 +33,8 @@ as \code{ibdEstimate(x, ids, param)}.}
 
 \item{N}{The number of simulations.}
 
-\item{method}{Either "parametric" or "nonparametric" (abbreviations are
-allowed). see Details.}
+\item{method}{Either "parametric" (default) or "nonparametric". Abbreviations
+are allowed. see Details for more information about each method.}
 
 \item{freqList}{A list of probability vectors: The allele frequencies for
 each marker.}

@@ -160,7 +160,6 @@ exclusionPower = function(claimPed, truePed, ids, markers = NULL, source = "clai
   if(!is.list(ids))
     ids = list(ids)
   ids = lapply(ids, as.character)
-  idslabs = sapply(ids, paste, collapse = "-")
   allids = unique.default(unlist(ids))
 
   # Number of `ids` vectors

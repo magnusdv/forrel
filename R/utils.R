@@ -112,7 +112,7 @@ disableMutationModels = function(x, disable, verbose = FALSE) {
 }
 
 
-# TODO: Move to pedtools
+# TODO: Move to pedtools?
 fixAllelesAndFreqs = function(alleles = NULL, afreq = NULL,
                               observed = NULL, NAstrings = c(0, "", NA, "-")) {
 
