@@ -12,6 +12,10 @@ isNumber = function(x, minimum = NA, maximum = NA) {
            (is.na(maximum) || x <= maximum))
 }
 
+# round + toSTring
+rst = function(v, digits = 3)
+  toString(round(v, digits))
+
 `%||%` = function(x, y) {
   if(is.null(x)) y else x
 }
