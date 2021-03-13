@@ -91,9 +91,9 @@ x
 
 **Estimation of IBD coefficients**  
 
-The `IBDestimate()` function estimates the coefficients of _identity-by-descent_ (IBD) between pairs of individuals, from the available marker data. 
+The `ibdEstimate()` function estimates the coefficients of _identity-by-descent_ (IBD) between pairs of individuals, from the available marker data. 
 ```{r}
-k = IBDestimate(x, ids = bros)
+k = ibdEstimate(x, ids = bros)
 k
 ```
 

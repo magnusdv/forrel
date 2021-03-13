@@ -1,7 +1,6 @@
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
-forrel <img src="man/figures/logo.png" align="right" height=140/>
-=================================================================
+# forrel <img src="man/figures/logo.png" align="right" height=140/>
 
 <!-- badges: start -->
 
@@ -11,8 +10,7 @@ status](https://www.r-pkg.org/badges/version/forrel)](https://CRAN.R-project.org
 [![](https://cranlogs.r-pkg.org/badges/last-month/forrel?color=yellow)](https://cran.r-project.org/package=forrel)
 <!-- badges: end -->
 
-Introduction
-------------
+## Introduction
 
 The goal of **forrel** is to provide forensic pedigree computations and
 relatedness inference from genetic marker data. The **forrel** package
@@ -38,8 +36,7 @@ The most important analyses currently supported by **forrel** are:
 -   Import of pedigree data and frequency databases from the `Familias`
     software.
 
-Installation
-------------
+## Installation
 
 To get the current official version of **forrel**, install from CRAN as
 follows:
@@ -56,8 +53,7 @@ GitHub:
 devtools::install_github("magnusdv/forrel")
 ```
 
-An example
-----------
+## An example
 
 In this short introduction, we first demonstrate simulation of marker
 data for a pair of siblings. Then - pretending the relationship is
@@ -127,15 +123,20 @@ x
 
 **Estimation of IBD coefficients**
 
-The `IBDestimate()` function estimates the coefficients of
+The `ibdEstimate()` function estimates the coefficients of
 *identity-by-descent* (IBD) between pairs of individuals, from the
 available marker data.
 
 ``` r
-k = IBDestimate(x, ids = bros)
+k = ibdEstimate(x, ids = bros)
+#> Estimating 'kappa' coefficients
+#> Initial search value: (0.333, 0.333, 0.333)
+#> Pairs of individuals: 1
+#>   bro1 vs. bro2: estimate = (0.149, 0.551, 0.3), iterations = 16
+#> Total time: 0.005 secs
 k
-#>    id1  id2   N        k0        k1        k2
-#> 1 bro1 bro2 100 0.1484924 0.5513491 0.3001585
+#>    id1  id2   N     k0      k1      k2
+#> 1 bro1 bro2 100 0.1486 0.55139 0.30002
 ```
 
 The theoretical expectation for non-inbred full siblings is
