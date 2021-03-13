@@ -1,7 +1,7 @@
 Package: forrel
 Type: Package
 Title: Forensic Pedigree Analysis and Relatedness Inference
-Version: 1.2.0.9000
+Version: 1.3.0
 Authors@R: c(
     person("Magnus Dehli", "Vigeland", email = "m.d.vigeland@medisin.uio.no", 
            role = c("aut", "cre"), comment = c(ORCID = "0000-0002-9134-4962")),
@@ -33,7 +33,6 @@ Imports:
     pedprobr (>= 0.4),
     ribd,
     pedmut,
-    maxLik,
     glue
 Suggests: testthat,
     ggplot2,
