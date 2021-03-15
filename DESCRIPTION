@@ -1,7 +1,7 @@
 Package: forrel
 Type: Package
 Title: Forensic Pedigree Analysis and Relatedness Inference
-Version: 1.3.0
+Version: 1.3.0.9000
 Authors@R: c(
     person("Magnus Dehli", "Vigeland", email = "m.d.vigeland@medisin.uio.no", 
            role = c("aut", "cre"), comment = c(ORCID = "0000-0002-9134-4962")),
@@ -13,7 +13,7 @@ Description: Forensic applications of pedigree analysis, including likelihood ra
     specifically with family reunion cases, implementing and developing ideas from 
     Kling et al. (2017) <doi:10.1016/j.fsigen.2017.08.006>. A novelty of 'forrel' 
     is the ability to model background inbreeding in forensic pedigree computations.
-    This can have significant impact in applications, as exemplified in Vigeland 
+    This can have significant impact in applications, as exemplified in Vigeland
     and Egeland (2019) <doi:10.1016/j.fsigss.2019.10.175>. 'forrel' is part of the
     ped suite, a collection of packages for pedigree analysis. In particular, 
     'forrel' imports 'pedtools' for creating and manipulating pedigrees and markers,

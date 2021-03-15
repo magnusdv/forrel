@@ -1,6 +1,6 @@
 # forrel 1.3.0
 
-# New features
+## New features
 
 * The new function `ibdEstimate()` replaces the previous `IBDestimate()` (note the name change). This is a complete rewrite, which optimises the log-likelihood using a projected gradient descent algorithm, combined with a version of Armijo line search.
 
