@@ -12,6 +12,24 @@ isNumber = function(x, minimum = NA, maximum = NA) {
            (is.na(maximum) || x <= maximum))
 }
 
+# Faster alternative to suppressWarnings(as.numeric(v))
+# NB: doesn't catch scientific notation 1e-4.
+asNum = function(v) {
+  num = grep("[^-0-9.]", v, invert = TRUE)
+  u = rep(NA_real_, length(v))
+  u[num] = as.numeric(v[num])
+  u
+}
+
+# Faster alternative to suppressWarnings(as.integer(v))
+# NB: doesn't catch scientific notation 1e+12.
+asInt = function(v) {
+  num = grep("[^-0-9]", v, invert = TRUE)
+  u = rep(NA_real_, length(v))
+  u[num] = as.integer(v[num])
+  u
+}
+
 # round + toSTring
 rst = function(v, digits = 3)
   toString(round(v, digits))
