@@ -4,10 +4,20 @@
 \alias{checkPairwise}
 \title{Check pedigree data for relationship errors}
 \usage{
-checkPairwise(x, plot = TRUE, labels = FALSE, LRthreshold = 1000, ...)
+checkPairwise(
+  x,
+  excludeInbred = TRUE,
+  plot = TRUE,
+  labels = FALSE,
+  LRthreshold = 1000,
+  ...
+)
 }
 \arguments{
 \item{x}{A \code{ped} object or a list of such.}
+
+\item{excludeInbred}{A logical, by default TRUE, indicating if inbred
+individuals should be excluded from the analysis.}
 
 \item{plot}{A logical (default: TRUE). If TRUE, a plot is produced, showing
 the IBD estimates in the IBD triangle.}
@@ -34,6 +44,13 @@ coefficients for all pairs of typed pedigree members, and computes the
 likelihood ratio (LR) comparing each estimate to the coefficients implied by
 the pedigree. By default, the estimates are shown in a colour-coded plot
 where unlikely relationships are easy to spot.
+}
+\details{
+By default, inbred individuals are excluded from the analysis, since pairwise
+relationships involving inbred individuals have undefined kappa coefficients
+(and therefore no position in the triangle). In some cases it may still be
+informative to include their estimates; set \code{excludeInbred = FALSE} to
+achieve this.
 }
 \examples{
 

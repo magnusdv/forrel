@@ -7,7 +7,15 @@
 #' the pedigree. By default, the estimates are shown in a colour-coded plot
 #' where unlikely relationships are easy to spot.
 #'
+#' By default, inbred individuals are excluded from the analysis, since pairwise
+#' relationships involving inbred individuals have undefined kappa coefficients
+#' (and therefore no position in the triangle). In some cases it may still be
+#' informative to include their estimates; set `excludeInbred = FALSE` to
+#' achieve this.
+#'
 #' @param x A `ped` object or a list of such.
+#' @param excludeInbred A logical, by default TRUE, indicating if inbred
+#'   individuals should be excluded from the analysis.
 #' @param plot A logical (default: TRUE). If TRUE, a plot is produced, showing
 #'   the IBD estimates in the IBD triangle.
 #' @param labels A logical (default: FALSE). If TRUE, labels are included in the
@@ -50,14 +58,28 @@
 #' checkPairwise(x, labels = TRUE)
 #' }
 #'
-#' @importFrom ribd kappaIBD ibdTriangle showInTriangle
+#' @importFrom ribd inbreeding kappaIBD ibdTriangle showInTriangle
 #' @export
-checkPairwise = function(x, plot = TRUE, labels = FALSE, LRthreshold = 1000, ...) {
+checkPairwise = function(x, excludeInbred = TRUE, plot = TRUE, labels = FALSE, LRthreshold = 1000, ...) {
+  includeIds = typedMembers(x)
+
+  if(excludeInbred) {
+    inbr = names(which(inbreeding(x) > 0))
+    if(length(inbr))
+      message("Excluding inbred individuals: ", inbr)
+    includeIds = setdiff(includeIds, inbr)
+  }
+
+  if(length(includeIds) < 2) {
+    message("No relationships to check")
+    return(invisible())
+  }
+
   # Estimated coefficients
-  kEst = ibdEstimate(x, verbose = FALSE)
+  kEst = ibdEstimate(x, ids = includeIds, verbose = FALSE)
 
   # Pedigree coefficients
-  kTrue = kappaIBD(x)
+  kTrue = kappaIBD(x, ids = includeIds)
 
   # Merge (to ensure same pairing)
   kMerge = merge(kEst, kTrue, by = 1:2)
