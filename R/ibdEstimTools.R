@@ -52,7 +52,7 @@
 }
 
 
-# Input: alleleData = ouput from .getAlleleData() for a pair of indivs
+# Input: alleleData = output from .getAlleleData() for a pair of indivs
 .likelihoodWeights = function(alleleData, param = "kappa") {
   .a = alleleData[[1]]$a1
   .b = alleleData[[1]]$a2
