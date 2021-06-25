@@ -57,17 +57,7 @@ checkPairwise = function(x, plot = TRUE, labels = FALSE, LRthreshold = 1000, ...
   kEst = ibdEstimate(x, verbose = FALSE)
 
   # Pedigree coefficients
-  if(is.ped(x)) {
-    kTrue = kappaIBD(x)
-  } else { #TODO: fix in ribd
-    kTrue = do.call(rbind, lapply(x, kappaIBD))
-    nPed = length(x)
-    for(i in seq_len(nPed - 1)) for(j in seq(i+1, nPed))
-      for(a in labels(x[[i]]))
-        kTrue = rbind(kTrue, data.frame(id1 = a, id2 = labels(x[[j]]),
-                                        kappa0 = 1, kappa1 = 0, kappa2 = 0,
-                                        stringsAsFactors = FALSE))
-  }
+  kTrue = kappaIBD(x)
 
   # Merge (to ensure same pairing)
   kMerge = merge(kEst, kTrue, by = 1:2)
