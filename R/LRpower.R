@@ -45,6 +45,7 @@
 #'
 #' @inheritParams exclusionPower
 #' @examples
+#'
 #' # Paternity LR of siblings
 #' claim = nuclearPed(fa = "A", mo = "NN", children = "B")
 #' unrel = list(singleton("A"), singleton("B"))
@@ -66,8 +67,7 @@
 #' pow1
 #'
 #' # Simulation 2: Same, but using an attached marker
-#' m = marker(truth, alleles = als, afreq = afr)
-#' truth = setMarkers(truth, m)
+#' truth = addMarker(truth, alleles = als, afreq = afr)
 #'
 #' pow2 = LRpower(claim, unrel, truth, ids = ids, nsim = nsim,
 #'                threshold = thresh, markers = 1, seed = 123)

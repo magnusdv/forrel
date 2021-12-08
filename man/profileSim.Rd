@@ -53,9 +53,8 @@ on these. The main work of this function is done by \code{\link[=markerSim]{mark
 x = nuclearPed(children = c("B1", "B2"))
 
 # Attach two markers; one brother is already genotyped
-m1 = marker(x, B1 = 1:2, alleles = 1:3)
-m2 = marker(x, B1 = 1, alleles = 1:4, afreq = (1:4)/10, chrom = "X")
-x = setMarkers(x, list(m1, m2))
+x = addMarker(x, B1 = "1/2", alleles = 1:3)
+x = addMarker(x, B1 = "1", alleles = 1:4, afreq = (1:4)/10, chrom = "X")
 
 # Simulate 3 profiles of B2 conditional on the above
 profileSim(x, N = 3, ids = "B2")

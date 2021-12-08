@@ -102,8 +102,11 @@ points are included.
 }
 \examples{
 
+# Create trio pedigree
 ref = nuclearPed(father = "fa", mother = "mo", child = "MP")
-ref = setMarkers(ref, marker(ref, alleles = 1:5))
+
+# Add empty marker with 5 alleles
+ref = addMarker(ref, alleles = 1:5)
 
 # Alternatives for genotyping
 sel = list("fa", c("fa", "mo"))

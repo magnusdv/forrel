@@ -43,8 +43,7 @@ test_that("Familias2ped() converts a single singleton", {
   datamatrix = data.frame(m1.1 = "A", m1.2 = "B", row.names = 1)
   ped = Familias2ped(famped, datamatrix, NULL)
 
-  true = singleton(1)
-  true = addMarkers(true, marker(true, name = "m1", `1` = c("A", "B")))
+  true = singleton(1) |> addMarker(name = "m1", "1" = "A/B")
 
   expect_identical(ped, true)
 })

@@ -44,8 +44,7 @@
 #' x = addSon(x, "Father", id = "HS")
 #'
 #' # Brother S1 is already genotyped with a marker with 4 alleles
-#' m = marker(x, S1 = 1:2, alleles = 1:4)
-#' x = setMarkers(x, m)
+#' x = addMarker(x, S1 = "1/2", alleles = 1:4)
 #'
 #' # Alternatives for additional genotyping
 #' sel = list("Father", "S2", "HS", c("Gm", "Uncle"))
@@ -60,10 +59,8 @@
 #'
 #' \donttest{
 #' ### With  mutations
-#' # Create inconsistent marker
-#' m2 = m
-#' genotype(m2, "Father") = 3
-#' x = setMarkers(x, list(m, m2))
+#' # Add inconsistent marker
+#' x = addMarker(x, S1 = "1/2", Father = "3/3", alleles = 1:4)
 #'
 #' # Set mutation models for both
 #' mutmod(x, 1:2) = list("equal", rate = 0.1)

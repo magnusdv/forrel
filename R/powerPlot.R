@@ -62,8 +62,11 @@
 #'
 #' @examples
 #'
+#' # Create trio pedigree
 #' ref = nuclearPed(father = "fa", mother = "mo", child = "MP")
-#' ref = setMarkers(ref, marker(ref, alleles = 1:5))
+#'
+#' # Add empty marker with 5 alleles
+#' ref = addMarker(ref, alleles = 1:5)
 #'
 #' # Alternatives for genotyping
 #' sel = list("fa", c("fa", "mo"))
@@ -264,9 +267,9 @@ powerPlot = function(ep, ip = NULL, type = 1, majorpoints = TRUE, minorpoints = 
     ggplot2::scale_shape_manual(values = shapeMapMajor) +
     ggplot2::scale_x_continuous(limits = xlim) +
     ggplot2::scale_y_continuous(limits = ylim) +
-    ggplot2::guides(colour = FALSE,
-                    fill = if(nolegend) FALSE else ggplot2::guide_legend(title = "", reverse = TRUE),
-                    shape = if(nolegend) FALSE else ggplot2::guide_legend(title = "", reverse = TRUE)
+    ggplot2::guides(colour = "none",
+                    fill = if(nolegend) "none" else ggplot2::guide_legend(title = "", reverse = TRUE),
+                    shape = if(nolegend) "none" else ggplot2::guide_legend(title = "", reverse = TRUE)
                     ) +
     ggplot2::coord_cartesian(clip = 'off') +
     ggplot2::theme_bw(base_size = 14)

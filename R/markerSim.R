@@ -55,7 +55,7 @@
 #' markerSim(x, N = 2, alleles = 1:3)
 #'
 #' # Conditional on one child being homozygous 1/1
-#' x = setMarkers(x, marker(x, '3' = 1, alleles = 1:3))
+#' x = addMarker(x, "3" = "1/1", alleles = 1:3)
 #' markerSim(x, N = 2, partialmarker = 1)
 #' markerSim(x, N = 1, ids = 4, partialmarker = 1, verbose = FALSE)
 #'

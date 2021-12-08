@@ -61,8 +61,7 @@ x = markerSim(x, N = 4, ids = 3:5, alleles = 1:3, seed = 577, verbose = FALSE)
 
 # Add marker with inconsistency in reference genotypes
 # (by default this is ignored by `missingPersonEP()`)
-badMarker = marker(x, `3` = 1, `4` = 2, `5` = 3)
-x = addMarkers(x, badMarker)
+x = addMarker(x, "3" = "1/1", "4" = "2/2", "5" = "3/3")
 
 # Compute exclusion power statistics
 missingPersonEP(x, missing = 6)

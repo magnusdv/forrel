@@ -26,17 +26,16 @@
 #'
 #' # Add marker with inconsistency in reference genotypes
 #' # (by default this is ignored by `missingPersonEP()`)
-#' badMarker = marker(x, `3` = 1, `4` = 2, `5` = 3)
-#' x = addMarkers(x, badMarker)
+#' x = addMarker(x, "3" = "1/1", "4" = "2/2", "5" = "3/3")
 #'
 #' # Compute exclusion power statistics
 #' missingPersonEP(x, missing = 6)
 #'
-#' @importFrom pedprobr likelihood
 #' @export
-missingPersonEP = function(reference, missing, markers = NULL, disableMutations = NA, verbose = TRUE) {
+missingPersonEP = function(reference, missing, markers = NULL, disableMutations = NA,
+                           verbose = TRUE) {
 
   randomPersonEP(x = reference, id = missing, markers = markers,
-               disableMutations = disableMutations, verbose = verbose)
+                 disableMutations = disableMutations, verbose = verbose)
 }
 
