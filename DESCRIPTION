@@ -27,8 +27,8 @@ BugReports: https://github.com/magnusdv/forrel/issues
 Encoding: UTF-8
 Language: en-GB
 LazyData: true
-Depends: R (>= 3.1.0),
-    pedtools (>= 0.9.7)
+Depends: R (>= 4.1.0),
+    pedtools (>= 1.1.0)
 Imports:
     pedprobr (>= 0.4),
     ribd (>= 1.3.0),
