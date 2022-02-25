@@ -1,3 +1,4 @@
+
 <!-- README.md is generated from README.Rmd. Please edit that file -->
 
 # forrel <img src="man/figures/logo.png" align="right" height=140/>
@@ -100,7 +101,7 @@ x = markerSim(x, N = 100, ids = bros, alleles = 1:2, seed = 1234)
 #> 
 #> Simulation finished.
 #> Calls to `likelihood()`: 0.
-#> Total time used: 0.06 seconds.
+#> Total time used: 0.13 seconds.
 ```
 
 Note 1: The `seed` argument is passed onto the random number generator.
@@ -133,15 +134,15 @@ k = ibdEstimate(x, ids = bros)
 #> Initial search value: (0.333, 0.333, 0.333)
 #> Pairs of individuals: 1
 #>   bro1 vs. bro2: estimate = (0.149, 0.551, 0.3), iterations = 16
-#> Total time: 0.005 secs
+#> Total time: 0.0146 secs
 k
 #>    id1  id2   N     k0      k1      k2
 #> 1 bro1 bro2 100 0.1486 0.55139 0.30002
 ```
 
 The theoretical expectation for non-inbred full siblings is
-(*κ*<sub>0</sub>, *κ*<sub>1</sub>, *κ*<sub>2</sub>) = (0.25, 0.5, 0.25).
-To get a visual sense of how close our estimate is, it is instructive to
+(*κ*<sub>0</sub>,*κ*<sub>1</sub>,*κ*<sub>2</sub>) = (0.25,0.5,0.25). To
+get a visual sense of how close our estimate is, it is instructive to
 plot it in the IBD triangle:
 
 ``` r
