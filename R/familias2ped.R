@@ -59,12 +59,12 @@
 Familias2ped = function(familiasped, datamatrix, loci, matchLoci = FALSE) {
 
   ### If first argument is a list of FamiliasPedigrees, convert one at a time.
-  if (is.list(familiasped) && class(familiasped[[1]]) == "FamiliasPedigree") {
+  if (is.list(familiasped) && inherits(familiasped[[1]], "FamiliasPedigree")) {
       res = lapply(familiasped, function(p)
         Familias2ped(p, datamatrix = datamatrix, loci = loci, matchLoci = matchLoci))
       return(res)
   }
-  else if(class(familiasped) != "FamiliasPedigree")
+  else if(!inherits(familiasped, "FamiliasPedigree"))
     stop2("The first argument must be a `FamiliasPedigree` or a list of such")
 
 
@@ -157,7 +157,7 @@ Familias2ped = function(familiasped, datamatrix, loci, matchLoci = FALSE) {
 readFamiliasLoci = function(loci) {
   if (is.null(loci))
     return(NULL)
-  if (class(loci) == "FamiliasLocus")
+  if (inherits(loci, "FamiliasLocus"))
     loci = list(loci)
 
   lapply(loci, function(a) {
