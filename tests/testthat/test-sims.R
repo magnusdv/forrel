@@ -91,7 +91,8 @@ test_that("markerSim() works in looped pedigree 2", {
   expect_identical(genotype(y1, id = 2, marker = 1), c("1", "2")) # Forced
 
   x = addParents(x, 2, 10, 11, verbose = FALSE)
-  x = setMarkers(x, marker(x, "6" = 1, "10" = 2))
+  x = addMarker(x, "6" = 1, "10" = 2)
+
   # plot(x,1)
   y2 = mSim(x, partialmarker = 1)
   expect_identical(genotype(y2, id = 2, marker = 1), c("1", "2")) # Forced!
