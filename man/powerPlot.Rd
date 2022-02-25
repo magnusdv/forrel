@@ -13,6 +13,7 @@ powerPlot(
   ellipse = FALSE,
   col = NULL,
   labs = NULL,
+  jitter = FALSE,
   alpha = 1,
   stroke = 1.5,
   shape = "circle",
@@ -47,6 +48,9 @@ in a group fall on a line.}
 
 \item{labs}{A character of the same length as \code{ep}. If NULL, the names of
 \code{ep} are used, if present.}
+
+\item{jitter}{A logical (default: FALSE). If TRUE, a small jitter is added to
+the major points.}
 
 \item{alpha}{Transparency for minor points (see Details).}
 
@@ -101,6 +105,40 @@ The parameters \code{majorpoints} and \code{minorpoints} control which of the ab
 points are included.
 }
 \examples{
+
+### Example 1: Comparing the power of 3 reference families ###
+
+# Helper function for simulating a single profile
+sim = function(x, id) {
+  y = setMarkers(x, locusAttributes = NorwegianFrequencies[1:3])
+  profileSim(y, ids = id)[[1]]
+}
+
+# Define pedigrees and simulate data
+PAR = nuclearPed(1, child = "MP") |> sim(id = 1)
+SIB = nuclearPed(2) |> relabel(old = 4, new = "MP") |> sim(id = 3)
+GRA = linearPed(2) |> relabel(old = 5, new = "MP") |> sim(id = 1)
+
+# Collect in list and plot
+peds = list(PAR = PAR, SIB = SIB, GRA = GRA)
+plotPedList(peds, marker = 1, hatched = typedMembers, frames = FALSE,
+            col = list(red = "MP"))
+
+# Compute exclusion/inclusion powers:
+ep = lapply(peds, function(y)
+  missingPersonEP(y, missing = "MP", verbose = FALSE))
+
+ip = lapply(peds, function(y)    # increase nsim!
+  missingPersonIP(y, missing = "MP", nsim = 5, threshold = 10, verbose = FALSE))
+
+# Plot
+powerPlot(ep, ip, size = 2)
+powerPlot(ep, ip, size = 2, jitter = TRUE)
+
+# Different plot type, not dependent of `threshold`
+powerPlot(ep, ip, size = 2, type = 3)
+
+### Example 2: Exploring powers for different sets of available relatives
 
 # Create trio pedigree
 ref = nuclearPed(father = "fa", mother = "mo", child = "MP")

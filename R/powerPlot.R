@@ -46,6 +46,8 @@
 #' @param col A colour vector, recycle to match the top level length of `ep`.
 #' @param labs A character of the same length as `ep`. If NULL, the names of
 #'   `ep` are used, if present.
+#' @param jitter A logical (default: FALSE). If TRUE, a small jitter is added to
+#'   the major points.
 #' @param stroke Border width for major points (see Details).
 #' @param alpha Transparency for minor points (see Details).
 #' @param shape Either "circle", "square", "diamond", "triangleUp" or
@@ -61,6 +63,40 @@
 #' @seealso [MPPsims()], [missingPersonEP()], [missingPersonEP()]
 #'
 #' @examples
+#'
+#' ### Example 1: Comparing the power of 3 reference families ###
+#'
+#' # Helper function for simulating a single profile
+#' sim = function(x, id) {
+#'   y = setMarkers(x, locusAttributes = NorwegianFrequencies[1:3])
+#'   profileSim(y, ids = id)[[1]]
+#' }
+#'
+#' # Define pedigrees and simulate data
+#' PAR = nuclearPed(1, child = "MP") |> sim(id = 1)
+#' SIB = nuclearPed(2) |> relabel(old = 4, new = "MP") |> sim(id = 3)
+#' GRA = linearPed(2) |> relabel(old = 5, new = "MP") |> sim(id = 1)
+#'
+#' # Collect in list and plot
+#' peds = list(PAR = PAR, SIB = SIB, GRA = GRA)
+#' plotPedList(peds, marker = 1, hatched = typedMembers, frames = FALSE,
+#'             col = list(red = "MP"))
+#'
+#' # Compute exclusion/inclusion powers:
+#' ep = lapply(peds, function(y)
+#'   missingPersonEP(y, missing = "MP", verbose = FALSE))
+#'
+#' ip = lapply(peds, function(y)    # increase nsim!
+#'   missingPersonIP(y, missing = "MP", nsim = 5, threshold = 10, verbose = FALSE))
+#'
+#' # Plot
+#' powerPlot(ep, ip, size = 2)
+#' powerPlot(ep, ip, size = 2, jitter = TRUE)
+#'
+#' # Different plot type, not dependent of `threshold`
+#' powerPlot(ep, ip, size = 2, type = 3)
+#'
+#' ### Example 2: Exploring powers for different sets of available relatives
 #'
 #' # Create trio pedigree
 #' ref = nuclearPed(father = "fa", mother = "mo", child = "MP")
@@ -100,9 +136,10 @@
 #' }
 #'
 #' @importFrom stats aggregate
+#' @importFrom scales oob_keep
 #' @export
 powerPlot = function(ep, ip = NULL, type = 1, majorpoints = TRUE, minorpoints = TRUE,
-                     ellipse = FALSE, col = NULL, labs = NULL, alpha = 1, stroke = 1.5,
+                     ellipse = FALSE, col = NULL, labs = NULL, jitter = FALSE, alpha = 1, stroke = 1.5,
                      shape = "circle", size = 1, hline = NULL, vline = NULL,
                      xlim = NULL, ylim = NULL, xlab = NULL, ylab = NULL) {
   if(!requireNamespace("ggplot2", quietly = TRUE))
@@ -260,13 +297,14 @@ powerPlot = function(ep, ip = NULL, type = 1, majorpoints = TRUE, minorpoints = 
       ggplot2::stat_ellipse(data = minor, ggplot2::aes(colour = group), na.rm = TRUE)} +
     {if(majorpoints)
       ggplot2::geom_point(data = major, ggplot2::aes(fill = group, shape = group),
-                        size = majorSize, alpha = majorAlpha, colour = "black", stroke = stroke)} +
+                          position = if(jitter) ggplot2::position_jitter(width = 0.025, height = 0.025) else "identity",
+                          size = majorSize, alpha = majorAlpha, colour = "black", stroke = stroke)} +
     ggplot2::labs(x = xlab, y = ylab, fill = NULL, colour = NULL) +
     ggplot2::scale_colour_manual(values = col) +
     ggplot2::scale_fill_manual(values = col) +
     ggplot2::scale_shape_manual(values = shapeMapMajor) +
-    ggplot2::scale_x_continuous(limits = xlim) +
-    ggplot2::scale_y_continuous(limits = ylim) +
+    ggplot2::scale_x_continuous(limits = xlim, oob = scales::oob_keep) +
+    ggplot2::scale_y_continuous(limits = ylim, oob = scales::oob_keep) +
     ggplot2::guides(colour = "none",
                     fill = if(nolegend) "none" else ggplot2::guide_legend(title = "", reverse = TRUE),
                     shape = if(nolegend) "none" else ggplot2::guide_legend(title = "", reverse = TRUE)
