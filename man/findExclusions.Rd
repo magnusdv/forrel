@@ -11,7 +11,7 @@ findExclusions(x, id, candidate, removeMut = TRUE)
 
 \item{id}{A character of length 1; the name of an untyped member of \code{x}.}
 
-\item{candidate}{A singleton pedigreee, with genotypes for the same markers as \code{x}.}
+\item{candidate}{A singleton pedigree, with genotypes for the same markers as \code{x}.}
 
 \item{removeMut}{A logical. If TRUE (default), all mutations models are stripped.}
 }

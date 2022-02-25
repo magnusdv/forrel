@@ -1,3 +1,20 @@
+# forrel 1.4.0
+
+## New features
+
+* New function `findExclusions()` for identifying incompatible markers in identification cases.
+
+* `powerPlot()` gains a logical argument `jitter`, which can be switched on to avoid overplotting.
+
+* `checkPairwise()` gains an argument `excludeInbred`, which is TRUE by default. This is sensible since the plot shows estimated kappa coefficients, which are well-behaved only for pairs of noninbred individuals.
+
+## Other chages
+
+* **forrel** now requires R version 4.1 and recent versions of **pedtools** and **ribd**. This allowed many simplifications in code and examples.
+
+* Added **scales** as a suggested package.
+
+
 # forrel 1.3.0
 
 ## New features

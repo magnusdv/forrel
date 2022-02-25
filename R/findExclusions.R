@@ -4,7 +4,7 @@
 #'
 #' @param x A `ped` object or a list of such.
 #' @param id A character of length 1; the name of an untyped member of `x`.
-#' @param candidate A singleton pedigreee, with genotypes for the same markers as `x`.
+#' @param candidate A singleton pedigree, with genotypes for the same markers as `x`.
 #' @param removeMut A logical. If TRUE (default), all mutations models are stripped.
 #' @return A character vector containing the names of incompatible markers.
 #'
