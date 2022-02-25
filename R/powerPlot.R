@@ -136,14 +136,15 @@
 #' }
 #'
 #' @importFrom stats aggregate
-#' @importFrom scales oob_keep
 #' @export
 powerPlot = function(ep, ip = NULL, type = 1, majorpoints = TRUE, minorpoints = TRUE,
                      ellipse = FALSE, col = NULL, labs = NULL, jitter = FALSE, alpha = 1, stroke = 1.5,
                      shape = "circle", size = 1, hline = NULL, vline = NULL,
                      xlim = NULL, ylim = NULL, xlab = NULL, ylab = NULL) {
   if(!requireNamespace("ggplot2", quietly = TRUE))
-    stop2("Package `ggplot2` is not installed. Please install this and try again.")
+    stop2("This function needs the `ggplot2` package, which does not seem to be available. Please install `ggplot2` and try again.")
+  if(!requireNamespace("scales", quietly = TRUE))
+    stop2("This function needs the `scales` package, which does not seem to be available. Please install `scales` and try again.")
 
   # TODO: simplify
   if(inherits(ep, "MPPsim")) {
