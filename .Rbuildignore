@@ -3,9 +3,9 @@
 ^README\.Rmd$
 ^notes-private$
 ^cran-comments\.md$
-^CRAN-RELEASE$
 ^Rprof.out$
 ^data-raw$
 ^R/examineKinships.R$
 ^R/kinshipPowerSims.R
 ^R/relationLR.R$
+^CRAN-SUBMISSION$
