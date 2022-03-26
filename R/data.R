@@ -84,3 +84,40 @@
 #'   Genetics Supplement Series, Volume 4 (1).
 #'
 "NorwegianFrequencies"
+
+
+#' FORCE panel kinship SNPs
+#'
+#' A data frame with data on a subset of the SNPs included on the FORCE panel
+#' (Tillmar et al., 2021). The subset contains the SNPs marked recommended for
+#' kinship analysis. As the original publication did not include allele
+#' frequencies, these have been obtained from Ensemble via the biomaRt package.
+#' 15 markers were removed as frequency information could not be
+#' retrieved.
+#'
+#' @format A data frame with 3915 rows and 6 columns:
+#'
+#'   * MARKER: Marker name (rs number)
+#'
+#'   * CHROM: Chromosome (1-22)
+#'
+#'   * MB: Physical position in megabases, according to genome build GRCh38
+#'
+#'   * AL1: Major allele
+#'
+#'   * AL2: Minor allele
+#'
+#'   * FR1: Allele frequency of AL1
+#'
+#' The data frame is designed to work smoothly with [pedtools::setSNPs()].
+#'
+#' @source Tillmar et al. The FORCE Panel: An All-in-One SNP Marker Set for
+#'   Confirming Investigative Genetic Genealogy Leads and for General Forensic
+#'   Applications. Genes. (2021)
+#'
+#' @examples
+#' x = setSNPs(nuclearPed(), FORCE)
+#' summary(x)
+#' head(getMap(x))
+#'
+"FORCE"
