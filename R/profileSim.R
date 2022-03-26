@@ -75,21 +75,24 @@ profileSim = function(x, N = 1, ids = NULL, markers = NULL, seed = NULL,
   if(is.null(markers))
     markers = seq_len(nMarkers(x))
 
-  # If single marker object, convert to list
-  if(is.marker(markers))
-    markers = list(markers)
+  # If marker object(s), attach
+  if(is.marker(markers)) {
+    x = setMarkers(x, markers, checkCons = TRUE)
+    markers = 1L
+  }
+  if(is.markerList(markers)) {
+    x = setMarkers(x, markers, checkCons = TRUE)
+    markers = seq_along(markers)
+  }
 
   if(length(markers) == 0) {
     message("Empty profile; returning `ped` object unchanged")
     return(x)
   }
 
-  # Marker names are lost in the sims - must be re-added
-  if (is.markerList(markers))
-    mnames = vapply(markers, name, "")
-  else if (is.atomic(markers))
-    mnames = name(x, markers)
-  nonNAs = which(!is.na(mnames))
+  # Marker names/positions are lost in the sims - must be re-added
+  map = getMap(x, markers = markers, verbose = FALSE)
+  useMap = !all(is.na(map))
 
 
   ### SIMULATIONS ###
@@ -125,11 +128,11 @@ profileSim = function(x, N = 1, ids = NULL, markers = NULL, seed = NULL,
   # Output: List of N `ped`s, each with length(markers) attached markers
   sims = lapply(1:N, function(i) {
     mlist = lapply(sims_markerwise, function(y) y$MARKERS[[i]])
-    s = setMarkers(x, mlist)
+    s = setMarkers(x, mlist, checkCons = FALSE)
 
-    # Add names if necessary
-    if(length(nonNAs) > 0)
-      name(s, nonNAs) = mnames[nonNAs]
+    # Add names/positions if necessary
+    if(useMap)
+      s = setMap(s, map, matchNames = FALSE)
 
     s
   })

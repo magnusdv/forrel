@@ -35,6 +35,8 @@ retrieved.
 }
 \examples{
 x = setSNPs(nuclearPed(), FORCE)
+summary(x)
+head(getMap(x))
 
 }
 \keyword{datasets}
