@@ -1,3 +1,8 @@
+# forrel 1.4.1
+
+* Fix CRAN complaint: Use `inherits()` instead of `class()`
+.
+
 # forrel 1.4.0
 
 ## New features
