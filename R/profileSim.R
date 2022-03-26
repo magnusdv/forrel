@@ -43,6 +43,11 @@ profileSim = function(x, N = 1, ids = NULL, markers = NULL, seed = NULL,
   if(!is.ped(x) && !is.pedList(x))
     stop2("The first argument must be a `ped` object or a list of such")
 
+  # Check for linked markers
+  if(hasLinkedMarkers(x))
+    warning("Linked markers detected. Be aware that this function ignores linkage.\n",
+            "(You may want to use `ibdsim2::profileSimIBD()` instead.)", call. = FALSE)
+
   # Set seed once (instead of passing it to markerSim)
   if(!is.null(seed))
     set.seed(seed)
