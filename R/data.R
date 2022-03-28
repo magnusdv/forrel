@@ -118,6 +118,8 @@
 #' @examples
 #' x = setSNPs(nuclearPed(), snpData = FORCE)
 #' summary(x)
-#' head(getMap(x))
+#'
+#' getMap(x, markers = 1:5)
+#' getFreqDatabase(x, markers = 1:5)
 #'
 "FORCE"

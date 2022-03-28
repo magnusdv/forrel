@@ -34,9 +34,11 @@ frequencies, these have been obtained from Ensemble via the biomaRt package.
 retrieved.
 }
 \examples{
-x = setSNPs(nuclearPed(), FORCE)
+x = setSNPs(nuclearPed(), snpData = FORCE)
 summary(x)
-head(getMap(x))
+
+getMap(x, markers = 1:5)
+getFreqDatabase(x, markers = 1:5)
 
 }
 \keyword{datasets}
