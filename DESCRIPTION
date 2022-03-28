@@ -40,7 +40,8 @@ Suggests:
     ggplot2,
     poibin,
     scales,
-    testthat
+    testthat,
+    ibdsim2
 Encoding: UTF-8
 Language: en-GB
 LazyData: true
