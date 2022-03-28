@@ -35,10 +35,17 @@ an error.}
 \item{markers}{A vector of marker names or indices indicating which markers
 should be included. If NULL (the default) all markers are used.}
 
-\item{linkageMap}{Either NULL (default), or a data frame with three columns:
-chromosome; marker name; centiMorgan position. If given, it signifies to
-the program that the markers are linked and invokes MERLIN for computing
-the likelihoods.}
+\item{linkageMap}{If this is non-NULL, the markers are interpreted as being
+linked, and likelihoods will be computed by an external call to MERLIN.
+
+The supplied object should be either:
+\itemize{
+\item a data frame, whose first three columns must be (i) chromosome (ii)
+marker name (iii) centiMorgan position, or
+\item an \code{genomeMap} object, typically created with \code{ibdsim2::loadMap()}. This
+will internally be applied to the attached markers to produce a suitable
+data frame as above.
+}}
 
 \item{verbose}{A logical.}
 }
@@ -111,17 +118,18 @@ if(requireNamespace("ibdsim2", quietly = TRUE)) {
   U = relabel(cousinPed(0, removal = 1), old = c(3,6), new = ids)
   G = relabel(linearPed(2), old = c(1,5), new = ids)
 
-  # Attach FORCE panel of SNPs
-  G = setSNPs(G, FORCE[1:20, ])  # use all for better results
+  # Attach FORCE panel of SNPs to G
+  G = setSNPs(G, FORCE[1:10, ])  # use all for better results
 
   # Simulate recombination pattern in G
-  ibd = ibdsim2::ibdsim(G, N = 1)[[1]]
+  map = ibdsim2::loadMap("decode19")#, uniform = TRUE)   # unif for speed
+  ibd = ibdsim2::ibdsim(G, N = 1, ids = ids, map = map)[[1]]
 
   # Simulate genotypes conditional on pattern
-  G = ibdsim2::profileSimIBD(G, ibdpattern = ibd, ids = ids)
+  G = ibdsim2::profileSimIBD(G, ibdpattern = ibd)
 
-  # Compute LR
-  kinshipLR(H, U, G, linkageMap = getMap(G))
+  # Compute LR (genotypes are automatically transferred to H and U)
+  kinshipLR(H, U, G, linkageMap = map)
 }
 
 }
