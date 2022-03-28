@@ -97,11 +97,11 @@
 #'
 #' @format A data frame with 3915 rows and 6 columns:
 #'
-#'   * MARKER: Marker name (rs number)
-#'
 #'   * CHROM: Chromosome (1-22)
 #'
-#'   * MB: Physical position in megabases, according to genome build GRCh38
+#'   * MARKER: Marker name (rs number)
+#'
+#'   * MB: Physical position in megabases (build GRCh38)
 #'
 #'   * AL1: Major allele
 #'
@@ -116,7 +116,7 @@
 #'   Applications. Genes. (2021)
 #'
 #' @examples
-#' x = setSNPs(nuclearPed(), FORCE)
+#' x = setSNPs(nuclearPed(), snpData = FORCE)
 #' summary(x)
 #' head(getMap(x))
 #'

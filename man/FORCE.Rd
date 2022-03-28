@@ -7,9 +7,9 @@
 \format{
 A data frame with 3915 rows and 6 columns:
 \itemize{
-\item MARKER: Marker name (rs number)
 \item CHROM: Chromosome (1-22)
-\item MB: Physical position in megabases, according to genome build GRCh38
+\item MARKER: Marker name (rs number)
+\item MB: Physical position in megabases (build GRCh38)
 \item AL1: Major allele
 \item AL2: Minor allele
 \item FR1: Allele frequency of AL1

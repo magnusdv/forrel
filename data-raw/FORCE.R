@@ -1,12 +1,14 @@
 library(tidyverse)
 library(biomaRt)
 
-xraw = readxl::read_xlsx("data-raw/FORCE-data.xlsx", skip = 2,
-                         col_types = "text", n_max = 5422) # skip bad ones at the bottom
+xraw = readxl::read_xlsx("data-raw/FORCE-data.xlsx",
+                         skip = 2,
+                         n_max = 5422,  # skip bad ones at the bottom
+                         col_types = "text")
 
 x = xraw %>%
   dplyr::filter(startsWith(Type, "Kinship")) %>%
-  dplyr::select(MARKER = SNP, CHROM = Chromosome, POS = "GRCh38 Region",
+  dplyr::select(CHROM = Chromosome, MARKER = SNP, POS = "GRCh38 Region",
          REF = "Reference Allele", ALT = "Alternate Allele") %>%
   dplyr::mutate(POS = as.integer(POS)) %>%
   print
@@ -30,8 +32,7 @@ y = left_join(x, info, by = c(MARKER = "refsnp_id")) %>%
     A1 = if_else(minor_allele == REF, ALT, REF),
     A2 = if_else(minor_allele == REF, REF, ALT),
     FREQ1 = 1 - minor_allele_freq
-  ) %>%
-  print
+  ) # %>% print
 
 # Checks
 filter(y, POS != chrom_start)
@@ -40,7 +41,9 @@ filter(y, nchar(A1) !=1 | nchar(A2) !=1)
 
 # Final table
 FORCE = y %>%
-  dplyr::select(MARKER, CHROM, MB, A1, A2, FREQ1) %>%
+  dplyr::select(CHROM, MARKER, MB, A1, A2, FREQ1) %>%
   as.data.frame()
+
+print(head(FORCE))
 
 usethis::use_data(FORCE, overwrite = TRUE)
