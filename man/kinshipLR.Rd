@@ -101,10 +101,11 @@ res$LRperMarker
 res$likelihoodsPerMarker
 
 
-### The power of linked markers
+### Separating grandparent/halfsib/uncle-newphew
+
 if(requireNamespace("ibdsim2", quietly = TRUE)) {
 
-  # Three relationships: H, U, G
+  # Define pedigrees
   ids = c("A", "B")
   H = relabel(halfSibPed(), old = 4:5, new = ids)
   U = relabel(cousinPed(0, removal = 1), old = c(3,6), new = ids)
