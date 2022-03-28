@@ -101,6 +101,28 @@ res$LRperMarker
 res$likelihoodsPerMarker
 
 
+### The power of linked markers
+if(requireNamespace("ibdsim2", quietly = TRUE)) {
+
+  # Three relationships: H, U, G
+  ids = c("A", "B")
+  H = relabel(halfSibPed(), old = 4:5, new = ids)
+  U = relabel(cousinPed(0, removal = 1), old = c(3,6), new = ids)
+  G = relabel(linearPed(2), old = c(1,5), new = ids)
+
+  # Attach FORCE panel of SNPs
+  G = setSNPs(G, FORCE[1:20, ])  # use all for better results
+
+  # Simulate recombination pattern in G
+  ibd = ibdsim2::ibdsim(G, N = 1)[[1]]
+
+  # Simulate genotypes conditional on pattern
+  G = ibdsim2::profileSimIBD(G, ibdpattern = ibd, ids = ids)
+
+  # Compute LR
+  kinshipLR(H, U, G, linkageMap = getMap(G))
+}
+
 }
 \seealso{
 \code{\link[=LRpower]{LRpower()}}, \code{\link[pedprobr:merlin]{pedprobr::likelihoodMerlin()}}

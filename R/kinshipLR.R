@@ -85,6 +85,29 @@
 #' res$likelihoodsPerMarker
 #'
 #'
+#' ### Linked markers: Separation of H/U/G
+#'
+#' if(requireNamespace("ibdsim2", quietly = TRUE)) {
+#'
+#'   # Three relationships: H, U, G
+#'   ids = c("A", "B")
+#'   H = relabel(halfSibPed(), old = 4:5, new = ids)
+#'   U = relabel(cousinPed(0, removal = 1), old = c(3,6), new = ids)
+#'   G = relabel(linearPed(2), old = c(1,5), new = ids)
+#'
+#'   # Attach FORCE panel of SNPs
+#'   G = setSNPs(G, FORCE[1:20, ])  # use all for better results
+#'
+#'   # Simulate recombination pattern in G
+#'   ibd = ibdsim2::ibdsim(G, N = 1)[[1]]
+#'
+#'   # Simulate genotypes conditional on pattern
+#'   G = ibdsim2::profileSimIBD(G, ibdpattern = ibd, ids = ids)
+#'
+#'   # Compute LR
+#'   kinshipLR(H, U, G, linkageMap = getMap(G))
+#' }
+#'
 #' @export
 kinshipLR = function(..., ref = NULL, source = NULL, markers = NULL, linkageMap = NULL, verbose = FALSE) {
   st = proc.time()
@@ -152,6 +175,9 @@ kinshipLR = function(..., ref = NULL, source = NULL, markers = NULL, linkageMap 
       srcPed = selectMarkers(srcPed, markers)
       markers = NULL # important!
     }
+    if(!is.null(linkageMap))
+      srcPed = lumpAlleles(srcPed, always = TRUE, verbose = verbose)
+
     x = lapply(x, transferMarkers, from = srcPed)
   }
 
@@ -179,25 +205,45 @@ kinshipLR = function(..., ref = NULL, source = NULL, markers = NULL, linkageMap 
 
   names(x) = hypnames
 
-  ### Linked markers: call MERLIN
+
+  # Linked markers: MERLIN ---------------------------------------------
+  if(hasLinkedMarkers(x[[1]]) && is.null(linkageMap))
+    stop2("Linked markers detected, but no `linkageMap` provided")
+
   if(!is.null(linkageMap)) {
     if(!checkMerlin())
       stop2("Kinship analysis with linked markers requires MERLIN to be installed")
 
-    xLumped = lapply(x, lumpAlleles, verbose = verbose)
+    # Lump all peds, if not already done (a bit of a hack)
+    if(is.null(source))
+      x = lapply(x, lumpAlleles, verbose = verbose)
 
-    lnLik = vapply(xLumped, function(hyp)
-      likelihoodMerlin(hyp, markers = markers, linkageMap = linkageMap,
-                       logbase = exp(1), verbose = FALSE),
-      FUN.VALUE = 1)
+    lnLikList = lapply(x, function(hyp)
+      likelihoodMerlin(hyp, markers = markers, linkageMap = linkageMap, perChrom = TRUE,
+                       logbase = exp(1), verbose = FALSE))
 
-    LRtotal = exp(lnLik - lnLik[[refIdx]])
-    LRtotal = signif(LRtotal, 3)
+    lnLikChrom = do.call(cbind, lnLikList)
+    rownames(lnLikChrom) = names(lnLikList[[1]]) # chrom labels
+
+    lnLik = colSums(lnLikChrom)
+    lnDiff = lnLik - lnLik[[refIdx]]
+    LRtotal = signif(exp(lnDiff), 3)
     names(LRtotal) = paste0(hypnames, ":", hypnames[refIdx])
 
-    return(structure(
-      list(LRtotal = LRtotal, lnLik = lnLik),
-      class = "LRresult"))
+    if(any(LRtotal == Inf & lnDiff < Inf))
+      warning("Overflow!\nOutput entries `lnLik` and `lnLikChrom` may still be informative",
+              immediate. = TRUE, call. = FALSE)
+    if(any(LRtotal == 0 & lnDiff > -Inf))
+      warning("Underflow!\nOutput entries `lnLik` and `lnLikChrom` may still be informative",
+              immediate. = TRUE, call. = FALSE)
+
+    lnDiffChrom = lnLikChrom - lnLikChrom[,refIdx]
+    LRchrom = signif(exp(lnDiffChrom), 3)
+
+    res = list(LRtotal = LRtotal, lnLik = lnLik,
+               LRchrom = LRchrom, lnLikChrom = lnLikChrom,
+               time = proc.time() - st)
+    return(structure(res, class = "LRresult"))
   }
 
   # Break all loops (NB: rapply() doesn't work here, since is.list(ped) = TRUE)
