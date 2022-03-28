@@ -10,3 +10,4 @@ R/examineKinships.R
 R/relationLR.R
 R/kinshipPowerSims.R
 man/kinshipPowerSims.Rd
+revdep/
