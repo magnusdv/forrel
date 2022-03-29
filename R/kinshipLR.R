@@ -157,7 +157,7 @@ kinshipLR = function(..., ref = NULL, source = NULL, markers = NULL, linkageMap 
     cat("Reference pedigree: ", ref, "\n")
 
   if(is.null(source)) {
-    # Identity peds without marker data
+    # Identify peds without marker data
     empty = !sapply(x, hasMarkers)
 
     if(all(empty))
@@ -196,6 +196,9 @@ kinshipLR = function(..., ref = NULL, source = NULL, markers = NULL, linkageMap 
     if(!all(nm == nm[1]))
       stop2("When `markers = NULL`, all pedigrees must have the same number of attached markers: ", nm)
     markers = seq_len(nm[1])
+  }
+  else {
+    x = lapply(x, selectMarkers, markers)
   }
 
   if(verbose)
