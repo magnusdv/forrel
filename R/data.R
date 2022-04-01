@@ -89,27 +89,29 @@
 #' FORCE panel kinship SNPs
 #'
 #' A data frame with data on a subset of the SNPs included on the FORCE panel
-#' (Tillmar et al., 2021). The subset contains the SNPs marked recommended for
-#' kinship analysis. As the original publication did not include allele
-#' frequencies, these have been obtained from Ensemble via the biomaRt package.
-#' 15 markers were removed as frequency information could not be
+#' (Tillmar et al., 2021). The subset contains the SNPs marked by the authors as
+#' recommended for kinship analysis. As the original publication did not include
+#' allele frequencies, these have been obtained from Ensemble via the biomaRt
+#' package. 15 markers were removed as frequency information could not be
 #' retrieved.
+#'
+#' To attach the FORCE markers to a pedigree, use [pedtools::setSNPs()] (see
+#' Examples).
+#'
 #'
 #' @format A data frame with 3915 rows and 6 columns:
 #'
-#'   * CHROM: Chromosome (1-22)
+#'   * `CHROM`: Chromosome (1-22)
 #'
-#'   * MARKER: Marker name (rs number)
+#'   * `MARKER`: Marker name (rs number)
 #'
-#'   * MB: Physical position in megabases (build GRCh38)
+#'   * `MB`: Physical position in megabases (build GRCh38)
 #'
-#'   * AL1: Major allele
+#'   * `A1`: First allele
 #'
-#'   * AL2: Minor allele
+#'   * `A2`: Second allele
 #'
-#'   * FR1: Allele frequency of AL1
-#'
-#' The data frame is designed to work smoothly with [pedtools::setSNPs()].
+#'   * `FREQ1`: Allele frequency of `A1`
 #'
 #' @source Tillmar et al. The FORCE Panel: An All-in-One SNP Marker Set for
 #'   Confirming Investigative Genetic Genealogy Leads and for General Forensic

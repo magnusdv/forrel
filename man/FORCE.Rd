@@ -7,15 +7,13 @@
 \format{
 A data frame with 3915 rows and 6 columns:
 \itemize{
-\item CHROM: Chromosome (1-22)
-\item MARKER: Marker name (rs number)
-\item MB: Physical position in megabases (build GRCh38)
-\item AL1: Major allele
-\item AL2: Minor allele
-\item FR1: Allele frequency of AL1
+\item \code{CHROM}: Chromosome (1-22)
+\item \code{MARKER}: Marker name (rs number)
+\item \code{MB}: Physical position in megabases (build GRCh38)
+\item \code{A1}: First allele
+\item \code{A2}: Second allele
+\item \code{FREQ1}: Allele frequency of \code{A1}
 }
-
-The data frame is designed to work smoothly with \code{\link[pedtools:setSNPs]{pedtools::setSNPs()}}.
 }
 \source{
 Tillmar et al. The FORCE Panel: An All-in-One SNP Marker Set for
@@ -27,11 +25,15 @@ FORCE
 }
 \description{
 A data frame with data on a subset of the SNPs included on the FORCE panel
-(Tillmar et al., 2021). The subset contains the SNPs marked recommended for
-kinship analysis. As the original publication did not include allele
-frequencies, these have been obtained from Ensemble via the biomaRt package.
-15 markers were removed as frequency information could not be
+(Tillmar et al., 2021). The subset contains the SNPs marked by the authors as
+recommended for kinship analysis. As the original publication did not include
+allele frequencies, these have been obtained from Ensemble via the biomaRt
+package. 15 markers were removed as frequency information could not be
 retrieved.
+}
+\details{
+To attach the FORCE markers to a pedigree, use \code{\link[pedtools:setSNPs]{pedtools::setSNPs()}} (see
+Examples).
 }
 \examples{
 x = setSNPs(nuclearPed(), snpData = FORCE)
