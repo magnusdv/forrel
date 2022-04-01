@@ -223,7 +223,7 @@ kinshipLR = function(..., ref = NULL, source = NULL, markers = NULL, linkageMap 
     stop2("Linked markers detected, but no `linkageMap` provided")
 
   if(!is.null(linkageMap)) {
-    if(!checkMerlin())
+    if(!checkMerlin("merlin", version = FALSE, error = FALSE))
       stop2("Kinship analysis with linked markers requires MERLIN to be installed and available in the search path")
 
     # If ibdsim recombination map, apply it to the attached markers
