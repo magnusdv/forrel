@@ -24,12 +24,12 @@ Applications. Genes. (2021)
 FORCE
 }
 \description{
-A data frame with data on a subset of the SNPs included on the FORCE panel
-(Tillmar et al., 2021). The subset contains the SNPs marked by the authors as
-recommended for kinship analysis. As the original publication did not include
-allele frequencies, these have been obtained from Ensemble via the biomaRt
-package. 15 markers were removed as frequency information could not be
-retrieved.
+A data frame describing (a subset of) the FORCE panel of SNPs designed for
+applications in forensic genetics (Tillmar et al., 2021). The subset included
+here are the SNPs recommended for kinship analysis. As the original
+publication did not include allele frequencies, these were downloaded from
+Ensembl via the biomaRt package. 15 markers were removed as frequency
+information could not be retrieved.
 }
 \details{
 To attach the FORCE markers to a pedigree, use \code{\link[pedtools:setSNPs]{pedtools::setSNPs()}} (see
