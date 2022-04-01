@@ -224,7 +224,7 @@ kinshipLR = function(..., ref = NULL, source = NULL, markers = NULL, linkageMap 
 
   if(!is.null(linkageMap)) {
     if(!checkMerlin())
-      stop2("Kinship analysis with linked markers requires MERLIN to be installed")
+      stop2("Kinship analysis with linked markers requires MERLIN to be installed and available in the search path")
 
     # If ibdsim recombination map, apply it to the attached markers
     if(inherits(linkageMap, "genomeMap")) {
@@ -243,7 +243,7 @@ kinshipLR = function(..., ref = NULL, source = NULL, markers = NULL, linkageMap 
 
     lnLikList = lapply(x, function(hyp)
       likelihoodMerlin(hyp, markers = markers, linkageMap = linkageMap, perChrom = TRUE,
-                       logbase = exp(1), verbose = FALSE))
+                       logbase = exp(1), checkpath = FALSE, verbose = FALSE))
 
     lnLikChrom = do.call(cbind, lnLikList)
     rownames(lnLikChrom) = names(lnLikList[[1]]) # chrom labels
