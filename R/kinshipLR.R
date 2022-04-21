@@ -223,6 +223,9 @@ kinshipLR = function(..., ref = NULL, source = NULL, markers = NULL, linkageMap 
     stop2("Linked markers detected, but no `linkageMap` provided")
 
   if(!is.null(linkageMap)) {
+    if(verbose)
+      cat("Linkage map detected - preparing to run MERLIN/MINX\n")
+
     if(!checkMerlin("merlin", version = FALSE, error = FALSE))
       stop2("Kinship analysis with linked markers requires MERLIN to be installed and available in the search path")
 
@@ -238,8 +241,8 @@ kinshipLR = function(..., ref = NULL, source = NULL, markers = NULL, linkageMap 
     }
 
     # Lump all peds, if not already done (a bit of a hack)
-    if(is.null(source))
-      x = lapply(x, lumpAlleles, verbose = verbose)
+    #if(is.null(source))
+    #  x = lapply(x, lumpAlleles, verbose = verbose)
 
     lnLikList = lapply(x, function(hyp)
       likelihoodMerlin(hyp, markers = markers, linkageMap = linkageMap, perChrom = TRUE,
