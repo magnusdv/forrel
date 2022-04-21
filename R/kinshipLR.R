@@ -246,7 +246,7 @@ kinshipLR = function(..., ref = NULL, source = NULL, markers = NULL, linkageMap 
 
     lnLikList = lapply(x, function(hyp)
       likelihoodMerlin(hyp, markers = markers, linkageMap = linkageMap, perChrom = TRUE,
-                       logbase = exp(1), checkpath = FALSE, verbose = FALSE))
+                       logbase = exp(1), checkpath = FALSE, verbose = verbose))
 
     lnLikChrom = do.call(cbind, lnLikList)
     rownames(lnLikChrom) = names(lnLikList[[1]]) # chrom labels
