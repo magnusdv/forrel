@@ -4,16 +4,15 @@
 \alias{missingPersonLR}
 \title{Likelihood ratio calculation for missing person identification}
 \usage{
-missingPersonLR(reference, missing, poi)
+missingPersonLR(reference, missing, poi = NULL, verbose = TRUE)
 }
 \arguments{
 \item{reference}{A \code{ped} object with attached markers.}
 
 \item{missing}{The ID label of the missing member of \code{reference}.}
 
-\item{poi}{A \code{singleton} object with genotypes for the person of interest.
-The marker names of \code{poi} must coincide with those of \code{reference}. The ID
-label of \code{poi} is irrelevant.}
+\item{poi}{A \code{singleton} object, or NULL. If NULL, and \code{missing} is
+genotyped, this data is extracted and used as \code{poi}.}
 }
 \value{
 The \code{LRresult} object returned by \code{\link[=kinshipLR]{kinshipLR()}}, but without the
@@ -54,7 +53,7 @@ lr1$LRperMarker
 ### Person of interest 2: The true MP
 
 # Simulate MP conditional on reference, and extract as singleton
-poi2 = profileSim(x, N = 1, ids = "MP")[[1]]
+poi2 = profileSim(x, N = 1, ids = c("2", "MP"))[[1]]
 
 # Extract MP as singleton
 poi2 = subset(poi2, "MP")
