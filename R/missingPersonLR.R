@@ -8,6 +8,8 @@
 #' @param missing The ID label of the missing member of `reference`.
 #' @param poi A `singleton` object, or NULL. If NULL, and `missing` is
 #'   genotyped, this data is extracted and used as `poi`.
+#' @param verbose A logical.
+#' @param ... Optional parameters to be passed onto [kinshipLR()].
 #'
 #' @return The `LRresult` object returned by [kinshipLR()], but without the
 #'   trivial `H2:H2` comparison.
@@ -17,43 +19,23 @@
 #' # Example: Identification of a missing grandchild
 #' #------------------------------------------------
 #'
-#' set.seed(2509)
+#' # Reference pedigree with missing grandchild (MP)
+#' x = linearPed(2) |> relabel(old = 5, new = "MP")
 #'
-#' ### Reference pedigree with missing grandchild (MP)
-#' x = relabel(linearPed(2), old = 5, new = "MP")
+#' # Database with 5 STR markers
+#' db = NorwegianFrequencies[1:5]
 #'
-#' # Simulate reference data for grandmother (5 STR markers)
-#' x = setMarkers(x, locusAttributes = NorwegianFrequencies[1:5])
-#' x = profileSim(x, N = 1, ids = 2)[[1]]
-#'
-#' ### Person of interest 1: Unrelated
-#' poi1 = singleton("poi1")
-#'
-#' # Transfer (empty) markers and simulate genotypes
-#' poi1 = transferMarkers(from = x, to = poi1)
-#' poi1 = profileSim(poi1, N = 1)[[1]]
+#' # Simulate reference data for grandmother and MP (5 STR markers)
+#' x = setMarkers(x, locusAttributes = db)
+#' x = profileSim(x, N = 1, ids = c(2, "MP"), seed = 2509)[[1]]
 #'
 #' # Compute LR
-#' lr1 = missingPersonLR(x, missing = "MP", poi = poi1)
-#' lr1
-#' lr1$LRperMarker
-#'
-#'
-#' ### Person of interest 2: The true MP
-#'
-#' # Simulate MP conditional on reference, and extract as singleton
-#' poi2 = profileSim(x, N = 1, ids = c("2", "MP"))[[1]]
-#'
-#' # Extract MP as singleton
-#' poi2 = subset(poi2, "MP")
-#'
-#' # Compute LR
-#' lr2 = missingPersonLR(x, missing = "MP", poi = poi2)
-#' lr2
-#' lr2$LRperMarker
+#' lr = missingPersonLR(x, missing = "MP")
+#' lr
+#' lr$LRperMarker
 #'
 #' @export
-missingPersonLR = function(reference, missing, poi = NULL, verbose = TRUE) {
+missingPersonLR = function(reference, missing, poi = NULL, verbose = TRUE, ...) {
 
   if(is.pedList(reference))
     stop2("Argument `reference` must be a connected pedigree, not a list of pedigrees")
@@ -69,6 +51,9 @@ missingPersonLR = function(reference, missing, poi = NULL, verbose = TRUE) {
 
     if(verbose)
       cat(sprintf("Interpreting `%s` as the person of interest\n", missing))
+
+    # Good to lump early!
+    reference = lumpAlleles(reference)
 
     # Hyp1
     if(verbose)
@@ -106,9 +91,10 @@ missingPersonLR = function(reference, missing, poi = NULL, verbose = TRUE) {
     H2 = setAlleles(H2, missing, alleles = 0)
   }
 
+  if(verbose) cat("\n")
 
   # Calculate LR
-  lr = kinshipLR(H1, H2, ref = 2, verbose = FALSE)
+  lr = kinshipLR(H1, H2, ref = 2, verbose = verbose, ...)
   lr$LRtotal = lr$LRtotal[1]
   lr$LRperMarker = lr$LRperMarker[,1]
   lr
