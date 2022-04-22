@@ -224,7 +224,7 @@ kinshipLR = function(..., ref = NULL, source = NULL, markers = NULL, linkageMap 
 
   if(!is.null(linkageMap)) {
     if(verbose)
-      cat("Linkage map detected - preparing to run MERLIN/MINX\n")
+      cat("\nLinkage map detected - preparing MERLIN or MINX\n")
 
     if(!checkMerlin("merlin", version = FALSE, error = FALSE))
       stop2("Kinship analysis with linked markers requires MERLIN to be installed and available in the search path")
@@ -244,9 +244,9 @@ kinshipLR = function(..., ref = NULL, source = NULL, markers = NULL, linkageMap 
     #if(is.null(source))
     #  x = lapply(x, lumpAlleles, verbose = verbose)
 
-    lnLikList = lapply(x, function(hyp)
-      likelihoodMerlin(hyp, markers = markers, linkageMap = linkageMap, perChrom = TRUE,
-                       logbase = exp(1), checkpath = FALSE, verbose = verbose))
+    lnLikList = lapply(seq_along(x), function(i)
+      likelihoodMerlin(x[[i]], markers = markers, linkageMap = linkageMap, perChrom = TRUE,
+                       logbase = exp(1), checkpath = FALSE, verbose = verbose && (i == 1)))
 
     lnLikChrom = do.call(cbind, lnLikList)
     rownames(lnLikChrom) = names(lnLikList[[1]]) # chrom labels
