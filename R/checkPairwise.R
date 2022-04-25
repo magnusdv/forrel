@@ -79,7 +79,7 @@ checkPairwise = function(x, excludeInbred = TRUE, plot = TRUE, labels = FALSE, L
   kEst = ibdEstimate(x, ids = includeIds, verbose = FALSE)
 
   # Pedigree coefficients
-  kTrue = kappaIBD(x, ids = includeIds)
+  kTrue = kappaIBD(x, ids = includeIds, simplify = FALSE)
 
   # Merge (to ensure same pairing)
   kMerge = merge(kEst, kTrue, by = 1:2)
