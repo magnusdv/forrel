@@ -10,6 +10,7 @@ kinshipLR(
   source = NULL,
   markers = NULL,
   linkageMap = NULL,
+  keepMerlin = NULL,
   verbose = FALSE
 )
 }
@@ -42,10 +43,13 @@ The supplied object should be either:
 \itemize{
 \item a data frame, whose first three columns must be (i) chromosome (ii)
 marker name (iii) centiMorgan position, or
-\item an \code{genomeMap} object, typically created with \code{ibdsim2::loadMap()}. This
-will internally be applied to the attached markers to produce a suitable
-data frame as above.
+\item a map object created with \code{ibdsim2::uniformMap()} or
+\code{ibdsim2::loadMap()}. This will internally be applied to the attached
+markers to produce a suitable data frame as above.
 }}
+
+\item{keepMerlin}{Either NULL (default) or the path to an existing folder. If
+given, MERLIN files are stored here, typically for debugging purposes.}
 
 \item{verbose}{A logical.}
 }

@@ -35,10 +35,12 @@
 #'   * a data frame, whose first three columns must be (i) chromosome (ii)
 #'   marker name (iii) centiMorgan position, or
 #'
-#'   * an `genomeMap` object, typically created with `ibdsim2::loadMap()`. This
-#'   will internally be applied to the attached markers to produce a suitable
-#'   data frame as above.
+#'   * a map object created with `ibdsim2::uniformMap()` or
+#'   `ibdsim2::loadMap()`. This will internally be applied to the attached
+#'   markers to produce a suitable data frame as above.
 #'
+#' @param keepMerlin Either NULL (default) or the path to an existing folder. If
+#'   given, MERLIN files are stored here, typically for debugging purposes.
 #' @param verbose A logical.
 #'
 #' @seealso [LRpower()], [pedprobr::likelihoodMerlin()]
@@ -118,7 +120,8 @@
 #' }
 #'
 #' @export
-kinshipLR = function(..., ref = NULL, source = NULL, markers = NULL, linkageMap = NULL, verbose = FALSE) {
+kinshipLR = function(..., ref = NULL, source = NULL, markers = NULL, linkageMap = NULL,
+                     keepMerlin = NULL, verbose = FALSE) {
   st = proc.time()
 
   x = list(...)
@@ -230,7 +233,7 @@ kinshipLR = function(..., ref = NULL, source = NULL, markers = NULL, linkageMap 
       stop2("Kinship analysis with linked markers requires MERLIN to be installed and available in the search path")
 
     # If ibdsim recombination map, apply it to the attached markers
-    if(inherits(linkageMap, "genomeMap")) {
+    if(inherits(linkageMap, "genomeMap") || inherits(linkageMap, "chromMap")) {
       if(!requireNamespace("ibdsim2", quietly = TRUE))
         stop2("The supplied `linkageMap` requires the `ibdsim2` package, which seems unavailable. Install `ibdsim2` and try again.")
       if(verbose)
@@ -244,9 +247,22 @@ kinshipLR = function(..., ref = NULL, source = NULL, markers = NULL, linkageMap 
     #if(is.null(source))
     #  x = lapply(x, lumpAlleles, verbose = verbose)
 
-    lnLikList = lapply(seq_along(x), function(i)
-      likelihoodMerlin(x[[i]], markers = markers, linkageMap = linkageMap, perChrom = TRUE,
-                       logbase = exp(1), checkpath = FALSE, verbose = verbose && (i == 1)))
+    if(!is.null(keepMerlin)) {
+      if(!dir.exists(keepMerlin))
+        stop2("`keepMerlin` must point to an existing folder: ", keepMerlin)
+      cleanup = FALSE
+      dir = keepMerlin
+    }
+    else {
+      cleanup = TRUE
+      dir = tempdir()
+    }
+
+    merlinFUN = function(x, verb)
+      likelihoodMerlin(x, markers = markers, linkageMap = linkageMap, perChrom = TRUE, logbase = exp(1),
+                       checkpath = FALSE, cleanup = cleanup, dir = dir, verbose = verb)
+
+    lnLikList = lapply(seq_along(x), function(i) merlinFUN(x[[i]], verbose && (i == 1)))
 
     lnLikChrom = do.call(cbind, lnLikList)
     rownames(lnLikChrom) = names(lnLikList[[1]]) # chrom labels
