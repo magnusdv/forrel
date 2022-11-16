@@ -17,7 +17,8 @@ missingPersonPlot(
   POI.hatched = FALSE,
   POI.height = 8,
   titles = c(expression(H[1] * ": POI = MP"), expression(H[2] * ": POI unrelated")),
-  width = 4,
+  width = NULL,
+  cex = 1.2,
   newdev = interactive(),
   ...
 )
@@ -56,7 +57,9 @@ frames.}
 
 \item{width}{A positive number controlling the width of the plot. More
 specifically this number is the relative width of the reference pedigree,
-compared to a singleton. Default: 4.}
+compared to a singleton.}
+
+\item{cex}{Expansion factor for pedigree symbols and font size.}
 
 \item{newdev}{A logical: If TRUE the plot is created in a new plot window.}
 
@@ -103,15 +106,16 @@ x = nuclearPed(father = "fa", mother = "mo", children = c("b1", "b2"))
 # Default plot
 missingPersonPlot(x, missing = "b2")
 
-# A bit nicer using various options
-missingPersonPlot(x, missing = "b2", MP.label = "Missing", labs = NULL,
-                  hatched = "b1", POI.hatched = TRUE,
-                  width = 2,      # adjust internal spacing (see above)
-                  dev.width = 7,  # device width (see ?plotPedList())
-                  dev.height = 3, # device height (see ?plotPedList())
-                  fmar = 0.02,    # adjust frame margin (see ?plotPedList())
+# Exploring various options
+missingPersonPlot(x,
+                  missing = "b2",
+                  hatched = "b1",
+                  POI.hatched = TRUE,
+                  POI.sex = 0,
                   cex = 1.5,      # larger symbols and label font (see ?par())
-                  cex.main = 1.3  # larger frame titles (see ?par())
+                  cex.main = 1.3, # larger frame titles (see ?par())
+                  dev.width = 7,  # device width (see ?plotPedList())
+                  dev.height = 3  # device height (see ?plotPedList())
                   )
 
 }

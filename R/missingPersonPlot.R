@@ -52,7 +52,8 @@
 #'   frames.
 #' @param width A positive number controlling the width of the plot. More
 #'   specifically this number is the relative width of the reference pedigree,
-#'   compared to a singleton. Default: 4.
+#'   compared to a singleton.
+#' @param cex Expansion factor for pedigree symbols and font size.
 #' @param newdev A logical: If TRUE the plot is created in a new plot window.
 #' @param ... Extra parameters passed on to [pedtools::plotPedList()].
 #'
@@ -64,15 +65,16 @@
 #' # Default plot
 #' missingPersonPlot(x, missing = "b2")
 #'
-#' # A bit nicer using various options
-#' missingPersonPlot(x, missing = "b2", MP.label = "Missing", labs = NULL,
-#'                   hatched = "b1", POI.hatched = TRUE,
-#'                   width = 2,      # adjust internal spacing (see above)
-#'                   dev.width = 7,  # device width (see ?plotPedList())
-#'                   dev.height = 3, # device height (see ?plotPedList())
-#'                   fmar = 0.02,    # adjust frame margin (see ?plotPedList())
+#' # Exploring various options
+#' missingPersonPlot(x,
+#'                   missing = "b2",
+#'                   hatched = "b1",
+#'                   POI.hatched = TRUE,
+#'                   POI.sex = 0,
 #'                   cex = 1.5,      # larger symbols and label font (see ?par())
-#'                   cex.main = 1.3  # larger frame titles (see ?par())
+#'                   cex.main = 1.3, # larger frame titles (see ?par())
+#'                   dev.width = 7,  # device width (see ?plotPedList())
+#'                   dev.height = 3  # device height (see ?plotPedList())
 #'                   )
 #'
 #' @importFrom stats setNames
@@ -85,14 +87,12 @@ missingPersonPlot = function(reference, missing, labs = labels(reference),
                              POI.height = 8,
                              titles = c(expression(H[1] * ": POI = MP"),
                                         expression(H[2] * ": POI unrelated")),
-                             width = 4, newdev = interactive(), ...) {
+                             width = NULL, cex = 1.2, newdev = interactive(), ...) {
 
   if(!is.ped(reference))
     stop2("Expecting a connected pedigree as H1")
   if(length(POI.label) != 1 || POI.label == "")
     stop2("`POI.label` must be a non-empty character string")
-  if(!isNumber(width, minimum = 1))
-    stop2("`width` must be a number larger than 1")
 
   nInd = pedsize(reference)
   if(identical(labs, "num"))
@@ -105,7 +105,7 @@ missingPersonPlot = function(reference, missing, labs = labels(reference),
   ped_related = setSex(ped_related, ids = missing, sex = POI.sex)
 
   # Labels
-  mp_poi = if(MP.label != "") sprintf("%s (=%s)", POI.label, MP.label) else POI.label
+  mp_poi = if(MP.label != "") sprintf("%s=%s", MP.label, POI.label) else POI.label
   mp_label = setNames(missing, mp_poi)
   if (is.null(labs) || identical(labs, ""))
     labs1 = mp_label
@@ -140,14 +140,16 @@ missingPersonPlot = function(reference, missing, labs = labels(reference),
 
   # Relabel POI (above MP label was used to enable transfer/sex)
   s = relabel(s, POI.label)
-  plot3 = list(s, col = POI.col, hatched = if(POI.hatched) POI.label,
-               margins = c(POI.height,0,0,0))
+  plot3 = list(s, col = POI.col, hatched = if(POI.hatched) POI.label) # margins = c(POI.height,0,0,0))
+
+  widths = if(!is.null(width)) c(width, width, 1) else NULL
 
   ### Plot
   plotPedList(list(plot1, plot2, plot3),
-              widths = c(width, width, 1),
+              widths = widths,
               groups = list(1, 2:3),
               titles = titles,
               marker = marker,
-              newdev = newdev, ...)
+              newdev = newdev,
+              cex = cex, ...)
 }
