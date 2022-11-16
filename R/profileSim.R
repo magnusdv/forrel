@@ -14,7 +14,10 @@
 #'   attributes (allele frequencies, mutation models a.s.o.) and any existing
 #'   genotypes in the indicated markers.
 #' @param seed An integer seed for the random number generator (optional).
-#' @param numCores The number of cores used for parallelisation, by default 1.
+#' @param numCores The number of cores to be used. The default is 1, i.e., no
+#'   parallelisation.
+#' @param simplify1 A logical, by default TRUE. If N is 1, simplify the output
+#'   by removing the outmost list layer.
 #' @param verbose A logical, by default TRUE.
 #' @param ... Further arguments passed on to [markerSim()].
 #'
@@ -22,6 +25,10 @@
 #'   Any previously attached markers are replaced by the simulated profiles. If
 #'   the indicated markers contained genotypes for some pedigree members, these
 #'   are still present in the simulated profiles.
+#'
+#'   The parameter `simplify1` only comes into play when `N = 1`, in which case
+#'   `profileSim(..., simplify1 = T)` is equivalent to `profileSim(...,
+#'   simplify1 = F)[[1]]`.
 #'
 #' @examples
 #' # Example with two brothers
@@ -38,7 +45,7 @@
 #'   clusterEvalQ clusterExport clusterSetRNGStream
 #' @export
 profileSim = function(x, N = 1, ids = NULL, markers = NULL, seed = NULL,
-                      numCores = 1, verbose = TRUE, ...){
+                      numCores = 1, simplify1 = FALSE, verbose = TRUE, ...){
 
   if(!is.ped(x) && !is.pedList(x))
     stop2("The first argument must be a `ped` object or a list of such")
@@ -64,10 +71,14 @@ profileSim = function(x, N = 1, ids = NULL, markers = NULL, seed = NULL,
 
     res_compwise = lapply(x, function(comp)
       profileSim(comp, N = N, ids = if(!is.null(ids)) intersect(ids, labels(comp)),
-                 markers = markers, numCores = numCores, verbose = verbose, ...))
+                 markers = markers, numCores = numCores, simplify1 = FALSE, verbose = verbose, ...))
 
     # Transpose: Collect j'th sim of each component.
     res = lapply(1:N, function(j) lapply(res_compwise, `[[`, j))
+
+    if(simplify1 && N == 1)
+      res = res[[1]]
+
     return(res)
   }
 
@@ -136,6 +147,9 @@ profileSim = function(x, N = 1, ids = NULL, markers = NULL, seed = NULL,
 
     s
   })
+
+  if(simplify1 && N == 1)
+    sims = sims[[1]]
 
   sims
 }

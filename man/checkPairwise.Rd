@@ -56,13 +56,13 @@ achieve this.
 
 ### Example with realistic data
 
-x = addSon(nuclearPed(nch = 2), parent = 4)
-x = setMarkers(x, locus = NorwegianFrequencies)
-x = profileSim(x, N = 1, seed = 1729)[[1]]
+x = avuncularPed() |>
+  setMarkers(locus = NorwegianFrequencies) |>
+  profileSim(N = 1, simplify1 = TRUE, seed = 1729)
 
 checkPairwise(x)
 
-### Create sample swap between 1 and 3
+### Create an error: sample swap 1 <-> 3
 als = getAlleles(x)
 als[c(1,3), ] = als[c(3,1), ]
 y = setAlleles(x, alleles = als)
@@ -73,14 +73,11 @@ checkPairwise(y)
 # Combined plot of pedigree and IBD estimates
 dev.new(height = 5, width = 8, noRStudioGD = TRUE)
 layout(rbind(1:2), widths = 2:3)
-plot(x, margins = c(4,2,4,2))
-checkPairwise(x, labels = TRUE)
+plot(y, margins = c(4,2,4,2), title = "Sample swap 1 - 3")
+checkPairwise(y, labels = TRUE)
 }
 
 }
 \seealso{
 \code{\link[=ibdEstimate]{ibdEstimate()}}
-}
-\author{
-Magnus Dehli Vigeland
 }

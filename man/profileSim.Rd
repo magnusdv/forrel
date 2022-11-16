@@ -11,6 +11,7 @@ profileSim(
   markers = NULL,
   seed = NULL,
   numCores = 1,
+  simplify1 = FALSE,
   verbose = TRUE,
   ...
 )
@@ -31,7 +32,11 @@ genotypes in the indicated markers.}
 
 \item{seed}{An integer seed for the random number generator (optional).}
 
-\item{numCores}{The number of cores used for parallelisation, by default 1.}
+\item{numCores}{The number of cores to be used. The default is 1, i.e., no
+parallelisation.}
+
+\item{simplify1}{A logical, by default TRUE. If N is 1, simplify the output
+by removing the outmost list layer.}
 
 \item{verbose}{A logical, by default TRUE.}
 
@@ -42,6 +47,9 @@ A list of \code{N} objects similar to \code{x}, but with simulated genotypes.
 Any previously attached markers are replaced by the simulated profiles. If
 the indicated markers contained genotypes for some pedigree members, these
 are still present in the simulated profiles.
+
+The parameter \code{simplify1} only comes into play when \code{N = 1}, in which case
+\code{profileSim(..., simplify1 = T)} is equivalent to \code{profileSim(..., simplify1 = F)[[1]]}.
 }
 \description{
 Simulation of DNA profiles for specified pedigree members. Some pedigree
