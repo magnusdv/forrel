@@ -181,7 +181,6 @@ readFamiliasLoci = function(loci) {
       mutmod = NULL
     else {
       mutmod = mutationModel(list(female = femalemut, male = malemut))
-      validateMutationModel(mutmod, alleles = als)
     }
 
     list(name = a$locusname, alleles = als, afreq = afreq, mutmod = mutmod)
