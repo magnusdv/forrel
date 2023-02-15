@@ -30,7 +30,7 @@ asInt = function(v) {
   u
 }
 
-# round + toSTring
+# round + toString
 rst = function(v, digits = 3)
   toString(round(v, digits))
 

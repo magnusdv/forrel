@@ -14,8 +14,10 @@
 #' Thompson (1975). Optimisation of \eqn{\kappa} is done in the \eqn{(\kappa_0,
 #' \kappa_2)}{(k0, k2)}-plane and restricted to the triangle defined by
 #' \deqn{\kappa_0 \ge 0, \kappa_2 \ge 0, \kappa_0 + \kappa_2 \le 1}{k0 >= 0, k2
-#' >= 0, k0 + k2 <= 1}. Optimisation of \eqn{\Delta} is done in unit simplex of
-#' R^8, using the first 8 coefficients.
+#' >= 0, k0 + k2 <= 1.}
+#'
+#' Optimisation of \eqn{\Delta} is done in unit simplex of \eqn{R^8}, using the
+#' first 8 coefficients.
 #'
 #' The implementation optimises the log-likelihood using a projected gradient
 #' descent algorithm, combined with a version of Armijo line search.
