@@ -11,7 +11,7 @@ profileSim(
   markers = NULL,
   seed = NULL,
   numCores = 1,
-  simplify1 = FALSE,
+  simplify1 = TRUE,
   verbose = TRUE,
   ...
 )
@@ -35,8 +35,8 @@ genotypes in the indicated markers.}
 \item{numCores}{The number of cores to be used. The default is 1, i.e., no
 parallelisation.}
 
-\item{simplify1}{A logical, by default TRUE. If N is 1, simplify the output
-by removing the outmost list layer.}
+\item{simplify1}{A logical, by default TRUE, removing the outer list layer
+when \code{N = 1}. See Value.}
 
 \item{verbose}{A logical, by default TRUE.}
 
@@ -48,8 +48,12 @@ Any previously attached markers are replaced by the simulated profiles. If
 the indicated markers contained genotypes for some pedigree members, these
 are still present in the simulated profiles.
 
-The parameter \code{simplify1} only comes into play when \code{N = 1}, in which case
-\code{profileSim(..., simplify1 = T)} is equivalent to \code{profileSim(..., simplify1 = F)[[1]]}.
+If \code{N = 1} and \code{simplify1 = TRUE}, the outer list layer is removed, i.e.,
+\code{profileSim(..., N = 1, simplify1 = T)} is equivalent to \code{profileSim(..., N = 1, simplify1 = F)[[1]]}. This is usually the desired object in
+interactive use, and works well with piping.
+
+When using \code{profileSim()} in other functions, it is recommended to add
+\code{simplify1 = FALSE} to safeguard against issues with \code{N = 1}.
 }
 \description{
 Simulation of DNA profiles for specified pedigree members. Some pedigree

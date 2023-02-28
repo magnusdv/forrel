@@ -69,7 +69,7 @@
 #' # Helper function for simulating a single profile
 #' sim = function(x, id) {
 #'   y = setMarkers(x, locusAttributes = NorwegianFrequencies[1:3])
-#'   profileSim(y, ids = id)[[1]]
+#'   profileSim(y, N = 1, ids = id)
 #' }
 #'
 #' # Define pedigrees and simulate data

@@ -189,7 +189,7 @@ LRpower = function(numeratorPed, denominatorPed, truePed = numeratorPed, ids, ma
   if(verbose)
     message("Simulating ", nsim, " profiles from true pedigree...", appendLF = FALSE)
 
-  allsims = profileSim(truePed, N = nsim, ids = allids, verbose = FALSE)
+  allsims = profileSim(truePed, N = nsim, ids = allids, simplify1 = FALSE, verbose = FALSE)
 
   if(verbose)
     message("done")

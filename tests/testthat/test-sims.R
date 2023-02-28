@@ -41,10 +41,10 @@ test_that("profileSim() keeps marker names", {
   x = setMarkers(x, list(m, m))
   name(x, 1:2) = c("m1", "m2")
 
-  s = pSim(x, N = 1)[[1]]
+  s = pSim(x, N = 1)
   expect_identical(name(s, 1:2), c("m1", "m2"))
 
-  s2 = pSim(x, N = 1, markers = list(m, m))[[1]]
+  s2 = pSim(x, N = 1, markers = list(m, m))
   expect_identical(name(s2, 1:2), rep(NA_character_, 2))
 })
 

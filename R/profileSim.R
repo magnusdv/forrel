@@ -16,8 +16,8 @@
 #' @param seed An integer seed for the random number generator (optional).
 #' @param numCores The number of cores to be used. The default is 1, i.e., no
 #'   parallelisation.
-#' @param simplify1 A logical, by default TRUE. If N is 1, simplify the output
-#'   by removing the outmost list layer.
+#' @param simplify1 A logical, by default TRUE, removing the outer list layer
+#'   when `N = 1`. See Value.
 #' @param verbose A logical, by default TRUE.
 #' @param ... Further arguments passed on to [markerSim()].
 #'
@@ -26,9 +26,13 @@
 #'   the indicated markers contained genotypes for some pedigree members, these
 #'   are still present in the simulated profiles.
 #'
-#'   The parameter `simplify1` only comes into play when `N = 1`, in which case
-#'   `profileSim(..., simplify1 = T)` is equivalent to `profileSim(...,
-#'   simplify1 = F)[[1]]`.
+#'   If `N = 1` and `simplify1 = TRUE`, the outer list layer is removed, i.e.,
+#'   `profileSim(..., N = 1, simplify1 = T)` is equivalent to `profileSim(..., N
+#'   = 1, simplify1 = F)[[1]]`. This is usually the desired object in
+#'   interactive use, and works well with piping.
+#'
+#'   When using `profileSim()` in other functions, it is recommended to add
+#'   `simplify1 = FALSE` to safeguard against issues with `N = 1`.
 #'
 #' @examples
 #' # Example with two brothers
@@ -45,7 +49,7 @@
 #'   clusterEvalQ clusterExport clusterSetRNGStream
 #' @export
 profileSim = function(x, N = 1, ids = NULL, markers = NULL, seed = NULL,
-                      numCores = 1, simplify1 = FALSE, verbose = TRUE, ...){
+                      numCores = 1, simplify1 = TRUE, verbose = TRUE, ...){
 
   if(!is.ped(x) && !is.pedList(x))
     stop2("The first argument must be a `ped` object or a list of such")

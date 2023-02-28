@@ -147,7 +147,7 @@ MPPsims = function(reference, missing = "MP", selections, ep = TRUE, ip = TRUE,
     }
 
     # Simulate profile for `ids`
-    sims = profileSim(ref, ids = ids, N = nProfiles, numCores = 1, verbose = FALSE)
+    sims = profileSim(ref, ids = ids, N = nProfiles, numCores = 1, simplify1 = FALSE, verbose = FALSE)
 
 
     # Compute updated EP and IP for each profile
