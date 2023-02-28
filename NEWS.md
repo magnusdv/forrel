@@ -1,7 +1,27 @@
+# forrel 1.5.0
+
+## Breaking change
+* The default output of `profileSim(x, N = 1)` is now a single pedigree, instead of a list of length 1 (containing the pedigree). This is usually the desired output of `N = 1` in interactive use. To override this behaviour, set `simplify1 = FALSE`.
+
+## New features
+
+* Added dataset FORCE describing the FORCE snp panel (Tillmar et al, 2021, doi:10.3390/genes12121968).
+
+* `profileSim()` has a new argument `simplify1` (by default TRUE) controlling the output when `N = 1`.
+
+* `profileSim()` now allows `markers` to be a list of frequency vectors, simplifying the code in unconditional simulations. For instance, the following command now works: `nuclearPed() |> profileSim(markers = NorwegianFrequencies)`. Previously this required an intermediate step of `setMarkers()`.
+
+* In `kinshipLR()` the treatment of linked markers (with MERLIN) has been rewritten and is substantially more efficient. A new argument `keepMerlin` allows to keep merlin files for debugging.
+
+* `missingPersonLR()` was overhauled, making it more user friendly.
+
+* `missingPersonPlot()` has been modified and updated in sync with changes in **pedtools**.
+
+
 # forrel 1.4.1
 
-* Fix CRAN complaint: Use `inherits()` instead of `class()`
-.
+* Fix CRAN complaint: Use `inherits()` instead of `class()`.
+
 
 # forrel 1.4.0
 
@@ -13,7 +33,7 @@
 
 * `checkPairwise()` gains an argument `excludeInbred`, which is TRUE by default. This is sensible since the plot shows estimated kappa coefficients, which are well-behaved only for pairs of noninbred individuals.
 
-## Other chages
+## Other changes
 
 * **forrel** now requires R version 4.1 and recent versions of **pedtools** and **ribd**. This allowed many simplifications in code and examples.
 
