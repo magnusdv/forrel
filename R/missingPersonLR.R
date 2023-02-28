@@ -26,8 +26,7 @@
 #' db = NorwegianFrequencies[1:5]
 #'
 #' # Simulate reference data for grandmother and MP (5 STR markers)
-#' x = setMarkers(x, locusAttributes = db)
-#' x = profileSim(x, N = 1, ids = c(2, "MP"), seed = 2509)
+#' x = profileSim(x, markers = db, ids = c(2, "MP"), seed = 2509)
 #'
 #' # Compute LR
 #' lr = missingPersonLR(x, missing = "MP")

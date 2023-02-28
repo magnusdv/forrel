@@ -37,8 +37,7 @@
 #' ### Example with realistic data
 #'
 #' x = avuncularPed() |>
-#'   setMarkers(locus = NorwegianFrequencies) |>
-#'   profileSim(N = 1, simplify1 = TRUE, seed = 1729)
+#'   profileSim(markers = NorwegianFrequencies, seed = 1729)
 #'
 #' checkPairwise(x)
 #'
@@ -53,7 +52,7 @@
 #' # Combined plot of pedigree and IBD estimates
 #' dev.new(height = 5, width = 8, noRStudioGD = TRUE)
 #' layout(rbind(1:2), widths = 2:3)
-#' plot(y, margins = c(4,2,4,2), title = "Sample swap 1 - 3")
+#' plot(y, margins = c(4,2,4,2), title = "Swapped 1 - 3")
 #' checkPairwise(y, labels = TRUE)
 #' }
 #'

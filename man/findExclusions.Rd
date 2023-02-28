@@ -23,15 +23,15 @@ Find markers for which the genotypes of a candidate individual is incompatible w
 }
 \examples{
 
+db = NorwegianFrequencies[1:5]
+
 # Pedigree with 3 siblings; simulate data for first two
 x = nuclearPed(3) |>
-  setMarkers(locusAttributes = NorwegianFrequencies[1:5]) |>
-  profileSim(ids = 3:4, seed = 1)
+  profileSim(ids = 3:4, markers = db, seed = 1)
 
 # Simulate random person
 poi = singleton("POI") |>
-  setMarkers(locusAttributes = NorwegianFrequencies[1:5]) |>
-  profileSim(seed = 1)
+  profileSim(markers = db, seed = 1)
 
 # Identify incompatible markers
 findExclusions(x, id = 5, candidate = poi)   # D21S11

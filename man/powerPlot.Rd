@@ -108,16 +108,16 @@ points are included.
 
 ### Example 1: Comparing the power of 3 reference families ###
 
-# Helper function for simulating a single profile
-sim = function(x, id) {
-  y = setMarkers(x, locusAttributes = NorwegianFrequencies[1:3])
-  profileSim(y, N = 1, ids = id)
-}
+# Frequencies for 3 STR markers
+db = NorwegianFrequencies[1:3]
 
 # Define pedigrees and simulate data
-PAR = nuclearPed(1, child = "MP") |> sim(id = 1)
-SIB = nuclearPed(2) |> relabel(old = 4, new = "MP") |> sim(id = 3)
-GRA = linearPed(2) |> relabel(old = 5, new = "MP") |> sim(id = 1)
+PAR = nuclearPed(1, child = "MP") |>
+  profileSim(markers = db, ids = 1)
+SIB = nuclearPed(2) |> relabel(old = 4, new = "MP") |>
+  profileSim(markers = db, ids = 3)
+GRA = linearPed(2) |> relabel(old = 5, new = "MP") |>
+  profileSim(markers = db, ids = 1)
 
 # Collect in list and plot
 peds = list(PAR = PAR, SIB = SIB, GRA = GRA)
@@ -133,7 +133,6 @@ ip = lapply(peds, function(y)    # increase nsim!
 
 # Plot
 powerPlot(ep, ip, size = 2)
-powerPlot(ep, ip, size = 2, jitter = TRUE)
 
 # Different plot type, not dependent of `threshold`
 powerPlot(ep, ip, size = 2, type = 3)
