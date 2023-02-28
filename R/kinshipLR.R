@@ -7,8 +7,8 @@
 #' 'source', from which data is transferred to all the other pedigrees.
 #'
 #' By default, all markers are assumed to be unlinked. To accommodate linkage, a
-#' genetic map should be supplied with the argument `linkageMap`. This requires
-#' the software MERLIN to be installed.
+#' genetic map may be supplied with the argument `linkageMap`. This requires the
+#' software MERLIN to be installed.
 #'
 #' @param ... Pedigree alternatives. Each argument should be either a single
 #'   `ped` object or a list of such. The pedigrees may be named; otherwise they
@@ -67,6 +67,8 @@
 #'
 #' @examples
 #'
+#' ### Example 1: Full vs half sibs
+#'
 #' # Simulate 5 markers for a pair of full sibs
 #' ids = c("A", "B")
 #' sibs = nuclearPed(children = ids)
@@ -95,29 +97,30 @@
 #' res$likelihoodsPerMarker
 #'
 #'
-#' ### Separating grandparent/halfsib/uncle-newphew
-#'
-#' if(requireNamespace("ibdsim2", quietly = TRUE)) {
+#' ### Example 2: Separating grandparent/halfsib/uncle-nephew
+#' \donttest{
+#' # Requires ibdsim2 and MERLIN
+#' if(requireNamespace("ibdsim2", quietly = TRUE) && pedprobr::checkMerlin()) {
 #'
 #'   # Define pedigrees
 #'   ids = c("A", "B")
-#'   H = relabel(halfSibPed(), old = 4:5, new = ids)
-#'   U = relabel(cousinPed(0, removal = 1), old = c(3,6), new = ids)
-#'   G = relabel(linearPed(2), old = c(1,5), new = ids)
+#'   H = relabel(halfSibPed(),   old = c(4,5), new = ids)
+#'   U = relabel(avuncularPed(), old = c(3,6), new = ids)
+#'   G = relabel(linearPed(2),   old = c(1,5), new = ids)
 #'
 #'   # Attach FORCE panel of SNPs to G
 #'   G = setSNPs(G, FORCE[1:10, ])  # use all for better results
 #'
 #'   # Simulate recombination pattern in G
-#'   map = ibdsim2::loadMap("decode19")#, uniform = TRUE)   # unif for speed
-#'   ibd = ibdsim2::ibdsim(G, N = 1, ids = ids, map = map)[[1]]
+#'   map = ibdsim2::loadMap("decode19", uniform = TRUE)   # unif for speed
+#'   ibd = ibdsim2::ibdsim(G, N = 1, ids = ids, map = map)
 #'
 #'   # Simulate genotypes conditional on pattern
 #'   G = ibdsim2::profileSimIBD(G, ibdpattern = ibd)
 #'
 #'   # Compute LR (genotypes are automatically transferred to H and U)
 #'   kinshipLR(H, U, G, linkageMap = map)
-#' }
+#' }}
 #'
 #' @export
 kinshipLR = function(..., ref = NULL, source = NULL, markers = NULL, linkageMap = NULL,
