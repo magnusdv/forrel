@@ -24,10 +24,11 @@ profileSim(
 \item{ids}{A character (or coercible to character) with ID labels indicating
 whose genotypes should be simulated.}
 
-\item{markers}{A list of marker objects, or a vector containing names or
-indices referring to markers attached to \code{x}. By default (\code{NULL}), all
-attached markers are used. The simulations will be conditional on the locus
-attributes (allele frequencies, mutation models a.s.o.) and any existing
+\item{markers}{Either a vector indicating a subset of markers attached to
+\code{x}, or a named list of frequency vectors. By default (\code{NULL}), all
+attached markers are used. If a frequency list is given, marker objects are
+created and attached to \code{x}. Simulations are conditional on the locus
+attributes (allele frequencies, mutation models, etc) and any existing
 genotypes in the indicated markers.}
 
 \item{seed}{An integer seed for the random number generator (optional).}
@@ -61,14 +62,22 @@ members may already be genotyped; in that case the simulation is conditional
 on these. The main work of this function is done by \code{\link[=markerSim]{markerSim()}}.
 }
 \examples{
-# Example with two brothers
+# Example pedigree with two brothers
 x = nuclearPed(children = c("B1", "B2"))
 
-# Attach two markers; one brother is already genotyped
-x = addMarker(x, B1 = "1/2", alleles = 1:3)
-x = addMarker(x, B1 = "1", alleles = 1:4, afreq = (1:4)/10, chrom = "X")
+### Simulate profiles using built-in freq database
+profileSim(x, markers = NorwegianFrequencies[1:3])
 
-# Simulate 3 profiles of B2 conditional on the above
-profileSim(x, N = 3, ids = "B2")
+### Conditioning on known genotypes for one brother
+
+# Attach two SNP markers with genotypes for B1
+y = x |>
+  addMarker(B1 = "1/2", alleles = 1:2) |>
+  addMarker(B1 = "1",   alleles = 1:2, chrom = "X")
+
+# Simulate 2 profiles of B2 conditional on the above
+profileSim(y, N = 2, ids = "B2", seed = 123)
+
+
 
 }
