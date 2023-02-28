@@ -16,7 +16,7 @@
 #'   profileSim(ids = 3:4, seed = 1)
 #'
 #' # Simulate random person
-#' poi = singleton(1) |>
+#' poi = singleton("POI") |>
 #'   setMarkers(locusAttributes = NorwegianFrequencies[1:5]) |>
 #'   profileSim(seed = 1)
 #'
@@ -24,7 +24,7 @@
 #' findExclusions(x, id = 5, candidate = poi)   # D21S11
 #'
 #' # Inspect
-#' plotPedList(c(x, poi), marker = "D21S11", frames = FALSE)
+#' plotPedList(list(x, poi), marker = "D21S11", hatched = typedMembers)
 #'
 #' @importFrom pedprobr likelihood
 #' @export
