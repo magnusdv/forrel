@@ -66,7 +66,11 @@ given number.
 }
 }
 \description{
-Inclusion power for missing person cases
+This function simulates the LR distribution for the true missing person in a
+reference family. The output contains both the total and marker-wise LR of
+each simulation, as well as various summary statistics. If a specific LR
+threshold is given, the \emph{inclusion power} is computed as the probability that
+LR exceeds the threshold.
 }
 \examples{
 
@@ -76,10 +80,11 @@ x = nuclearPed(4)
 # Remaining sibs typed with 5 triallelic markers
 x = markerSim(x, N = 5, ids = 3:5, alleles = 1:3, seed = 123, verbose = FALSE)
 
-# Compute exclusion power statistics
-missingPersonIP(x, missing = 6, nsim = 5, threshold = c(10, 100))
+# Compute inclusion power statistics
+ip = missingPersonIP(x, missing = 6, nsim = 5, threshold = c(10, 100))
+ip
 
-# Compare with genotypes
-x
+# LRs from each simulation
+ip$LRperSim
 
 }

@@ -4,12 +4,24 @@
 #' person identification. A person of interest (POI) is matched against a
 #' reference dataset containing genotypes of relatives of the missing person.
 #'
+#' Note that this function accepts two forms of input:
+#'
+#' 1. With `poi` a typed singleton. This is the typical use case, when you want
+#' to compute the LR for some person of interest.
+#'
+#' 2. With `poi = NULL`, but `missing` being genotyped. The data for `missing`
+#' is then extracted as a singleton POI. This is especially useful in simulation
+#' procedures, e.g., for simulating the LR distribution of the true missing
+#' person.
+#'
+#' See Examples for illustrations of both cases.
+#'
 #' @param reference A `ped` object with attached markers.
 #' @param missing The ID label of the missing member of `reference`.
 #' @param poi A `singleton` object, or NULL. If NULL, and `missing` is
 #'   genotyped, this data is extracted and used as `poi`.
 #' @param verbose A logical.
-#' @param ... Optional parameters to be passed onto [kinshipLR()].
+#' @param ... Optional parameters to be passed on to [kinshipLR()].
 #'
 #' @return The `LRresult` object returned by [kinshipLR()], but without the
 #'   trivial `H2:H2` comparison.
@@ -19,19 +31,49 @@
 #' # Example: Identification of a missing grandchild
 #' #------------------------------------------------
 #'
-#' # Reference pedigree with missing grandchild (MP)
-#' x = linearPed(2) |> relabel(old = 5, new = "MP")
-#'
-#' # Database with 5 STR markers
+#' # Database with 5 STR markers (increase to make more realistic)
 #' db = NorwegianFrequencies[1:5]
 #'
-#' # Simulate reference data for grandmother and MP (5 STR markers)
-#' x = profileSim(x, markers = db, ids = c(2, "MP"), seed = 2509)
+#' # Pedigree with missing person (MP); grandmother is genotyped
+#' x = linearPed(2) |>
+#'   relabel(old = 5, new = "MP") |>
+#'   profileSim(markers = db, ids = "2", seed = 123)
+#'
+#'
+#' ### Scenario 1: Unrelated POI --------------------
+#'
+#' # Generate random unrelated profile
+#' poi = singleton("POI") |>
+#'   profileSim(markers = db, seed = 1234)
 #'
 #' # Compute LR
-#' lr = missingPersonLR(x, missing = "MP")
+#' lr = missingPersonLR(x, missing = "MP", poi = poi)
 #' lr
 #' lr$LRperMarker
+#'
+#'
+#' ### Scenario 2: POI is the missing person --------
+#' # A small simulation example
+#'
+#' # Simulate profiles for MP conditional on the grandmother
+#' N = 10
+#' y = profileSim(x, N = N, ids = "MP", seed = 12345)
+#'
+#' # Compute LRs for each sim
+#' LRsims = lapply(y, missingPersonLR, missing = "MP", verbose = FALSE)
+#'
+#' # Plot distribution
+#' LRtotal = sapply(LRsims, function(a) a$LRtotal)
+#' plot(density(LRtotal))
+#'
+#' # LRs for each marker
+#' LRperMarker = sapply(LRsims, function(a) a$LRperMarker)
+#' LRperMarker
+#'
+#' # Overlaying marker-wise density plots (requires tidyverse)
+#' # library(tidyverse)
+#' # t(LRperMarker) |> as_tibble() |> pivot_longer(everything()) |>
+#' #   ggplot() + geom_density(aes(value, fill = name), alpha = 0.6)
 #'
 #' @export
 missingPersonLR = function(reference, missing, poi = NULL, verbose = TRUE, ...) {
@@ -49,7 +91,7 @@ missingPersonLR = function(reference, missing, poi = NULL, verbose = TRUE, ...) 
       stop2(sprintf("Interpreting `%s` as POI, but this individual is not typed", missing))
 
     if(verbose)
-      cat(sprintf("Interpreting `%s` as the person of interest\n", missing))
+      cat(sprintf("Interpreting `%s` as the person of interest (POI)\n", missing))
 
     # Good to lump early!
     reference = lumpAlleles(reference)

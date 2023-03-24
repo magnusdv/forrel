@@ -16,7 +16,7 @@ genotyped, this data is extracted and used as \code{poi}.}
 
 \item{verbose}{A logical.}
 
-\item{...}{Optional parameters to be passed onto \code{\link[=kinshipLR]{kinshipLR()}}.}
+\item{...}{Optional parameters to be passed on to \code{\link[=kinshipLR]{kinshipLR()}}.}
 }
 \value{
 The \code{LRresult} object returned by \code{\link[=kinshipLR]{kinshipLR()}}, but without the
@@ -27,23 +27,66 @@ This is a wrapper function for \code{\link[=kinshipLR]{kinshipLR()}} for the spe
 person identification. A person of interest (POI) is matched against a
 reference dataset containing genotypes of relatives of the missing person.
 }
+\details{
+Note that this function accepts two forms of input:
+\enumerate{
+\item With \code{poi} a typed singleton. This is the typical use case, when you want
+to compute the LR for some person of interest.
+\item With \code{poi = NULL}, but \code{missing} being genotyped. The data for \code{missing}
+is then extracted as a singleton POI. This is especially useful in simulation
+procedures, e.g., for simulating the LR distribution of the true missing
+person.
+}
+
+See Examples for illustrations of both cases.
+}
 \examples{
 #------------------------------------------------
 # Example: Identification of a missing grandchild
 #------------------------------------------------
 
-# Reference pedigree with missing grandchild (MP)
-x = linearPed(2) |> relabel(old = 5, new = "MP")
-
-# Database with 5 STR markers
+# Database with 5 STR markers (increase to make more realistic)
 db = NorwegianFrequencies[1:5]
 
-# Simulate reference data for grandmother and MP (5 STR markers)
-x = profileSim(x, markers = db, ids = c(2, "MP"), seed = 2509)
+# Pedigree with missing person (MP); grandmother is genotyped
+x = linearPed(2) |>
+  relabel(old = 5, new = "MP") |>
+  profileSim(markers = db, ids = "2", seed = 123)
+
+
+### Scenario 1: Unrelated POI --------------------
+
+# Generate random unrelated profile
+poi = singleton("POI") |>
+  profileSim(markers = db, seed = 1234)
 
 # Compute LR
-lr = missingPersonLR(x, missing = "MP")
+lr = missingPersonLR(x, missing = "MP", poi = poi)
 lr
 lr$LRperMarker
+
+
+### Scenario 2: POI is the missing person --------
+# A small simulation example
+
+# Simulate profiles for MP conditional on the grandmother
+N = 10
+y = profileSim(x, N = N, ids = "MP", seed = 12345)
+
+# Compute LRs for each sim
+LRsims = lapply(y, missingPersonLR, missing = "MP", verbose = FALSE)
+
+# Plot distribution
+LRtotal = sapply(LRsims, function(a) a$LRtotal)
+plot(density(LRtotal))
+
+# LRs for each marker
+LRperMarker = sapply(LRsims, function(a) a$LRperMarker)
+LRperMarker
+
+# Overlaying marker-wise density plots (requires tidyverse)
+# library(tidyverse)
+# t(LRperMarker) |> as_tibble() |> pivot_longer(everything()) |>
+#   ggplot() + geom_density(aes(value, fill = name), alpha = 0.6)
 
 }
