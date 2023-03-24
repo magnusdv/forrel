@@ -70,17 +70,16 @@ missingPersonLR = function(reference, missing, poi = NULL, verbose = TRUE, ...) 
     if(!is.singleton(poi))
       stop2("Argument `poi` must be a singleton or NULL: ", poi)
 
-    poiName = labels(poi)
-
     # Hypothesis 1: POI = MP
     if(verbose)
-      cat(sprintf("\nForming H1 from reference:\n  * Renaming `%s` to `%s`\n  * Transferring genotypes\n", missing, poiName))
-    H1 = relabel(reference, old = missing, new = poiName)
-    H1 = transferMarkers(from = poi, to = H1, erase = FALSE)
+      cat(sprintf("\nForming H1 from reference:\n  * Transferring genotypes from POI to '%s'\n", missing))
+    poi$ID = missing
+    H1 = transferMarkers(from = poi, to = reference, erase = FALSE)
 
     # Hypothesis 2: POI unrelated to MP
     if(verbose)
       cat("\nForming H2 from reference:\n  * List of reference and poi singleton\n")
+    poi$ID = "POI"
     H2 = list(reference, poi)
   }
 
