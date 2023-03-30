@@ -169,13 +169,13 @@ readFamiliasLoci = function(loci) {
 
     if (all(diag(malemut) == 1))
       malemut = NULL
-    else
-      malemut = mutationMatrix("custom", matrix = malemut)
+    else if(!inherits(malemut, "mutationMatrix"))  # not sure when this is needed!
+      malemut = mutationMatrix("custom", matrix = malemut, afreq = afreq)
 
     if (all(diag(femalemut) == 1))
       femalemut = NULL
-    else
-      femalemut = mutationMatrix("custom", matrix = femalemut)
+    else if(!inherits(femalemut, "mutationMatrix"))
+      femalemut = mutationMatrix("custom", matrix = femalemut, afreq = afreq)
 
     if (is.null(malemut) && is.null(femalemut))
       mutmod = NULL
