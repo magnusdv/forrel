@@ -4,7 +4,13 @@
 \alias{readFam}
 \title{Read \code{Familias} .fam files}
 \usage{
-readFam(famfile, useDVI = NA, Xchrom = FALSE, verbose = TRUE)
+readFam(
+  famfile,
+  useDVI = NA,
+  Xchrom = FALSE,
+  prefixAdded = "added_",
+  verbose = TRUE
+)
 }
 \arguments{
 \item{famfile}{Path to a ".fam" file.}
@@ -15,6 +21,8 @@ included if it is present in the input file.}
 
 \item{Xchrom}{A logical. If TRUE, the \code{chrom} attribute of all markers will
 be set to "X". (Default = FALSE.)}
+
+\item{prefixAdded}{A string used as prefix when adding missing parents.}
 
 \item{verbose}{A logical. If TRUE, various information is written to the
 screen during the parsing process.}

@@ -5,7 +5,13 @@
 \alias{readFamiliasLoci}
 \title{Convert \code{Familias} objects to \code{ped} format}
 \usage{
-Familias2ped(familiasped, datamatrix, loci, matchLoci = FALSE)
+Familias2ped(
+  familiasped,
+  datamatrix,
+  loci,
+  matchLoci = FALSE,
+  prefixAdded = "added_"
+)
 
 readFamiliasLoci(loci)
 }
@@ -23,6 +29,8 @@ The column names of \code{datamatrix} are assumed to come in pairs with suffixes
 ".1" and ".2", e.g. "TH01.1", "TH01.2", etc. If FALSE (the default) it is
 assumed that the \code{loci} correspond to the (pairs of) columns in
 \code{datamatrix} sequentially.}
+
+\item{prefixAdded}{A string used as prefix when adding missing parents.}
 }
 \value{
 A \code{ped} object, or a list of such.

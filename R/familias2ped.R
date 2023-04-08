@@ -27,6 +27,8 @@
 #'   ".1" and ".2", e.g. "TH01.1", "TH01.2", etc. If FALSE (the default) it is
 #'   assumed that the `loci` correspond to the (pairs of) columns in
 #'   `datamatrix` sequentially.
+#' @param prefixAdded A string used as prefix when adding missing parents.
+#'
 #' @return A `ped` object, or a list of such.
 #' @author Magnus Dehli Vigeland, Thore Egeland
 #'
@@ -56,12 +58,12 @@
 #'
 #'
 #' @export
-Familias2ped = function(familiasped, datamatrix, loci, matchLoci = FALSE) {
+Familias2ped = function(familiasped, datamatrix, loci, matchLoci = FALSE, prefixAdded = "added_") {
 
   ### If first argument is a list of FamiliasPedigrees, convert one at a time.
   if (is.list(familiasped) && inherits(familiasped[[1]], "FamiliasPedigree")) {
       res = lapply(familiasped, function(p)
-        Familias2ped(p, datamatrix = datamatrix, loci = loci, matchLoci = matchLoci))
+        Familias2ped(p, datamatrix = datamatrix, loci = loci, matchLoci = matchLoci, prefixAdded = prefixAdded))
       return(res)
   }
   else if(!inherits(familiasped, "FamiliasPedigree"))
@@ -84,8 +86,8 @@ Familias2ped = function(familiasped, datamatrix, loci, matchLoci = FALSE) {
   nFath = length(fatherMissing)
   nMoth = length(motherMissing)
 
-  newFathers = paste("added", seq(1, length.out = nFath), sep = "_")
-  newMothers = paste("added", seq(nFath + 1, length.out = nMoth), sep = "_")
+  newFathers = paste0(prefixAdded, seq(1, length.out = nFath))
+  newMothers = paste0(prefixAdded, seq(nFath + 1, length.out = nMoth))
 
   # add new fathers
   if (nFath > 0) {

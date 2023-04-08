@@ -10,6 +10,7 @@
 #'   included if it is present in the input file.
 #' @param Xchrom A logical. If TRUE, the `chrom` attribute of all markers will
 #'   be set to "X". (Default = FALSE.)
+#' @param prefixAdded A string used as prefix when adding missing parents.
 #' @param verbose A logical. If TRUE, various information is written to the
 #'   screen during the parsing process.
 #'
@@ -27,7 +28,7 @@
 #' @importFrom pedmut mutationMatrix
 #' @importFrom utils packageVersion
 #' @export
-readFam = function(famfile, useDVI = NA, Xchrom = FALSE, verbose = TRUE) {
+readFam = function(famfile, useDVI = NA, Xchrom = FALSE, prefixAdded = "added_", verbose = TRUE) {
   if(!endsWith(famfile, ".fam"))
     stop("Input file must end with '.fam'", call. = FALSE)
 
@@ -334,7 +335,7 @@ readFam = function(famfile, useDVI = NA, Xchrom = FALSE, verbose = TRUE) {
       message("\nConverting to `ped` format")
     res = lapply(dvi.families, function(fam) {
       Familias2ped(familiasped = fam$pedigrees, datamatrix = fam$datamatrix,
-                   loci = loci, matchLoci = TRUE)
+                   loci = loci, matchLoci = TRUE, prefixAdded = prefixAdded)
     })
 
     # Set all chrom attributes to X if indicated
@@ -384,7 +385,8 @@ readFam = function(famfile, useDVI = NA, Xchrom = FALSE, verbose = TRUE) {
   if(!is.null(pedigrees)) {
     if(verbose)
       message("\nConverting to `ped` format")
-    res = Familias2ped(familiasped = pedigrees, datamatrix = datamatrix, loci = loci)
+    res = Familias2ped(familiasped = pedigrees, datamatrix = datamatrix, loci = loci,
+                       prefixAdded = prefixAdded)
 
     # Set all chrom attributes to X if indicated
     if(Xchrom) {
