@@ -10,3 +10,4 @@
 ^R/relationLR.R$
 ^CRAN-SUBMISSION$
 ^revdep$
+^LICENSE\.md$
