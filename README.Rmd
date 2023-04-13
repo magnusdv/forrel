@@ -8,7 +8,8 @@ output: github_document
 knitr::opts_chunk$set(
   collapse = TRUE,
   comment = "#>",
-  fig.path = "man/figures/README-"
+  fig.path = "man/figures/README-",
+  fig.align = "center"
 )
 ```
 
@@ -22,7 +23,7 @@ knitr::opts_chunk$set(
 
 
 ## Introduction
-The goal of **forrel** is to provide forensic pedigree computations and relatedness inference from genetic marker data. The **forrel** package is part of the **ped suite**, a collection of R packages for pedigree analysis.
+The goal of **forrel** is to provide forensic pedigree computations and relatedness inference from genetic marker data. The **forrel** package is part of the **pedsuite**, a collection of R packages for pedigree analysis.
 
 The most important analyses currently supported by **forrel** are:
 
@@ -61,42 +62,52 @@ library(forrel)
 
 We start by creating and plotting a pedigree with two brothers, named `bro1` and `bro2`. 
 
-```{r, eval=FALSE}
-bros = c("bro1", "bro2")
-x = nuclearPed(children = bros)
+```{r sibs, fig.height=2.5, fig.width=2.5}
+x = nuclearPed(children = c("bro1", "bro2"))
 plot(x)
 ```
-```{r sibs, echo=FALSE, fig.height=2.5, fig.width=2.5, fig.align="center"}
-bros = c("bro1", "bro2")
-x = nuclearPed(children = bros)
-plot(x, margins = c(1, 1, 1, 1))
-```
-
 
 **Marker simulation**  
 
-Now let us simulate the genotypes of 100 independent SNPs for the brothers. Each SNP has alleles 1 and 2, with equal frequencies by default. This is an example of _unconditional_ simulation, since we don't give any genotypes to condition on. Unconditional simulation is performed by simple _gene dropping_, i.e., by drawing random alleles independently for the parents, followed by a "Mendelian coin toss" in each parent-child transmission.
+Now let us simulate the genotypes of 100 independent SNPs for all four family members. Each SNP has alleles 1 and 2, with equal frequencies by default. This is an example of _unconditional_ simulation, since we don't give any genotypes to condition on. 
 ```{r}
-x = markerSim(x, N = 100, ids = bros, alleles = 1:2, seed = 1234)
+x = markerSim(x, N = 100, alleles = 1:2, seed = 1234)
 ```
 Note 1: The `seed` argument is passed onto the random number generator. If you use the same seed, you should get exactly the same results.  
 Note 2: To suppress the informative messages printed during simulation, add `verbose = FALSE` to the function call.
 
 The pedigree `x` now has 100 markers attached to it. The genotypes of the first few markers are shown when printing `x` to the screen:
+
 ```{r}
 x
 ```
 
+**Conditional simulation**
+
+Suppose one of the brothers is homozygous 1/1 and that we want to simulate genotypes for the other brother.
+This is achieved with the following code, where after first attaching a marker to the pedigree, specifying the known genotype, we condition on it by referencing it in `markerSim()`. 
+
+```{r}
+y = nuclearPed(children = c("bro1", "bro2")) |> 
+  addMarker(bro1 = "1/1", alleles = 1:2, name = "snp1") |> 
+  markerSim(N = 100, ids = "bro2", partialmarker = "snp1", 
+            seed = 321, verbose = FALSE)
+y
+```
+
+Note that the previous code also demonstrates how **pedsuite** is well adapted to the R pipe `|>`.
+
 **Estimation of IBD coefficients**  
 
-The `ibdEstimate()` function estimates the coefficients of _identity-by-descent_ (IBD) between pairs of individuals, from the available marker data. 
+The `ibdEstimate()` function estimates the coefficients of _identity-by-descent_ (IBD) between pairs of individuals, from the available marker data. Let us try with the simulated genotypes we just generated:
 ```{r}
-k = ibdEstimate(x, ids = bros)
+k = ibdEstimate(y, ids = c("bro1", "bro2"))
 k
 ```
 
-The theoretical expectation for non-inbred full siblings is $(\kappa_0, \kappa_1, \kappa_2) = (0.25, 0.5, 0.25)$.
-To get a visual sense of how close our estimate is, it is instructive to plot it in the IBD triangle:
-```{r triangle, fig.height=4, fig.width=4, fig.align="center"}
+To get a visual sense of the estimate, it is instructive to plot it in the IBD triangle:
+```{r triangle, fig.height=4, fig.width=4}
 showInTriangle(k, labels = TRUE)
 ```
+
+Reassuringly, the estimate is close to the theoretical expectation for non-inbred full siblings, $(\kappa_0, \kappa_1, \kappa_2) = (0.25, 0.5, 0.25)$, corresponding to the point marked `S` in the triangle.
