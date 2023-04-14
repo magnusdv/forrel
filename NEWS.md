@@ -12,7 +12,7 @@
 
 ## Other
 
-* Added license GPL (>=2).
+* Added license statement GPL (>=2).
 
 * Expand README, adding an example with conditional simulation.
 

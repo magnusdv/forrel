@@ -137,6 +137,8 @@ powerPlot(ep, ip, size = 2)
 # Different plot type, not dependent of `threshold`
 powerPlot(ep, ip, size = 2, type = 3)
 
+
+\donttest{
 ### Example 2: Exploring powers for different sets of available relatives
 
 # Create trio pedigree
@@ -155,6 +157,7 @@ simData = MPPsims(ref, selections = sel, nProfiles = 3, lrSims = 5,
 # Power plot 1: EP vs IP
 powerPlot(simData, type = 1)
 powerPlot(simData, type = 1, minorpoints = FALSE, hline = 0.8)
+}
 
 \donttest{
 
