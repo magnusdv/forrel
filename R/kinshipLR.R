@@ -102,6 +102,9 @@
 #' # Requires ibdsim2 and MERLIN
 #' if(requireNamespace("ibdsim2", quietly = TRUE) && pedprobr::checkMerlin()) {
 #'
+#'   # Load recombination map
+#'   map = ibdsim2::loadMap("decode19", uniform = TRUE)   # unif for speed
+#'
 #'   # Define pedigrees
 #'   ids = c("A", "B")
 #'   H = relabel(halfSibPed(),   old = c(4,5), new = ids)
@@ -112,7 +115,6 @@
 #'   G = setSNPs(G, FORCE[1:10, ])  # use all for better results
 #'
 #'   # Simulate recombination pattern in G
-#'   map = ibdsim2::loadMap("decode19", uniform = TRUE)   # unif for speed
 #'   ibd = ibdsim2::ibdsim(G, N = 1, ids = ids, map = map)
 #'
 #'   # Simulate genotypes conditional on pattern
@@ -243,7 +245,7 @@ kinshipLR = function(..., ref = NULL, source = NULL, markers = NULL, linkageMap 
         cat("Converting attached marker positions from MB to CM\n")
 
       physMap = getMap(x[[1]])
-      linkageMap = ibdsim2:::convertMap(physMap, genomeMap = linkageMap)
+      linkageMap = .convertMap(physMap, linkageMap)
     }
 
     # Lump all peds, if not already done (a bit of a hack)
@@ -335,3 +337,22 @@ print.LRresult = function(x, ...) {
   print(x$LRtotal)
 }
 
+
+# physMap = output from `getMap()`
+# genMap = class `genomeMap`
+.convertMap = function(physMap, genMap) {
+
+  # Split marker map by chromosome (keep original chrom order)
+  chromSplit = split(physMap, factor(physMap$CHROM, levels = unique(physMap$CHROM)))
+
+  # Convert positions in each chrom
+  newmap = lapply(chromSplit, function(chrmap) {
+    CM = ibdsim2::convertPos(chrmap$CHROM, Mb = chrmap$MB, map = genMap, sex = "average")
+    cbind(chrmap, CM = CM)[c("CHROM", "MARKER", "CM", "MB")] # 3 first cols as used by MERLIN
+  })
+
+  res = do.call(rbind, newmap)
+  rownames(res) = NULL
+
+  res
+}

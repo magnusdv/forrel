@@ -119,6 +119,9 @@ res$likelihoodsPerMarker
 # Requires ibdsim2 and MERLIN
 if(requireNamespace("ibdsim2", quietly = TRUE) && pedprobr::checkMerlin()) {
 
+  # Load recombination map
+  map = ibdsim2::loadMap("decode19", uniform = TRUE)   # unif for speed
+
   # Define pedigrees
   ids = c("A", "B")
   H = relabel(halfSibPed(),   old = c(4,5), new = ids)
@@ -129,7 +132,6 @@ if(requireNamespace("ibdsim2", quietly = TRUE) && pedprobr::checkMerlin()) {
   G = setSNPs(G, FORCE[1:10, ])  # use all for better results
 
   # Simulate recombination pattern in G
-  map = ibdsim2::loadMap("decode19", uniform = TRUE)   # unif for speed
   ibd = ibdsim2::ibdsim(G, N = 1, ids = ids, map = map)
 
   # Simulate genotypes conditional on pattern

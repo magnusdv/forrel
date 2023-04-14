@@ -66,8 +66,8 @@
 #'
 #' ### Example 1: Comparing the power of 3 reference families ###
 #'
-#' # Frequencies for 3 STR markers
-#' db = NorwegianFrequencies[1:3]
+#' # Frequencies for 2 STR markers
+#' db = NorwegianFrequencies[1:2]  # Increase!
 #'
 #' # Define pedigrees and simulate data
 #' PAR = nuclearPed(1, child = "MP") |>

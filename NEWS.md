@@ -14,9 +14,11 @@
 
 * Added license statement GPL (>=2).
 
-* Expand README, adding an example with conditional simulation.
+* Expanded README, adding an example with conditional simulation.
 
-* Update package documentation.
+* Updated package documentation.
+
+* Fixed CRAN note by avoiding `ibdsim2:::`.
 
 
 # forrel 1.5.0
