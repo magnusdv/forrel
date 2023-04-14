@@ -1,3 +1,24 @@
+# forrel 1.5.1
+
+## New features
+
+* `readFam()` now handle all mutation models available in the Familias software.
+
+* `readFam()` and `Familias2ped()` gain argument `prefixAdded`.
+
+## Bug fixes
+
+* Fixed bug in `missingPersonLR()` manifesting when POI and MP have identical names.
+
+## Other
+
+* Added license GPL (>=2).
+
+* Expand README, adding an example with conditional simulation.
+
+* Update package documentation.
+
+
 # forrel 1.5.0
 
 ## Breaking change
