@@ -242,14 +242,29 @@ readFam = function(famfile, useDVI = NA, Xchrom = FALSE, prefixAdded = "added_",
 
     # Number of alleles except the silent
     nAll = x[loc.line + 12]
-    nAll = as.integer(strsplit(nAll, "\t")[[1]][[1]])
-    checkInt(nAll, sprintf('number of alleles for marker "%s"', loc.name))
+    nAll = getInt(loc.line + 12, value = strsplit(nAll, "\t")[[1]][[1]],
+                  paste("number of alleles for marker", loc.name))
 
     # Read alleles and freqs
     als.lines = seq(loc.line + 13, by = 2, length.out = nAll)
     als = x[als.lines]
     frqs = as.numeric(x[als.lines + 1])
     names(frqs) = als
+
+    # Check for Rest allele
+    hasRestAllele = "rest allele" %in% tolower(als)
+    warn = TRUE
+    if(hasRestAllele && model.idx.mal > 0) {
+      warning(sprintf("'Rest Allele' at locus %s is incompatible with '%s' model. Changed to 'equal'.",
+                       loc.name, maleMod), call. = FALSE)
+      model.idx.mal = 0
+      warn = FALSE # don't warn again for female
+    }
+    if(hasRestAllele && model.idx.fem > 0) {
+      if(warn) warning(sprintf("'Rest allele' at locus %s is incompatible with '%s' mutation model. Changed to 'equal' model.",
+                               loc.name, femaleMod))
+      model.idx.fem = 0
+    }
 
     # Mutation models
     models = c("equal", "proportional", "stepwise", "stepwise", "stepwise")
