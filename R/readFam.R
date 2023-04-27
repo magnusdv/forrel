@@ -189,15 +189,20 @@ readFam = function(famfile, useDVI = NA, Xchrom = FALSE, prefixAdded = "added_",
     }
   }
 
-  has.probs = x[ped.line] == "#TRUE#"
+  has.probs = startsWith(x[ped.line], "#TRUE#")
   if(has.probs)
     stop("\nThis file includes precomputed probabilities; this is not supported yet.")
 
   ### Database ###
 
+  # Theta?
+  patt = "(?<=Theta/Kinship/Fst:).*(?=\\))"
+  theta = suppressWarnings(as.numeric(regmatches(x[ped.line], regexpr(patt, x[ped.line], perl = T))))
+  if(length(theta) && !is.na(theta) && theta > 0)
+    warning("Nonzero theta correction detected: theta = ", theta, call. = FALSE)
+
   db.line = ped.line + 1
-  nLoc = as.integer(x[db.line])
-  checkInt(nLoc, "number of loci")
+  nLoc = getInt(db.line, "number of loci")
 
   has.info = x[db.line + 1] == "#TRUE#"
   if(verbose) {
