@@ -37,10 +37,11 @@ readFam = function(famfile, useDVI = NA, Xchrom = FALSE, prefixAdded = "added_",
   x = gsub("\\\"", "", raw)
 
   # Utility function for checking integer values
-  checkInt = function(a, line, txt, value) {
-    if(!is.na(a)) return()
-    stop(sprintf('Expected line %d to be %s, but found: "%s"',
-                 line, txt, x[line]), call. = FALSE)
+  getInt = function(line, txt, value = x[line], max = Inf) {
+    if(is.na(j <- suppressWarnings(as.integer(value))) || j > max)
+      stop(sprintf('Expected line %d to be %s, but found: "%s"',
+                   line, txt, value), call. = FALSE)
+    j
   }
 
   # Read and print Familias version
@@ -60,8 +61,7 @@ readFam = function(famfile, useDVI = NA, Xchrom = FALSE, prefixAdded = "added_",
 
   # Number of individuals
   nid.line = if(x[4] != "") 4 else 5
-  nid = as.integer(x[nid.line]) # Number of persons involved in pedigrees (but excluding "extras")
-  checkInt(nid, nid.line, "number of individuals")
+  nid = getInt(nid.line, "number of individuals") # all excluding "extras"
   if(verbose)
     message("\nNumber of individuals (excluding 'extras'): ", nid)
 
@@ -78,9 +78,7 @@ readFam = function(famfile, useDVI = NA, Xchrom = FALSE, prefixAdded = "added_",
     id[i] = x[id.line]
     sex[i] = ifelse(x[id.line + 4] == "#TRUE#", 1, 2)
 
-    nmi = as.integer(x[id.line + 5])
-    checkInt(nmi, id.line + 5,
-             sprintf('number of genotypes for "%s"', id[i]))
+    nmi = getInt(id.line + 5, sprintf('number of genotypes for "%s"', id[i]))
     if(verbose)
       message(sprintf("  Individual '%s': Genotypes for %d markers read", id[i], nmi))
 
@@ -128,8 +126,7 @@ readFam = function(famfile, useDVI = NA, Xchrom = FALSE, prefixAdded = "added_",
   }
 
   # Initialise list of final pedigrees
-  nPed = as.integer(x[rel.line])
-  checkInt(nPed, "number of pedigrees")
+  nPed = getInt(rel.line, "number of pedigrees")
   if(verbose)
     message("\nNumber of pedigrees: ", nPed)
 
@@ -224,8 +221,8 @@ readFam = function(famfile, useDVI = NA, Xchrom = FALSE, prefixAdded = "added_",
     loc.name = x[loc.line]
     mutrate.fem = as.numeric(x[loc.line + 1])
     mutrate.mal = as.numeric(x[loc.line + 2])
-    model.idx.fem = as.integer(x[loc.line + 3])
-    model.idx.mal = as.integer(x[loc.line + 4])
+    model.idx.fem = getInt(loc.line + 3, "an integer code (0-4) for the female mutation model", max = 4)
+    model.idx.mal = getInt(loc.line + 4, "an integer code (0-4) for the male mutation model", max = 4)
 
     nAll.with.silent = as.integer(x[loc.line + 5]) # includes silent allele
 
