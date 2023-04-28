@@ -256,16 +256,16 @@ readFam = function(famfile, useDVI = NA, Xchrom = FALSE, prefixAdded = "added_",
     # Check for Rest allele
     hasRestAllele = "rest allele" %in% tolower(als)
     warn = TRUE
-    if(hasRestAllele && model.idx.mal > 0) {
-      warning(sprintf("'Rest Allele' at locus %s is incompatible with '%s' model. Changed to 'equal'.",
+    if(hasRestAllele && model.idx.mal > 1) {
+      warning(sprintf("'Rest Allele' at locus %s is incompatible with '%s' model. Changed to 'proportional'.",
                        loc.name, maleMod), call. = FALSE)
-      model.idx.mal = 0
+      model.idx.mal = 1
       warn = FALSE # don't warn again for female
     }
-    if(hasRestAllele && model.idx.fem > 0) {
-      if(warn) warning(sprintf("'Rest allele' at locus %s is incompatible with '%s' mutation model. Changed to 'equal' model.",
+    if(hasRestAllele && model.idx.fem > 1) {
+      if(warn) warning(sprintf("'Rest allele' at locus %s is incompatible with '%s' mutation model. Changed to 'proportional'.",
                                loc.name, femaleMod))
-      model.idx.fem = 0
+      model.idx.fem = 1
     }
 
     # Mutation models
