@@ -249,23 +249,36 @@ readFam = function(famfile, useDVI = NA, Xchrom = FALSE, prefixAdded = "added_",
     als = x[als.lines]
     frqs = as.numeric(x[als.lines + 1])
 
+    if("0" %in% als) {
+      warning(sprintf("Illegal allele '0' at locus %s. Changing to '00'.", loc.name), call. = FALSE)
+      als[als == "0"] = "00"
+    }
+
     # Check for illegal alleles, including "Rest allele", with stepwise models
     if(model.idx.mal > 1 || model.idx.fem > 1) {
+      change = FALSE
       alsNum = suppressWarnings(as.numeric(als))
       if(any(is.na(alsNum))) {
+        change = TRUE
         warning(sprintf("Non-numerical allele '%s' at locus %s incompatible with stepwise model. Changing to proportional model.",
                          als[is.na(alsNum)][1], loc.name), call. = FALSE)
-        if(model.idx.mal > 1) model.idx.mal = 1
-        if(model.idx.fem > 1) model.idx.fem = 1
+      }
+      else if(any(alsNum < 1)) {
+        change = TRUE
+        warning(sprintf("Database error: Allele '%s' at locus %s is incompatible with stepwise model. Changing to proportional model.",
+                        als[alsNum < 1][1], loc.name), call. = FALSE)
       }
       else {
         badMicro = round(alsNum, 1) != alsNum
         if(any(badMicro)) {
+          change = TRUE
           warning(sprintf("Database error: Illegal microvariant '%s' at locus %s. Changing to proportional model.",
                           als[badMicro][1], loc.name), call. = FALSE)
-          if(model.idx.mal > 1) model.idx.mal = 1
-          if(model.idx.fem > 1) model.idx.fem = 1
         }
+      }
+      if(change) {
+        if(model.idx.mal > 1) model.idx.mal = 1
+        if(model.idx.fem > 1) model.idx.fem = 1
       }
     }
 
