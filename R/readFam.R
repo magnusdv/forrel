@@ -218,10 +218,7 @@ readFam = function(famfile, useDVI = NA, Xchrom = FALSE, prefixAdded = "added_",
   loci = vector("list", nLoc)
   loc.line = db.line + 2 + has.info
 
-  # Storage for unsupported mutation models
-  unsupp = character()
-
-
+  # Loop over database loci
   for(i in seq_len(nLoc)) {
     loc.name = x[loc.line]
     mutrate.fem = as.numeric(x[loc.line + 1])
@@ -251,22 +248,29 @@ readFam = function(famfile, useDVI = NA, Xchrom = FALSE, prefixAdded = "added_",
     als.lines = seq(loc.line + 13, by = 2, length.out = nAll)
     als = x[als.lines]
     frqs = as.numeric(x[als.lines + 1])
-    names(frqs) = als
 
-    # Check for Rest allele
-    hasRestAllele = "rest allele" %in% tolower(als)
-    warn = TRUE
-    if(hasRestAllele && model.idx.mal > 1) {
-      warning(sprintf("'Rest Allele' at locus %s is incompatible with '%s' model. Changed to 'proportional'.",
-                       loc.name, maleMod), call. = FALSE)
-      model.idx.mal = 1
-      warn = FALSE # don't warn again for female
+    # Check for illegal alleles, including "Rest allele", with stepwise models
+    if(model.idx.mal > 1 || model.idx.fem > 1) {
+      alsNum = suppressWarnings(as.numeric(als))
+      if(any(is.na(alsNum))) {
+        warning(sprintf("Non-numerical allele '%s' at locus %s incompatible with stepwise model. Changing to proportional model.",
+                         als[is.na(alsNum)][1], loc.name), call. = FALSE)
+        if(model.idx.mal > 1) model.idx.mal = 1
+        if(model.idx.fem > 1) model.idx.fem = 1
+      }
+      else {
+        badMicro = round(alsNum, 1) != alsNum
+        if(any(badMicro)) {
+          warning(sprintf("Database error: Illegal microvariant '%s' at locus %s. Changing to proportional model.",
+                          als[badMicro][1], loc.name), call. = FALSE)
+          if(model.idx.mal > 1) model.idx.mal = 1
+          if(model.idx.fem > 1) model.idx.fem = 1
+        }
+      }
     }
-    if(hasRestAllele && model.idx.fem > 1) {
-      if(warn) warning(sprintf("'Rest allele' at locus %s is incompatible with '%s' mutation model. Changed to 'proportional'.",
-                               loc.name, femaleMod))
-      model.idx.fem = 1
-    }
+
+    # After checks, associate alleles with freqs
+    names(frqs) = als
 
     # Mutation models
     models = c("equal", "proportional", "stepwise", "stepwise", "stepwise")
@@ -300,11 +304,14 @@ readFam = function(famfile, useDVI = NA, Xchrom = FALSE, prefixAdded = "added_",
           mut_txt = paste0(mut_txt, sprintf(", range = %.2g, rate2 = %.2g", range.mal, mutrate2.mal))
       }
       else {
-        mut_txt = sprintf("mut model (M/F) = %s/%s, rate = %.2g/%.2g",
-                           names(maleMod), names(femaleMod), mutrate.mal, mutrate.fem)
-        if(maleMod == "stepwise" && femaleMod == "stepwise")
-          mut_txt = paste0(mut_txt, sprintf(", range = %.2g/%.2g, rate2 = %.2g/%.2g",
-                                            range.mal, range.fem, mutrate2.mal, mutrate2.fem))
+        mod = if(names(maleMod) == names(femaleMod)) names(maleMod) else paste(names(maleMod), names(femaleMod), sep = "/")
+        rate = if(mutrate.mal == mutrate.fem) sprintf("%.2g", mutrate.mal) else sprintf("%.2g/%.2g", mutrate.mal, mutrate.fem)
+        mut_txt = sprintf("mut model (M/F) = %s, rate = %s", mod, rate)
+        if(maleMod == "stepwise" && femaleMod == "stepwise") {
+          range = if(range.mal == range.fem) sprintf("%.2g", range.mal) else sprintf("%.2g/%.2g", range.mal, range.fem)
+          rate2 = if(mutrate2.mal == mutrate2.fem) sprintf("%.2g", mutrate2.mal) else sprintf("%.2g/%.2g", mutrate2.mal, mutrate2.fem)
+          mut_txt = paste0(mut_txt, sprintf(", range = %s, rate2 = %s", range, rate2))
+        }
         else if(maleMod == "stepwise")
           mut_txt = paste0(mut_txt, sprintf(", range = %.2g, rate2 = %.2g", range.mal, mutrate2.mal))
         else if(femaleMod == "stepwise")
@@ -323,13 +330,6 @@ readFam = function(famfile, useDVI = NA, Xchrom = FALSE, prefixAdded = "added_",
     # Goto next locus
     loc.line = loc.line + 13 + 2*nAll
   }
-
-  # Warn about unsupported mutation models
-  #if(length(unsupp) > 0) {
-  #  unsupp = sort(unique.default(unsupp))
-  #  tmp ="Some mutation models were set to NULL. Model '%s' is not supported yet."
-  #  warning(paste0(sprintf(tmp, unsupp), collapse = "\n"), call. = FALSE)
-  #}
 
 
   ###########
