@@ -1,3 +1,10 @@
+# forrel 1.5.2
+
+## New features
+
+* `readFam()` includes more input checks and gives better error/warning messages.
+
+
 # forrel 1.5.1
 
 ## New features
