@@ -250,7 +250,7 @@ readFam = function(famfile, useDVI = NA, Xchrom = FALSE, prefixAdded = "added_",
     frqs = as.numeric(x[als.lines + 1])
 
     if("0" %in% als) {
-      warning(sprintf("Illegal allele '0' at locus %s. Changing to '00'.", loc.name), call. = FALSE)
+      warning(sprintf("Illegal allele '0' at locus %s. Changed to '00'.", loc.name), call. = FALSE)
       als[als == "0"] = "00"
     }
 
@@ -260,19 +260,19 @@ readFam = function(famfile, useDVI = NA, Xchrom = FALSE, prefixAdded = "added_",
       alsNum = suppressWarnings(as.numeric(als))
       if(any(is.na(alsNum))) {
         change = TRUE
-        warning(sprintf("Non-numerical allele '%s' at locus %s incompatible with stepwise model. Changing to proportional model.",
+        warning(sprintf("Non-numerical allele '%s' at locus %s incompatible with stepwise model. Changed to 'proportional.",
                          als[is.na(alsNum)][1], loc.name), call. = FALSE)
       }
       else if(any(alsNum < 1)) {
         change = TRUE
-        warning(sprintf("Database error: Allele '%s' at locus %s is incompatible with stepwise model. Changing to proportional model.",
+        warning(sprintf("Database error: Allele '%s' at locus %s is incompatible with stepwise model. Changed to 'proportional'.",
                         als[alsNum < 1][1], loc.name), call. = FALSE)
       }
       else {
         badMicro = round(alsNum, 1) != alsNum
         if(any(badMicro)) {
           change = TRUE
-          warning(sprintf("Database error: Illegal microvariant '%s' at locus %s. Changing to proportional model.",
+          warning(sprintf("Database error: Illegal microvariant '%s' at locus %s. Changed mutation model to 'proportional'.",
                           als[badMicro][1], loc.name), call. = FALSE)
         }
       }
