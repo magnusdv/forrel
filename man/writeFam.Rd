@@ -43,9 +43,9 @@ stopifnot(all.equal(likelihood(x),
 
 
 ### With stepwise mutation model
-x2 = setMutationModel(x, model = "stepwise",
-                      rate = list(male = 0.001, female = 0.002),
-                      range = 0.1, rate2 = 0.0001)
+x2 = setMutmod(x, model = "stepwise",
+               rate = list(male = 0.001, female = 0.002),
+               range = 0.1, rate2 = 0.0001)
 
 y2 = x2 |> writeFam(famfile = tempfile()) |> readFam()
 

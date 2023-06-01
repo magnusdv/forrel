@@ -35,7 +35,7 @@ findExclusions = function(x, id, candidate, removeMut = TRUE) {
                       idsFrom = labels(candidate), idsTo = id)
 
   if(removeMut)
-    y = setMutationModel(y, NULL)
+    y = setMutmod(y, model = NULL)
 
   # Vector of marker names
   mvec = name(y)
