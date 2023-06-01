@@ -9,6 +9,7 @@ readFam(
   useDVI = NA,
   Xchrom = FALSE,
   prefixAdded = "added_",
+  fallbackModel = c("equal", "proportional"),
   verbose = TRUE
 )
 }
@@ -23,6 +24,10 @@ included if it is present in the input file.}
 be set to "X". (Default = FALSE.)}
 
 \item{prefixAdded}{A string used as prefix when adding missing parents.}
+
+\item{fallbackModel}{Either "equal" or "proportional"; the mutation model to
+be applied (with the same overall rate) when a specified model fails for
+some reason. Default: "equal".}
 
 \item{verbose}{A logical. If TRUE, various information is written to the
 screen during the parsing process.}
