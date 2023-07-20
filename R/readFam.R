@@ -29,7 +29,6 @@
 #'   multiple pedigrees, so the output gets another layer in this case.
 #'
 #' @importFrom pedmut mutationMatrix
-#' @importFrom utils packageVersion
 #' @export
 readFam = function(famfile, useDVI = NA, Xchrom = FALSE, prefixAdded = "added_",
                    fallbackModel = c("equal", "proportional"), verbose = TRUE) {
@@ -302,17 +301,10 @@ readFam = function(famfile, useDVI = NA, Xchrom = FALSE, prefixAdded = "added_",
     femaleMutMat = mutationMatrix(model = femaleMod, alleles = als, afreq = frqs,
                                   rate = mutrate.fem, rate2 = mutrate2.fem, range = range.fem)
 
-    if("step-stationary" %in% c(names(maleMod), names(femaleMod))) {
-      if(packageVersion("pedmut") > 0.5) {
-        if(names(maleMod) == "step-stationary")
-          maleMutMat = pedmut::stabilize(maleMutMat, method = "PM")
-        if(names(femaleMod) == "step-stationary")
-          femaleMutMat = pedmut::stabilize(femaleMutMat, method = "PM")
-      }
-      else
-        warning("Please update the `pedmut` package to enable stabilization of mutation models",
-                immediate. = FALSE, call. = FALSE)
-    }
+    if(names(maleMod) == "step-stationary")
+      maleMutMat = pedmut::stabilize(maleMutMat, method = "PM")
+    if(names(femaleMod) == "step-stationary")
+      femaleMutMat = pedmut::stabilize(femaleMutMat, method = "PM")
 
     # Print locus summary
     if(verbose) {
