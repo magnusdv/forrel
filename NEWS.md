@@ -1,3 +1,20 @@
+# forrel 1.6.0
+
+## New features
+
+* New function `writeFam()`.
+
+* `readFam()` gains argument `fallbackModel` to be applied if the function encounters unrecognisable mutation models in the .fam file.
+
+## Other
+
+* Remove use of `packageVersion()` (thereby sidestepping CRAN issue).
+
+* Use `pedtools::setMutmod()` instead of `pedprobr::setMutationModel()`.
+
+* Update version requirements for imported packages.
+
+
 # forrel 1.5.2
 
 ## New features
