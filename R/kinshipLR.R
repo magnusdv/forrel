@@ -198,17 +198,16 @@ kinshipLR = function(..., ref = NULL, source = NULL, markers = NULL, linkageMap 
     x = lapply(x, transferMarkers, from = srcPed)
   }
 
-  # By default, use all markers
-  if(is.null(markers)) {
-    nm = vapply(x, nMarkers, FUN.VALUE = 1)
-    if(!all(nm == nm[1]))
-      stop2("When `markers = NULL`, all pedigrees must have the same number of attached markers: ", nm)
-    markers = seq_len(nm[1])
-  }
-  else {
+  # Select markers
+  if(!is.null(markers))
     x = lapply(x, selectMarkers, markers)
-  }
 
+  # Check marker consistency
+  nm = vapply(x, nMarkers, FUN.VALUE = 1)
+  if(!all(nm == nm[1]))
+    stop2("The pedigrees have different markers attached.\nTip: Use `markers` and/or `source`.")
+
+  markers = seq_len(nm[1])
   if(verbose)
     cat("Number of markers: ", length(markers), "\n")
 
