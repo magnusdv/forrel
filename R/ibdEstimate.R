@@ -3,7 +3,8 @@
 #' Estimate the IBD coefficients \eqn{\kappa = (\kappa_0, \kappa_1,
 #' \kappa_2)}{(k0, k1, k2)} or the condensed identity coefficients \eqn{\Delta =
 #' (\Delta_1, ..., \Delta_9)}{(d1, ..., d9)} between a pair (or several pairs)
-#' of pedigree members, using maximum likelihood methods.
+#' of pedigree members, using maximum likelihood methods. Estimates of
+#' \eqn{\kappa} may be visualised with [showInTriangle()].
 #'
 #' It should be noted that this procedure estimates the *realised* identity
 #' coefficients of each pair, i.e., the actual fractions of the autosomes in
@@ -22,13 +23,16 @@
 #' The implementation optimises the log-likelihood using a projected gradient
 #' descent algorithm, combined with a version of Armijo line search.
 #'
+#' When `param = "kappa"`, the output may be fed directly to [showInTriangle()]
+#' for visualisation.
+#'
 #' @param x A `ped` object or a list of such.
 #' @param ids Either a vector with ID labels, or a data frame/matrix with two
-#'   columns, where each row contains the ID labels of two individuals. The
-#'   entries are coerced to characters, and must match uniquely against the ID
-#'   labels of `x`. By default, all pairs of members of `x` are included.
+#'   columns, each row indicating a pair of individuals. The entries are coerced
+#'   to characters, and must match uniquely against the ID labels of `x`. By
+#'   default, all pairs of genotyped members of `x` are included.
 #' @param markers A vector with names or indices of markers attached to x,
-#'   indicating which markers to include. If NULL (default), all markers are
+#'   indicating which markers to include. By default, all markers are
 #'   used.
 #' @param param Either "kappa" (default) or "delta"; indicating which set of
 #'   coefficients should be estimated.
@@ -46,7 +50,7 @@
 #'   chosen automatically.
 #' @param verbose A logical.
 #'
-#' @return An object of class `ibdEst`, which is basically a dataframe with
+#' @return An object of class `ibdEst`, which is basically a data frame with
 #'   either 6 columns (if `param = "kappa"`) or 12 columns (if `param =
 #'   "delta"`). The first three columns are `id1` (label of first individual),
 #'   `id2` (label of second individual) and `N` (the number of markers with no
@@ -68,26 +72,31 @@
 #' @examples
 #'
 #' ### Example 1: Siblings
-#' x = nuclearPed(2)
 #'
-#' # Simulate 100 markers
-#' x = markerSim(x, N = 100, alleles = 1:4, seed = 123, verbose = FALSE)
+#' # Create pedigree and simulate 100 markers
+#' x = nuclearPed(2) |> markerSim(N = 100, alleles = 1:4, seed = 123)
+#' x
 #'
 #' # Estimate kappa (expectation: (0.25, 0.5, 0.25)
-#' ibdEstimate(x, ids = 3:4)
+#' k = ibdEstimate(x, ids = 3:4)
+#' k
 #'
-#' # Plot contours of the log-likelihood function
+#' # Visualise estimate
+#' showInTriangle(k, labels = TRUE)
+#'
+#' # Contour plot of the log-likelihood function
 #' ibdEstimate(x, ids = 3:4, contourPlot = TRUE)
 #'
-#' ### Example 2: Full sib mating
-#' y = fullSibMating(1)
 #'
-#' # Simulate 200 SNP markers
-#' y = markerSim(y, N = 1000, alleles = 1:10, seed = 123, verbose = FALSE)
+#' ### Example 2: Full sib mating
+#' y = fullSibMating(1) |>
+#'   markerSim(ids = 5:6, N = 1000, alleles = 1:10, seed = 123)
 #'
 #' # Estimate
-#' ibdEstimate(y, ids = 5:6, param = "delta")
+#' ibdEstimate(y, param = "delta")
 #'
+#' # Exact coefficient by `ribd`:
+#' ribd::condensedIdentity(y, 5:6, simplify = FALSE)
 #'
 #' @export
 ibdEstimate = function(x, ids = typedMembers(x), param = c("kappa", "delta"),
@@ -159,7 +168,7 @@ ibdEstimate = function(x, ids = typedMembers(x), param = c("kappa", "delta"),
   }
 
   if(verbose)
-    message("Total time: ", format(Sys.time() - st, digits = 3))
+    message("Total time: ", ftime(st))
 
   res
 }
