@@ -57,6 +57,10 @@ pluralise = function(noun, n) {
 }
 
 
+ftime = function(st, digits = 3)
+  format(Sys.time() - st, digits = digits)
+
+
 # Faster version of t.default(combn(n, 2, simplify = T))
 .comb2 = function(n, vec = length(n) > 1){
   if(vec) {

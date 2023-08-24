@@ -165,7 +165,7 @@ MPPsims = function(reference, missing = "MP", selections, ep = TRUE, ip = TRUE,
   names(powSims) = names(selections)
 
   # Timing
-  totalTime = format(Sys.time() - st, digits = 3)
+  totalTime = ftime(st)
   if(verbose)
     message("Total time used: ", totalTime)
 
