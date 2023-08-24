@@ -238,13 +238,10 @@ kinshipLR = function(..., ref = NULL, source = NULL, markers = NULL, linkageMap 
 
     # If ibdsim recombination map, apply it to the attached markers
     if(inherits(linkageMap, "genomeMap") || inherits(linkageMap, "chromMap")) {
-      if(!requireNamespace("ibdsim2", quietly = TRUE))
-        stop2("The supplied `linkageMap` requires the `ibdsim2` package, which seems unavailable. Install `ibdsim2` and try again.")
       if(verbose)
         cat("Converting attached marker positions from MB to CM\n")
 
-      physMap = getMap(x[[1]])
-      linkageMap = .convertMap(physMap, linkageMap)
+      linkageMap = .convertMap(physMap = getMap(x[[1]]), linkageMap)
     }
 
     # Lump all peds, if not already done (a bit of a hack)
@@ -340,6 +337,9 @@ print.LRresult = function(x, ...) {
 # physMap = output from `getMap()`
 # genMap = class `genomeMap`
 .convertMap = function(physMap, genMap) {
+
+  if(!requireNamespace("ibdsim2", quietly = TRUE))
+    stop2("The supplied linkage map requires the `ibdsim2` package, which seems unavailable. Install `ibdsim2` and try again.")
 
   # Split marker map by chromosome (keep original chrom order)
   chromSplit = split(physMap, factor(physMap$CHROM, levels = unique(physMap$CHROM)))
