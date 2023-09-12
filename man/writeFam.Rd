@@ -4,7 +4,7 @@
 \alias{writeFam}
 \title{Convert \code{ped} objects to \code{Familias} format}
 \usage{
-writeFam(..., famfile = "ped.fam", theta = 0)
+writeFam(..., famfile = "ped.fam", theta = 0, dropout = 0)
 }
 \arguments{
 \item{...}{One or several pedigrees. Each argument should be either a single
@@ -14,8 +14,11 @@ assigned names "Ped 1", "Ped 2", etc.}
 \item{famfile}{The name or path to the output file to be written. The
 extension ".fam" is added if missing.}
 
-\item{theta}{A nonnegative number indicating a theta correction for the
-marker database. By default 0.}
+\item{theta}{A number between 0 and 1 inclusive, indicating a theta
+correction for the marker database. By default 0.}
+
+\item{dropout}{A number between 0 and 1 inclusive, or a named vector of such
+numbers, indicating dropout probability. By default 0.}
 }
 \value{
 The filename is returned invisibly.

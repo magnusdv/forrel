@@ -8,8 +8,10 @@
 #'   assigned names "Ped 1", "Ped 2", etc.
 #' @param famfile The name or path to the output file to be written. The
 #'   extension ".fam" is added if missing.
-#' @param theta A nonnegative number indicating a theta correction for the
-#'   marker database. By default 0.
+#' @param theta A number between 0 and 1 inclusive, indicating a theta
+#'   correction for the marker database. By default 0.
+#' @param dropout A number between 0 and 1 inclusive, or a named vector of such
+#'   numbers, indicating dropout probability. By default 0.
 #'
 #' @return The filename is returned invisibly.
 #' @seealso [readFam()]
@@ -42,7 +44,7 @@
 #' stopifnot(all.equal(likelihood(x2), likelihood(y2)))
 #'
 #' @export
-writeFam = function(..., famfile = "ped.fam", theta = 0) {
+writeFam = function(..., famfile = "ped.fam", theta = 0, dropout = 0) {
   peds = list(...)
   if (length(peds) == 1)
     peds = peds[[1]]
@@ -64,6 +66,28 @@ writeFam = function(..., famfile = "ped.fam", theta = 0) {
   LABS = unique.default(unlist(lapply(peds, labels)))
   nind = length(LABS)
 
+  # Dropout
+  if(!is.null(dnms <- names(dropout))) {
+    if(!all(dnms %in% LABS))
+      stop2("Unknown ID in `dropout`: ", setdiff(dnms, LABS))
+    rest = rep_len(0, nind - length(dropout))
+    names(rest) = setdiff(LABS, dnms)
+    dropout = c(dropout, rest)[LABS] # sort to look nice
+  }
+  else {
+    dropout = rep_len(dropout, nind)
+    names(dropout) = LABS
+  }
+
+  dropoutValue = max(dropout)
+
+  if(length(udr <- unique.default(dropout[dropout > 0])) > 1)
+    stop2("All nonzero dropout values must be equal: ", sort(udr))
+
+  # Make sure only typed individuals have dropout (otherwise Familias crashes!)
+  untyped = unlist(lapply(peds, untypedMembers))
+  dropout[untyped] = 0
+
   # Unique marker names
   MARKERS = unique.default(unlist(lapply(peds, name)))
 
@@ -78,12 +102,11 @@ writeFam = function(..., famfile = "ped.fam", theta = 0) {
   quo = function(s) sprintf('"%s"', s)
 
   # Preamble
-  addline(quo("Output from Familias, version 3.3.1"),
+  addline(quo("Output from Familias, version 3.2.8"),
           quo(sprintf("(Actually produced by R/pedsuite, %s)", format(Sys.Date(), "%d %b %Y"))),
-          "3.3.1",
+          "3.2.8",
           '""',
           nind)
-
 
   # Individuals and genotypes ---------------------------------------------
 
@@ -95,7 +118,10 @@ writeFam = function(..., famfile = "ped.fam", theta = 0) {
     if(taken[id])
       next
 
-    addline(quo(id), "#FALSE#", -1, "#FALSE#",
+    addline(quo(id),
+            "#FALSE#",
+            if(dropout[id] > 0) "-1 (Consider dropouts)" else "-1",
+            "#FALSE#",
             ifelse(getSex(x, id) == 1, "#TRUE#", "#FALSE#"))
 
     idx = internalID(x, id)
@@ -186,7 +212,7 @@ writeFam = function(..., famfile = "ped.fam", theta = 0) {
             mut$rate2 %na% 0)
 
     addline("#FALSE#", 0,
-            paste(nals,	"(DatabaseSize = 1000 , Dropout probability = 0 , Minor allele frequency = 0 )", sep = "\t"))
+            sprintf("%d\t(DatabaseSize = 1000 , Dropout probability = %f , Minor allele frequency = 0 )", nals, dropoutValue))
 
     frvec = character(2*nals)
     frvec[2*(1:nals) - 1] = quo(attrs$alleles)
