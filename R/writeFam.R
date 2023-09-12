@@ -15,6 +15,7 @@
 #' @param verbose A logical, by default TRUE.
 #'
 #' @return The filename is returned invisibly.
+#'
 #' @seealso [readFam()]
 #'
 #' @examples
@@ -223,9 +224,20 @@ writeFam = function(..., famfile = "ped.fam", theta = 0, dropout = 0, verbose = 
     takenMark[mname] = TRUE
   }
 
+  pth = normalizePath(famfile)
   if(verbose)
-    cat("Written to file:", normalizePath(famfile))
-  invisible(famfile)
+    cat("Written to file:", pth)
+  invisible(pth)
+}
+
+openFamilias = function(famfile = NULL, FamiliasPath = "Familias3.exe") {
+  bat = "_loadFam.bat"
+  on.exit(unlink(bat))
+  cmd = shQuote(FamiliasPath)
+  if(!is.null(famfile))
+    cmd = paste(cmd, shQuote(famfile))
+  writeLines(cmd, bat)
+  system2(bat)
 }
 
 
