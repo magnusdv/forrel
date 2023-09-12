@@ -12,6 +12,7 @@
 #'   correction for the marker database. By default 0.
 #' @param dropout A number between 0 and 1 inclusive, or a named vector of such
 #'   numbers, indicating dropout probability. By default 0.
+#' @param verbose A logical, by default TRUE.
 #'
 #' @return The filename is returned invisibly.
 #' @seealso [readFam()]
@@ -44,7 +45,7 @@
 #' stopifnot(all.equal(likelihood(x2), likelihood(y2)))
 #'
 #' @export
-writeFam = function(..., famfile = "ped.fam", theta = 0, dropout = 0) {
+writeFam = function(..., famfile = "ped.fam", theta = 0, dropout = 0, verbose = TRUE) {
   peds = list(...)
   if (length(peds) == 1)
     peds = peds[[1]]
@@ -222,6 +223,8 @@ writeFam = function(..., famfile = "ped.fam", theta = 0, dropout = 0) {
     takenMark[mname] = TRUE
   }
 
+  if(verbose)
+    cat("Written to file:", normalizePath(famfile))
   invisible(famfile)
 }
 

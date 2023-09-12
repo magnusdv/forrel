@@ -4,7 +4,7 @@
 \alias{writeFam}
 \title{Convert \code{ped} objects to \code{Familias} format}
 \usage{
-writeFam(..., famfile = "ped.fam", theta = 0, dropout = 0)
+writeFam(..., famfile = "ped.fam", theta = 0, dropout = 0, verbose = TRUE)
 }
 \arguments{
 \item{...}{One or several pedigrees. Each argument should be either a single
@@ -19,6 +19,8 @@ correction for the marker database. By default 0.}
 
 \item{dropout}{A number between 0 and 1 inclusive, or a named vector of such
 numbers, indicating dropout probability. By default 0.}
+
+\item{verbose}{A logical, by default TRUE.}
 }
 \value{
 The filename is returned invisibly.
