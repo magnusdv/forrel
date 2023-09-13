@@ -49,3 +49,11 @@ This function parses the content of a \code{Familias}-formatted ".fam" file, and
 converts it into suitable \code{ped} objects. This function does not depend on the
 \code{Familias} R package.
 }
+\references{
+Egeland, T., P. F. Mostad, et al. (2000). \emph{Beyond traditional
+paternity and identification cases. Selecting the most probable pedigree.}
+Forensic Sci Int 110(1): 47-59.
+}
+\seealso{
+\code{\link[=writeFam]{writeFam()}}
+}

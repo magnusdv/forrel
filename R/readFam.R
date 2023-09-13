@@ -28,6 +28,11 @@
 #'   are parsed and converted to `ped` objects. Each family generally describes
 #'   multiple pedigrees, so the output gets another layer in this case.
 #'
+#' @seealso [writeFam()]
+#' @references Egeland, T., P. F. Mostad, et al. (2000). _Beyond traditional
+#'   paternity and identification cases. Selecting the most probable pedigree._
+#'   Forensic Sci Int 110(1): 47-59.
+#'
 #' @importFrom pedmut mutationMatrix
 #' @export
 readFam = function(famfile, useDVI = NA, Xchrom = FALSE, prefixAdded = "added_",

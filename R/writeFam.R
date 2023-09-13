@@ -1,7 +1,9 @@
 #' Convert `ped` objects to `Familias` format
 #'
-#' This function produces a .fam file readable by the `Familias` software,
-#' containing all input pedigrees and their marker data.
+#' This function produces a .fam file readable by the `Familias` software
+#' (Egeland, Mostad et al., 2000), containing all input pedigrees and their
+#' marker data. The option `openFam = TRUE` calls `openFamilias()` to open a
+#' fresh `Familias` session with the produced file pre-loaded.
 #'
 #' @param ... One or several pedigrees. Each argument should be either a single
 #'   `ped` object or a list of such. If the pedigrees are unnamed, they are
@@ -12,11 +14,20 @@
 #'   correction for the marker database. By default 0.
 #' @param dropout A number between 0 and 1 inclusive, or a named vector of such
 #'   numbers, indicating dropout probability. By default 0.
+#' @param openFam A logical. If TRUE, an attempt is made to open the produced
+#'   `fam` file in an external `Familias` session. Only available on Windows
+#'   systems with a working `Familias` installation.
+#' @param FamiliasPath The path to the Familias executable. If empty, the
+#'   following are tried in order: "Familias3.exe", "C:/Program Files
+#'   (x86)/Familias3/Familias3.exe".
 #' @param verbose A logical, by default TRUE.
 #'
 #' @return The filename is returned invisibly.
 #'
 #' @seealso [readFam()]
+#' @references Egeland, T., P. F. Mostad, et al. (2000). _Beyond traditional
+#'   paternity and identification cases. Selecting the most probable pedigree._
+#'   Forensic Sci Int 110(1): 47-59.
 #'
 #' @examples
 #' library(pedprobr)
@@ -46,7 +57,8 @@
 #' stopifnot(all.equal(likelihood(x2), likelihood(y2)))
 #'
 #' @export
-writeFam = function(..., famfile = "ped.fam", theta = 0, dropout = 0, verbose = TRUE) {
+writeFam = function(..., famfile = "ped.fam", theta = 0, dropout = 0,
+                    openFam = FALSE, FamiliasPath = NULL, verbose = TRUE) {
   peds = list(...)
   if (length(peds) == 1)
     peds = peds[[1]]
@@ -97,7 +109,9 @@ writeFam = function(..., famfile = "ped.fam", theta = 0, dropout = 0, verbose = 
   if(!endsWith(famfile, ".fam"))
     famfile = paste0(famfile, ".fam")
   fam = file(famfile, "w", encoding = "UTF-8")
-  on.exit(close(fam))
+
+  isClosed = FALSE
+  on.exit(if(!isClosed) close(fam), add = TRUE)
 
   # Quick utilities
   addline = function(...) cat(..., file = fam, sep = "\n")
@@ -224,22 +238,47 @@ writeFam = function(..., famfile = "ped.fam", theta = 0, dropout = 0, verbose = 
     takenMark[mname] = TRUE
   }
 
+  close(fam)
+  isClosed = TRUE
   pth = normalizePath(famfile)
+
   if(verbose)
-    cat("Written to file:", pth)
+    cat("Written to file:", pth, "\n")
+
+  if(openFam) {
+    if(verbose)
+      cat("Trying to open in Familias\n")
+    openFamilias(pth, FamiliasPath, verbose = verbose)
+  }
+
   invisible(pth)
 }
 
-openFamilias = function(famfile = NULL, FamiliasPath = "Familias3.exe") {
-  bat = "_loadFam.bat"
-  on.exit(unlink(bat))
-  cmd = shQuote(FamiliasPath)
-  if(!is.null(famfile))
-    cmd = paste(cmd, shQuote(famfile))
-  writeLines(cmd, bat)
-  system2(bat)
+#' @rdname writeFam
+#' @export
+openFamilias = function(famfile = NULL, FamiliasPath = NULL, verbose = TRUE) {
+  FamiliasPath = .checkFamilias(FamiliasPath)
+  if(verbose)
+    cat("Familias executable:", FamiliasPath, "\n")
+  if(is.null(famfile))
+    cmd = sprintf('"%s"', shQuote(FamiliasPath))
+  else
+    cmd = sprintf('"%s %s"', shQuote(FamiliasPath), shQuote(famfile))
+
+  shell(cmd, wait = FALSE)
 }
 
+.checkFamilias = function(FamiliasPath = NULL) {
+  if(Sys.info()["sysname"] != "Windows")
+    stop2("Familias is only available on Windows systems.")
+  if(is.null(FamiliasPath))
+    FamiliasPath = c("Familias3.exe", "C:/Program Files (x86)/Familias3/Familias3.exe")
+  for(p in FamiliasPath) {
+    if(file.exists(p) && file.info(p)$exe != "no")
+      return(p)
+  }
+  stop2("Could not find Familias executable: ", FamiliasPath)
+}
 
 `%na%` = function(x, y) {
   if(length(x) == 1) {

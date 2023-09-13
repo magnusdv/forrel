@@ -2,9 +2,20 @@
 % Please edit documentation in R/writeFam.R
 \name{writeFam}
 \alias{writeFam}
+\alias{openFamilias}
 \title{Convert \code{ped} objects to \code{Familias} format}
 \usage{
-writeFam(..., famfile = "ped.fam", theta = 0, dropout = 0, verbose = TRUE)
+writeFam(
+  ...,
+  famfile = "ped.fam",
+  theta = 0,
+  dropout = 0,
+  openFam = FALSE,
+  FamiliasPath = NULL,
+  verbose = TRUE
+)
+
+openFamilias(famfile = NULL, FamiliasPath = NULL, verbose = TRUE)
 }
 \arguments{
 \item{...}{One or several pedigrees. Each argument should be either a single
@@ -20,14 +31,24 @@ correction for the marker database. By default 0.}
 \item{dropout}{A number between 0 and 1 inclusive, or a named vector of such
 numbers, indicating dropout probability. By default 0.}
 
+\item{openFam}{A logical. If TRUE, an attempt is made to open the produced
+\code{fam} file in an external \code{Familias} session. Only available on Windows
+systems with a working \code{Familias} installation.}
+
+\item{FamiliasPath}{The path to the Familias executable. If empty, the
+following are tried in order: "Familias3.exe", "C:/Program Files
+(x86)/Familias3/Familias3.exe".}
+
 \item{verbose}{A logical, by default TRUE.}
 }
 \value{
 The filename is returned invisibly.
 }
 \description{
-This function produces a .fam file readable by the \code{Familias} software,
-containing all input pedigrees and their marker data.
+This function produces a .fam file readable by the \code{Familias} software
+(Egeland, Mostad et al., 2000), containing all input pedigrees and their
+marker data. The option \code{openFam = TRUE} calls \code{openFamilias()} to open a
+fresh \code{Familias} session with the produced file pre-loaded.
 }
 \examples{
 library(pedprobr)
@@ -56,6 +77,11 @@ y2 = x2 |> writeFam(famfile = tempfile()) |> readFam()
 
 stopifnot(all.equal(likelihood(x2), likelihood(y2)))
 
+}
+\references{
+Egeland, T., P. F. Mostad, et al. (2000). \emph{Beyond traditional
+paternity and identification cases. Selecting the most probable pedigree.}
+Forensic Sci Int 110(1): 47-59.
 }
 \seealso{
 \code{\link[=readFam]{readFam()}}
