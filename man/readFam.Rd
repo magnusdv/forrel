@@ -10,6 +10,7 @@ readFam(
   Xchrom = FALSE,
   prefixAdded = "added_",
   fallbackModel = c("equal", "proportional"),
+  simplify1 = TRUE,
   verbose = TRUE
 )
 }
@@ -28,6 +29,9 @@ be set to "X". (Default = FALSE.)}
 \item{fallbackModel}{Either "equal" or "proportional"; the mutation model to
 be applied (with the same overall rate) when a specified model fails for
 some reason. Default: "equal".}
+
+\item{simplify1}{A logical indicating if the outer list layer should be
+removed in the output if the file contains only a single pedigree.}
 
 \item{verbose}{A logical. If TRUE, various information is written to the
 screen during the parsing process.}

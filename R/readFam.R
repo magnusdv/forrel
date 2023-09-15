@@ -14,6 +14,8 @@
 #' @param fallbackModel Either "equal" or "proportional"; the mutation model to
 #'   be applied (with the same overall rate) when a specified model fails for
 #'   some reason. Default: "equal".
+#' @param simplify1 A logical indicating if the outer list layer should be
+#'   removed in the output if the file contains only a single pedigree.
 #' @param verbose A logical. If TRUE, various information is written to the
 #'   screen during the parsing process.
 #'
@@ -36,7 +38,8 @@
 #' @importFrom pedmut mutationMatrix
 #' @export
 readFam = function(famfile, useDVI = NA, Xchrom = FALSE, prefixAdded = "added_",
-                   fallbackModel = c("equal", "proportional"), verbose = TRUE) {
+                   fallbackModel = c("equal", "proportional"), simplify1 = TRUE,
+                   verbose = TRUE) {
   if(!endsWith(famfile, ".fam"))
     stop("Input file must end with '.fam'", call. = FALSE)
 
@@ -425,6 +428,10 @@ readFam = function(famfile, useDVI = NA, Xchrom = FALSE, prefixAdded = "added_",
       if(verbose) message("Changing all chromosome attributes to `X`")
       chrom(res, seq_along(loci)) = "X"
     }
+
+    # Simplify output if single pedigree
+    if(simplify1 && length(res) == 1)
+      res = res[[1]]
   }
   else {
     if(verbose)
@@ -433,6 +440,7 @@ readFam = function(famfile, useDVI = NA, Xchrom = FALSE, prefixAdded = "added_",
   }
 
   if(verbose) message("")
+
   res
 }
 
