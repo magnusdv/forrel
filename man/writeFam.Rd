@@ -10,6 +10,8 @@ writeFam(
   famfile = "ped.fam",
   theta = 0,
   dropout = 0,
+  dbName = "Unknown_db",
+  dbOnly = FALSE,
   openFam = FALSE,
   FamiliasPath = NULL,
   verbose = TRUE
@@ -31,6 +33,11 @@ correction for the marker database. By default 0.}
 \item{dropout}{A number between 0 and 1 inclusive, or a named vector of such
 numbers, indicating dropout probability. By default 0.}
 
+\item{dbName}{The name of the marker database.}
+
+\item{dbOnly}{A logical. If TRUE, no pedigree information is included; only
+the frequency database.}
+
 \item{openFam}{A logical. If TRUE, an attempt is made to open the produced
 \code{fam} file in an external \code{Familias} session. Only available on Windows
 systems with a working \code{Familias} installation.}
@@ -51,11 +58,10 @@ marker data. The option \code{openFam = TRUE} calls \code{openFamilias()} to ope
 fresh \code{Familias} session with the produced file pre-loaded.
 }
 \examples{
-library(pedprobr)
 
-x = nuclearPed(father = "AF", mother = "MO", children = "CH") |>
-  profileSim(N = 1, ids = c("AF", "CH"), seed = 111,
-             markers = NorwegianFrequencies[1:2])
+# Create pedigree with 2 markers
+x = nuclearPed() |>
+  profileSim(markers = NorwegianFrequencies[1:2], seed = 1)
 
 # Write to .fam
 tmp = writeFam(x, famfile = tempfile())
@@ -63,9 +69,7 @@ tmp = writeFam(x, famfile = tempfile())
 # Read back in
 y = readFam(tmp)
 
-# Verify that likelihoods agree
-stopifnot(all.equal(likelihood(x),
-                    likelihood(y)))
+stopifnot(identical(x, y))
 
 
 ### With stepwise mutation model
@@ -73,9 +77,25 @@ x2 = setMutmod(x, model = "stepwise",
                rate = list(male = 0.001, female = 0.002),
                range = 0.1, rate2 = 0.0001)
 
-y2 = x2 |> writeFam(famfile = tempfile()) |> readFam()
+# Write and read
+y2 = x2 |>
+  writeFam(famfile = tempfile()) |>
+  readFam()
 
-stopifnot(all.equal(likelihood(x2), likelihood(y2)))
+stopifnot(identical(x, y))
+
+
+### Read/write frequency database
+
+# Write database as .fam file
+dbfam = writeFam(x2, famfile = tempfile(), dbOnly = TRUE)
+
+# Read in; attach to a pedigree; write again
+dbfam2 = singleton(1) |>
+  setMarkers(locusAttributes = readFam(dbfam)) |>
+  writeFam(famfile = tempfile(), dbOnly = TRUE)
+
+stopifnot(identical(readLines(dbfam), readLines(dbfam2)))
 
 }
 \references{

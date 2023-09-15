@@ -5,6 +5,7 @@
 #' marker data. The option `openFam = TRUE` calls `openFamilias()` to open a
 #' fresh `Familias` session with the produced file pre-loaded.
 #'
+#'
 #' @param ... One or several pedigrees. Each argument should be either a single
 #'   `ped` object or a list of such. If the pedigrees are unnamed, they are
 #'   assigned names "Ped 1", "Ped 2", etc.
@@ -14,6 +15,9 @@
 #'   correction for the marker database. By default 0.
 #' @param dropout A number between 0 and 1 inclusive, or a named vector of such
 #'   numbers, indicating dropout probability. By default 0.
+#' @param dbName The name of the marker database.
+#' @param dbOnly A logical. If TRUE, no pedigree information is included; only
+#'   the frequency database.
 #' @param openFam A logical. If TRUE, an attempt is made to open the produced
 #'   `fam` file in an external `Familias` session. Only available on Windows
 #'   systems with a working `Familias` installation.
@@ -30,11 +34,10 @@
 #'   Forensic Sci Int 110(1): 47-59.
 #'
 #' @examples
-#' library(pedprobr)
 #'
-#' x = nuclearPed(father = "AF", mother = "MO", children = "CH") |>
-#'   profileSim(N = 1, ids = c("AF", "CH"), seed = 111,
-#'              markers = NorwegianFrequencies[1:2])
+#' # Create pedigree with 2 markers
+#' x = nuclearPed() |>
+#'   profileSim(markers = NorwegianFrequencies[1:2], seed = 1)
 #'
 #' # Write to .fam
 #' tmp = writeFam(x, famfile = tempfile())
@@ -42,9 +45,7 @@
 #' # Read back in
 #' y = readFam(tmp)
 #'
-#' # Verify that likelihoods agree
-#' stopifnot(all.equal(likelihood(x),
-#'                     likelihood(y)))
+#' stopifnot(identical(x, y))
 #'
 #'
 #' ### With stepwise mutation model
@@ -52,21 +53,35 @@
 #'                rate = list(male = 0.001, female = 0.002),
 #'                range = 0.1, rate2 = 0.0001)
 #'
-#' y2 = x2 |> writeFam(famfile = tempfile()) |> readFam()
+#' # Write and read
+#' y2 = x2 |>
+#'   writeFam(famfile = tempfile()) |>
+#'   readFam()
 #'
-#' stopifnot(all.equal(likelihood(x2), likelihood(y2)))
+#' stopifnot(identical(x, y))
+#'
+#'
+#' ### Read/write frequency database
+#'
+#' # Write database as .fam file
+#' dbfam = writeFam(x2, famfile = tempfile(), dbOnly = TRUE)
+#'
+#' # Read in; attach to a pedigree; write again
+#' dbfam2 = singleton(1) |>
+#'   setMarkers(locusAttributes = readFam(dbfam)) |>
+#'   writeFam(famfile = tempfile(), dbOnly = TRUE)
+#'
+#' stopifnot(identical(readLines(dbfam), readLines(dbfam2)))
 #'
 #' @export
 writeFam = function(..., famfile = "ped.fam", theta = 0, dropout = 0,
-                    openFam = FALSE, FamiliasPath = NULL, verbose = TRUE) {
+                    dbName = "Unknown_db", dbOnly = FALSE, openFam = FALSE,
+                    FamiliasPath = NULL, verbose = TRUE) {
   peds = list(...)
   if (length(peds) == 1)
     peds = peds[[1]]
   if (is.ped(peds))
     peds = list(peds)
-
-  npeds = length(peds)
-  pednames = names(peds) %||% paste("Ped", 1:npeds)
 
   # Ensure each entry is a pedlist
   peds = lapply(peds, function(p) if(is.ped(p)) list(p) else p)
@@ -122,13 +137,17 @@ writeFam = function(..., famfile = "ped.fam", theta = 0, dropout = 0,
           quo(sprintf("(Actually produced by R/pedsuite, %s)", format(Sys.Date(), "%d %b %Y"))),
           "3.2.8",
           '""',
-          nind)
+          if(dbOnly) 0 else nind)
 
   # Individuals and genotypes ---------------------------------------------
 
   # Loop over indivs
   taken = rep(FALSE, length(LABS))
   names(taken) = LABS
+
+  # Hack to skip everyone if `dbOnly = TRUE`
+  if(dbOnly)
+    taken[] = TRUE
 
   for(ped in peds) for(x in ped) for(id in labels(x)) {
     if(taken[id])
@@ -163,10 +182,18 @@ writeFam = function(..., famfile = "ped.fam", theta = 0, dropout = 0,
 
   # Pedigrees ---------------------------------------------------------------
 
+  # Skip all pedigrees if `dbOnly = TRUE`
+  if(dbOnly) {
+    npeds = 0
+  } else {
+    npeds = length(peds)
+    pednames = names(peds) %||% paste("Ped", 1:npeds)
+  }
+
   addline('"Known relations"', 0,0,0, npeds)
 
   # Loop over pedigrees
-  for(i in 1:npeds) {
+  for(i in seq_len(npeds)) {
     ped = peds[[i]]
     nrels = sum(lengths(lapply(ped, nonfounders))) * 2
 
@@ -194,7 +221,7 @@ writeFam = function(..., famfile = "ped.fam", theta = 0, dropout = 0,
   addline(sprintf("#FALSE# (#Databases: 1 ;Theta/Kinship/Fst: %g )", theta),
           length(MARKERS),
           "#TRUE#",
-          quo("Unknown_db"))
+          quo(dbName))
 
   takenMark = rep(FALSE, length(MARKERS))
   names(takenMark) = MARKERS
@@ -228,7 +255,7 @@ writeFam = function(..., famfile = "ped.fam", theta = 0, dropout = 0,
             mut$rate2 %na% 0)
 
     addline("#FALSE#", 0,
-            sprintf("%d\t(DatabaseSize = 1000 , Dropout probability = %f , Minor allele frequency = 0 )", nals, dropoutValue))
+            sprintf("%d\t(DatabaseSize = 1000 , Dropout probability = %g , Minor allele frequency = 0 )", nals, dropoutValue))
 
     frvec = character(2*nals)
     frvec[2*(1:nals) - 1] = quo(attrs$alleles)
