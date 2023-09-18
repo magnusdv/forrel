@@ -11,6 +11,7 @@ readFam(
   prefixAdded = "added_",
   fallbackModel = c("equal", "proportional"),
   simplify1 = TRUE,
+  includeParams = FALSE,
   verbose = TRUE
 )
 }
@@ -33,20 +34,45 @@ some reason. Default: "equal".}
 \item{simplify1}{A logical indicating if the outer list layer should be
 removed in the output if the file contains only a single pedigree.}
 
+\item{includeParams}{A logical indicating if various parameters should be
+read and returned in a separate list. See Value for details. Default:
+FALSE.}
+
 \item{verbose}{A logical. If TRUE, various information is written to the
 screen during the parsing process.}
 }
 \value{
-If the .fam file only contains a database, the output is a list of
-information (name, alleles, frequencies) about each locus. This list can be
-used as \code{locusAttributes} in e.g. \code{\link[=setMarkers]{setMarkers()}}.
+The output of \code{readFam()} depends on the contents of the input file,
+and the argument \code{includeParams}. This is FALSE by default, giving the
+following possible outcomes:
+\itemize{
+\item If the input file only contains a database, the output is a list of
+information (name, alleles, frequencies, mutation model) about each locus.
+This list can be used as \code{locusAttributes} in e.g. \code{\link[=setMarkers]{setMarkers()}}.
+\item If the input file describes pedigree data, the output is a list of \code{ped}
+objects. If there is only one pedigree, and \code{simplify1 = TRUE}, the output
+is a \code{ped} object.
+\item If \code{useDVI = TRUE}, or \code{useDVI = NA} \emph{and} the file contains DVI data, then
+the \verb{Reference Families} section of the file is parsed and converted to
+\code{ped} objects. Each family generally describes multiple pedigrees, so the
+output gets another layer in this case.
+}
 
-If the .fam file describes pedigree data, the output is a \code{ped} object or a
-list of such.
-
-If \code{useDVI = TRUE}, then the families described under \verb{Reference Families}
-are parsed and converted to \code{ped} objects. Each family generally describes
-multiple pedigrees, so the output gets another layer in this case.
+If \code{includeParams = TRUE}, the output is a list with elements \code{main} (the
+main output, as described above) and \code{params}, a list with some or all of
+the following entries:
+\itemize{
+\item \code{dbName}: The name of the database
+\item \code{dbSize}: A named numeric vector containing the DatabaseSize reported for
+each marker
+\item \code{dropoutConsider}: A named logical vector indicating for each person if
+dropouts should be considered
+\item \code{dropoutValue}: A named numeric vector containing the dropout value for
+each marker
+\item \code{maf}: A named numeric vector containing the "Minor Allele Frequency"
+given for each marker
+\item \code{theta}: The \code{Theta/Kinship/Fst} value given for the marker database
+}
 }
 \description{
 This function parses the content of a \code{Familias}-formatted ".fam" file, and

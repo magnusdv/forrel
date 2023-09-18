@@ -16,19 +16,44 @@
 #'   some reason. Default: "equal".
 #' @param simplify1 A logical indicating if the outer list layer should be
 #'   removed in the output if the file contains only a single pedigree.
+#' @param includeParams A logical indicating if various parameters should be
+#'   read and returned in a separate list. See Value for details. Default:
+#'   FALSE.
 #' @param verbose A logical. If TRUE, various information is written to the
 #'   screen during the parsing process.
 #'
-#' @return If the .fam file only contains a database, the output is a list of
-#'   information (name, alleles, frequencies) about each locus. This list can be
-#'   used as `locusAttributes` in e.g. [setMarkers()].
+#' @return The output of `readFam()` depends on the contents of the input file,
+#'   and the argument `includeParams`. This is FALSE by default, giving the
+#'   following possible outcomes:
 #'
-#'   If the .fam file describes pedigree data, the output is a `ped` object or a
-#'   list of such.
+#'   * If the input file only contains a database, the output is a list of
+#'   information (name, alleles, frequencies, mutation model) about each locus.
+#'   This list can be used as `locusAttributes` in e.g. [setMarkers()].
 #'
-#'   If `useDVI = TRUE`, then the families described under `Reference Families`
-#'   are parsed and converted to `ped` objects. Each family generally describes
-#'   multiple pedigrees, so the output gets another layer in this case.
+#'   * If the input file describes pedigree data, the output is a list of `ped`
+#'   objects. If there is only one pedigree, and `simplify1 = TRUE`, the output
+#'   is a `ped` object.
+#'
+#'   * If `useDVI = TRUE`, or `useDVI = NA` _and_ the file contains DVI data, then
+#'   the `Reference Families` section of the file is parsed and converted to
+#'   `ped` objects. Each family generally describes multiple pedigrees, so the
+#'   output gets another layer in this case.
+#'
+#'   If `includeParams = TRUE`, the output is a list with elements `main` (the
+#'   main output, as described above) and `params`, a list with some or all of
+#'   the following entries:
+#'
+#'   * `dbName`: The name of the database
+#'   * `dbSize`: A named numeric vector containing the DatabaseSize reported for
+#'   each marker
+#'   * `dropoutConsider`: A named logical vector indicating for each person if
+#'   dropouts should be considered
+#'   * `dropoutValue`: A named numeric vector containing the dropout value for
+#'   each marker
+#'   * `maf`: A named numeric vector containing the "Minor Allele Frequency"
+#'   given for each marker
+#'   * `theta`: The `Theta/Kinship/Fst` value given for the marker database
+#'
 #'
 #' @seealso [writeFam()]
 #' @references Egeland, T., P. F. Mostad, et al. (2000). _Beyond traditional
@@ -39,7 +64,8 @@
 #' @export
 readFam = function(famfile, useDVI = NA, Xchrom = FALSE, prefixAdded = "added_",
                    fallbackModel = c("equal", "proportional"), simplify1 = TRUE,
-                   verbose = TRUE) {
+                   includeParams = FALSE, verbose = TRUE) {
+
   if(!endsWith(famfile, ".fam"))
     stop("Input file must end with '.fam'", call. = FALSE)
 
@@ -54,6 +80,9 @@ readFam = function(famfile, useDVI = NA, Xchrom = FALSE, prefixAdded = "added_",
                    line, txt, value), call. = FALSE)
     j
   }
+
+  # Initialise storage for extra info, if indicated
+  params = if(includeParams) list() else NULL
 
   # Read and print Familias version
   version = x[3]
@@ -87,6 +116,13 @@ readFam = function(famfile, useDVI = NA, Xchrom = FALSE, prefixAdded = "added_",
   id.line = nid.line + 1
   for(i in seq_len(nid)) {
     id[i] = x[id.line]
+
+    if(includeParams) {
+      dr = grepl("(Consider dropouts)", x[id.line + 2])
+      names(dr) = id[i]
+      params$dropoutConsider = c(params$dropoutConsider, dr)
+    }
+
     sex[i] = ifelse(x[id.line + 4] == "#TRUE#", 1, 2)
 
     nmi = getInt(id.line + 5, sprintf('number of genotypes for "%s"', id[i]))
@@ -209,9 +245,11 @@ readFam = function(famfile, useDVI = NA, Xchrom = FALSE, prefixAdded = "added_",
   fallbackModel = match.arg(fallbackModel)
 
   # Theta?
-  patt = "(?<=Theta/Kinship/Fst:).*(?=\\))"
-  theta = suppressWarnings(as.numeric(regmatches(x[ped.line], regexpr(patt, x[ped.line], perl = T))))
-  if(length(theta) && !is.na(theta) && theta > 0)
+  patt = "(?<=Theta/Kinship/Fst: )[\\.\\d]+"
+  theta = safeNum(regmatches(x[ped.line], regexpr(patt, x[ped.line], perl = TRUE)))
+  if(includeParams)
+    params$theta = theta
+  else if(length(theta) && !is.na(theta) && theta > 0)
     warning("Nonzero theta correction detected: theta = ", theta, call. = FALSE)
 
   db.line = ped.line + 1
@@ -224,6 +262,9 @@ readFam = function(famfile, useDVI = NA, Xchrom = FALSE, prefixAdded = "added_",
     else
       message("")
   }
+
+  if(includeParams)
+    params$dbName = if(has.info) x[db.line + 2] else ""
 
   if(verbose)
     message("Number of loci: ", nLoc)
@@ -252,10 +293,36 @@ readFam = function(famfile, useDVI = NA, Xchrom = FALSE, prefixAdded = "added_",
       stop2("Locus ", loc.name, " has silent frequencies: this is not implemented yet")
     silent.freq = as.numeric(x[loc.line + 11])
 
-    # Number of alleles except the silent
-    nAll = x[loc.line + 12]
-    nAll = getInt(loc.line + 12, value = strsplit(nAll, "\t")[[1]][[1]],
+    # Info line, e.g. "17\t(DatabaseSize = 600 , Dropout probability = 0 , Minor allele frequency = 0 )"
+    mInfo = unlist(strsplit(x[loc.line + 12], "\t"))
+
+    # First part: Number of alleles except the silent
+    nAll = getInt(loc.line + 12, value = mInfo[[1]],
                   paste("number of alleles for marker", loc.name))
+
+    # Second part I: Database size
+    if(includeParams) {
+      patt1 = "(?<=DatabaseSize = )\\d+"
+      dbsize = safeNum(regmatches(mInfo[[2]], regexpr(patt1, mInfo[[2]], perl = TRUE)))
+      names(dbsize) = loc.name
+      params$dbSize = c(params$dbSize, dbsize)
+    }
+
+    # Second part II: Dropout value per marker
+    if(includeParams) {
+      patt2 = "(?<=Dropout probability = )[\\.\\d]+"
+      drVal = safeNum(regmatches(mInfo[[2]], regexpr(patt2, mInfo[[2]], perl = TRUE)))
+      names(drVal) = loc.name
+      params$dropoutValue = c(params$dropoutValue, drVal)
+    }
+
+    # Second part III: Minor allele frequency
+    if(includeParams) {
+      patt3 = "(?<=Minor allele frequency = )[\\.\\d]+"
+      thismaf = safeNum(regmatches(mInfo[[2]], regexpr(patt3, mInfo[[2]], perl = TRUE)))
+      names(thismaf) = loc.name
+      params$maf = c(params$maf, thismaf)
+    }
 
     # Read alleles and freqs
     als.lines = seq(loc.line + 13, by = 2, length.out = nAll)
@@ -270,7 +337,7 @@ readFam = function(famfile, useDVI = NA, Xchrom = FALSE, prefixAdded = "added_",
     # Check for illegal alleles, including "Rest allele", with stepwise models
     if(model.idx.mal > 1 || model.idx.fem > 1) {
       change = FALSE
-      alsNum = suppressWarnings(as.numeric(als))
+      alsNum = safeNum(als)
       if(any(is.na(alsNum))) {
         change = TRUE
         warning(sprintf("Database error, locus %s: Non-numerical allele '%s' incompatible with stepwise model. Changed to '%s' model.",
@@ -438,6 +505,9 @@ readFam = function(famfile, useDVI = NA, Xchrom = FALSE, prefixAdded = "added_",
       message("\nReturning database only")
     res = readFamiliasLoci(loci = loci)
   }
+
+  if(includeParams)
+    res = list(main = res, params = params)
 
   if(verbose) message("")
 
@@ -682,4 +752,9 @@ dnaData2vec = function(x) {
 
 getValue = function(x, iftag, default) {
   if(x[1] == iftag) x[2] else default
+}
+
+# Safe version of as.numeric
+safeNum = function(x) {
+  suppressWarnings(as.numeric(x))
 }
