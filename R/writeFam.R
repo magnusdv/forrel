@@ -5,17 +5,28 @@
 #' marker data. The option `openFam = TRUE` calls `openFamilias()` to open a
 #' fresh `Familias` session with the produced file pre-loaded.
 #'
+#' The following parameters are applied by default, but may be adjusted with the
+#' `params` argument:
+#'
+#' * `dbName = "unknown"`
+#' * `dbSize = 1000`
+#' * `dropout = 0`
+#' * `maf = 0`
+#' * `theta = 0`
+#'
+#' The `params` argument should be a list similar to the `params` slot produced
+#' by [readFam()] with `includeParams = TRUE`. Single entries are recycled if
+#' needed. If `params` contains a vector `dropout` with dropout probabilities
+#' for certain pedigree members, it is converted into corresponding
+#' `dropoutConsider` and `dropoutValue` vectors (see Examples).
 #'
 #' @param ... One or several pedigrees. Each argument should be either a single
 #'   `ped` object or a list of such. If the pedigrees are unnamed, they are
 #'   assigned names "Ped 1", "Ped 2", etc.
 #' @param famfile The name or path to the output file to be written. The
 #'   extension ".fam" is added if missing.
-#' @param theta A number between 0 and 1 inclusive, indicating a theta
-#'   correction for the marker database. By default 0.
-#' @param dropout A number between 0 and 1 inclusive, or a named vector of such
-#'   numbers, indicating dropout probability. By default 0.
-#' @param dbName The name of the marker database.
+#' @param params A list of further parameters; see [readFam()] for valid
+#'   entries. See also Details for default values.
 #' @param dbOnly A logical. If TRUE, no pedigree information is included; only
 #'   the frequency database.
 #' @param openFam A logical. If TRUE, an attempt is made to open the produced
@@ -29,6 +40,7 @@
 #' @return The filename is returned invisibly.
 #'
 #' @seealso [readFam()]
+#'
 #' @references Egeland, T., P. F. Mostad, et al. (2000). _Beyond traditional
 #'   paternity and identification cases. Selecting the most probable pedigree._
 #'   Forensic Sci Int 110(1): 47-59.
@@ -58,25 +70,40 @@
 #'   writeFam(famfile = tempfile()) |>
 #'   readFam()
 #'
-#' stopifnot(identical(x, y))
+#' stopifnot(identical(x2, y2))
+#'
+#'
+#' ### Read/write including detailed parameters
+#' params = list(theta = 0.1, dbName = "myDB", dropout = c("3" = 0.01))
+#' fam = writeFam(x2, famfile = tempfile(), params = params)
+#'
+#' dat = readFam(fam, includeParams = TRUE)
+#'
+#' # Pedigree is now in the `main` slot
+#' stopifnot(identical(x2, dat$main))
+#'
+#' # The `dropout` parameter is converted to (and is equivalent to):
+#' dat$params$dropoutConsider
+#' dat$params$dropoutValue
 #'
 #'
 #' ### Read/write frequency database
 #'
-#' # Write database as .fam file
+#' # Write database as fam file
 #' dbfam = writeFam(x2, famfile = tempfile(), dbOnly = TRUE)
 #'
-#' # Read in; attach to a pedigree; write again
-#' dbfam2 = singleton(1) |>
-#'   setMarkers(locusAttributes = readFam(dbfam)) |>
-#'   writeFam(famfile = tempfile(), dbOnly = TRUE)
+#' # Read back in: The result is a list of marker attributes
+#' a = readFam(dbfam)
+#'
+#' # Attach to a pedigree and write to a new file
+#' z = singleton(1) |> setMarkers(locusAttributes = a)
+#' dbfam2 = writeFam(z, famfile = tempfile(), dbOnly = TRUE)
 #'
 #' stopifnot(identical(readLines(dbfam), readLines(dbfam2)))
 #'
 #' @export
-writeFam = function(..., famfile = "ped.fam", theta = 0, dropout = 0,
-                    dbName = "Unknown_db", dbOnly = FALSE, openFam = FALSE,
-                    FamiliasPath = NULL, verbose = TRUE) {
+writeFam = function(..., famfile = "ped.fam", params = NULL, dbOnly = FALSE,
+                    openFam = FALSE, FamiliasPath = NULL, verbose = TRUE) {
   peds = list(...)
   if (length(peds) == 1)
     peds = peds[[1]]
@@ -95,30 +122,48 @@ writeFam = function(..., famfile = "ped.fam", theta = 0, dropout = 0,
   LABS = unique.default(unlist(lapply(peds, labels)))
   nind = length(LABS)
 
-  # Dropout
-  if(!is.null(dnms <- names(dropout))) {
-    if(!all(dnms %in% LABS))
-      stop2("Unknown ID in `dropout`: ", setdiff(dnms, LABS))
-    rest = rep_len(0, nind - length(dropout))
-    names(rest) = setdiff(LABS, dnms)
-    dropout = c(dropout, rest)[LABS] # sort to look nice
-  }
-  else {
-    dropout = rep_len(dropout, nind)
-    names(dropout) = LABS
-  }
+  # All unique marker names
+  MARKERS = unique.default(unlist(lapply(peds, name)))
+  nmar = length(MARKERS)
 
-  dropoutValue = max(dropout)
+  # Extra param: Dropout
+  dropoutConsider = params$dropoutConsider %||% setNames(rep_len(FALSE, nind), LABS)
+  dropoutValue    = params$dropoutValue %||% setNames(rep_len(0, nmar), MARKERS)
 
-  if(length(udr <- unique.default(dropout[dropout > 0])) > 1)
-    stop2("All nonzero dropout values must be equal: ", sort(udr))
+  # If shortcut "dropout" is used, overrule the others
+  if(!is.null(dropoutInd <- params[["dropout"]])) {
+
+    # Familias doesn't support individual dropout values
+    if(length(udr <- unique.default(dropoutInd[dropoutInd > 0])) > 1)
+      stop2("All nonzero dropout values must be equal: ", sort(udr))
+
+    # Override dropoutValue
+    dropoutValue[] = max(udr)
+
+    # Override params$dropoutConsider
+    if(!is.null(dnms <- names(dropoutInd))) {
+      if(!all(dnms %in% LABS))
+        stop2("Unknown ID in `dropout`: ", setdiff(dnms, LABS))
+      dropoutConsider[] = FALSE
+      dropoutConsider[dnms] = dropoutInd > 0
+    }
+    else if(length(dropoutInd) == 1 && is.numeric(dropoutInd))
+      dropoutConsider[] = dropoutInd > 0
+  }
 
   # Make sure only typed individuals have dropout (otherwise Familias crashes!)
   untyped = unlist(lapply(peds, untypedMembers))
-  dropout[untyped] = 0
+  dropoutConsider[untyped] = FALSE
 
-  # Unique marker names
-  MARKERS = unique.default(unlist(lapply(peds, name)))
+  # Extra parameter: Database size for each marker
+  dbSize = params$dbSize %||% 1000
+  if(length(dbSize) == 1)
+    dbSize = setNames(rep_len(dbSize, nmar), MARKERS)
+
+  # Extra parameter: Minor allele frequency for each marker
+  maf = params$maf %||% 0
+  if(length(maf) == 1)
+    maf = setNames(rep_len(maf, nmar), MARKERS)
 
   # Open output connection
   if(!endsWith(famfile, ".fam"))
@@ -155,7 +200,7 @@ writeFam = function(..., famfile = "ped.fam", theta = 0, dropout = 0,
 
     addline(quo(id),
             "#FALSE#",
-            if(dropout[id] > 0) "-1 (Consider dropouts)" else "-1",
+            paste(-1, if(dropoutConsider[id] > 0) "(Consider dropouts)"),
             "#FALSE#",
             ifelse(getSex(x, id) == 1, "#TRUE#", "#FALSE#"))
 
@@ -218,10 +263,10 @@ writeFam = function(..., famfile = "ped.fam", theta = 0, dropout = 0,
 
   # Database -------------------------------------------------------
 
-  addline(sprintf("#FALSE# (#Databases: 1 ;Theta/Kinship/Fst: %g )", theta),
-          length(MARKERS),
+  addline(sprintf("#FALSE# (#Databases: 1 ;Theta/Kinship/Fst: %g )", params$theta %||% 0),
+          nmar,
           "#TRUE#",
-          quo(dbName))
+          quo(params$dbName))
 
   takenMark = rep(FALSE, length(MARKERS))
   names(takenMark) = MARKERS
@@ -255,7 +300,8 @@ writeFam = function(..., famfile = "ped.fam", theta = 0, dropout = 0,
             mut$rate2 %na% 0)
 
     addline("#FALSE#", 0,
-            sprintf("%d\t(DatabaseSize = 1000 , Dropout probability = %g , Minor allele frequency = 0 )", nals, dropoutValue))
+            sprintf("%d\t(DatabaseSize = %d , Dropout probability = %g , Minor allele frequency = %g )",
+                    nals, dbSize[[mname]], dropoutValue[[mname]], maf[[mname]]))
 
     frvec = character(2*nals)
     frvec[2*(1:nals) - 1] = quo(attrs$alleles)

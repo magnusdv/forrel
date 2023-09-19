@@ -8,9 +8,7 @@
 writeFam(
   ...,
   famfile = "ped.fam",
-  theta = 0,
-  dropout = 0,
-  dbName = "Unknown_db",
+  params = NULL,
   dbOnly = FALSE,
   openFam = FALSE,
   FamiliasPath = NULL,
@@ -27,13 +25,8 @@ assigned names "Ped 1", "Ped 2", etc.}
 \item{famfile}{The name or path to the output file to be written. The
 extension ".fam" is added if missing.}
 
-\item{theta}{A number between 0 and 1 inclusive, indicating a theta
-correction for the marker database. By default 0.}
-
-\item{dropout}{A number between 0 and 1 inclusive, or a named vector of such
-numbers, indicating dropout probability. By default 0.}
-
-\item{dbName}{The name of the marker database.}
+\item{params}{A list of further parameters; see \code{\link[=readFam]{readFam()}} for valid
+entries. See also Details for default values.}
 
 \item{dbOnly}{A logical. If TRUE, no pedigree information is included; only
 the frequency database.}
@@ -56,6 +49,23 @@ This function produces a .fam file readable by the \code{Familias} software
 (Egeland, Mostad et al., 2000), containing all input pedigrees and their
 marker data. The option \code{openFam = TRUE} calls \code{openFamilias()} to open a
 fresh \code{Familias} session with the produced file pre-loaded.
+}
+\details{
+The following parameters are applied by default, but may be adjusted with the
+\code{params} argument:
+\itemize{
+\item \code{dbName = "unknown"}
+\item \code{dbSize = 1000}
+\item \code{dropout = 0}
+\item \code{maf = 0}
+\item \code{theta = 0}
+}
+
+The \code{params} argument should be a list similar to the \code{params} slot produced
+by \code{\link[=readFam]{readFam()}} with \code{includeParams = TRUE}. Single entries are recycled if
+needed. If \code{params} contains a vector \code{dropout} with dropout probabilities
+for certain pedigree members, it is converted into corresponding
+\code{dropoutConsider} and \code{dropoutValue} vectors (see Examples).
 }
 \examples{
 
@@ -82,18 +92,34 @@ y2 = x2 |>
   writeFam(famfile = tempfile()) |>
   readFam()
 
-stopifnot(identical(x, y))
+stopifnot(identical(x2, y2))
+
+
+### Read/write including detailed parameters
+params = list(theta = 0.1, dbName = "myDB", dropout = c("3" = 0.01))
+fam = writeFam(x2, famfile = tempfile(), params = params)
+
+dat = readFam(fam, includeParams = TRUE)
+
+# Pedigree is now in the `main` slot
+stopifnot(identical(x2, dat$main))
+
+# The `dropout` parameter is converted to (and is equivalent to):
+dat$params$dropoutConsider
+dat$params$dropoutValue
 
 
 ### Read/write frequency database
 
-# Write database as .fam file
+# Write database as fam file
 dbfam = writeFam(x2, famfile = tempfile(), dbOnly = TRUE)
 
-# Read in; attach to a pedigree; write again
-dbfam2 = singleton(1) |>
-  setMarkers(locusAttributes = readFam(dbfam)) |>
-  writeFam(famfile = tempfile(), dbOnly = TRUE)
+# Read back in: The result is a list of marker attributes
+a = readFam(dbfam)
+
+# Attach to a pedigree and write to a new file
+z = singleton(1) |> setMarkers(locusAttributes = a)
+dbfam2 = writeFam(z, famfile = tempfile(), dbOnly = TRUE)
 
 stopifnot(identical(readLines(dbfam), readLines(dbfam2)))
 
