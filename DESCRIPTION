@@ -33,6 +33,7 @@ Depends:
     R (>= 4.1.0)
 Imports:
     glue,
+    pedFamilias,
     pedmut (>= 0.6),
     pedprobr (>= 0.8),
     ribd (>= 1.5.0)

@@ -1,7 +1,6 @@
 #' Norwegian STR frequencies
 #'
-#' A database of Norwegian allele frequencies for 35 STR markers. This database
-#' is also available in the R package `Familias`.
+#' A database of Norwegian allele frequencies for 35 STR markers.
 #'
 #' @format A list of length 35. Each entry is a numerical vector summing to 1,
 #'   named with allele labels.
