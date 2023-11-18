@@ -7,6 +7,7 @@
 #' individuals are available for genotyping. Some individuals may already be
 #' genotyped; all simulations are then conditional on these.
 #'
+#' @inheritParams exclusionPower
 #' @param numeratorPed,denominatorPed `ped` objects (or lists of such),
 #'   describing the two relationships under comparison.
 #' @param truePed A `ped` object (or a list of such), describing the true
@@ -43,7 +44,6 @@
 #'   * `params`: A list containing the input parameters `missing`, `markers`,
 #'   `nsim`, `threshold` and `disableMutations`
 #'
-#' @inheritParams exclusionPower
 #' @examples
 #'
 #' # Paternity LR of siblings
@@ -79,7 +79,7 @@
 #' founderInbreeding(truth, founders(truth)) = 0.5
 #' truth
 #' pow3 = LRpower(claim, unrel, truth, ids = ids, nsim = nsim,
-#'                threshold = thresh, markers = 1, seed = 123, plot = TRUE)
+#'                threshold = thresh, markers = 1, seed = 123) # plot = TRUE
 #' pow3
 #' }
 #'

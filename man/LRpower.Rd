@@ -125,7 +125,7 @@ stopifnot(identical(pow1$LRperSim, pow2$LRperSim))
 founderInbreeding(truth, founders(truth)) = 0.5
 truth
 pow3 = LRpower(claim, unrel, truth, ids = ids, nsim = nsim,
-               threshold = thresh, markers = 1, seed = 123, plot = TRUE)
+               threshold = thresh, markers = 1, seed = 123) # plot = TRUE
 pow3
 }
 
