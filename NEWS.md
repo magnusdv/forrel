@@ -1,3 +1,12 @@
+# forrel 1.6.1
+
+* Functions facilitating interaction with the Familias software have been moved to a dedicated package, **pedFamilias**. However, `readFam()` and `writeFam()` will continue to be re-exported from **forrel** for some time.
+
+* Remove dependency of **pedmut**.
+
+* In `kinshipLR()`, improve checking of argument `markers`.
+
+
 # forrel 1.6.0
 
 ## New features
