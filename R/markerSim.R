@@ -471,26 +471,27 @@ markerSim = function(x, N = 1, ids = NULL, alleles = NULL, afreq = NULL,
 #'
 #' Unconditional simulation of unlinked markers
 #'
-#' This simulation is done by distributing alleles randomly to all founders,
-#' followed by unconditional gene dropping down throughout the pedigree (i.e.
-#' for each non-founder a random allele is selected from each of the parents).
-#' Finally the genotypes of any individuals not included in `ids` are removed.
+#' Simple genotype simulation, performed by first distributing alleles randomly
+#' to all founders, followed by Mendelian _gene dropping_ down throughout the
+#' pedigree (i.e., for each non-founder a random allele is selected from each of
+#' the parents). Finally, genotypes of individuals not included in `ids` are
+#' removed.
 #'
-#' @param x a `ped` object
-#' @param N a positive integer: the number of markers to be simulated
-#' @param alleles a vector with allele labels.
-#' @param afreq a numeric vector of allele frequencies. If missing, the alleles
-#'   are assumed to be equi-frequent.
-#' @param ids a vector containing ID labels of those pedigree members whose
+#' @param x A `ped` object.
+#' @param N A positive integer: the number of markers to be simulated.
+#' @param alleles A vector with allele labels.
+#' @param afreq A numeric vector of allele frequencies. If missing, the alleles
+#'   are assumed to be equifrequent.
+#' @param ids A vector containing ID labels of those pedigree members whose
 #'   genotypes should be simulated.
-#' @param Xchrom a logical: X linked markers or not?
-#' @param mutmod a [pedmut::mutationModel()] object, i.e., list of mutation
-#'   matrices named 'female' and 'male'.
+#' @param Xchrom A logical: X linked markers or not?
+#' @param mutmod A list of mutation matrices named 'female' and 'male'.
 #' @param seed An integer seed for the random number generator (optional).
-#' @param verbose a logical.
-#' @return a `ped` object equal to `x` in all respects except its `MARKERS`
-#'   entry, which consists of the `N` simulated markers.
-#' @author Magnus Dehli Vigeland
+#' @param verbose A logical.
+#'
+#' @return A `ped` object equal to `x` except its `MARKERS` entry, which
+#'   consists of the `N` simulated markers.
+#'
 #' @seealso [markerSim()]
 #'
 #' @examples
@@ -528,14 +529,14 @@ simpleSim = function(x, N, alleles, afreq, ids, Xchrom = FALSE,
     ids = labels(x)
 
   mutations = !is.null(mutmod)
-  if (mutations) {
+  # if (mutations) {
     # If single matrix given: make sex specific list
-    if (is.matrix(mutmod))
-      mutmod = pedmut::mutationModel("custom", matrix = mutmod)
+    # if (is.matrix(mutmod))
+    #  mutmod = pedmut::mutationModel("custom", matrix = mutmod)
 
     # Always validate
-    pedmut::validateMutationModel(mutmod, alleles)
-  }
+    # pedmut::validateMutationModel(mutmod, alleles)
+  # }
 
   # Reorder if necessary
   reorder = !hasParentsBeforeChildren(x)

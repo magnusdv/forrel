@@ -17,39 +17,39 @@ simpleSim(
 )
 }
 \arguments{
-\item{x}{a \code{ped} object}
+\item{x}{A \code{ped} object.}
 
-\item{N}{a positive integer: the number of markers to be simulated}
+\item{N}{A positive integer: the number of markers to be simulated.}
 
-\item{alleles}{a vector with allele labels.}
+\item{alleles}{A vector with allele labels.}
 
-\item{afreq}{a numeric vector of allele frequencies. If missing, the alleles
-are assumed to be equi-frequent.}
+\item{afreq}{A numeric vector of allele frequencies. If missing, the alleles
+are assumed to be equifrequent.}
 
-\item{ids}{a vector containing ID labels of those pedigree members whose
+\item{ids}{A vector containing ID labels of those pedigree members whose
 genotypes should be simulated.}
 
-\item{Xchrom}{a logical: X linked markers or not?}
+\item{Xchrom}{A logical: X linked markers or not?}
 
-\item{mutmod}{a \code{\link[pedmut:mutationModel]{pedmut::mutationModel()}} object, i.e., list of mutation
-matrices named 'female' and 'male'.}
+\item{mutmod}{A list of mutation matrices named 'female' and 'male'.}
 
 \item{seed}{An integer seed for the random number generator (optional).}
 
-\item{verbose}{a logical.}
+\item{verbose}{A logical.}
 }
 \value{
-a \code{ped} object equal to \code{x} in all respects except its \code{MARKERS}
-entry, which consists of the \code{N} simulated markers.
+A \code{ped} object equal to \code{x} except its \code{MARKERS} entry, which
+consists of the \code{N} simulated markers.
 }
 \description{
 Unconditional simulation of unlinked markers
 }
 \details{
-This simulation is done by distributing alleles randomly to all founders,
-followed by unconditional gene dropping down throughout the pedigree (i.e.
-for each non-founder a random allele is selected from each of the parents).
-Finally the genotypes of any individuals not included in \code{ids} are removed.
+Simple genotype simulation, performed by first distributing alleles randomly
+to all founders, followed by Mendelian \emph{gene dropping} down throughout the
+pedigree (i.e., for each non-founder a random allele is selected from each of
+the parents). Finally, genotypes of individuals not included in \code{ids} are
+removed.
 }
 \examples{
 x = nuclearPed(1)
@@ -61,7 +61,4 @@ simpleSim(y, N = 3, alleles = LETTERS[1:10])
 }
 \seealso{
 \code{\link[=markerSim]{markerSim()}}
-}
-\author{
-Magnus Dehli Vigeland
 }
