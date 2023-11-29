@@ -165,3 +165,14 @@ fixAllelesAndFreqs = function(alleles = NULL, afreq = NULL,
   # Return ordered, named frequencies
   afreq[ord]
 }
+
+
+#' Add points to the IBD triangle
+#'
+#' This function is re-exported from the `ribd` package. For documentation see
+#' [ribd::showInTriangle()].
+#'
+#' @importFrom ribd showInTriangle
+#' @name showInTriangle
+#' @export
+NULL

@@ -57,6 +57,7 @@
 #' }
 #'
 #' @importFrom ribd inbreeding kappaIBD ibdTriangle showInTriangle
+#' @importFrom graphics legend points
 #' @export
 checkPairwise = function(x, excludeInbred = TRUE, plot = TRUE, labels = FALSE, LRthreshold = 1000, ...) {
   includeIds = typedMembers(x)
