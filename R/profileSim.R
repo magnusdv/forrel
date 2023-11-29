@@ -137,35 +137,31 @@ profileSim = function(x, N = 1, ids = NULL, markers = NULL, seed = NULL,
   map = getMap(x, markers = markers, verbose = FALSE)
   useMap = !all(is.na(map))
 
-
   ### SIMULATIONS ###
 
   # Parallelise?
   if(is.na(numCores))
     numCores = max(detectCores() - 1, 1)
 
+  cl = NULL
   if(numCores > 1) {
     cl = makeCluster(numCores)
     on.exit(stopCluster(cl))
-    if(verbose) {
+
+    if(verbose)
       message("Preparing parallelisation using ", length(cl), " cores")
-    }
+
     clusterEvalQ(cl, library(forrel))
     clusterExport(cl, c("markerSim", "N", "ids"), envir = environment())
 
     # Random number seed for cluster. NB: Keep this outside of function call
-    iseed = sample.int(1e6,1)
+    iseed = sample.int(1e6, 1)
     clusterSetRNGStream(cl, iseed = iseed)
+  }
 
-    # Iterate over the loci, make N simulations of each.
-    sims_markerwise = parLapply(cl, markers, function(pm)
-      markerSim(x, N = N, ids = ids, partialmarker = pm, verbose = FALSE))
-  }
-  else {
-    # Iterate over the loci, make N simulations of each.
-    sims_markerwise = lapply(markers, function(pm)
-        markerSim(x, N = N, ids = ids, partialmarker = pm, verbose = FALSE, ...))
-  }
+  # Iterate over the loci, make N simulations of each.
+  sims_markerwise = pblapply(markers, cl = cl, FUN = function(pm)
+    markerSim(x, N = N, ids = ids, partialmarker = pm, verbose = FALSE))
 
   ### Transpose: Extract i'th marker from each sim above.
   # Output: List of N `ped`s, each with length(markers) attached markers
