@@ -44,13 +44,29 @@
     f1 = f2 = rep(NA_real_, nMark)
     f1[a1nonz] = freqMat[cbind(a1, nSeq)]
     f2[a2nonz] = freqMat[cbind(a2, nSeq)]
-    list(a1 = a1, a2 = a2, f1 = f1, f2 = f2)
+    list(a1 = a1, a2 = a2, f1 = f1, f2 = f2, miss = which(!(a1nonz & a2nonz)))
   })
 
   names(res) = ids
   res
 }
 
+.removeMissing = function(dat) {
+  anymiss = lapply(dat, function(d) d$miss) |>
+    unlist(recursive = FALSE) |>
+    unique.default()
+
+  if(length(anymiss)) {
+    dat = lapply(dat, function(d) {
+      d[[1]] = d[[1]][-anymiss]
+      d[[2]] = d[[2]][-anymiss]
+      d[[3]] = d[[3]][-anymiss]
+      d[[4]] = d[[4]][-anymiss]
+      d
+    })
+  }
+  dat
+}
 
 # Input: alleleData = output from .getAlleleData() for a pair of indivs
 .likelihoodWeights = function(alleleData, param = "kappa") {
@@ -140,7 +156,7 @@ simplexProject = function(y) {
 
 ##### Moved from the old IBDestimate
 
-# TODO: These should be emerged into the newer functinos and removed.
+# TODO: These should be merged into the newer functions and removed.
 
 # Used in checkPairwise()
 .IBDlikelihood = function(x, ids, kappa, log = TRUE, total = TRUE) {

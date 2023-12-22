@@ -200,12 +200,11 @@ as.double.ibdEst = function(x, ...) {
   if(is.null(dat))
     dat = .getAlleleData2(x, ids = ids)
 
-  pair = names(dat) %||% c("_1", "_2")
+  # Remove markers with missing data
+  dat = .removeMissing(dat)
 
-  # Remove missing
-  keep = !is.na(dat[[1]]$f1) & !is.na(dat[[2]]$f2)
-  if(!all(keep))
-    dat = list(lapply(dat[[1]], `[`, keep), lapply(dat[[2]], `[`, keep))
+  # Names (for output)
+  pair = names(dat) %||% c("_1", "_2")
 
   # Coordinate-wise likelihoods: P(G_j | IBD = i)
   wei = .likelihoodWeights(dat, param = param)
@@ -296,7 +295,7 @@ as.double.ibdEst = function(x, ...) {
   #res = data.frame(id1 = pair[1], id2 = pair[2], N = sum(keep), rbind(xk), row.names = NULL)
   #names(res)[-(1:3)] = switch(param, kappa = paste0("k", 0:2), delta = paste0("d", 1:9))
 
-  list(estimate = xk, loglik = LL$loglik, iterations = k, ids = pair, nMarkers = sum(keep))
+  list(estimate = xk, loglik = LL$loglik, iterations = k, ids = pair, nMarkers = length(dat[[1]][[1]]))
 }
 
 
@@ -312,6 +311,9 @@ contoursKappaML = function(x, ids, peak = NA, levels = NULL) {
     stop2("Contour plots require `ids` to be a single pair of individuals")
 
   dat = .getAlleleData2(x, ids = ids)
+
+  # Remove markers with missing data
+  dat = .removeMissing(dat)
 
   if(isTRUE(is.na(peak))) {
     peak = ibdEstimate(x, ids, param = "kappa", verbose = FALSE)
