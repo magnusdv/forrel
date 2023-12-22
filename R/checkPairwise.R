@@ -18,6 +18,8 @@
 #'   individuals should be excluded from the analysis.
 #' @param plot A logical (default: TRUE). If TRUE, a plot is produced, showing
 #'   the IBD estimates in the IBD triangle.
+#' @param plotType Either "base" (default), "ggplot2", "plotly" or "none".
+#'   Abbreviations are allowed.
 #' @param labels A logical (default: FALSE). If TRUE, labels are included in the
 #'   IBD triangle plot.
 #' @param LRthreshold A positive number (default: 1000). IBD estimates whose LR
@@ -59,8 +61,15 @@
 #' @importFrom ribd inbreeding kappaIBD ibdTriangle showInTriangle
 #' @importFrom graphics legend points
 #' @export
-checkPairwise = function(x, excludeInbred = TRUE, plot = TRUE, labels = FALSE, LRthreshold = 1000, ...) {
+checkPairwise = function(x, excludeInbred = TRUE, plot = TRUE,
+                         plotType = c("base", "ggplot2", "plotly", "none"),
+                         labels = FALSE, LRthreshold = 1000, ...) {
   includeIds = typedMembers(x)
+  plotType = match.arg(plotType)
+  if(isFALSE(plot)) {
+    message("Argument `plot` is replaced with `plotType`. For `plot = F` use `plotType = 'none'`")
+    plotType = "none"
+  }
 
   if(excludeInbred) {
     inbr = names(which(inbreeding(x) > 0))
@@ -95,28 +104,37 @@ checkPairwise = function(x, excludeInbred = TRUE, plot = TRUE, labels = FALSE, L
     exp(loglik1 - loglik2)
   }, FUN.VALUE = 1)
 
+  # Relationship according to kappa (pedigree)
+  kStr = paste(kappa0, kappa2, sep = "-")
+  pedrel = factor(kStr, levels = unique(kStr[order(kappa0, kappa2)]))
+  levels(pedrel)[levels(pedrel) == "0-0"] = "Parent-offspring"
+  levels(pedrel)[levels(pedrel) == "0.25-0.25"] = "Full siblings"
+  levels(pedrel)[levels(pedrel) == "0.5-0"] = "Half/Uncle/Grand"
+  levels(pedrel)[levels(pedrel) == "0.75-0"] = "First cousins"
+  levels(pedrel)[levels(pedrel) == "1-0"] = "Unrelated"
+  levels(pedrel)[levels(pedrel) == "NA-NA"] = "NA (inbred)"
+  kMerge$pedrel = pedrel
 
-  if(plot) {
-    # Factor defining colours
-    kStr = paste(kappa0, kappa2, sep = "-")
-    kFac = factor(kStr, levels = unique(kStr[order(kappa0, kappa2)]))
-    levels(kFac)[levels(kFac) == "0-0"] = "Parent-offspring"
-    levels(kFac)[levels(kFac) == "0.25-0.25"] = "Full siblings"
-    levels(kFac)[levels(kFac) == "0.5-0"] = "Half/Uncle/Grand"
-    levels(kFac)[levels(kFac) == "0.75-0"] = "First cousins"
-    levels(kFac)[levels(kFac) == "1-0"] = "Unrelated"
-    levels(kFac)[levels(kFac) == "NA-NA"] = "NA (inbred)"
+  # Test for large LRs
+  kMerge$err = err = kMerge$LR > LRthreshold
 
-    cols = pchs = as.integer(kFac) + 1
-    nlev = nlevels(kFac)
+  if(any(err)) {
+    errDat = kMerge[err, , drop = FALSE]
+    errDat$labs = labs = paste(errDat$id1, "-", errDat$id2)
+  }
+  else
+    errDat = NULL
+
+  # Plot --------------------------------------------------------------------
+
+  if(plotType == "base") {
+    cols = pchs = as.integer(pedrel) + 1
+    nlev = nlevels(pedrel)
 
     # Legend specifications
     legcol = legpch = seq_len(nlev) + 1
     legcex = rep(1, nlev)
-    legtxt = levels(kFac)
-
-    # Test for large LRs
-    err = kMerge$LR > LRthreshold
+    legtxt = levels(pedrel)
 
     if(any(err, na.rm = T)) {
       legcol = c(legcol, NA, 1)
@@ -125,14 +143,45 @@ checkPairwise = function(x, excludeInbred = TRUE, plot = TRUE, labels = FALSE, L
       legtxt = c(legtxt, NA, sprintf("LR > %d", LRthreshold))
     }
 
-    ribd::ibdTriangle(...)
-    ribd::showInTriangle(kMerge[1:6], col = cols, pch = pchs, labels = labels, new = FALSE)
-    points(k0[err], k2[err], pch = 1, lwd = 2, cex = 3)
+    ribd::showInTriangle(kMerge[1:6], plotType = "base", col = cols, pch = pchs,
+                         labels = labels, ...)
+    points(errDat$k0, errDat$k2, pch = 1, lwd = 1.8, cex = 3)
 
     legend("topright", title = " According to pedigree", title.adj = 0,
            bg = "whitesmoke", legend = legtxt, col = legcol, pch = legpch,
            pt.cex = legcex, lty = NA, lwd = 2)
   }
+
+  if(plotType == "ggplot2") {
+    if(!requireNamespace("ggplot2", quietly = TRUE))
+        stop2("Package `ggplot2` must be installed for this option to work")
+
+    p = ribd::ibdTriangle(plotType = "ggplot2", ...) +
+      ggplot2::geom_point(data = kMerge, ggplot2::aes(k0, k2, color = pedrel, shape = pedrel),
+                          size = 2, stroke = 1.5) +
+      ggplot2::labs(color = "According to pedigree", shape = "According to pedigree") +
+      ggplot2::scale_shape_manual(values = 1+seq_len(nlevels(pedrel))) +
+      ggplot2::scale_color_manual(values = 1+seq_len(nlevels(pedrel))) +
+      ggplot2::theme(legend.position = c(1,1),
+                     legend.justification = c(1, 1.1),
+                     legend.margin = ggplot2::margin(3,6,3,6),
+                     legend.background = ggplot2::element_rect(fill = "whitesmoke"))
+
+    if(!is.null(errDat)) {
+      if(!requireNamespace("ggrepel", quietly = TRUE))
+        stop2("Package `ggrepel` must be installed for this option to work")
+
+      p = p +
+        ggplot2::geom_point(data = errDat, ggplot2::aes(k0, k2, size = I(8)),
+                          shape = 1, size = 8, stroke = 1, col = 1) +
+        ggrepel::geom_text_repel(data = errDat, ggplot2::aes(k0, k2, label = labs), size = 4,
+                               max.overlaps = Inf, box.padding = 1)
+    }
+    print(p)
+  }
+
+  if(plotType == "plotly")
+    stop2("Not implemented yet")
 
   kMerge
 }

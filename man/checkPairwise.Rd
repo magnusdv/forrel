@@ -8,6 +8,7 @@ checkPairwise(
   x,
   excludeInbred = TRUE,
   plot = TRUE,
+  plotType = c("base", "ggplot2", "plotly", "none"),
   labels = FALSE,
   LRthreshold = 1000,
   ...
@@ -21,6 +22,9 @@ individuals should be excluded from the analysis.}
 
 \item{plot}{A logical (default: TRUE). If TRUE, a plot is produced, showing
 the IBD estimates in the IBD triangle.}
+
+\item{plotType}{Either "base" (default), "ggplot2", "plotly" or "none".
+Abbreviations are allowed.}
 
 \item{labels}{A logical (default: FALSE). If TRUE, labels are included in the
 IBD triangle plot.}
