@@ -174,8 +174,9 @@ checkPairwise = function(x, excludeInbred = TRUE, plot = TRUE,
       p = p +
         ggplot2::geom_point(data = errDat, ggplot2::aes(k0, k2, size = I(8)),
                           shape = 1, size = 8, stroke = 1, col = 1) +
-        ggrepel::geom_text_repel(data = errDat, ggplot2::aes(k0, k2, label = labs), size = 4,
-                               max.overlaps = Inf, box.padding = 1)
+        ggrepel::geom_text_repel(ggplot2::aes(k0, k2, label = labs, color = pedrel),
+                                 data = errDat, size = 4, max.overlaps = Inf,
+                                 box.padding = 1, show.legend = FALSE)
     }
     print(p)
   }

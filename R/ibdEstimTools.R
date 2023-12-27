@@ -62,6 +62,7 @@
       d[[2]] = d[[2]][-anymiss]
       d[[3]] = d[[3]][-anymiss]
       d[[4]] = d[[4]][-anymiss]
+      d$miss = integer(0)
       d
     })
   }
