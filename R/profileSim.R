@@ -160,8 +160,10 @@ profileSim = function(x, N = 1, ids = NULL, markers = NULL, seed = NULL,
   }
 
   # Iterate over the loci, make N simulations of each.
+  op = pboptions(type = if(N > 1) "timer" else "none")
   sims_markerwise = pblapply(markers, cl = cl, FUN = function(pm)
     markerSim(x, N = N, ids = ids, partialmarker = pm, verbose = FALSE))
+  pboptions(op)
 
   ### Transpose: Extract i'th marker from each sim above.
   # Output: List of N `ped`s, each with length(markers) attached markers
