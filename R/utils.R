@@ -38,7 +38,8 @@ rst = function(v, digits = 3)
   if(is.null(x)) y else x
 }
 
-pluralise = function(noun, n) {
+pluralise = function(noun = "", n) {
+  if(missing(n)) return(pluralise("", noun))
   if(n == 1) noun else sprintf("%ss", noun)
 }
 

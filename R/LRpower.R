@@ -174,8 +174,8 @@ LRpower = function(numeratorPed, denominatorPed, truePed = numeratorPed, ids, ma
     }
 
     plotPedList(peds, newdev = TRUE, titles = frms,
-                hatched = function(p) c(allids, typedMembers(p)),
-                col = list(red = allids),
+                hatched = typedMembers,
+                fill = list(green = allids),
                 marker = match(plotMarkers, markers))
 
     if (plot == "plotOnly")
@@ -187,7 +187,9 @@ LRpower = function(numeratorPed, denominatorPed, truePed = numeratorPed, ids, ma
 
   # Simulate nsim complete profiles from truePed
   if(verbose)
-    message("Simulating ", nsim, " profiles from true pedigree...", appendLF = FALSE)
+    message(sprintf("Simulating %d profile%s from the true pedigree ...\n",
+                    nsim, pluralise(nsim)),
+            appendLF = FALSE)
 
   allsims = profileSim(truePed, N = nsim, ids = allids, simplify1 = FALSE, verbose = FALSE)
 
@@ -218,7 +220,8 @@ LRpower = function(numeratorPed, denominatorPed, truePed = numeratorPed, ids, ma
 lrPowerCompute = function(sims, numeratorPed, denominatorPed, ids, params, verbose = TRUE) {
 
   if(verbose)
-    message("Computing LR distribution for individuals ", toString(ids), "...", appendLF = FALSE)
+    message(sprintf("Computing LR distribution for individual%s %s ... ",
+                    pluralise(length(ids)), toString(ids)), appendLF = FALSE)
 
   markers = params$markers
   threshold = params$threshold

@@ -114,12 +114,12 @@ missingPersonIP = function(reference, missing, markers, nsim = 1, threshold = NU
 
   # Simulate nsim complete profiles of relatedPed
   if(verbose)
-    message("Simulating ", nsim, " profiles...", appendLF = FALSE)
+    message(sprintf("Simulating %d profile%s ...\n", nsim, pluralise(nsim)), appendLF = FALSE)
 
   allsims = profileSim(relatedPed, ids = "_POI_", N = nsim, markers = midx, simplify1 = FALSE, verbose = FALSE)
 
   if(verbose)
-    message("done\nComputing likelihood ratios...", appendLF = FALSE)
+    message("done\nComputing likelihood ratios ... ", appendLF = FALSE)
 
   # Compute LR of each marker
   lrs = vapply(allsims, function(s) {
