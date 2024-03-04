@@ -47,14 +47,14 @@
 #' @examples
 #'
 #' # Paternity LR of siblings
+#' ids = c("A", "B")
+#' truth = nuclearPed(children = ids)
 #' claim = nuclearPed(fa = "A", mo = "NN", children = "B")
-#' unrel = list(singleton("A"), singleton("B"))
-#' truth = nuclearPed(children = c("A", "B"))
+#' unrel = singletons(ids)
 #'
 #' # Simulation parameters
 #' nsim = 10   # increase!
 #' thresh = 1
-#' ids = c("A", "B")
 #'
 #' # Simulation 1:
 #' als = 1:5
@@ -75,10 +75,10 @@
 #' stopifnot(identical(pow1$LRperSim, pow2$LRperSim))
 #'
 #' \donttest{
-#' # Founder inbreeding in true pedigree
-#' founderInbreeding(truth, founders(truth)) = 0.5
-#' truth
-#' pow3 = LRpower(claim, unrel, truth, ids = ids, nsim = nsim,
+#' # True pedigree has inbred founders
+#' truth2 = setFounderInbreeding(truth, value = 0.5)
+#'
+#' pow3 = LRpower(claim, unrel, truth2, ids = ids, nsim = nsim,
 #'                threshold = thresh, markers = 1, seed = 123) # plot = TRUE
 #' pow3
 #' }
@@ -208,9 +208,8 @@ LRpower = function(numeratorPed, denominatorPed, truePed = numeratorPed, ids, ma
                          params = params, verbose = verbose)
 
   # Timing
-  time = Sys.time() - st
   if(verbose)
-    message("Total time used: ", format(time, digits = 3))
+    message("Total time used: ", ftime(st))
 
   # Return results
   res

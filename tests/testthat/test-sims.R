@@ -75,8 +75,7 @@ expect_identical(genotype(y, id = 1, marker = 1), c("1", "2"))
 })
 
 test_that("markerSim() works in looped pedigree 1", {
-  x = linearPed(2) |>
-    addChildren(5,2,1) |>
+  x = linearPed(2) |> addSon(c(2,5)) |>
     addMarker("5" = "1/1", alleles = 1:2, afreq = c(0.001, 0.999))
 
   y = mSim(x, partialmarker = 1, seed = 123)
@@ -85,22 +84,19 @@ test_that("markerSim() works in looped pedigree 1", {
 })
 
 test_that("markerSim() works in looped pedigree 2", {
-  x = linearPed(2) |>
-    addChildren(5,2,1) |>
-    addMarker("6" = "1/1", "2" = "0/2")
-  # plot(x,1)
+  x = linearPed(2) |> addSon(c(2,5)) |> addMarker("6" = "1/1", "2" = "0/2")
+  # plot(x, mark =1)
 
   y1 = mSim(x, partialmarker = 1)
   expect_identical(genotype(y1, id = 2, marker = 1), c("1", "2")) # Forced
 
-  x = addParents(x, 2, 10, 11, verbose = FALSE)
-  x = addMarker(x, "6" = 1, "10" = 2)
+  x2 = x |> addParents(2, 10, 11, verbose = FALSE) |> addMarker("6" = 1, "10" = 2)
+  # plot(x2, mark = 2)
 
-  # plot(x,1)
-  y2 = mSim(x, partialmarker = 1)
+  y2 = mSim(x2, partialmarker = 2)
   expect_identical(genotype(y2, id = 2, marker = 1), c("1", "2")) # Forced!
 
-  y3 = mSim(x, partialmarker = 1, loopBreaker = "5")
+  y3 = mSim(x2, partialmarker = 2, loopBreaker = "5")
   expect_identical(genotype(y3, id = 2, marker = 1), c("1", "2")) # Forced!
 })
 

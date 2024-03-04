@@ -76,7 +76,7 @@
 #'
 #' # Create two alternative hypotheses
 #' halfsibs = relabel(halfSibPed(), old = 4:5, new = ids)
-#' unrel = list(singleton("A"), singleton("B"))
+#' unrel = singletons(c("A", "B"))
 #'
 #' # Compute LRs. By default, the last ped is used as reference
 #' kinshipLR(sibs, halfsibs, unrel)

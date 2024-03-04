@@ -7,7 +7,7 @@ quickEP = function(claim, true, ids, afreq = NULL, ...) {
 
 test_that("EP works in empty paternity case", {
   claim = nuclearPed(1)
-  true = list(singleton(1), singleton(3))
+  true = singletons(c(1,3))
   ids = c(1, 3)
   afr = c(.1, .9)
 
@@ -20,7 +20,7 @@ test_that("EP works in empty paternity case", {
 
   # X: father/daughter
   claim2 = nuclearPed(1, sex = 2)
-  true2 = list(singleton(1), singleton(3, sex = 2))
+  true2 = singletons(c(1,3), sex = 1:2)
 
   ep_X = quickEP(claim2, true2, ids, afr, Xchrom = T)
   expect_equal(ep_X, afr[1] * afr[2]) # p^2*q + p*q^2
@@ -28,7 +28,7 @@ test_that("EP works in empty paternity case", {
 
 test_that("EP works in empty pat-case with added singletons", {
   claim = list(nuclearPed(1), singleton(4))
-  true = list(singleton(1), singleton(3), singleton(4))
+  true = singletons(c(1,3,4))
   ids = c(1, 3, 4)
   afr = c(.1, .9)
 
@@ -40,13 +40,13 @@ test_that("EP works in empty pat-case with added singletons", {
 
   # X: father/daughter
   claim2 = list(nuclearPed(1, sex = 2), singleton(4))
-  true2 = list(singleton(1), singleton(3, sex = 2), singleton(4))
+  true2 = singletons(c(1,3,4), sex = c(1,2,1))
   expect_equal(quickEP(claim2, true2, ids, afr, Xchrom = T), afr[1] * afr[2])
 })
 
 test_that("EP works in paternity case with child typed", {
   claim = nuclearPed(1, sex = 2)
-  true = list(singleton(1), singleton(3))
+  true = singletons(c(1,3))
   afr = c(.5, .3, .2)
 
   m = mX = marker(claim, `3` = 1, alleles = 1:3, afreq = afr)
@@ -64,7 +64,7 @@ test_that("EP works in paternity case with child typed", {
 
 test_that("EP works in paternity case with parents typed", {
   claim = nuclearPed(1, sex = 2)
-  true = list(singleton(1), singleton(3, sex = 2))
+  true = singletons(c(1,3), sex = 1:2)
   afr = c(.5, .3, .2)
 
   m = mX = marker(claim, `1` = 1, `2` = 2, alleles = 1:3, afreq = afr)

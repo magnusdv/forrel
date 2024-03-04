@@ -25,7 +25,7 @@ test_that("kinshipLR() computes correctly in paternity case", {
   H1 = nuclearPed(fa = "fa", child = "ch") |>
     addMarker(name = "M1", fa = "A/A", ch = "A/A", afreq = c(A=0.05, B=0.95)) |>
     addMarker(name = "M2", fa = "A/A", ch = "A/A", afreq = c(A=0.1, B=0.9))
-  H2 = list(singleton("fa"), singleton("ch"))
+  H2 = singletons(c("fa", "ch"))
 
   expect_equal(kinshipLR(H1, H2, source = 1)$LRtotal[[1]], 20*10)
   expect_equal(kinshipLR(H1, H2, markers = "M1")$LRtotal[[1]], 20)

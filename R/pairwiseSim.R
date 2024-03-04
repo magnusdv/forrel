@@ -131,7 +131,7 @@ markerSimParametric = function(kappa = NULL, delta = NULL, states = NULL,
 
   # Return
   switch(match.arg(returnValue),
-    singletons = setMarkers(x = list(singleton(1), singleton(2)),
+    singletons = setMarkers(x = singletons(1:2),
                             alleleMatrix = matrix(rbind(.a, .c, .b, .d), nrow = 2,
                                                   dimnames = list(1:2, NULL)),
                             locusAttributes = list(afreq = afreq)),
@@ -189,7 +189,7 @@ profileSimParametric = function(kappa = NULL, delta = NULL, states = NULL,
   # Return
   switch(returnValue,
     singletons = lapply(sims, function(s)
-        setMarkers(list(singleton(1), singleton(2)),
+        setMarkers(singletons(1:2),
                    alleleMatrix = matrix(s[c(1,3,2,4), ], nrow = 2, dimnames = list(1:2, NULL)),
                    locusAttributes = freqList)),
     genotypes = lapply(sims, function(s) list(paste(s[1,], s[2,], sep = "/"),

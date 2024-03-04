@@ -96,25 +96,25 @@
 #' ### unrelated to the child.
 #' ############################################
 #'
-#' # Claim: Individual 1 is the father of individual 3
-#' claim = nuclearPed(nch = 1, sex = 2)
+#' # Claim: 'AF' is the father of 'CH'
+#' claim = nuclearPed(father = "AF", children = "CH")
 #'
-#' # Truth: 1 and 3 are unrelated
-#' true = list(singleton(id = 1), singleton(id = 3, sex = 2))
+#' # Attach two (empty) markers
+#' claim = claim |>
+#'   addMarker(alleles = 1:2) |>
+#'   addMarker(alleles = 1:3)
 #'
-#' # Attach two markers
-#' m1 = marker(claim, alleles = 1:2)
-#' m2 = marker(claim, alleles = 1:3)
-#' claim = setMarkers(claim, list(m1, m2))
+#' # Truth: 'AF' and 'CH' are unrelated
+#' true = singletons(c("AF", "CH"))
 #'
-#' # Compute EP when father and child is available for genotyping
-#' exclusionPower(claim, true, ids = c(1,3))
+#' # EP when both are available for genotyping
+#' exclusionPower(claim, true, ids = c("AF", "CH"))
 #'
-#' # Suppose child is already genotyped
-#' genotype(claim, marker = 1, id = 3) = c(1, 1)
-#' genotype(claim, marker = 2, id = 3) = c(1, 1)
+#' # EP when the child is typed; homozygous 1/1 at both markers
+#' claim2 = claim |>
+#'   setGenotype(marker = 1:2, id = "CH", geno = "1/1")
 #'
-#' exclusionPower(claim, true, ids = 1)
+#' exclusionPower(claim2, true, ids = "AF")
 #'
 #'
 #' ############################################
@@ -122,30 +122,32 @@
 #' ### We compute the power of various markers to reject the claim.
 #' ############################################
 #'
-#' mother_daughter = nuclearPed(1, sex = 2)
-#' sisters = relabel(nuclearPed(2, sex = c(2, 2)), c(101, 102, 2, 3))
-#' ids = 2:3
+#' ids = c("A", "B")
+#' claim = nuclearPed(father = "NN", mother = "A", children = "B", sex = 2)
+#' true = nuclearPed(children = ids, sex = 2)
 #'
 #' # SNP with MAF = 0.1:
-#' PE1 = exclusionPower(claimPed = mother_daughter, truePed = sisters,
-#'                      ids = ids, alleles = 2, afreq = c(0.9, 0.1))
+#' PE1 = exclusionPower(claimPed = claim, truePed = true, ids = ids,
+#'                      alleles = 1:2, afreq = c(0.9, 0.1))
+#'
+#' stopifnot(round(PE1$EPtotal, 5) == 0.00405)
 #'
 #' # Tetra-allelic marker with one major allele:
-#' PE2 = exclusionPower(claimPed = mother_daughter, truePed = sisters,
-#'                      ids = ids, alleles = 4, afreq = c(0.7, 0.1, 0.1, 0.1))
+#' PE2 = exclusionPower(claimPed = claim, truePed = true, ids = ids,
+#'                      alleles = 1:4, afreq = c(0.7, 0.1, 0.1, 0.1))
 #'
-#' stopifnot(all.equal(c(PE1$EPtotal, PE2$EPtotal), c(0.00405, 0.03090)))
+#' stopifnot(round(PE2$EPtotal, 5) == 0.03090)
+#'
 #'
 #' ### How does the power change if the true pedigree is inbred?
-#' sisters_LOOP = addParents(sisters, 101, father = 201, mother = 202)
-#' sisters_LOOP = addParents(sisters_LOOP, 102, father = 201, mother = 203)
-#'
+#' trueLOOP = halfSibPed(sex2 = 2) |> addChildren(4, 5, ids = ids)
 #'
 #' # SNP with MAF = 0.1:
-#' PE3 = exclusionPower(claimPed = mother_daughter, truePed = sisters_LOOP,
-#'                      ids = ids, alleles = 2, afreq = c(0.9, 0.1))
+#' PE3 = exclusionPower(claimPed = claim, truePed = trueLOOP, ids = ids,
+#'                      alleles = 1:2, afreq = c(0.9, 0.1))
 #'
-#' stopifnot(all.equal(PE3$EPtotal, 0.00765))
+#' # Power almost doubled compared with PE1
+#' stopifnot(round(PE3$EPtotal, 5) == 0.00765)
 #'
 #' @importFrom pedprobr likelihood
 #' @export
@@ -347,9 +349,8 @@ exclusionPower = function(claimPed, truePed, ids, markers = NULL, source = "clai
   }
 
   # Timing
-  time = Sys.time() - st
   if(verbose)
-    message("Total time used: ", format(time, digits = 3))
+    message("Total time: ", ftime(st))
 
   res
 }

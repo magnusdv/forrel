@@ -147,7 +147,7 @@ missingPersonIP = function(reference, missing, markers, nsim = 1, threshold = NU
   names(IP) = threshold
 
   # Timing
-  time = Sys.time() - st
+  time = Sys.time() - st # included in output
   if(verbose)
     message("Total time used: ", format(time, digits = 3))
 
