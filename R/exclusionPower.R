@@ -441,7 +441,7 @@ print.EPresult = function(x, ...) {
       return(NULL)
 
     omd = oneMarkerDistribution(claim[[i]], ids = ids[compsClaim == i],
-                                partialmarker = 1, verbose = FALSE, eliminate = 0)
+                                partialmarker = 1, verbose = FALSE)
     omd == 0
     })
 
@@ -495,8 +495,7 @@ print.EPresult = function(x, ...) {
     grid.i = unique.matrix(incomp.grid[, ids.i, drop = FALSE])
 
     omd = oneMarkerDistribution(true[[i]], ids.i, partialmarker = 1,
-                          grid.subset = grid.i, verbose = FALSE,
-                          eliminate = 1)
+                          grid.subset = grid.i, verbose = FALSE)
     omd
   })
 

@@ -34,9 +34,6 @@
 #' @param loopBreakers A numeric containing IDs of individuals to be used as
 #'   loop breakers. Relevant only if the pedigree has loops, and only if
 #'   `partialmarker` is non-NULL. See [pedtools::breakLoops()].
-#' @param eliminate A non-negative integer, indicating the number of iterations
-#'   in the internal genotype-compatibility algorithm. Positive values can save
-#'   time if `partialmarker` is non-NULL and the number of alleles is large.
 #' @param seed An integer seed for the random number generator (optional).
 #' @param verbose A logical.
 #' @return A `ped` object equal to `x` except its `MARKERS` entry, which
@@ -63,8 +60,7 @@
 #' @export
 markerSim = function(x, N = 1, ids = NULL, alleles = NULL, afreq = NULL,
                      mutmod = NULL, rate = NULL, partialmarker = NULL,
-                     loopBreakers = NULL, eliminate = 0, seed = NULL,
-                     verbose = TRUE) {
+                     loopBreakers = NULL, seed = NULL, verbose = TRUE) {
 
   if (!is.ped(x) && !is.pedList(x))
     stop2("x must be either a `ped` object or a list of such")
@@ -74,11 +70,12 @@ markerSim = function(x, N = 1, ids = NULL, alleles = NULL, afreq = NULL,
 
   # if input is a list of ped objects: Apply markerSim recursively
   if (is.pedList(x))
-    return(lapply(x, function(xi) markerSim(xi, N = N, ids = intersect(labels(xi), ids),
+    return(lapply(x, function(xi) markerSim(xi, N = N,
+                                            ids = intersect(labels(xi), ids),
                                             alleles = alleles, afreq = afreq,
                                             partialmarker = partialmarker,
                                             loopBreakers = loopBreakers,
-                                            eliminate = eliminate, verbose = verbose)))
+                                            verbose = verbose)))
 
   starttime = proc.time()
 
@@ -288,7 +285,7 @@ markerSim = function(x, N = 1, ids = NULL, alleles = NULL, afreq = NULL,
     jointp = apply(allgenos_row_grid, 2, function(rownrs) {
       partial = m
       partial[joint_int, ] = allgenos[rownrs, ]
-      likelihood(x, markers = partial, eliminate = eliminate)
+      likelihood(x, markers = partial)
     })
     likel_counter = likel_counter + length(jointp)
     if (identical(sum(jointp), 0))
@@ -309,7 +306,7 @@ markerSim = function(x, N = 1, ids = NULL, alleles = NULL, afreq = NULL,
         partial[] = markers[, c(mi - 1, mi)]  # preserves all attributes of the m.
         probs = unlist(lapply(gridi, function(r) {
           partial[i, ] = allgenos[r, ]
-          li = likelihood(x, markers = partial, eliminate = eliminate)
+          li = likelihood(x, markers = partial)
         }))
 
         if (sum(probs) == 0) {

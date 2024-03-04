@@ -14,7 +14,6 @@ markerSim(
   rate = NULL,
   partialmarker = NULL,
   loopBreakers = NULL,
-  eliminate = 0,
   seed = NULL,
   verbose = TRUE
 )
@@ -49,10 +48,6 @@ marker object (on which the simulation should be conditioned) or the name
 \item{loopBreakers}{A numeric containing IDs of individuals to be used as
 loop breakers. Relevant only if the pedigree has loops, and only if
 \code{partialmarker} is non-NULL. See \code{\link[pedtools:inbreedingLoops]{pedtools::breakLoops()}}.}
-
-\item{eliminate}{A non-negative integer, indicating the number of iterations
-in the internal genotype-compatibility algorithm. Positive values can save
-time if \code{partialmarker} is non-NULL and the number of alleles is large.}
 
 \item{seed}{An integer seed for the random number generator (optional).}
 
