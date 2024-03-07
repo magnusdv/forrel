@@ -12,14 +12,13 @@ missingPersonPlot(
   hatched = typedMembers(reference),
   MP.label = "MP",
   POI.label = "POI",
+  MP.col = "#FF9999",
+  POI.col = "lightgreen",
   POI.sex = getSex(reference, missing),
-  POI.col = "red",
-  POI.hatched = FALSE,
-  POI.height = 8,
+  POI.hatched = NULL,
   titles = c(expression(H[1] * ": POI = MP"), expression(H[2] * ": POI unrelated")),
   width = NULL,
   cex = 1.2,
-  newdev = interactive(),
   ...
 )
 }
@@ -33,35 +32,27 @@ missingPersonPlot(
 
 \item{marker}{Optional vector of marker indices to be included in the plot.}
 
-\item{hatched}{A vector of ID labels indicating who should appear with hatched
-symbols in the plot. By default, all typed members.}
+\item{hatched}{A vector of ID labels indicating who should appear with
+hatched symbols in the plot. By default, all typed members.}
 
-\item{MP.label}{The label of the missing member. Default: "MP".}
+\item{MP.label, POI.label}{Custom labels of the missing person and the POI.
+Default: "MP" and "POI".}
 
-\item{POI.label}{The label of the person of interest. Default: "POI".}
+\item{MP.col, POI.col}{Fill colours for MP and POI.}
 
 \item{POI.sex}{The sex of POI. This defaults to that of the missing person,
 but may be set explicitly. This is particularly useful when the missing
 person has unknown sex.}
 
-\item{POI.col}{The plot colour of POI. Default: red.}
+\item{POI.hatched}{Deprecated (ignored).}
 
-\item{POI.hatched}{A logical: If TRUE (default), the POI is plotted with a
-hatched symbol.}
-
-\item{POI.height}{A numeric controlling the vertical placement of the POI
-singleton (in the right panel).}
-
-\item{titles}{A character of length 2, with subtitles for the two
-frames.}
+\item{titles}{A character of length 2, with subtitles for the two frames.}
 
 \item{width}{A positive number controlling the width of the plot. More
 specifically this number is the relative width of the reference pedigree,
 compared to a singleton.}
 
 \item{cex}{Expansion factor for pedigree symbols and font size.}
-
-\item{newdev}{A logical: If TRUE the plot is created in a new plot window.}
 
 \item{...}{Extra parameters passed on to \code{\link[pedtools:plotPedList]{pedtools::plotPedList()}}.}
 }
@@ -78,7 +69,7 @@ explanations.
 \details{
 A standard family reunification case involves the following ingredients:
 \itemize{
-\item A reference family in which a single member ("MP") is missing.
+\item A reference family with a single missing person ("MP").
 \item Some of the family members have been genotyped
 \item A person of interest ("POI") is to be matched against the reference family
 }
@@ -106,13 +97,12 @@ x = nuclearPed(father = "fa", mother = "mo", children = c("b1", "b2"))
 # Default plot
 missingPersonPlot(x, missing = "b2")
 
-# Exploring various options
+# Open in separate window; explore various options
 missingPersonPlot(x,
                   missing = "b2",
                   hatched = "b1",
-                  POI.hatched = TRUE,
-                  POI.sex = 0,
-                  cex = 1.5,      # larger symbols and label font (see ?par())
+                  deceased = c("fa", "mo"),
+                  cex = 1.5,      # larger symbols and labels (see ?par())
                   cex.main = 1.3, # larger frame titles (see ?par())
                   dev.width = 7,  # device width (see ?plotPedList())
                   dev.height = 3  # device height (see ?plotPedList())

@@ -8,7 +8,7 @@
 #'
 #' A standard family reunification case involves the following ingredients:
 #'
-#' * A reference family in which a single member ("MP") is missing.
+#' * A reference family with a single missing person ("MP").
 #'
 #' * Some of the family members have been genotyped
 #'
@@ -36,25 +36,20 @@
 #' @param labs A character vector with labels for the pedigree members. See
 #'   [pedtools::plot.ped()].
 #' @param marker Optional vector of marker indices to be included in the plot.
-#' @param hatched A vector of ID labels indicating who should appear with hatched
-#'   symbols in the plot. By default, all typed members.
-#' @param MP.label The label of the missing member. Default: "MP".
-#' @param POI.label The label of the person of interest. Default: "POI".
+#' @param hatched A vector of ID labels indicating who should appear with
+#'   hatched symbols in the plot. By default, all typed members.
+#' @param MP.label,POI.label Custom labels of the missing person and the POI.
+#'   Default: "MP" and "POI".
+#' @param MP.col,POI.col Fill colours for MP and POI.
 #' @param POI.sex The sex of POI. This defaults to that of the missing person,
 #'   but may be set explicitly. This is particularly useful when the missing
 #'   person has unknown sex.
-#' @param POI.col The plot colour of POI. Default: red.
-#' @param POI.hatched A logical: If TRUE (default), the POI is plotted with a
-#'   hatched symbol.
-#' @param POI.height A numeric controlling the vertical placement of the POI
-#'   singleton (in the right panel).
-#' @param titles A character of length 2, with subtitles for the two
-#'   frames.
+#' @param POI.hatched Deprecated (ignored).
+#' @param titles A character of length 2, with subtitles for the two frames.
 #' @param width A positive number controlling the width of the plot. More
 #'   specifically this number is the relative width of the reference pedigree,
 #'   compared to a singleton.
 #' @param cex Expansion factor for pedigree symbols and font size.
-#' @param newdev A logical: If TRUE the plot is created in a new plot window.
 #' @param ... Extra parameters passed on to [pedtools::plotPedList()].
 #'
 #' @return None
@@ -65,13 +60,12 @@
 #' # Default plot
 #' missingPersonPlot(x, missing = "b2")
 #'
-#' # Exploring various options
+#' # Open in separate window; explore various options
 #' missingPersonPlot(x,
 #'                   missing = "b2",
 #'                   hatched = "b1",
-#'                   POI.hatched = TRUE,
-#'                   POI.sex = 0,
-#'                   cex = 1.5,      # larger symbols and label font (see ?par())
+#'                   deceased = c("fa", "mo"),
+#'                   cex = 1.5,      # larger symbols and labels (see ?par())
 #'                   cex.main = 1.3, # larger frame titles (see ?par())
 #'                   dev.width = 7,  # device width (see ?plotPedList())
 #'                   dev.height = 3  # device height (see ?plotPedList())
@@ -82,12 +76,12 @@
 missingPersonPlot = function(reference, missing, labs = labels(reference),
                              marker = NULL, hatched = typedMembers(reference),
                              MP.label = "MP", POI.label = "POI",
+                             MP.col = "#FF9999", POI.col = "lightgreen",
                              POI.sex = getSex(reference, missing),
-                             POI.col = "red", POI.hatched = FALSE,
-                             POI.height = 8,
+                             POI.hatched = NULL,
                              titles = c(expression(H[1] * ": POI = MP"),
                                         expression(H[2] * ": POI unrelated")),
-                             width = NULL, cex = 1.2, newdev = interactive(), ...) {
+                             width = NULL, cex = 1.2, ...) {
 
   if(!is.ped(reference))
     stop2("Expecting a connected pedigree as H1")
@@ -105,23 +99,21 @@ missingPersonPlot = function(reference, missing, labs = labels(reference),
   ped_related = setSex(ped_related, ids = missing, sex = POI.sex)
 
   # Labels
-  mp_poi = if(MP.label != "") sprintf("%s=%s", MP.label, POI.label) else POI.label
+  mp_poi = if(MP.label != "") sprintf("%s=%s", POI.label, MP.label) else POI.label
   mp_label = setNames(missing, mp_poi)
   if (is.null(labs) || identical(labs, ""))
     labs1 = mp_label
   else
     labs1 = c(mp_label, labs[labs != missing])
 
-  # Colour of POI/MP in first ped
-  col1 = setNames(list(as.character(missing)), POI.col)
+  # Shading: Remove MP/POI
+  hatched = .mysetdiff(hatched, missing)
 
-  # Shading
-  hatched1 = hatched
-  if(POI.hatched)
-    hatched1 = c(hatched1, missing)
+  # Colour of MP/POI in first ped
+  fill1 = setNames(POI.col, missing)
 
   # Build plot 1
-  plot1 = list(ped_related, labs = labs1, col = col1, hatched = hatched1)
+  plot1 = list(ped_related, labs = labs1, fill = fill1, hatched = hatched)
 
 
   ### Hypothesis 2: Unrelated
@@ -130,7 +122,10 @@ missingPersonPlot = function(reference, missing, labs = labels(reference),
   if(missing %in% labs)  # fix MP label
     names(labs)[match(missing, labs)] = MP.label
 
-  plot2 = list(reference, labs = labs, hatched = hatched)
+  # Fill color MP
+  fill2 = setNames(MP.col, missing)
+
+  plot2 = list(reference, labs = labs, hatched = hatched, fill = fill2)
 
   # Second part: POI singleton
   s = singleton(id = missing, sex = POI.sex)
@@ -138,9 +133,11 @@ missingPersonPlot = function(reference, missing, labs = labels(reference),
   if(!is.null(marker))
     s = transferMarkers(from = reference, to = s)
 
+  fill3 = setNames(POI.col, POI.label)
+
   # Relabel POI (above MP label was used to enable transfer/sex)
   s = relabel(s, POI.label)
-  plot3 = list(s, col = POI.col, hatched = if(POI.hatched) POI.label) # margins = c(POI.height,0,0,0))
+  plot3 = list(s, fill = fill3)
 
   widths = if(!is.null(width)) c(width, width, 1) else NULL
 
@@ -150,6 +147,5 @@ missingPersonPlot = function(reference, missing, labs = labels(reference),
               groups = list(1, 2:3),
               titles = titles,
               marker = marker,
-              newdev = newdev,
               cex = cex, ...)
 }
