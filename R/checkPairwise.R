@@ -71,6 +71,20 @@ checkPairwise = function(x, excludeInbred = TRUE, plot = TRUE,
     plotType = "none"
   }
 
+  # If pedlist, allow duplicated names among non-included indivs
+  if(is.pedList(x) && anyDuplicated(labs <- labels(x, unlist = TRUE))) {
+    dups = unique.default(labs[duplicated.default(labs)])
+    if(any(dups %in% includeIds))
+      stop2("Duplicated ID label: ", intersect(dups, includeIds))
+
+    # Other dups: Give unique labels
+    for(i in seq_along(x)) {
+      cmp = x[[i]]
+      old = intersect(cmp$ID, dups)
+      x[[i]] = relabel(cmp, old = old, new = sprintf("%s (Fam %d)", old, i))
+    }
+  }
+
   if(excludeInbred) {
     inbr = names(which(inbreeding(x) > 0))
     if(length(inbr))
