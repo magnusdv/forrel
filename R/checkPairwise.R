@@ -178,11 +178,45 @@ checkPairwise = function(x, excludeInbred = TRUE, plot = TRUE,
                                  data = errDat, size = 4, max.overlaps = Inf,
                                  box.padding = 1, show.legend = FALSE)
     }
-    print(p)
+    return(p)
   }
 
-  if(plotType == "plotly")
-    stop2("Not implemented yet")
+  if(plotType == "plotly") {
+    dat = kMerge
+    dat$idx = seq_len(nrow(kMerge))
+    dat$labs = paste0("ID1: ", kMerge$id1, "<br>", "ID2: ", kMerge$id2)
 
-  kMerge
+    symbs = c("Parent-offspring" = "triangle-up-open",
+              "Full siblings" = "cross",
+              "Half/Uncle/Grand" = "x",
+              "First cousins" = "diamond-open",
+              "Unrelated" = "triangle-down-open",
+              "NA (inbred)" = "square-open")
+
+    cols = palette()[c(2,3,4,7,5,6)]
+    names(cols) = names(symbs)
+
+    p = ribd::ibdTriangle(plotType = "plotly", ...)
+    for(r in levels(pedrel)) {
+      datr = dat[dat$pedrel == r, , drop = FALSE]
+      p = p |> plotly::add_markers(data = datr, x = ~k0, y = ~k2, customdata = ~idx,
+                                   symbol = I(symbs[r]), color = I(cols[r]),
+                  marker = list(size = 10,line = list(width = 2)),
+                  text= ~labs, hoverinfo = "text", name = r)
+    }
+    if(any(dat$err)) {
+      p = p |> plotly::add_markers(data = dat[dat$err, , drop = FALSE],
+                                  x = ~k0, y = ~k2, name = sprintf("LR > %d", LRthreshold),
+                                  symbol = I("circle-open"), color = I("black"),
+                                  marker = list(size = 20,line = list(width = 1)))
+    }
+
+    p = p |> plotly::layout(
+      legend = list(title = list(text = 'According to pedigree', font = list(size = 15)),
+                    x = .7, y = 0.9,
+                    bgcolor = "whitesmoke"))
+    return(p)
+  }
+
+  invisible(NULL)
 }
