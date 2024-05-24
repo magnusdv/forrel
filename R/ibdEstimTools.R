@@ -25,7 +25,7 @@
     freqlist = lapply(x$MARKERS, function(m) attr(m, "afreq")) # faster than the generic afreq()
   }
 
-  rownames(alsMat) = unlist(labels(x))
+  rownames(alsMat) = labels(x, unlist = TRUE)
   alsMat = alsMat[ids, , drop = FALSE]
 
   maxAlNum = max(lengths(freqlist))

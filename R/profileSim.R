@@ -92,7 +92,7 @@ profileSim = function(x, N = 1, ids = NULL, markers = NULL, seed = NULL,
     set.seed(seed)
 
   # Check that all `ids` are in x
-  labs = if(is.ped(x)) labels(x) else unlist(labels(x))
+  labs = labels(x, unlist = TRUE)
   if(length(err <- setdiff(ids, labs)))
     stop2("Unknown ID label: ", err)
 
@@ -102,7 +102,7 @@ profileSim = function(x, N = 1, ids = NULL, markers = NULL, seed = NULL,
       stop2("When `x` is a list of pedigrees, `markers` must be a vector of marker names/indices referring to attached markers")
 
     res_compwise = lapply(x, function(comp)
-      profileSim(comp, N = N, ids = if(!is.null(ids)) intersect(ids, labels(comp)),
+      profileSim(comp, N = N, ids = if(!is.null(ids)) intersect(ids, comp$ID),
                  markers = markers, numCores = numCores, simplify1 = FALSE, verbose = verbose, ...))
 
     # Transpose: Collect j'th sim of each component.

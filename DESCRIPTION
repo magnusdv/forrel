@@ -22,7 +22,7 @@ License: GPL (>= 2)
 URL: https://github.com/magnusdv/forrel
 BugReports: https://github.com/magnusdv/forrel/issues
 Depends: 
-    pedtools (>= 2.2.0),
+    pedtools (>= 2.6.0),
     R (>= 4.1.0)
 Imports:
     glue,

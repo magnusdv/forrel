@@ -71,7 +71,7 @@ markerSim = function(x, N = 1, ids = NULL, alleles = NULL, afreq = NULL,
   # if input is a list of ped objects: Apply markerSim recursively
   if (is.pedList(x))
     return(lapply(x, function(xi) markerSim(xi, N = N,
-                                            ids = intersect(labels(xi), ids),
+                                            ids = intersect(xi$ID, ids),
                                             alleles = alleles, afreq = afreq,
                                             partialmarker = partialmarker,
                                             loopBreakers = loopBreakers,
@@ -408,7 +408,7 @@ markerSim = function(x, N = 1, ids = NULL, alleles = NULL, afreq = NULL,
 
   # If ped was reordered, revert to original
   if(reorder)
-    x = reorderPed(x, internalID(x, ORIGINAL_ORDER))
+    x = reorderPed(x, internalID(x, ORIGINAL_ORDER), internal = TRUE)
 
   if (verbose) {
     seconds = (proc.time() - starttime)[["elapsed"]]
@@ -612,7 +612,7 @@ simpleSim = function(x, N, alleles, afreq, ids, Xchrom = FALSE,
 
   # If ped was reordered, revert to original
   if(reorder) {
-    x = reorderPed(x, internalID(x, ORIGINAL_ORDER))
+    x = reorderPed(x, internalID(x, ORIGINAL_ORDER), internal = TRUE)
   }
 
   if (verbose) {
