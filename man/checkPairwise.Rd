@@ -6,22 +6,24 @@
 \usage{
 checkPairwise(
   x,
+  ids = typedMembers(x),
   excludeInbred = TRUE,
-  plot = TRUE,
   plotType = c("base", "ggplot2", "plotly", "none"),
   labels = FALSE,
   LRthreshold = 1000,
+  plot = TRUE,
+  verbose = TRUE,
   ...
 )
 }
 \arguments{
 \item{x}{A \code{ped} object or a list of such.}
 
+\item{ids}{A vector of ID labels; the individuals to include in the check.
+Default: All typed members of \code{x}.}
+
 \item{excludeInbred}{A logical, by default TRUE, indicating if inbred
 individuals should be excluded from the analysis.}
-
-\item{plot}{A logical (default: TRUE). If TRUE, a plot is produced, showing
-the IBD estimates in the IBD triangle.}
 
 \item{plotType}{Either "base" (default), "ggplot2", "plotly" or "none".
 Abbreviations are allowed.}
@@ -33,13 +35,19 @@ IBD triangle plot.}
 exceed this, when compared to the coefficients implied by the pedigree, are
 encircled in the plot.}
 
+\item{plot}{Deprecated. To suppress the triangle plot, use \code{plotType = "none"}}
+
+\item{verbose}{A logical.}
+
 \item{...}{Further parameters passed on to \code{\link[ribd:ibdTriangle]{ribd::ibdTriangle()}}.}
 }
 \value{
-A data frame containing both the estimated and pedigree-based IBD
-coefficients for each pair of typed individuals. The last column contains
-the likelihood ratio comparing the estimated coefficients to the
-pedigree-based ones.
+If \code{plotType} is "none" or "base": A data frame containing both the
+estimated and pedigree-based IBD coefficients for each pair of typed
+individuals. The last column contains the likelihood ratio comparing the
+estimated coefficients to the pedigree-based ones.
+
+If \code{plotType} is "ggplot2" or "plotly", the plot objects are returned.
 }
 \description{
 This function provides a convenient way to check for pedigree errors, given
@@ -76,7 +84,7 @@ checkPairwise(y)
 # Combined plot of pedigree and IBD estimates
 dev.new(height = 5, width = 8, noRStudioGD = TRUE)
 layout(rbind(1:2), widths = 2:3)
-plot(y, margins = c(4,2,4,2), title = "Swapped 1 - 3")
+plot(y, margins = 2, title = "Swapped 1 - 3")
 checkPairwise(y, labels = TRUE)
 }
 

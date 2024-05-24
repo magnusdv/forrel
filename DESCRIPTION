@@ -29,11 +29,12 @@ Imports:
     pbapply,
     pedFamilias,
     pedprobr (>= 0.8),
-    ribd (>= 1.5.0)
+    ribd (>= 1.7.0)
 Suggests: 
     ggplot2,
     ggrepel,
     ibdsim2,
+    plotly,
     poibin,
     scales,
     testthat

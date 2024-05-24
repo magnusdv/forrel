@@ -14,10 +14,10 @@
 #' achieve this.
 #'
 #' @param x A `ped` object or a list of such.
+#' @param ids A vector of ID labels; the individuals to include in the check.
+#'   Default: All typed members of `x`.
 #' @param excludeInbred A logical, by default TRUE, indicating if inbred
 #'   individuals should be excluded from the analysis.
-#' @param plot A logical (default: TRUE). If TRUE, a plot is produced, showing
-#'   the IBD estimates in the IBD triangle.
 #' @param plotType Either "base" (default), "ggplot2", "plotly" or "none".
 #'   Abbreviations are allowed.
 #' @param labels A logical (default: FALSE). If TRUE, labels are included in the
@@ -25,12 +25,17 @@
 #' @param LRthreshold A positive number (default: 1000). IBD estimates whose LR
 #'   exceed this, when compared to the coefficients implied by the pedigree, are
 #'   encircled in the plot.
+#' @param plot Deprecated. To suppress the triangle plot, use `plotType =
+#'   "none"`
+#' @param verbose A logical.
 #' @param ... Further parameters passed on to [ribd::ibdTriangle()].
 #'
-#' @return A data frame containing both the estimated and pedigree-based IBD
-#'   coefficients for each pair of typed individuals. The last column contains
-#'   the likelihood ratio comparing the estimated coefficients to the
-#'   pedigree-based ones.
+#' @return If `plotType` is "none" or "base": A data frame containing both the
+#'   estimated and pedigree-based IBD coefficients for each pair of typed
+#'   individuals. The last column contains the likelihood ratio comparing the
+#'   estimated coefficients to the pedigree-based ones.
+#'
+#'   If `plotType` is "ggplot2" or "plotly", the plot objects are returned.
 #'
 #' @seealso [ibdEstimate()]
 #'
@@ -54,20 +59,28 @@
 #' # Combined plot of pedigree and IBD estimates
 #' dev.new(height = 5, width = 8, noRStudioGD = TRUE)
 #' layout(rbind(1:2), widths = 2:3)
-#' plot(y, margins = c(4,2,4,2), title = "Swapped 1 - 3")
+#' plot(y, margins = 2, title = "Swapped 1 - 3")
 #' checkPairwise(y, labels = TRUE)
 #' }
 #'
 #' @importFrom ribd inbreeding kappaIBD ibdTriangle showInTriangle
 #' @importFrom graphics legend points
+#' @importFrom grDevices palette
 #' @export
-checkPairwise = function(x, excludeInbred = TRUE, plot = TRUE,
+checkPairwise = function(x, ids = typedMembers(x), excludeInbred = TRUE,
                          plotType = c("base", "ggplot2", "plotly", "none"),
-                         labels = FALSE, LRthreshold = 1000, ...) {
-  includeIds = typedMembers(x)
+                         labels = FALSE, LRthreshold = 1000, plot = TRUE,
+                         verbose = TRUE, ...) {
+
+  includeIds = .myintersect(ids, typedMembers(x))
+  if(length(includeIds) < 2) {
+    if(verbose) message("No relationships to check: Less than 2 typed individuals included")
+    return(invisible())
+  }
+
   plotType = match.arg(plotType)
   if(isFALSE(plot)) {
-    message("Argument `plot` is replaced with `plotType`. For `plot = F` use `plotType = 'none'`")
+    message("Argument `plot` is replaced with `plotType`. Use `plotType = 'none'` to suppress plotting")
     plotType = "none"
   }
 
@@ -86,14 +99,14 @@ checkPairwise = function(x, excludeInbred = TRUE, plot = TRUE,
   }
 
   if(excludeInbred) {
-    inbr = names(which(inbreeding(x) > 0))
-    if(length(inbr))
-      message("Excluding inbred individuals: ", inbr)
+    inbr = names(which(inbreeding(x, includeIds) > 0))
+    if(length(inbr) && verbose)
+      message("Excluding inbred individuals: ", toString(inbr))
     includeIds = setdiff(includeIds, inbr)
   }
 
   if(length(includeIds) < 2) {
-    message("No relationships to check")
+    if(verbose) message("No relationships to check: Less than 2 typed individuals included")
     return(invisible())
   }
 
@@ -101,7 +114,7 @@ checkPairwise = function(x, excludeInbred = TRUE, plot = TRUE,
   kEst = ibdEstimate(x, ids = includeIds, verbose = FALSE)
 
   # Pedigree coefficients
-  kTrue = kappaIBD(x, ids = includeIds, simplify = FALSE)
+  kTrue = kappaIBD(x, ids = includeIds, inbredAction = as.integer(verbose), simplify = FALSE)
 
   # Merge (to ensure same pairing)
   kMerge = merge(kEst, kTrue, by = 1:2)
@@ -112,25 +125,33 @@ checkPairwise = function(x, excludeInbred = TRUE, plot = TRUE,
 
   # LR comparing estimate against pedigree claim
   kMerge$LR = vapply(1:nrow(kMerge), function(i) {
+    if(is.na(kappa0[i]) || is.na(kappa2[i]))
+      return(NA_real_)
     ids = kMerge[i, 1:2]
     loglik1 = .IBDlikelihood(x, ids = ids, kappa = c(k0[i], k2[i]), log = TRUE)
     loglik2 = .IBDlikelihood(x, ids = ids, kappa = c(kappa0[i], kappa2[i]), log = TRUE)
     exp(loglik1 - loglik2)
-  }, FUN.VALUE = 1)
+  }, FUN.VALUE = numeric(1))
 
   # Relationship according to kappa (pedigree)
   kStr = paste(kappa0, kappa2, sep = "-")
-  pedrel = factor(kStr, levels = unique(kStr[order(kappa0, kappa2)]))
-  levels(pedrel)[levels(pedrel) == "0-0"] = "Parent-offspring"
-  levels(pedrel)[levels(pedrel) == "0.25-0.25"] = "Full siblings"
-  levels(pedrel)[levels(pedrel) == "0.5-0"] = "Half/Uncle/Grand"
-  levels(pedrel)[levels(pedrel) == "0.75-0"] = "First cousins"
-  levels(pedrel)[levels(pedrel) == "1-0"] = "Unrelated"
-  levels(pedrel)[levels(pedrel) == "NA-NA"] = "NA (inbred)"
-  kMerge$pedrel = pedrel
+  relLabs = c("0-0"       = "Parent-offspring",
+              "0.25-0.25" = "Full siblings",
+              "0.5-0"     = "Half/Uncle/Grand",
+              "0.75-0"    = "First cousins",
+              "1-0"       = "Unrelated",
+              "NA-NA"     = "Other")
+  pedrel = as.character(relLabs[kStr])
+  pedrel[is.na(pedrel)] = "Other"
+  kMerge$pedrel = pedrel = factor(pedrel, levels = .myintersect(relLabs, pedrel))
 
   # Test for large LRs
-  kMerge$err = err = kMerge$LR > LRthreshold
+  kMerge$err = err = !is.na(kMerge$LR) & kMerge$LR > LRthreshold
+
+  if(plotType == "none")
+    return(kMerge)
+
+  # Plot --------------------------------------------------------------------
 
   if(any(err)) {
     errDat = kMerge[err, , drop = FALSE]
@@ -138,8 +159,6 @@ checkPairwise = function(x, excludeInbred = TRUE, plot = TRUE,
   }
   else
     errDat = NULL
-
-  # Plot --------------------------------------------------------------------
 
   if(plotType == "base") {
     cols = pchs = as.integer(pedrel) + 1
@@ -164,6 +183,8 @@ checkPairwise = function(x, excludeInbred = TRUE, plot = TRUE,
     legend("topright", title = " According to pedigree", title.adj = 0,
            bg = "whitesmoke", legend = legtxt, col = legcol, pch = legpch,
            pt.cex = legcex, lty = NA, lwd = 2)
+
+    return(kMerge)
   }
 
   if(plotType == "ggplot2") {
@@ -196,39 +217,44 @@ checkPairwise = function(x, excludeInbred = TRUE, plot = TRUE,
   }
 
   if(plotType == "plotly") {
+    if(!requireNamespace("plotly", quietly = TRUE))
+        stop2("Package `plotly` must be installed for this option to work")
+
     dat = kMerge
     dat$idx = seq_len(nrow(kMerge))
     dat$labs = paste0("ID1: ", kMerge$id1, "<br>", "ID2: ", kMerge$id2)
 
     symbs = c("Parent-offspring" = "triangle-up-open",
-              "Full siblings" = "cross",
-              "Half/Uncle/Grand" = "x",
+              "Full siblings" = "cross-thin-open",
+              "Half/Uncle/Grand" = "x-thin-open",
               "First cousins" = "diamond-open",
               "Unrelated" = "triangle-down-open",
-              "NA (inbred)" = "square-open")
+              "Other" = "asterisk-open")
 
-    cols = palette()[c(2,3,4,7,5,6)]
+    cols = c(palette()[c(2,3,4,7,5)],"#C8A2C8")
     names(cols) = names(symbs)
 
     p = ribd::ibdTriangle(plotType = "plotly", ...)
-    for(r in levels(pedrel)) {
+    for(r in rev(levels(pedrel))) {
       datr = dat[dat$pedrel == r, , drop = FALSE]
       p = p |> plotly::add_markers(data = datr, x = ~k0, y = ~k2, customdata = ~idx,
                                    symbol = I(symbs[r]), color = I(cols[r]),
-                  marker = list(size = 10,line = list(width = 2)),
+                  marker = list(size = 12,line = list(width = if(r == "Other") 1 else 2)),
                   text= ~labs, hoverinfo = "text", name = r)
     }
     if(any(dat$err)) {
-      p = p |> plotly::add_markers(data = dat[dat$err, , drop = FALSE],
-                                  x = ~k0, y = ~k2, name = sprintf("LR > %d", LRthreshold),
-                                  symbol = I("circle-open"), color = I("black"),
-                                  marker = list(size = 20,line = list(width = 1)))
+      p = p |> plotly::add_markers(data = errDat, x = ~k0, y = ~k2,
+                                   name = sprintf("LR > %d", LRthreshold),
+                                   symbol = I("circle-open"), color = I("black"),
+                                   marker = list(size = 20,line = list(width = 1)))
     }
 
     p = p |> plotly::layout(
-      legend = list(title = list(text = 'According to pedigree', font = list(size = 15)),
-                    x = .7, y = 0.9,
-                    bgcolor = "whitesmoke"))
+      legend = list(title = list(text = 'According to pedigree'),
+                    x = 1, y = 1, xanchor = 'right', yanchor = 'top',
+                    bgcolor = "whitesmoke",
+                    traceorder = "reversed")
+      )
     return(p)
   }
 
