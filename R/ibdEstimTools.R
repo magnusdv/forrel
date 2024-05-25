@@ -1,10 +1,11 @@
 # Prepare data for fast computation of IBD likelihood
 # Input: ids = a vector of ID labels
-# Output: List of lists. For each indiv, the output contains a list of 4 vectors:
+# Output: List of lists. For each indiv, the output contains a list of 5 vectors:
 #   a1: first allele
 #   a2: second allele
 #   f1: frequency of first allele
 #   f2: frequency of second allele
+#   miss: Indices of markers with missing data
 .getAlleleData2 = function(x, ids) {
   nMark = nMarkers(x)
   nSeq = seq_len(nMark)
@@ -69,7 +70,7 @@
   dat
 }
 
-# Input: alleleData = output from .getAlleleData() for a pair of indivs
+# Input: alleleData = output from .getAlleleData2() for a pair of indivs
 .likelihoodWeights = function(alleleData, param = "kappa") {
   .a = alleleData[[1]]$a1
   .b = alleleData[[1]]$a2
@@ -234,13 +235,25 @@ simplexProject = function(y) {
 }
 
 
-.IBDlikelihoodFAST = function(kappa02, alleleMat, freqMat) {
+.IBDlikelihoodFAST = function(kappa, alleleMat, freqMat = NULL, freqList = NULL) {
   ### Fast computation of kappa likelihoods, given alleles/freqs for two individuals
   # k: numeric of length 2 = (kappa0, kappa2)
+
+  # Ensure alleleMat is matrix with 4 rows
+  if(is.list(alleleMat))
+    alleleMat = do.call(rbind, alleleMat)
+
+  if(is.null(freqMat)) {
+    if(is.null(freqList)) stop2("`freqMat` and `freqList` cannot both be NULL")
+    freqMat = vapply(seq_along(freqList), FUN.VALUE = numeric(4),
+                     function(i) freqList[[i]][alleleMat[, i]])
+  }
+
   .a = alleleMat[1,]
   .b = alleleMat[2,]
   .c = alleleMat[3,]
   .d = alleleMat[4,]
+
   pa = freqMat[1,]
   pb = freqMat[2,]
   pc = freqMat[3,]
@@ -264,10 +277,22 @@ simplexProject = function(y) {
   # Prob(g1, g2 | monozygotic twins)
   MZ = g1.fr * ((mac & mbd) | (mad & mbc))
 
-  # return likelihoods (Thompson)
-  k0 = kappa02[1]
-  k2 = kappa02[2]
-  k1 = 1 - k0 - k2
+  # Kappa
+  lenK = length(kappa)
+
+  if(lenK == 2) {
+    k0 = kappa[1]
+    k2 = kappa[2]
+    k1 = max(0, 1 - k0 - k2)  # avoids floating point issues
+  }
+  else if(length(kappa) == 3) {
+    k0 = kappa[1]
+    k1 = kappa[2]
+    k2 = kappa[3]
+  }
+  else stop2("`kappa` must have length 2 or 3")
+
+  # Likelihoods (Thompson)
   k0 * UN + k1 * PO + k2 * MZ
 }
 
