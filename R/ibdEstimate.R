@@ -126,7 +126,7 @@ ibdEstimate = function(x, ids = typedMembers(x), param = c("kappa", "delta"),
     stop2("Untyped pedigree member: ", setdiff(allids, typedMembers(x)))
 
   # Alleles and frequencies
-  alleleData = .getAlleleData2(x, ids = allids)
+  alleleData = .prepAlleleData(x, ids = allids)
 
   # Start point
   if(is.null(start))
@@ -196,15 +196,15 @@ as.double.ibdEst = function(x, ...) {
 .PGD = function(dat = NULL, param, start, tol = sqrt(.Machine$double.eps),
                 beta = 0.5, sigma = 0.5, maxit = 500, x = NULL, ids = NULL, verbose = FALSE) {
 
+  # Names (for output)
+  pair = names(dat) %||% c("_1", "_2")
+
   # Simplify running this function on its own, with `x` and `ids` (for debugging purposes)
   if(is.null(dat))
-    dat = .getAlleleData2(x, ids = ids)
+    dat = .prepAlleleData(x, ids = ids)
 
   # Remove markers with missing data
   dat = .removeMissing(dat)
-
-  # Names (for output)
-  pair = names(dat) %||% c("_1", "_2")
 
   # Coordinate-wise likelihoods: P(G_j | IBD = i)
   wei = .likelihoodWeights(dat, param = param)
@@ -237,7 +237,7 @@ as.double.ibdEst = function(x, ...) {
     k = k + 1
 
     ARMIJO = function(y) {
-      LHS = loglik(y)
+      LHS = loglik(y, grad = FALSE)
       RHS = ll + sigma * as.numeric(gr %*% (y - xk))
       if(verbose)
         message("Armijo: y = ", rst(y,5), "; LHS = ", rst(LHS,5), "; Diff = ", LHS - RHS)
@@ -310,34 +310,23 @@ contoursKappaML = function(x, ids, peak = NA, levels = NULL) {
   if(length(ids) != 2)
     stop2("Contour plots require `ids` to be a single pair of individuals")
 
-  dat = .getAlleleData2(x, ids = ids)
-
-  # Remove markers with missing data
-  dat = .removeMissing(dat)
-
   if(isTRUE(is.na(peak))) {
     peak = ibdEstimate(x, ids, param = "kappa", verbose = FALSE)
     peak = c(peak$k0, peak$k2)
   }
 
-  # Remove missing
-  keep = !is.na(dat[[1]]$f1) & !is.na(dat[[2]]$f2)
-  if(!all(keep))
-    dat = list(lapply(dat[[1]], `[`, keep), lapply(dat[[2]], `[`, keep))
-
-  # Coordinate-wise likelihoods: P(G_j | IBD = i)
-  wei = .likelihoodWeights(dat, param = "kappa")
-
   # Log-likelihood function: Input full-dimensional kappa
-  loglik = function(k0, k2) sum(log(as.numeric(c(k0, 1 - k0 - k2, k2) %*% wei)))
+  loglik = ibdLoglikFUN(x, ids, input = "kappa")
 
   n = 51
   k0 = seq(0, 1, length.out = n)
   k2 = seq(0, 1, length.out = n)
 
   loglikMat = matrix(NA_real_, ncol = n, nrow = n)
-  for(i in 1:n) for(j in seq_len(n-i))
-    loglikMat[i,j] = loglik(k0[i], k2[j])
+  for(i in 1:n) for(j in seq_len(n-i)) {
+    kap = c(k0[i], 1 - k0[i] - k2[j], k2[j])
+    loglikMat[i,j] = loglik(kap)
+  }
 
   if(is.null(levels)) {
     ll = as.numeric(loglikMat)
@@ -369,3 +358,16 @@ contoursKappaML = function(x, ids, peak = NA, levels = NULL) {
 
 add = function(v, col = 2, pch = 16) points(v[1], v[3], col = col, pch = pch)
 
+
+# Efficient version directly from allele data, e.g. output from
+# `profileSimParametric(...,  returnValue = "alleles")`
+# NB: Used in `ibdBootstrap()`
+.ibdEstimFromAlleles = function(als, freqList, param, start = NULL) {
+  # als: list of 4 vectors with true (not internal) alleles
+  # freqList: List like `NorwegianFrequencies`
+
+  # Prepare for estimation
+  dat = .prepAlleleData2(als, freqList)
+
+  .PGD(dat, param = param, start = start)$estimate
+}

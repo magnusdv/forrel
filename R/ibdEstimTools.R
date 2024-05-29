@@ -6,18 +6,21 @@
 #   f1: frequency of first allele
 #   f2: frequency of second allele
 #   miss: Indices of markers with missing data
-.getAlleleData2 = function(x, ids) {
+.prepAlleleData = function(x, ids) {
   nMark = nMarkers(x)
   nSeq = seq_len(nMark)
   ids = as.character(ids)
+  isList = is.pedList(x)
 
-  if(is.pedList(x)) {
+  if(isList) {
     pednr = getComponent(x, ids, checkUnique = TRUE)
-    if(all(pednr == pednr[1]))
+    if(all(pednr == pednr[1])) {
       x = x[[pednr[1]]]
+      isList = FALSE
+    }
   }
 
-  if(is.pedList(x)) {
+  if(isList) {
     alsMat = do.call(rbind, lapply(x, function(cmp) matrix(unlist(cmp$MARKERS), ncol = 2*nMark)))
     freqlist = lapply(nSeq, function(i) unname(afreq(x, i))) # checks consistency!
   }
@@ -52,6 +55,20 @@
   res
 }
 
+# Version of .prepAlleleData for interaction with e.g. profileSimParametric
+# als: list of vectors a,b,c,d; where a/b and c/d are the genotypes
+# freqList: e.g. NorwegianFreqs
+.prepAlleleData2 = function(als, freqList) {
+  alsMat = do.call(rbind, als)
+  freqMat = vapply(seq_along(freqList),
+                   function(i) freqList[[i]][alsMat[, i]],
+                   FUN.VALUE = numeric(4))
+
+  list(list(a1 = als[[1]], a2 = als[[2]], f1 = freqMat[1, ], f2 = freqMat[2, ]),
+       list(a1 = als[[3]], a2 = als[[4]], f1 = freqMat[3, ], f2 = freqMat[4, ]))
+}
+
+
 .removeMissing = function(dat) {
   anymiss = lapply(dat, function(d) d$miss) |>
     unlist(recursive = FALSE) |>
@@ -70,7 +87,7 @@
   dat
 }
 
-# Input: alleleData = output from .getAlleleData2() for a pair of indivs
+# Input: alleleData = output from .prepAlleleData() for a pair of indivs
 .likelihoodWeights = function(alleleData, param = "kappa") {
   .a = alleleData[[1]]$a1
   .b = alleleData[[1]]$a2
@@ -153,146 +170,141 @@ simplexProject = function(y) {
 }
 
 
-
-
-
 ##### Moved from the old IBDestimate
 
-# TODO: These should be merged into the newer functions and removed.
-
-# Used in checkPairwise()
-.IBDlikelihood = function(x, ids, kappa, log = TRUE, total = TRUE) {
-  if(length(ids) != 2)
-    stop2("`ids` must have length 2")
-
-  if(!is.numeric(kappa))
-    stop2("`kappa` must be numeric")
-
-  if (!length(kappa) %in% 2:3)
-    stop2("`kappa` must have length 2 or 3")
-
-  kappa02 = if(length(kappa) == 3) kappa[c(1, 3)] else kappa
-
-  dat = .getAlleleData(x, ids)
-  liks = .IBDlikelihoodFAST(kappa02, dat$alleleMat, dat$freqMat)
-
-  # Correction of negative values (caused by rounding errors)
-  liks[liks < 0] = 0
-
-  if(log)
-    liks = log(liks)
-
-  if(total)
-    if(log) sum(liks) else prod(liks)
-  else
-    liks
-}
-
-# Prepare data for fast computation of IBD likelihood
-# Output: 2 matrices w/ 1 col per marker and 4 rows (id1-a1, id1-a2, id2-a1, id2-a2)
-#   alleleMat: internal allele indices
-#   probMat: allele frequencies corresponding to entries in alleleMat
-# Input: ids = a pair of ID labels
-.getAlleleData = function(x, ids) {
-  pednr = getComponent(x, ids, checkUnique = TRUE)
-  pednr1 = pednr[1]
-  pednr2 = pednr[2]
-  # TODO: use afreq() to extract frqs. This checks consistency across components!
-
-  if(pednr1 == pednr2) {
-    ped = if(is.ped(x)) x else x[[pednr1]]
-    idsInt = internalID(ped, ids)
-    A = vapply(ped$MARKERS, function(m) {
-      als = c(m[idsInt[1], ], m[idsInt[2], ])
-      frq = if(all(als > 0)) attr(m, 'afreq')[als] else rep_len(NA_real_, 4)
-      c(als, frq)
-    }, FUN.VALUE = numeric(8))
-  }
-  else {
-    ped1 = x[[pednr1]]
-    ped2 = x[[pednr2]]
-    idsInt1 = internalID(ped1, ids[1])
-    idsInt2 = internalID(ped2, ids[2])
-
-    A = vapply(seq_len(nMarkers(x)), function(i) {
-      m1 = ped1$MARKERS[[i]]
-      m2 = ped2$MARKERS[[i]]
-      als = c(m1[idsInt1, ], m2[idsInt2, ])
-      frq = if(all(als > 0)) attr(m1, 'afreq')[als] else rep_len(NA_real_, 4)
-      c(als, frq)
-    }, FUN.VALUE = numeric(8))
-  }
-
-  # Missing data: Check any of the freq rows
-  miss = is.na(A[5, ])
-
-  # Split alleles and frequencies
-  alleleMat = A[1:4, !miss, drop = FALSE]
-  mode(alleleMat) = "integer"
-  freqMat = A[5:8, !miss, drop = FALSE]
-
-  list(alleleMat = alleleMat, freqMat = freqMat)
-}
-
-
-.IBDlikelihoodFAST = function(kappa, alleleMat, freqMat = NULL, freqList = NULL) {
-  ### Fast computation of kappa likelihoods, given alleles/freqs for two individuals
-  # k: numeric of length 2 = (kappa0, kappa2)
-
-  # Ensure alleleMat is matrix with 4 rows
-  if(is.list(alleleMat))
-    alleleMat = do.call(rbind, alleleMat)
-
-  if(is.null(freqMat)) {
-    if(is.null(freqList)) stop2("`freqMat` and `freqList` cannot both be NULL")
-    freqMat = vapply(seq_along(freqList), FUN.VALUE = numeric(4),
-                     function(i) freqList[[i]][alleleMat[, i]])
-  }
-
-  .a = alleleMat[1,]
-  .b = alleleMat[2,]
-  .c = alleleMat[3,]
-  .d = alleleMat[4,]
-
-  pa = freqMat[1,]
-  pb = freqMat[2,]
-  pc = freqMat[3,]
-  pd = freqMat[4,]
-
-  homoz1 = .a == .b
-  homoz2 = .c == .d
-  mac = .a == .c
-  mbc = .b == .c
-  mad = .a == .d
-  mbd = .b == .d
-  g1.fr = 2^(!homoz1) * pa * pb
-  g2.fr = 2^(!homoz2) * pc * pd
-
-  # Prob(g1, g2 | unrelated)
-  UN = g1.fr * g2.fr
-
-  # Prob(g1, g2 | parent-offspring)
-  PO = (.5)^(homoz1+homoz2)*pa*pb*(pd*(mac+mbc) + pc*(mad+mbd))
-
-  # Prob(g1, g2 | monozygotic twins)
-  MZ = g1.fr * ((mac & mbd) | (mad & mbc))
-
-  # Kappa
-  lenK = length(kappa)
-
-  if(lenK == 2) {
-    k0 = kappa[1]
-    k2 = kappa[2]
-    k1 = max(0, 1 - k0 - k2)  # avoids floating point issues
-  }
-  else if(length(kappa) == 3) {
-    k0 = kappa[1]
-    k1 = kappa[2]
-    k2 = kappa[3]
-  }
-  else stop2("`kappa` must have length 2 or 3")
-
-  # Likelihoods (Thompson)
-  k0 * UN + k1 * PO + k2 * MZ
-}
-
+# # Used in checkPairwise()
+# .IBDlikelihood = function(x, ids, kappa, log = TRUE, total = TRUE) {
+#   if(length(ids) != 2)
+#     stop2("`ids` must have length 2")
+#
+#   if(!is.numeric(kappa))
+#     stop2("`kappa` must be numeric")
+#
+#   if (!length(kappa) %in% 2:3)
+#     stop2("`kappa` must have length 2 or 3")
+#
+#   kappa02 = if(length(kappa) == 3) kappa[c(1, 3)] else kappa
+#
+#   dat = .getAlleleData(x, ids)
+#   liks = .IBDlikelihoodFAST(kappa02, dat$alleleMat, dat$freqMat)
+#
+#   # Correction of negative values (caused by rounding errors)
+#   liks[liks < 0] = 0
+#
+#   if(log)
+#     liks = log(liks)
+#
+#   if(total)
+#     if(log) sum(liks) else prod(liks)
+#   else
+#     liks
+# }
+#
+# # Prepare data for fast computation of IBD likelihood
+# # Output: 2 matrices w/ 1 col per marker and 4 rows (id1-a1, id1-a2, id2-a1, id2-a2)
+# #   alleleMat: internal allele indices
+# #   probMat: allele frequencies corresponding to entries in alleleMat
+# # Input: ids = a pair of ID labels
+# .getAlleleData = function(x, ids) {
+#   pednr = getComponent(x, ids, checkUnique = TRUE)
+#   pednr1 = pednr[1]
+#   pednr2 = pednr[2]
+#   # TODO: use afreq() to extract frqs. This checks consistency across components!
+#
+#   if(pednr1 == pednr2) {
+#     ped = if(is.ped(x)) x else x[[pednr1]]
+#     idsInt = internalID(ped, ids)
+#     A = vapply(ped$MARKERS, function(m) {
+#       als = c(m[idsInt[1], ], m[idsInt[2], ])
+#       frq = if(all(als > 0)) attr(m, 'afreq')[als] else rep_len(NA_real_, 4)
+#       c(als, frq)
+#     }, FUN.VALUE = numeric(8))
+#   }
+#   else {
+#     ped1 = x[[pednr1]]
+#     ped2 = x[[pednr2]]
+#     idsInt1 = internalID(ped1, ids[1])
+#     idsInt2 = internalID(ped2, ids[2])
+#
+#     A = vapply(seq_len(nMarkers(x)), function(i) {
+#       m1 = ped1$MARKERS[[i]]
+#       m2 = ped2$MARKERS[[i]]
+#       als = c(m1[idsInt1, ], m2[idsInt2, ])
+#       frq = if(all(als > 0)) attr(m1, 'afreq')[als] else rep_len(NA_real_, 4)
+#       c(als, frq)
+#     }, FUN.VALUE = numeric(8))
+#   }
+#
+#   # Missing data: Check any of the freq rows
+#   miss = is.na(A[5, ])
+#
+#   # Split alleles and frequencies
+#   alleleMat = A[1:4, !miss, drop = FALSE]
+#   mode(alleleMat) = "integer"
+#   freqMat = A[5:8, !miss, drop = FALSE]
+#
+#   list(alleleMat = alleleMat, freqMat = freqMat)
+# }
+#
+#
+# .IBDlikelihoodFAST = function(kappa, alleleMat, freqMat = NULL, freqList = NULL) {
+#   ### Fast computation of kappa likelihoods, given alleles/freqs for two individuals
+#   # k: numeric of length 2 = (kappa0, kappa2)
+#
+#   # Ensure alleleMat is matrix with 4 rows
+#   if(is.list(alleleMat))
+#     alleleMat = do.call(rbind, alleleMat)
+#
+#   if(is.null(freqMat)) {
+#     if(is.null(freqList)) stop2("`freqMat` and `freqList` cannot both be NULL")
+#     freqMat = vapply(seq_along(freqList), FUN.VALUE = numeric(4),
+#                      function(i) freqList[[i]][alleleMat[, i]])
+#   }
+#
+#   .a = alleleMat[1,]
+#   .b = alleleMat[2,]
+#   .c = alleleMat[3,]
+#   .d = alleleMat[4,]
+#
+#   pa = freqMat[1,]
+#   pb = freqMat[2,]
+#   pc = freqMat[3,]
+#   pd = freqMat[4,]
+#
+#   homoz1 = .a == .b
+#   homoz2 = .c == .d
+#   mac = .a == .c
+#   mbc = .b == .c
+#   mad = .a == .d
+#   mbd = .b == .d
+#   g1.fr = 2^(!homoz1) * pa * pb
+#   g2.fr = 2^(!homoz2) * pc * pd
+#
+#   # Prob(g1, g2 | unrelated)
+#   UN = g1.fr * g2.fr
+#
+#   # Prob(g1, g2 | parent-offspring)
+#   PO = (.5)^(homoz1+homoz2)*pa*pb*(pd*(mac+mbc) + pc*(mad+mbd))
+#
+#   # Prob(g1, g2 | monozygotic twins)
+#   MZ = g1.fr * ((mac & mbd) | (mad & mbc))
+#
+#   # Kappa
+#   lenK = length(kappa)
+#
+#   if(lenK == 2) {
+#     k0 = kappa[1]
+#     k2 = kappa[2]
+#     k1 = max(0, 1 - k0 - k2)  # avoids floating point issues
+#   }
+#   else if(length(kappa) == 3) {
+#     k0 = kappa[1]
+#     k1 = kappa[2]
+#     k2 = kappa[3]
+#   }
+#   else stop2("`kappa` must have length 2 or 3")
+#
+#   # Likelihoods (Thompson)
+#   k0 * UN + k1 * PO + k2 * MZ
+# }
+#

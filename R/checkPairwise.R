@@ -128,8 +128,9 @@ checkPairwise = function(x, ids = typedMembers(x), excludeInbred = TRUE,
     if(is.na(kappa0[i]) || is.na(kappa2[i]))
       return(NA_real_)
     ids = kMerge[i, 1:2]
-    loglik1 = .IBDlikelihood(x, ids = ids, kappa = c(k0[i], k2[i]), log = TRUE)
-    loglik2 = .IBDlikelihood(x, ids = ids, kappa = c(kappa0[i], kappa2[i]), log = TRUE)
+    llFun = ibdLoglikFUN(x, ids = ids, input = "kappa02")
+    loglik1 = llFun(c(k0[i], k2[i]))
+    loglik2 = llFun(c(kappa0[i], kappa2[i]))
     exp(loglik1 - loglik2)
   }, FUN.VALUE = numeric(1))
 

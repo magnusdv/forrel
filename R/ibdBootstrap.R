@@ -157,20 +157,3 @@ ibdBootstrap = function(x = NULL, ids = NULL, param = NULL, kappa = NULL, delta 
   res
 
 }
-
-.ibdEstimFromAlleles = function(als, freqList, param, start = NULL) {
-  # NB: als is a list of 4 vectors with true (not internal) alleles
-  # Therefore: Need the allele names in each freqList vector
-
-  alsMat = do.call(rbind, als)
-  freqMat = vapply(seq_along(freqList),
-                   function(i) freqList[[i]][alsMat[, i]],
-                   FUN.VALUE = numeric(4))
-
-  # Same format as .getAlleleData2()
-  dat = list(list(a1 = als$a, a2 = als$b, f1 = freqMat[1, ], f2 = freqMat[2, ]),
-             list(a1 = als$c, a2 = als$d, f1 = freqMat[3, ], f2 = freqMat[4, ]))
-
-  .PGD(dat, param = param, start = start)$estimate
-}
-
