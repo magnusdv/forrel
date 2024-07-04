@@ -69,8 +69,8 @@
 #' @export
 checkPairwise = function(x, ids = typedMembers(x), excludeInbred = TRUE,
                          plotType = c("base", "ggplot2", "plotly", "none"),
-                         labels = FALSE, LRthreshold = 1000, plot = TRUE,
-                         verbose = TRUE, ...) {
+                         labels = FALSE, LRthreshold = 1000, nsim = 1000,
+                         plot = TRUE, verbose = TRUE, ...) {
 
   includeIds = .myintersect(ids, typedMembers(x))
   if(length(includeIds) < 2) {
@@ -121,18 +121,22 @@ checkPairwise = function(x, ids = typedMembers(x), excludeInbred = TRUE,
   k0 = kMerge$k0
   k2 = kMerge$k2
   kappa0 = kMerge$kappa0
+  kappa1 = kMerge$kappa1 # needed in GLR
   kappa2 = kMerge$kappa2
+  NR = nrow(kMerge)
 
   # LR comparing estimate against pedigree claim
-  kMerge$LR = vapply(1:nrow(kMerge), function(i) {
+  logLR = vapply(1:NR, function(i) {
     if(is.na(kappa0[i]) || is.na(kappa2[i]))
       return(NA_real_)
     ids = kMerge[i, 1:2]
     llFun = ibdLoglikFUN(x, ids = ids, input = "kappa02")
     loglik1 = llFun(c(k0[i], k2[i]))
     loglik2 = llFun(c(kappa0[i], kappa2[i]))
-    exp(loglik1 - loglik2)
+    loglik1 - loglik2
   }, FUN.VALUE = numeric(1))
+
+  kMerge$LR = exp(logLR)
 
   # Relationship according to kappa (pedigree)
   kStr = paste(kappa0, kappa2, sep = "-")
@@ -148,6 +152,34 @@ checkPairwise = function(x, ids = typedMembers(x), excludeInbred = TRUE,
 
   # Test for large LRs
   kMerge$err = err = !is.na(kMerge$LR) & kMerge$LR > LRthreshold
+
+  # GLR
+  kMerge$GLR = GLR = 1/kMerge$LR
+
+  # Empirical p-value
+  ecdfList = list()
+  db = getFreqDatabase(x)
+
+  pval = rep(NA_real_, NR)
+
+  for(i in 1:NR) {
+    kap = c(kappa0[i], kappa1[i], kappa2[i])
+    if(anyNA(kap))
+      next
+
+    kapStr = paste(kap, collapse = "-")
+
+    # If ecdf already computed, get it - otherwise simulate
+    if(kapStr %in% names(ecdfList))
+      cdf = ecdfList[[kapStr]]
+    else {
+      if(verbose) cat("Simulating null distribution for GLR at kappa =", kapStr, "\n")
+      cdf = ecdfList[[kapStr]] = ecdfGLR(kappa = kap, nsim = nsim, freqList = db)
+    }
+    pval[i] = cdf(log(GLR[i]))
+  }
+
+  kMerge$pval = pval
 
   if(plotType == "none")
     return(kMerge)
@@ -260,4 +292,30 @@ checkPairwise = function(x, ids = typedMembers(x), excludeInbred = TRUE,
   }
 
   invisible(NULL)
+}
+
+
+
+ecdfGLR = function(kappa = NULL, nsim = 1000, freqList = NULL, log = TRUE) {
+
+  # Insert default allele labels (1,2,3,...) where needed
+  freqList = lapply(freqList, function(fr)
+    if(is.null(names(fr))) .setnames(fr, seq_along(fr)) else fr)
+
+  # Simulate from kappa; return only allele indices (most efficient)
+  sims = profileSimParametric(kappa = kappa, N = nsim, freqList = freqList,
+                              returnValue = "internal")
+
+  # GLR for each sim
+  glr = lapply(sims, function(s) {
+    numer = .ibdLoglikFromAlleles(s, freqList, kappa = kappa)
+    denom = .ibdEstimFromAlleles(s, freqList, param = "kappa", start = kappa, returnValue = "loglik")
+    numer - denom
+  })
+
+  glrvec = unlist(glr, use.names = FALSE)
+  if(!log)
+    glrvec = exp(glrvec)
+
+  ecdf(glrvec)
 }

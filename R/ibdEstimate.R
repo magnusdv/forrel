@@ -362,12 +362,13 @@ add = function(v, col = 2, pch = 16) points(v[1], v[3], col = col, pch = pch)
 # Efficient version directly from allele data, e.g. output from
 # `profileSimParametric(...,  returnValue = "alleles")`
 # NB: Used in `ibdBootstrap()`
-.ibdEstimFromAlleles = function(als, freqList, param, start = NULL) {
+.ibdEstimFromAlleles = function(als, freqList, param, start = NULL, returnValue = "estimate", ...) {
   # als: list of 4 vectors with true (not internal) alleles
   # freqList: List like `NorwegianFrequencies`
 
   # Prepare for estimation
   dat = .prepAlleleData2(als, freqList)
 
-  .PGD(dat, param = param, start = start)$estimate
+  res = .PGD(dat, param = param, start = start, ...)
+  if(is.null(returnValue)) res else res[[returnValue]]
 }

@@ -57,6 +57,11 @@ pluralise = function(noun = "", n) {
   sample.int(2, size = n, replace = TRUE) - 1L
 }
 
+.setnames = function(x, nms) {
+  names(x) = nms
+  x
+}
+
 
 ftime = function(st, digits = 3)
   format(Sys.time() - st, digits = digits)
