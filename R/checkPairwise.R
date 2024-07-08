@@ -163,17 +163,15 @@ checkPairwise = function(x, ids = typedMembers(x), excludeInbred = TRUE,
   kMerge$GLR = GLR = 1/kMerge$LR
 
   # Empirical p-value
+  pval = rep(NA_real_, NR)
   if(nsim > 0) {
     ecdfList = list()
     db = getFreqDatabase(x)
-
-    pval = rep(NA_real_, NR)
 
     for(i in 1:NR) {
       kap = c(kappa0[i], kappa1[i], kappa2[i])
       if(anyNA(kap))
         next
-
       kapStr = paste(kap, collapse = "-")
 
       # If ecdf already computed, get it - otherwise simulate
@@ -185,9 +183,9 @@ checkPairwise = function(x, ids = typedMembers(x), excludeInbred = TRUE,
       }
       pval[i] = cdf(log(GLR[i]))
     }
-
-    kMerge$pval = pval
   }
+  kMerge$pval = pval
+
 
   # Test for errors
   if(isNumber(pvalThreshold, minimum = 0, maximum = 1) && nsim > 0) {
