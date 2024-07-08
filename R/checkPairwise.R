@@ -23,8 +23,13 @@
 #' @param labels A logical (default: FALSE). If TRUE, labels are included in the
 #'   IBD triangle plot.
 #' @param LRthreshold A positive number (default: 1000). IBD estimates whose LR
-#'   exceed this, when compared to the coefficients implied by the pedigree, are
-#'   encircled in the plot.
+#'   exceed this when compared to the coefficients implied by the pedigree, are
+#'   flagged as potential errors in the output table and encircled in the plot.
+#' @param pvalThreshold A positive number, or NULL (default). If given, this is
+#'   used instead of `LRthreshold` to identify potential errors. Ignored if
+#'   `nsim = 0`.
+#' @param nsim A nonnegative number; the number of simulations used to estimate
+#'   p-values. If 0 (default), this step is skipped.
 #' @param plot Deprecated. To suppress the triangle plot, use `plotType =
 #'   "none"`
 #' @param verbose A logical.
@@ -32,10 +37,10 @@
 #'
 #' @return If `plotType` is "none" or "base": A data frame containing both the
 #'   estimated and pedigree-based IBD coefficients for each pair of typed
-#'   individuals. The last column contains the likelihood ratio comparing the
+#'   individuals. The last columns contains LRs and test results comparing the
 #'   estimated coefficients to the pedigree-based ones.
 #'
-#'   If `plotType` is "ggplot2" or "plotly", the plot objects are returned.
+#'   If `plotType` is "ggplot2" or "plotly", only the plot objects are returned.
 #'
 #' @seealso [ibdEstimate()]
 #'
@@ -55,6 +60,10 @@
 #'
 #' checkPairwise(y)
 #'
+#' # Using p-values instead of LR (increase nsim!)
+#' nsim = 10 # increase!
+#' checkPairwise(y, nsim = nsim, pvalThreshold = 0.05)
+#'
 #' \donttest{
 #' # Combined plot of pedigree and IBD estimates
 #' dev.new(height = 5, width = 8, noRStudioGD = TRUE)
@@ -69,8 +78,8 @@
 #' @export
 checkPairwise = function(x, ids = typedMembers(x), excludeInbred = TRUE,
                          plotType = c("base", "ggplot2", "plotly", "none"),
-                         labels = FALSE, LRthreshold = 1000, nsim = 1000,
-                         plot = TRUE, verbose = TRUE, ...) {
+                         labels = FALSE, LRthreshold = 1000, pvalThreshold = NULL,
+                         nsim = 0, plot = TRUE, verbose = TRUE, ...) {
 
   includeIds = .myintersect(ids, typedMembers(x))
   if(length(includeIds) < 2) {
@@ -150,36 +159,45 @@ checkPairwise = function(x, ids = typedMembers(x), excludeInbred = TRUE,
   pedrel[is.na(pedrel)] = "Other"
   kMerge$pedrel = pedrel = factor(pedrel, levels = .myintersect(relLabs, pedrel))
 
-  # Test for large LRs
-  kMerge$err = err = !is.na(kMerge$LR) & kMerge$LR > LRthreshold
-
   # GLR
   kMerge$GLR = GLR = 1/kMerge$LR
 
   # Empirical p-value
-  ecdfList = list()
-  db = getFreqDatabase(x)
+  if(nsim > 0) {
+    ecdfList = list()
+    db = getFreqDatabase(x)
 
-  pval = rep(NA_real_, NR)
+    pval = rep(NA_real_, NR)
 
-  for(i in 1:NR) {
-    kap = c(kappa0[i], kappa1[i], kappa2[i])
-    if(anyNA(kap))
-      next
+    for(i in 1:NR) {
+      kap = c(kappa0[i], kappa1[i], kappa2[i])
+      if(anyNA(kap))
+        next
 
-    kapStr = paste(kap, collapse = "-")
+      kapStr = paste(kap, collapse = "-")
 
-    # If ecdf already computed, get it - otherwise simulate
-    if(kapStr %in% names(ecdfList))
-      cdf = ecdfList[[kapStr]]
-    else {
-      if(verbose) cat("Simulating null distribution for GLR at kappa =", kapStr, "\n")
-      cdf = ecdfList[[kapStr]] = ecdfGLR(kappa = kap, nsim = nsim, freqList = db)
+      # If ecdf already computed, get it - otherwise simulate
+      if(kapStr %in% names(ecdfList))
+        cdf = ecdfList[[kapStr]]
+      else {
+        if(verbose) cat("Simulating null distribution for GLR at kappa =", kapStr, "\n")
+        cdf = ecdfList[[kapStr]] = ecdfGLR(kappa = kap, nsim = nsim, freqList = db)
+      }
+      pval[i] = cdf(log(GLR[i]))
     }
-    pval[i] = cdf(log(GLR[i]))
+
+    kMerge$pval = pval
   }
 
-  kMerge$pval = pval
+  # Test for errors
+  if(isNumber(pvalThreshold, minimum = 0, maximum = 1) && nsim > 0) {
+    kMerge$err = err = !is.na(kMerge$pval) & kMerge$pval < pvalThreshold
+    errtxt = sprintf("pval < %g", pvalThreshold)
+  }
+  else {
+    kMerge$err = err = !is.na(kMerge$LR) & kMerge$LR > LRthreshold
+    errtxt = sprintf("LR > %g", LRthreshold)
+  }
 
   if(plotType == "none")
     return(kMerge)
@@ -206,7 +224,7 @@ checkPairwise = function(x, ids = typedMembers(x), excludeInbred = TRUE,
       legcol = c(legcol, NA, 1)
       legpch = c(legpch, NA, 1)
       legcex = c(legcex, NA, 3)
-      legtxt = c(legtxt, NA, sprintf("LR > %d", LRthreshold))
+      legtxt = c(legtxt, NA, errtxt)
     }
 
     ribd::showInTriangle(kMerge[1:6], plotType = "base", col = cols, pch = pchs,
@@ -277,7 +295,7 @@ checkPairwise = function(x, ids = typedMembers(x), excludeInbred = TRUE,
     }
     if(any(dat$err)) {
       p = p |> plotly::add_markers(data = errDat, x = ~k0, y = ~k2,
-                                   name = sprintf("LR > %d", LRthreshold),
+                                   name = errtxt,
                                    symbol = I("circle-open"), color = I("black"),
                                    marker = list(size = 20,line = list(width = 1)))
     }
@@ -295,7 +313,8 @@ checkPairwise = function(x, ids = typedMembers(x), excludeInbred = TRUE,
 }
 
 
-
+# Empiric cdf of GLR
+#' @importFrom stats ecdf
 ecdfGLR = function(kappa = NULL, nsim = 1000, freqList = NULL, log = TRUE) {
 
   # Insert default allele labels (1,2,3,...) where needed

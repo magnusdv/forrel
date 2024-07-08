@@ -11,6 +11,8 @@ checkPairwise(
   plotType = c("base", "ggplot2", "plotly", "none"),
   labels = FALSE,
   LRthreshold = 1000,
+  pvalThreshold = NULL,
+  nsim = 0,
   plot = TRUE,
   verbose = TRUE,
   ...
@@ -32,8 +34,15 @@ Abbreviations are allowed.}
 IBD triangle plot.}
 
 \item{LRthreshold}{A positive number (default: 1000). IBD estimates whose LR
-exceed this, when compared to the coefficients implied by the pedigree, are
-encircled in the plot.}
+exceed this when compared to the coefficients implied by the pedigree, are
+flagged as potential errors in the output table and encircled in the plot.}
+
+\item{pvalThreshold}{A positive number, or NULL (default). If given, this is
+used instead of \code{LRthreshold} to identify potential errors. Ignored if
+\code{nsim = 0}.}
+
+\item{nsim}{A nonnegative number; the number of simulations used to estimate
+p-values. If 0 (default), this step is skipped.}
 
 \item{plot}{Deprecated. To suppress the triangle plot, use \code{plotType = "none"}}
 
@@ -44,10 +53,10 @@ encircled in the plot.}
 \value{
 If \code{plotType} is "none" or "base": A data frame containing both the
 estimated and pedigree-based IBD coefficients for each pair of typed
-individuals. The last column contains the likelihood ratio comparing the
+individuals. The last columns contains LRs and test results comparing the
 estimated coefficients to the pedigree-based ones.
 
-If \code{plotType} is "ggplot2" or "plotly", the plot objects are returned.
+If \code{plotType} is "ggplot2" or "plotly", only the plot objects are returned.
 }
 \description{
 This function provides a convenient way to check for pedigree errors, given
@@ -79,6 +88,10 @@ als[c(1,3), ] = als[c(3,1), ]
 y = setAlleles(x, alleles = als)
 
 checkPairwise(y)
+
+# Using p-values instead of LR (increase nsim!)
+nsim = 10 # increase!
+checkPairwise(y, nsim = nsim, pvalThreshold = 0.05)
 
 \donttest{
 # Combined plot of pedigree and IBD estimates
