@@ -252,17 +252,24 @@ checkPairwise = function(x, ids = typedMembers(x), excludeInbred = TRUE,
       ggplot2::theme(legend.position = c(1,1),
                      legend.justification = c(1, 1.1),
                      legend.margin = ggplot2::margin(3,6,3,6),
-                     legend.background = ggplot2::element_rect(fill = "whitesmoke"))
+                     legend.background = ggplot2::element_rect(fill = "whitesmoke"),
+                     legend.text = ggplot2::element_text(size = 10),
+                     legend.title = ggplot2::element_text(size = 12)
+                     )
 
     if(!is.null(errDat)) {
       if(!requireNamespace("ggrepel", quietly = TRUE))
         stop2("Package `ggrepel` must be installed for this option to work")
 
       p = p +
-        ggplot2::geom_point(data = errDat, ggplot2::aes(k0, k2, size = I(8)),
-                          shape = 1, size = 8, stroke = 1, col = 1) +
+        ggplot2::geom_point(data = errDat, ggplot2::aes(k0, k2, size = "big"),
+                          shape = 1, stroke = 1, col = 1) +
+        ggplot2::scale_size_manual(values = c(big = 8), labels = errtxt, name = NULL) +
+        ggplot2::guides(shape = ggplot2::guide_legend(order = 1),
+                        colour = ggplot2::guide_legend(order = 1)) +
         ggrepel::geom_text_repel(ggplot2::aes(k0, k2, label = labs, color = pedrel),
-                                 data = errDat, size = 4, max.overlaps = Inf,
+                                 data = errDat, size = 4
+                                 , max.overlaps = Inf,
                                  box.padding = 1, show.legend = FALSE)
     }
     return(p)
