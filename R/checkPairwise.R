@@ -30,6 +30,8 @@
 #'   `nsim = 0`.
 #' @param nsim A nonnegative number; the number of simulations used to estimate
 #'   p-values. If 0 (default), this step is skipped.
+#' @param seed An integer seed for the random number generator (optional, and
+#'   only relevant if `nsim > 0`).
 #' @param plot Deprecated. To suppress the triangle plot, use `plotType =
 #'   "none"`
 #' @param verbose A logical.
@@ -79,7 +81,7 @@
 checkPairwise = function(x, ids = typedMembers(x), excludeInbred = TRUE,
                          plotType = c("base", "ggplot2", "plotly", "none"),
                          labels = FALSE, LRthreshold = 1000, pvalThreshold = NULL,
-                         nsim = 0, plot = TRUE, verbose = TRUE, ...) {
+                         nsim = 0, seed = NULL, plot = TRUE, verbose = TRUE, ...) {
 
   includeIds = .myintersect(ids, typedMembers(x))
   if(length(includeIds) < 2) {
@@ -165,6 +167,7 @@ checkPairwise = function(x, ids = typedMembers(x), excludeInbred = TRUE,
   # Empirical p-value
   pval = rep(NA_real_, NR)
   if(nsim > 0) {
+
     ecdfList = list()
     db = getFreqDatabase(x)
 
@@ -179,7 +182,7 @@ checkPairwise = function(x, ids = typedMembers(x), excludeInbred = TRUE,
         cdf = ecdfList[[kapStr]]
       else {
         if(verbose) cat("Simulating null distribution for GLR at kappa =", kapStr, "\n")
-        cdf = ecdfList[[kapStr]] = ecdfGLR(kappa = kap, nsim = nsim, freqList = db)
+        cdf = ecdfList[[kapStr]] = ecdfGLR(kap, nsim = nsim, freqList = db, seed = seed)
       }
       pval[i] = cdf(log(GLR[i]))
     }
@@ -313,7 +316,7 @@ checkPairwise = function(x, ids = typedMembers(x), excludeInbred = TRUE,
 
 # Empiric cdf of GLR
 #' @importFrom stats ecdf
-ecdfGLR = function(kappa = NULL, nsim = 1000, freqList = NULL, log = TRUE) {
+ecdfGLR = function(kappa = NULL, nsim = 1000, freqList = NULL, log = TRUE, seed = NULL) {
 
   # Insert default allele labels (1,2,3,...) where needed
   freqList = lapply(freqList, function(fr)
@@ -321,7 +324,7 @@ ecdfGLR = function(kappa = NULL, nsim = 1000, freqList = NULL, log = TRUE) {
 
   # Simulate from kappa; return only allele indices (most efficient)
   sims = profileSimParametric(kappa = kappa, N = nsim, freqList = freqList,
-                              returnValue = "internal")
+                              returnValue = "internal", seed = seed)
 
   # GLR for each sim
   glr = lapply(sims, function(s) {

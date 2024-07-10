@@ -13,6 +13,7 @@ checkPairwise(
   LRthreshold = 1000,
   pvalThreshold = NULL,
   nsim = 0,
+  seed = NULL,
   plot = TRUE,
   verbose = TRUE,
   ...
@@ -43,6 +44,9 @@ used instead of \code{LRthreshold} to identify potential errors. Ignored if
 
 \item{nsim}{A nonnegative number; the number of simulations used to estimate
 p-values. If 0 (default), this step is skipped.}
+
+\item{seed}{An integer seed for the random number generator (optional, and
+only relevant if \code{nsim > 0}).}
 
 \item{plot}{Deprecated. To suppress the triangle plot, use \code{plotType = "none"}}
 
