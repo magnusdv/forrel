@@ -257,21 +257,33 @@ checkPairwise = function(x, ids = typedMembers(x), excludeInbred = TRUE,
                      legend.title = ggplot2::element_text(size = 12)
                      )
 
-    if(!is.null(errDat)) {
+    if(isTRUE(labels) || !is.null(errDat)) {
       if(!requireNamespace("ggrepel", quietly = TRUE))
         stop2("Package `ggrepel` must be installed for this option to work")
+    }
 
+    # TODO: ad hoc!
+    if(isTRUE(labels)) {
+      kMerge$labs = paste(kMerge$id1, "-", kMerge$id2)
+
+      p = p + ggrepel::geom_text_repel(data = kMerge,
+        ggplot2::aes(k0, k2, label = labs, color = pedrel), min.segment.length = 1.5, seed = seed, ...,
+        size = 4, max.overlaps = Inf, box.padding = 1, show.legend = FALSE)
+    }
+
+    if(!is.null(errDat)) {
       p = p +
         ggplot2::geom_point(data = errDat, ggplot2::aes(k0, k2, size = "big"),
                           shape = 1, stroke = 1, col = 1) +
         ggplot2::scale_size_manual(values = c(big = 8), labels = errtxt, name = NULL) +
         ggplot2::guides(shape = ggplot2::guide_legend(order = 1),
-                        colour = ggplot2::guide_legend(order = 1)) +
-        ggrepel::geom_text_repel(ggplot2::aes(k0, k2, label = labs, color = pedrel),
-                                 data = errDat, size = 4
-                                 , max.overlaps = Inf,
+                        colour = ggplot2::guide_legend(order = 1))
+        if(!isTRUE(labels)) # if TRUE, all labs anyway below
+          p = p + ggrepel::geom_text_repel(ggplot2::aes(k0, k2, label = labs, color = pedrel),
+                                 data = errDat, size = 4, max.overlaps = Inf,
                                  box.padding = 1, show.legend = FALSE)
     }
+
     return(p)
   }
 
