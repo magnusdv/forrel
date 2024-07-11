@@ -27,18 +27,28 @@ The goal of **forrel** is to provide forensic pedigree computations and relatedn
 
 The most important analyses currently supported by **forrel** are:
 
-* Likelihood ratio (LR) computations for relationship testing
+* Likelihood ratio (LR) computations for kinship testing
+    * `quickLR()`
+    * `kinshipLR()`
 * Pairwise relatedness inference: Estimation of IBD coefficients (both $\kappa$ and $\Delta$) from marker data
-* Visualisation of IBD coefficients in the IBD triangle
-* Simulation of marker genotypes. Unconditional or conditional on known genotypes
-* Power analysis for relationship testing: LR distributions, exclusion power (EP) and inclusion power (IP)
-* Tailor-made functions for power analysis in family reunion cases: 
+    * `ibdEstimate()`
+    * `ibdBootstrap()`
+* Check and visualise relationships in pedigree data
+    * `checkPairwise()`
+* Simulation of marker genotypes, possibly conditional on known genotypes
+    * `markerSim()`
+    * `profileSim()`
+    * `markerSimParametric()`
+    * `profileSimParametric()`
+* Power analysis for relationship testing
+    * `LRpower()`
+    * `exclusionPower()`
+* Tailor-made functions for power analysis in missing person cases
     * `missingPersonPlot()`
     * `missingPersonEP()`
     * `missingPersonIP()`
     * `MPPsims()`
     * `powerPlot()`
-* Import of pedigree data and frequency databases from the `Familias` software.
 
 ## Installation
 To get the current official version of **forrel**, install from CRAN as follows:

@@ -20,22 +20,30 @@ analysis.
 
 The most important analyses currently supported by **forrel** are:
 
-- Likelihood ratio (LR) computations for relationship testing
+- Likelihood ratio (LR) computations for kinship testing
+  - `quickLR()`
+  - `kinshipLR()`
 - Pairwise relatedness inference: Estimation of IBD coefficients (both
   $\kappa$ and $\Delta$) from marker data
-- Visualisation of IBD coefficients in the IBD triangle
-- Simulation of marker genotypes. Unconditional or conditional on known
+  - `ibdEstimate()`
+  - `ibdBootstrap()`
+- Check and visualise relationships in pedigree data
+  - `checkPairwise()`
+- Simulation of marker genotypes, possibly conditional on known
   genotypes
-- Power analysis for relationship testing: LR distributions, exclusion
-  power (EP) and inclusion power (IP)
-- Tailor-made functions for power analysis in family reunion cases:
+  - `markerSim()`
+  - `profileSim()`
+  - `markerSimParametric()`
+  - `profileSimParametric()`
+- Power analysis for relationship testing
+  - `LRpower()`
+  - `exclusionPower()`
+- Tailor-made functions for power analysis in missing person cases
   - `missingPersonPlot()`
   - `missingPersonEP()`
   - `missingPersonIP()`
   - `MPPsims()`
   - `powerPlot()`
-- Import of pedigree data and frequency databases from the `Familias`
-  software.
 
 ## Installation
 
@@ -97,7 +105,7 @@ x = markerSim(x, N = 100, alleles = 1:2, seed = 1234)
 #> 
 #> Simulation finished.
 #> Calls to `likelihood()`: 0.
-#> Total time used: 0.11 seconds.
+#> Total time used: 0.02 seconds.
 ```
 
 Note 1: The `seed` argument is passed onto the random number generator.
@@ -156,7 +164,7 @@ k = ibdEstimate(y, ids = c("bro1", "bro2"))
 #> Initial search value: (0.333, 0.333, 0.333)
 #> Pairs of individuals: 1
 #>   bro1 vs. bro2: estimate = (0.28, 0.54, 0.18), iterations = 10
-#> Total time: 0.00928 secs
+#> Total time: 0.00339 secs
 k
 #>    id1  id2   N      k0      k1      k2
 #> 1 bro1 bro2 100 0.28001 0.53998 0.18001
