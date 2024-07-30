@@ -41,20 +41,19 @@ each pedigree.
 # Numerator ped
 numPed = nuclearPed(father = "fa", mother = "mo", child = "ch")
 
-# Denominator ped: fa, mo, ch are unrelated. Ugly hack!
-denomPed = nuclearPed(father = "fa", mother = "mo", nch = 1)
-denomPed = addChildren(denomPed, father = "ch", mother = "mo", nch = 1)
+# Denominator ped: fa, mo, ch are unrelated. (Hack!)
+denomPed = halfSibPed() |> relabel(old = 1:3, new = c("mo", "fa", "ch"))
 
 # Scenario 1: Only mother is typed; genotype 1/2
 p = 0.9
-m1 = marker(numPed, mo = 1:2, afreq = c("1" = p, "2" = 1-p))
+m1 = marker(numPed, mo = "1/2", afreq = c("1" = p, "2" = 1-p))
 expectedLR(numPed, denomPed, ids = "ch", marker = m1)
 
 1/(8*p*(1-p)) + 1/2 # exact formula
 
 # Scenario 2: Include father, with genotype 1/1
 m2 = m1
-genotype(m2, id = "fa") = c(1, 1)
+genotype(m2, id = "fa") = "1/1"
 expectedLR(numPed, denomPed, ids = "ch", marker = m2)
 
 1/(8*p*(1-p)) + 1/(4*p^2) # exact formula
