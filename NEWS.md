@@ -1,3 +1,34 @@
+# forrel 1.7.0
+
+## New features
+
+* New function `quickLR()` performs the most common kinship tests (paternity and sibship) for a pair of individuals. 
+
+* New function `ibdLoglik()` computes the pairwise likelihood for given set IBD coefficients (kappa or delta). It replaces the previous (unexported) `.IBDlikelihood` and versions of this.
+
+* `checkPairwise()` gains argument `plotType`, which can be either value is either "base" (default), "ggplot" or "plotly". 
+
+* In `checkPairwise()` the output column LR is renamed to GLR (generalised likelihood ratio).
+
+* `checkPairwise()` can now estimate p-values for each pairwise relationship, by simulating the distribution of GLR under the null. This feature is controlled through new arguments `nsim`, `pvalThreshold` and `seed`. By default `nsim = 0`, meaning that no simulations are performed.
+
+* `checkPairwise()` gains argument `ids`, allowing to restrict checks to those individuals.
+
+* `checkPairwise()` now contains a detailed description of each relationship according to the pedigree, obtained with the **verbalisr** package.
+
+* Improved progress bars using the `pbapply` package.
+
+## Other
+
+* Refresh code in examples.
+
+* Removed (long deprecated) `IBDtriangle()`, replaced by `ribd::ibdTriangle()`.
+
+* Improved `missingPersonPlot()` appearance.
+
+* Better removal of missing data in `ibdEstimate()`.
+
+
 # forrel 1.6.1
 
 * Functions facilitating interaction with the Familias software have been moved to a dedicated package, **pedFamilias**. However, `readFam()` and `writeFam()` will continue to be re-exported from **forrel** for some time.
