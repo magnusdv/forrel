@@ -29,7 +29,8 @@ Imports:
     pbapply,
     pedFamilias,
     pedprobr (>= 0.8),
-    ribd (>= 1.7.0)
+    ribd (>= 1.7.0),
+    verbalisr
 Suggests: 
     ggplot2,
     ggrepel,
