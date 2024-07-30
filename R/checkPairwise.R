@@ -146,20 +146,31 @@ checkPairwise = function(x, ids = typedMembers(x), excludeInbred = TRUE,
     loglik2 = llFun(c(kappa0[i], kappa2[i]))
     loglik1 - loglik2
   }, FUN.VALUE = numeric(1))
+  pedrel = character(NR)
+  for(i in 1:NR) {
+    rel = x |>
+      verbalise(ids = kMerge[i, 1:2]) |>
+      format(cap = FALSE, simplify = TRUE, abbreviate = TRUE, collapse = " & ")
+    # TODO: remove when verbalise v0.7
+    if(length(rel) > 1) rel = paste(rel, collapse = " & ")
 
   kMerge$LR = exp(logLR)
+    pedrel[i] = rel
+  }
+  kMerge$pedrel = pedrel
 
-  # Relationship according to kappa (pedigree)
+  # Relationship group (for legend)
   kStr = paste(kappa0, kappa2, sep = "-")
   relLabs = c("0-0"       = "Parent-offspring",
               "0.25-0.25" = "Full siblings",
               "0.5-0"     = "Half/Uncle/Grand",
-              "0.75-0"    = "First cousins",
-              "1-0"       = "Unrelated",
-              "NA-NA"     = "Other")
-  pedrel = as.character(relLabs[kStr])
-  pedrel[is.na(pedrel)] = "Other"
-  kMerge$pedrel = pedrel = factor(pedrel, levels = .myintersect(relLabs, pedrel))
+              "0.75-0"    = "First cousins/etc",
+              "NA-NA"     = "Other",
+              "1-0"       = "Unrelated")
+  relGroup = as.character(relLabs[kStr])
+  relGroup[is.na(relGroup)] = "Other"
+  relGroup = factor(relGroup, levels = .myintersect(relLabs, relGroup))
+  kMerge$relgroup = relGroup
 
   # GLR
   kMerge$GLR = GLR = 1/kMerge$LR
@@ -212,20 +223,24 @@ checkPairwise = function(x, ids = typedMembers(x), excludeInbred = TRUE,
   else
     errDat = NULL
 
+  ALLCOLS = .setnames(2:7, relLabs)
+  ALLSHAPES = .setnames(c(2,3,4,5,8,6), relLabs)
+
   if(plotType == "base") {
-    cols = pchs = as.integer(pedrel) + 1
-    nlev = nlevels(pedrel)
+    cols = ALLCOLS[as.character(relGroup)]
+    pchs = ALLSHAPES[as.character(relGroup)]
 
     # Legend specifications
-    legcol = legpch = seq_len(nlev) + 1
-    legcex = rep(1, nlev)
-    legtxt = levels(pedrel)
+    legtxt = levels(relGroup)
+    legcol = ALLCOLS[levels(relGroup)]
+    legpch = ALLSHAPES[levels(relGroup)]
+    legcex = rep(1, length(legcol))
 
     if(any(err, na.rm = T)) {
+      legtxt = c(legtxt, NA, errtxt)
       legcol = c(legcol, NA, 1)
       legpch = c(legpch, NA, 1)
       legcex = c(legcex, NA, 3)
-      legtxt = c(legtxt, NA, errtxt)
     }
 
     ribd::showInTriangle(kMerge[1:6], plotType = "base", col = cols, pch = pchs,
@@ -244,11 +259,11 @@ checkPairwise = function(x, ids = typedMembers(x), excludeInbred = TRUE,
         stop2("Package `ggplot2` must be installed for this option to work")
 
     p = ribd::ibdTriangle(plotType = "ggplot2", ...) +
-      ggplot2::geom_point(data = kMerge, ggplot2::aes(k0, k2, color = pedrel, shape = pedrel),
+      ggplot2::geom_point(data = kMerge, ggplot2::aes(k0, k2, color = relGroup, shape = relGroup),
                           size = 2, stroke = 1.5) +
       ggplot2::labs(color = "According to pedigree", shape = "According to pedigree") +
-      ggplot2::scale_shape_manual(values = 1+seq_len(nlevels(pedrel))) +
-      ggplot2::scale_color_manual(values = 1+seq_len(nlevels(pedrel))) +
+      ggplot2::scale_shape_manual(values = ALLSHAPES) +
+      ggplot2::scale_color_manual(values = ALLCOLS) +
       ggplot2::theme(legend.position = c(1,1),
                      legend.justification = c(1, 1.1),
                      legend.margin = ggplot2::margin(3,6,3,6),
@@ -267,7 +282,7 @@ checkPairwise = function(x, ids = typedMembers(x), excludeInbred = TRUE,
       kMerge$labs = paste(kMerge$id1, "-", kMerge$id2)
 
       p = p + ggrepel::geom_text_repel(data = kMerge,
-        ggplot2::aes(k0, k2, label = labs, color = pedrel), min.segment.length = 1.5, seed = seed, ...,
+        ggplot2::aes(k0, k2, label = labs, color = relGroup), min.segment.length = 1.5, seed = seed, ...,
         size = 4, max.overlaps = Inf, box.padding = 1, show.legend = FALSE)
     }
 
@@ -278,8 +293,8 @@ checkPairwise = function(x, ids = typedMembers(x), excludeInbred = TRUE,
         ggplot2::scale_size_manual(values = c(big = 8), labels = errtxt, name = NULL) +
         ggplot2::guides(shape = ggplot2::guide_legend(order = 1),
                         colour = ggplot2::guide_legend(order = 1))
-        if(!isTRUE(labels)) # if TRUE, all labs anyway below
-          p = p + ggrepel::geom_text_repel(ggplot2::aes(k0, k2, label = labs, color = pedrel),
+        if(!isTRUE(labels) && !is.null(labels)) # if TRUE, all labs anyway
+          p = p + ggrepel::geom_text_repel(ggplot2::aes(k0, k2, label = labs, color = relGroup),
                                  data = errDat, size = 4, max.overlaps = Inf,
                                  box.padding = 1, show.legend = FALSE)
     }
@@ -298,16 +313,16 @@ checkPairwise = function(x, ids = typedMembers(x), excludeInbred = TRUE,
     symbs = c("Parent-offspring" = "triangle-up-open",
               "Full siblings" = "cross-thin-open",
               "Half/Uncle/Grand" = "x-thin-open",
-              "First cousins" = "diamond-open",
-              "Unrelated" = "triangle-down-open",
-              "Other" = "asterisk-open")
+              "First cousins/etc" = "diamond-open",
+              "Other" = "asterisk-open",
+              "Unrelated" = "triangle-down-open")
 
-    cols = c(palette()[c(2,3,4,7,5)],"#C8A2C8")
+    cols = c(palette()[2:7]) #c(2,3,4,7,5)],"#C8A2C8")
     names(cols) = names(symbs)
 
     p = ribd::ibdTriangle(plotType = "plotly", ...)
-    for(r in rev(levels(pedrel))) {
-      datr = dat[dat$pedrel == r, , drop = FALSE]
+    for(r in rev(levels(relGroup))) {
+      datr = dat[dat$relGroup == r, , drop = FALSE]
       p = p |> plotly::add_markers(data = datr, x = ~k0, y = ~k2, customdata = ~idx,
                                    symbol = I(symbs[r]), color = I(cols[r]),
                   marker = list(size = 12,line = list(width = if(r == "Other") 1 else 2)),
