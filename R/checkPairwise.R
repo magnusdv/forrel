@@ -2,10 +2,19 @@
 #'
 #' This function provides a convenient way to check for pedigree errors, given
 #' the available marker data. The function calls [ibdEstimate()] to estimate IBD
-#' coefficients for all pairs of typed pedigree members, and computes the
-#' likelihood ratio (LR) comparing each estimate to the coefficients implied by
-#' the pedigree. By default, the estimates are shown in a colour-coded plot
-#' where unlikely relationships are easy to spot.
+#' coefficients for all pairs of typed pedigree members, and uses the estimates
+#' to test for potential errors. The results are shown in a colour-coded plot
+#' (based on [ribd::ibdTriangle()]) where unlikely relationships are easy to
+#' spot.
+#'
+#' To identify potential pedigree errors, the function calculates the
+#' *generalised likelihood ratio* (GLR) of each pairwise relationship.
+#' This compares the likelihood of the estimated coefficients with that of the
+#' coefficients implied by the pedigree. By default, relationships whose GLR
+#' exceed 1000 are flagged as errors and shown with a circle in the plot.
+#' Alternatively, if arguments `nsim` and `pvalThreshold` are supplied, the
+#' p-value of each score is estimated by simulation, and used as threshold for
+#' calling errors.
 #'
 #' By default, inbred individuals are excluded from the analysis, since pairwise
 #' relationships involving inbred individuals have undefined kappa coefficients
@@ -22,11 +31,11 @@
 #'   Abbreviations are allowed.
 #' @param labels A logical (default: FALSE). If TRUE, labels are included in the
 #'   IBD triangle plot.
-#' @param LRthreshold A positive number (default: 1000). IBD estimates whose LR
-#'   exceed this when compared to the coefficients implied by the pedigree, are
+#' @param GLRthreshold A positive number, by default 1000. Threshold for the
+#'   generalised likelihood ratio (see Details). Scores exceeding this are
 #'   flagged as potential errors in the output table and encircled in the plot.
 #' @param pvalThreshold A positive number, or NULL (default). If given, this is
-#'   used instead of `LRthreshold` to identify potential errors. Ignored if
+#'   used instead of `GLRthreshold` to identify potential errors. Ignored if
 #'   `nsim = 0`.
 #' @param nsim A nonnegative number; the number of simulations used to estimate
 #'   p-values. If 0 (default), this step is skipped.
@@ -39,10 +48,10 @@
 #'
 #' @return If `plotType` is "none" or "base": A data frame containing both the
 #'   estimated and pedigree-based IBD coefficients for each pair of typed
-#'   individuals. The last columns contains LRs and test results comparing the
-#'   estimated coefficients to the pedigree-based ones.
+#'   individuals. The last columns (`GLR`, `pval` and `err`) contain test
+#'   results using the GLR scores to identify potential pedigree errors.
 #'
-#'   If `plotType` is "ggplot2" or "plotly", only the plot objects are returned.
+#'   If `plotType` is "ggplot2" or "plotly", the plot objects are returned.
 #'
 #' @seealso [ibdEstimate()]
 #'
@@ -62,7 +71,7 @@
 #'
 #' checkPairwise(y)
 #'
-#' # Using p-values instead of LR (increase nsim!)
+#' # Using p-values instead of GLR (increase nsim!)
 #' nsim = 10 # increase!
 #' checkPairwise(y, nsim = nsim, pvalThreshold = 0.05)
 #'
@@ -77,10 +86,11 @@
 #' @importFrom ribd inbreeding kappaIBD ibdTriangle showInTriangle
 #' @importFrom graphics legend points
 #' @importFrom grDevices palette
+#' @importFrom verbalisr verbalise
 #' @export
 checkPairwise = function(x, ids = typedMembers(x), excludeInbred = TRUE,
                          plotType = c("base", "ggplot2", "plotly", "none"),
-                         labels = FALSE, LRthreshold = 1000, pvalThreshold = NULL,
+                         labels = FALSE, GLRthreshold = 1000, pvalThreshold = NULL,
                          nsim = 0, seed = NULL, plot = TRUE, verbose = TRUE, ...) {
 
   includeIds = .myintersect(ids, typedMembers(x))
@@ -136,16 +146,6 @@ checkPairwise = function(x, ids = typedMembers(x), excludeInbred = TRUE,
   kappa2 = kMerge$kappa2
   NR = nrow(kMerge)
 
-  # LR comparing estimate against pedigree claim
-  logLR = vapply(1:NR, function(i) {
-    if(is.na(kappa0[i]) || is.na(kappa2[i]))
-      return(NA_real_)
-    ids = kMerge[i, 1:2]
-    llFun = ibdLoglikFUN(x, ids = ids, input = "kappa02")
-    loglik1 = llFun(c(k0[i], k2[i]))
-    loglik2 = llFun(c(kappa0[i], kappa2[i]))
-    loglik1 - loglik2
-  }, FUN.VALUE = numeric(1))
   pedrel = character(NR)
   for(i in 1:NR) {
     rel = x |>
@@ -154,7 +154,6 @@ checkPairwise = function(x, ids = typedMembers(x), excludeInbred = TRUE,
     # TODO: remove when verbalise v0.7
     if(length(rel) > 1) rel = paste(rel, collapse = " & ")
 
-  kMerge$LR = exp(logLR)
     pedrel[i] = rel
   }
   kMerge$pedrel = pedrel
@@ -172,43 +171,49 @@ checkPairwise = function(x, ids = typedMembers(x), excludeInbred = TRUE,
   relGroup = factor(relGroup, levels = .myintersect(relLabs, relGroup))
   kMerge$relgroup = relGroup
 
-  # GLR
-  kMerge$GLR = GLR = 1/kMerge$LR
+  # GLR: compare estimate against pedigree claim
+  logGLR = vapply(1:NR, function(i) {
+    khat = c(k0[i], k2[i])
+    kped = c(kappa0[i], kappa2[i])
+    if(anyNA(kped))
+      return(NA_real_)
+    llFun = ibdLoglikFUN(x, ids = kMerge[i, 1:2], input = "kappa02")
+    llFun(khat) - llFun(kped)
+  }, FUN.VALUE = numeric(1))
+
+  kMerge$GLR = exp(logGLR)
 
   # Empirical p-value
   pval = rep(NA_real_, NR)
-  if(nsim > 0) {
 
+  if(nsim > 0) {
     ecdfList = list()
     db = getFreqDatabase(x)
 
-    for(i in 1:NR) {
-      kap = c(kappa0[i], kappa1[i], kappa2[i])
-      if(anyNA(kap))
-        next
-      kapStr = paste(kap, collapse = "-")
+    for(i in which(!is.na(logGLR))) { # only rows with GLR result
+      ks = kStr[i]
 
-      # If ecdf already computed, get it - otherwise simulate
-      if(kapStr %in% names(ecdfList))
-        cdf = ecdfList[[kapStr]]
-      else {
-        if(verbose) cat("Simulating null distribution for GLR at kappa =", kapStr, "\n")
-        cdf = ecdfList[[kapStr]] = ecdfGLR(kap, nsim = nsim, freqList = db, seed = seed)
+      # If ecdf not already computed: simulate
+      if(!ks %in% names(ecdfList)) {
+        if(verbose)
+          cat("Simulating null distribution for GLR at kappa =", ks, "\n")
+        kap = c(kappa0[i], kappa1[i], kappa2[i])
+        ecdfList[[ks]] = ecdfGLR(kap, nsim = nsim, freqList = db, log = TRUE, seed = seed)
       }
-      pval[i] = cdf(log(GLR[i]))
+      cdf = ecdfList[[ks]]
+      pval[i] = 1 - cdf(logGLR[i])
     }
   }
   kMerge$pval = pval
 
-
-  # Test for errors
+  # Flag potential pedigree errors
   if(isNumber(pvalThreshold, minimum = 0, maximum = 1) && nsim > 0) {
-    kMerge$err = err = !is.na(kMerge$pval) & kMerge$pval < pvalThreshold
+    kMerge$err = err = !is.na(pval) & pval < pvalThreshold
     errtxt = sprintf("pval < %g", pvalThreshold)
   }
   else {
-    kMerge$err = err = !is.na(kMerge$LR) & kMerge$LR > LRthreshold
-    errtxt = sprintf("LR > %g", LRthreshold)
+    kMerge$err = err = !is.na(kMerge$GLR) & kMerge$GLR > GLRthreshold
+    errtxt = sprintf("GLR > %g", GLRthreshold)
   }
 
   if(plotType == "none")
@@ -362,8 +367,8 @@ ecdfGLR = function(kappa = NULL, nsim = 1000, freqList = NULL, log = TRUE, seed 
 
   # GLR for each sim
   glr = lapply(sims, function(s) {
-    numer = .ibdLoglikFromAlleles(s, freqList, kappa = kappa)
-    denom = .ibdEstimFromAlleles(s, freqList, param = "kappa", start = kappa, returnValue = "loglik")
+    numer = .ibdEstimFromAlleles(s, freqList, param = "kappa", start = kappa, returnValue = "loglik")
+    denom = .ibdLoglikFromAlleles(s, freqList, kappa = kappa)
     numer - denom
   })
 

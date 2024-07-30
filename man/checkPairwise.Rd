@@ -10,7 +10,7 @@ checkPairwise(
   excludeInbred = TRUE,
   plotType = c("base", "ggplot2", "plotly", "none"),
   labels = FALSE,
-  LRthreshold = 1000,
+  GLRthreshold = 1000,
   pvalThreshold = NULL,
   nsim = 0,
   seed = NULL,
@@ -34,12 +34,12 @@ Abbreviations are allowed.}
 \item{labels}{A logical (default: FALSE). If TRUE, labels are included in the
 IBD triangle plot.}
 
-\item{LRthreshold}{A positive number (default: 1000). IBD estimates whose LR
-exceed this when compared to the coefficients implied by the pedigree, are
+\item{GLRthreshold}{A positive number, by default 1000. Threshold for the
+generalised likelihood ratio (see Details). Scores exceeding this are
 flagged as potential errors in the output table and encircled in the plot.}
 
 \item{pvalThreshold}{A positive number, or NULL (default). If given, this is
-used instead of \code{LRthreshold} to identify potential errors. Ignored if
+used instead of \code{GLRthreshold} to identify potential errors. Ignored if
 \code{nsim = 0}.}
 
 \item{nsim}{A nonnegative number; the number of simulations used to estimate
@@ -57,20 +57,29 @@ only relevant if \code{nsim > 0}).}
 \value{
 If \code{plotType} is "none" or "base": A data frame containing both the
 estimated and pedigree-based IBD coefficients for each pair of typed
-individuals. The last columns contains LRs and test results comparing the
-estimated coefficients to the pedigree-based ones.
+individuals. The last columns (\code{GLR}, \code{pval} and \code{err}) contain test
+results using the GLR scores to identify potential pedigree errors.
 
-If \code{plotType} is "ggplot2" or "plotly", only the plot objects are returned.
+If \code{plotType} is "ggplot2" or "plotly", the plot objects are returned.
 }
 \description{
 This function provides a convenient way to check for pedigree errors, given
 the available marker data. The function calls \code{\link[=ibdEstimate]{ibdEstimate()}} to estimate IBD
-coefficients for all pairs of typed pedigree members, and computes the
-likelihood ratio (LR) comparing each estimate to the coefficients implied by
-the pedigree. By default, the estimates are shown in a colour-coded plot
-where unlikely relationships are easy to spot.
+coefficients for all pairs of typed pedigree members, and uses the estimates
+to test for potential errors. The results are shown in a colour-coded plot
+(based on \code{\link[ribd:ibdTriangle]{ribd::ibdTriangle()}}) where unlikely relationships are easy to
+spot.
 }
 \details{
+To identify potential pedigree errors, the function calculates the
+\emph{generalised likelihood ratio} (GLR) of each pairwise relationship.
+This compares the likelihood of the estimated coefficients with that of the
+coefficients implied by the pedigree. By default, relationships whose GLR
+exceed 1000 are flagged as errors and shown with a circle in the plot.
+Alternatively, if arguments \code{nsim} and \code{pvalThreshold} are supplied, the
+p-value of each score is estimated by simulation, and used as threshold for
+calling errors.
+
 By default, inbred individuals are excluded from the analysis, since pairwise
 relationships involving inbred individuals have undefined kappa coefficients
 (and therefore no position in the triangle). In some cases it may still be
@@ -93,7 +102,7 @@ y = setAlleles(x, alleles = als)
 
 checkPairwise(y)
 
-# Using p-values instead of LR (increase nsim!)
+# Using p-values instead of GLR (increase nsim!)
 nsim = 10 # increase!
 checkPairwise(y, nsim = nsim, pvalThreshold = 0.05)
 
