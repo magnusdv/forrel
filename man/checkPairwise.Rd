@@ -2,6 +2,7 @@
 % Please edit documentation in R/checkPairwise.R
 \name{checkPairwise}
 \alias{checkPairwise}
+\alias{plotCP}
 \title{Check pedigree data for relationship errors}
 \usage{
 checkPairwise(
@@ -9,13 +10,21 @@ checkPairwise(
   ids = typedMembers(x),
   excludeInbred = TRUE,
   plotType = c("base", "ggplot2", "plotly", "none"),
-  labels = FALSE,
   GLRthreshold = 1000,
   pvalThreshold = NULL,
   nsim = 0,
   seed = NULL,
   plot = TRUE,
   verbose = TRUE,
+  ...
+)
+
+plotCP(
+  cpRes,
+  plotType = c("base", "ggplot2", "plotly"),
+  labels = FALSE,
+  errtxt = "Potential error",
+  seed = NULL,
   ...
 )
 }
@@ -30,9 +39,6 @@ individuals should be excluded from the analysis.}
 
 \item{plotType}{Either "base" (default), "ggplot2", "plotly" or "none".
 Abbreviations are allowed.}
-
-\item{labels}{A logical (default: FALSE). If TRUE, labels are included in the
-IBD triangle plot.}
 
 \item{GLRthreshold}{A positive number, by default 1000. Threshold for the
 generalised likelihood ratio (see Details). Scores exceeding this are
@@ -53,6 +59,13 @@ only relevant if \code{nsim > 0}).}
 \item{verbose}{A logical.}
 
 \item{...}{Further parameters passed on to \code{\link[ribd:ibdTriangle]{ribd::ibdTriangle()}}.}
+
+\item{cpRes}{A data frame: the output from \code{checkPairwise()}.}
+
+\item{labels}{A logical (default: FALSE). If TRUE, labels are included in the
+IBD triangle plot.}
+
+\item{errtxt}{A character string to use for the error legend.}
 }
 \value{
 If \code{plotType} is "none" or "base": A data frame containing both the
@@ -63,12 +76,12 @@ results using the GLR scores to identify potential pedigree errors.
 If \code{plotType} is "ggplot2" or "plotly", the plot objects are returned.
 }
 \description{
-This function provides a convenient way to check for pedigree errors, given
-the available marker data. The function calls \code{\link[=ibdEstimate]{ibdEstimate()}} to estimate IBD
-coefficients for all pairs of typed pedigree members, and uses the estimates
-to test for potential errors. The results are shown in a colour-coded plot
-(based on \code{\link[ribd:ibdTriangle]{ribd::ibdTriangle()}}) where unlikely relationships are easy to
-spot.
+The \code{checkPairwise()} function provides a convenient way to check for
+pedigree errors, given the available marker data. The function calls
+\code{\link[=ibdEstimate]{ibdEstimate()}} to estimate IBD coefficients for all pairs of typed pedigree
+members, and uses the estimates to test for potential errors. By default, the
+results are shown in a colour-coded plot (based on \code{\link[ribd:ibdTriangle]{ribd::ibdTriangle()}})
+where unlikely relationships are easy to spot.
 }
 \details{
 To identify potential pedigree errors, the function calculates the
@@ -84,7 +97,7 @@ By default, inbred individuals are excluded from the analysis, since pairwise
 relationships involving inbred individuals have undefined kappa coefficients
 (and therefore no position in the triangle). In some cases it may still be
 informative to include their estimates; set \code{excludeInbred = FALSE} to
-achieve this.
+enforce this.
 }
 \examples{
 
@@ -102,16 +115,20 @@ y = setAlleles(x, alleles = als)
 
 checkPairwise(y)
 
-# Using p-values instead of GLR (increase nsim!)
+# Using p-values instead of GLR
 nsim = 10 # increase!
 checkPairwise(y, nsim = nsim, pvalThreshold = 0.05)
 
+# Plot can be done separately
+res = checkPairwise(y, nsim = nsim, pvalThreshold = 0.05, plotType = "none")
+plotCP(res, plotType = "base", errtxt = "Not good!")
+
 \donttest{
-# Combined plot of pedigree and IBD estimates
+# Combined plot of pedigree and check results
 dev.new(height = 5, width = 8, noRStudioGD = TRUE)
 layout(rbind(1:2), widths = 2:3)
 plot(y, margins = 2, title = "Swapped 1 - 3")
-checkPairwise(y, labels = TRUE)
+plotCP(res, labels = TRUE)
 }
 
 }

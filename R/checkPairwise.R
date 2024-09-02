@@ -1,11 +1,11 @@
 #' Check pedigree data for relationship errors
 #'
-#' This function provides a convenient way to check for pedigree errors, given
-#' the available marker data. The function calls [ibdEstimate()] to estimate IBD
-#' coefficients for all pairs of typed pedigree members, and uses the estimates
-#' to test for potential errors. The results are shown in a colour-coded plot
-#' (based on [ribd::ibdTriangle()]) where unlikely relationships are easy to
-#' spot.
+#' The `checkPairwise()` function provides a convenient way to check for
+#' pedigree errors, given the available marker data. The function calls
+#' [ibdEstimate()] to estimate IBD coefficients for all pairs of typed pedigree
+#' members, and uses the estimates to test for potential errors. By default, the
+#' results are shown in a colour-coded plot (based on [ribd::ibdTriangle()])
+#' where unlikely relationships are easy to spot.
 #'
 #' To identify potential pedigree errors, the function calculates the
 #' *generalised likelihood ratio* (GLR) of each pairwise relationship.
@@ -20,7 +20,7 @@
 #' relationships involving inbred individuals have undefined kappa coefficients
 #' (and therefore no position in the triangle). In some cases it may still be
 #' informative to include their estimates; set `excludeInbred = FALSE` to
-#' achieve this.
+#' enforce this.
 #'
 #' @param x A `ped` object or a list of such.
 #' @param ids A vector of ID labels; the individuals to include in the check.
@@ -41,6 +41,8 @@
 #'   p-values. If 0 (default), this step is skipped.
 #' @param seed An integer seed for the random number generator (optional, and
 #'   only relevant if `nsim > 0`).
+#' @param cpRes A data frame: the output from `checkPairwise()`.
+#' @param errtxt A character string to use for the error legend.
 #' @param plot Deprecated. To suppress the triangle plot, use `plotType =
 #'   "none"`
 #' @param verbose A logical.
@@ -71,27 +73,29 @@
 #'
 #' checkPairwise(y)
 #'
-#' # Using p-values instead of GLR (increase nsim!)
+#' # Using p-values instead of GLR
 #' nsim = 10 # increase!
 #' checkPairwise(y, nsim = nsim, pvalThreshold = 0.05)
 #'
+#' # Plot can be done separately
+#' res = checkPairwise(y, nsim = nsim, pvalThreshold = 0.05, plotType = "none")
+#' plotCP(res, plotType = "base", errtxt = "Not good!")
+#'
 #' \donttest{
-#' # Combined plot of pedigree and IBD estimates
+#' # Combined plot of pedigree and check results
 #' dev.new(height = 5, width = 8, noRStudioGD = TRUE)
 #' layout(rbind(1:2), widths = 2:3)
 #' plot(y, margins = 2, title = "Swapped 1 - 3")
-#' checkPairwise(y, labels = TRUE)
+#' plotCP(res, labels = TRUE)
 #' }
 #'
-#' @importFrom ribd inbreeding kappaIBD ibdTriangle showInTriangle
-#' @importFrom graphics legend points
-#' @importFrom grDevices palette
+#' @importFrom ribd inbreeding kappaIBD
 #' @importFrom verbalisr verbalise
 #' @export
 checkPairwise = function(x, ids = typedMembers(x), excludeInbred = TRUE,
                          plotType = c("base", "ggplot2", "plotly", "none"),
-                         labels = FALSE, GLRthreshold = 1000, pvalThreshold = NULL,
-                         nsim = 0, seed = NULL, plot = TRUE, verbose = TRUE, ...) {
+                         GLRthreshold = 1000, pvalThreshold = NULL, nsim = 0,
+                         seed = NULL, plot = TRUE, verbose = TRUE, ...) {
 
   includeIds = .myintersect(ids, typedMembers(x))
   if(length(includeIds) < 2) {
@@ -138,25 +142,25 @@ checkPairwise = function(x, ids = typedMembers(x), excludeInbred = TRUE,
   kTrue = kappaIBD(x, ids = includeIds, inbredAction = as.integer(verbose), simplify = FALSE)
 
   # Merge (to ensure same pairing)
-  kMerge = merge(kEst, kTrue, by = 1:2)
-  k0 = kMerge$k0
-  k2 = kMerge$k2
-  kappa0 = kMerge$kappa0
-  kappa1 = kMerge$kappa1 # needed in GLR
-  kappa2 = kMerge$kappa2
-  NR = nrow(kMerge)
+  cpRes = merge(kEst, kTrue, by = 1:2)
+  k0 = cpRes$k0
+  k2 = cpRes$k2
+  kappa0 = cpRes$kappa0
+  kappa1 = cpRes$kappa1 # needed in GLR
+  kappa2 = cpRes$kappa2
+  NR = nrow(cpRes)
 
   pedrel = character(NR)
   for(i in 1:NR) {
     rel = x |>
-      verbalise(ids = kMerge[i, 1:2]) |>
+      verbalise(ids = cpRes[i, 1:2]) |>
       format(cap = TRUE, simplify = TRUE, abbreviate = TRUE, collapse = " & ")
     # TODO: remove when verbalise v0.7
     if(length(rel) > 1) rel = paste(rel, collapse = " & ")
 
     pedrel[i] = rel
   }
-  kMerge$pedrel = pedrel
+  cpRes$pedrel = pedrel
 
   # Relationship group (for legend)
   kStr = paste(kappa0, kappa2, sep = "-")
@@ -169,7 +173,7 @@ checkPairwise = function(x, ids = typedMembers(x), excludeInbred = TRUE,
   relgroup = as.character(relLabs[kStr])
   relgroup[is.na(relgroup)] = "Other"
   relgroup = factor(relgroup, levels = .myintersect(relLabs, relgroup))
-  kMerge$relgroup = relgroup
+  cpRes$relgroup = relgroup
 
   # GLR: compare estimate against pedigree claim
   logGLR = vapply(1:NR, function(i) {
@@ -177,11 +181,11 @@ checkPairwise = function(x, ids = typedMembers(x), excludeInbred = TRUE,
     kped = c(kappa0[i], kappa2[i])
     if(anyNA(kped))
       return(NA_real_)
-    llFun = ibdLoglikFUN(x, ids = kMerge[i, 1:2], input = "kappa02")
+    llFun = ibdLoglikFUN(x, ids = cpRes[i, 1:2], input = "kappa02")
     llFun(khat) - llFun(kped)
   }, FUN.VALUE = numeric(1))
 
-  kMerge$GLR = exp(logGLR)
+  cpRes$GLR = exp(logGLR)
 
   # Empirical p-value
   pval = rep(NA_real_, NR)
@@ -204,30 +208,53 @@ checkPairwise = function(x, ids = typedMembers(x), excludeInbred = TRUE,
       pval[i] = 1 - cdf(logGLR[i])
     }
   }
-  kMerge$pval = pval
+  cpRes$pval = pval
 
   # Flag potential pedigree errors
   if(isNumber(pvalThreshold, minimum = 0, maximum = 1) && nsim > 0) {
-    kMerge$err = err = !is.na(pval) & pval < pvalThreshold
+    cpRes$err = err = !is.na(pval) & pval < pvalThreshold
     errtxt = sprintf("pval < %g", pvalThreshold)
   }
   else {
-    kMerge$err = err = !is.na(kMerge$GLR) & kMerge$GLR > GLRthreshold
+    cpRes$err = err = !is.na(cpRes$GLR) & cpRes$GLR > GLRthreshold
     errtxt = sprintf("GLR > %g", GLRthreshold)
   }
 
-  if(plotType == "none")
-    return(kMerge)
+  if(plotType != "none")
+    plotCP(cpRes, plotType = plotType, errtxt = errtxt, seed = seed, ...)
+  else
+    return(cpRes)
+}
 
-  # Plot --------------------------------------------------------------------
+# Plot methods ----------------------------------------------------------------
 
+#' @rdname checkPairwise
+#' @importFrom ribd ibdTriangle showInTriangle
+#' @importFrom graphics legend points
+#' @importFrom grDevices palette
+#' @export
+plotCP = function(cpRes, plotType = c("base", "ggplot2", "plotly"),
+                  labels = FALSE, errtxt = "Potential error",
+                  seed = NULL, ...) {
+  err = cpRes$err
+  relgroup = cpRes$relgroup
+  k0 = cpRes$k0
+  k2 = cpRes$k2
+  plotType = match.arg(plotType)
+
+  errDat = NULL
   if(any(err)) {
-    errDat = kMerge[err, , drop = FALSE]
+    errDat = cpRes[err, , drop = FALSE]
     errDat$labs = labs = paste(errDat$id1, "-", errDat$id2)
   }
-  else
-    errDat = NULL
 
+  # Copied from checkPairwise()
+  relLabs = c("0-0"       = "Parent-offspring",
+              "0.25-0.25" = "Full siblings",
+              "0.5-0"     = "Half/Uncle/Grand",
+              "0.75-0"    = "First cousins/etc",
+              "NA-NA"     = "Other",
+              "1-0"       = "Unrelated")
   ALLCOLS = .setnames(2:7, relLabs)
   ALLSHAPES = .setnames(c(2,3,4,5,8,6), relLabs)
 
@@ -248,7 +275,7 @@ checkPairwise = function(x, ids = typedMembers(x), excludeInbred = TRUE,
       legcex = c(legcex, NA, 3)
     }
 
-    ribd::showInTriangle(kMerge[1:6], plotType = "base", col = cols, pch = pchs,
+    ribd::showInTriangle(cpRes[1:6], plotType = "base", col = cols, pch = pchs,
                          labels = labels, ...)
     points(errDat$k0, errDat$k2, pch = 1, lwd = 1.8, cex = 3)
 
@@ -256,7 +283,7 @@ checkPairwise = function(x, ids = typedMembers(x), excludeInbred = TRUE,
            bg = "whitesmoke", legend = legtxt, col = legcol, pch = legpch,
            pt.cex = legcex, lty = NA, lwd = 2)
 
-    return(kMerge)
+    return(cpRes)
   }
 
   if(plotType == "ggplot2") {
@@ -264,7 +291,7 @@ checkPairwise = function(x, ids = typedMembers(x), excludeInbred = TRUE,
         stop2("Package `ggplot2` must be installed for this option to work")
 
     p = ribd::ibdTriangle(plotType = "ggplot2", ...) +
-      ggplot2::geom_point(data = kMerge, ggplot2::aes(k0, k2, color = relgroup, shape = relgroup),
+      ggplot2::geom_point(data = cpRes, ggplot2::aes(k0, k2, color = relgroup, shape = relgroup),
                           size = 2, stroke = 1.5) +
       ggplot2::labs(color = "According to pedigree", shape = "According to pedigree") +
       ggplot2::scale_shape_manual(values = ALLSHAPES) +
@@ -284,9 +311,9 @@ checkPairwise = function(x, ids = typedMembers(x), excludeInbred = TRUE,
 
     # TODO: ad hoc!
     if(isTRUE(labels)) {
-      kMerge$labs = paste(kMerge$id1, "-", kMerge$id2)
+      cpRes$labs = paste(cpRes$id1, "-", cpRes$id2)
 
-      p = p + ggrepel::geom_text_repel(data = kMerge,
+      p = p + ggrepel::geom_text_repel(data = cpRes,
         ggplot2::aes(k0, k2, label = labs, color = relgroup), min.segment.length = 1.5, seed = seed, ...,
         size = 4, max.overlaps = Inf, box.padding = 1, show.legend = FALSE)
     }
@@ -311,9 +338,9 @@ checkPairwise = function(x, ids = typedMembers(x), excludeInbred = TRUE,
     if(!requireNamespace("plotly", quietly = TRUE))
         stop2("Package `plotly` must be installed for this option to work")
 
-    dat = kMerge
-    dat$idx = seq_len(nrow(kMerge))
-    dat$labs = paste0("ID1: ", kMerge$id1, "<br>", "ID2: ", kMerge$id2)
+    dat = cpRes
+    dat$idx = seq_len(nrow(cpRes))
+    dat$labs = paste0("ID1: ", cpRes$id1, "<br>", "ID2: ", cpRes$id2)
 
     symbs = c("Parent-offspring" = "triangle-up-open",
               "Full siblings" = "cross-thin-open",
@@ -326,6 +353,7 @@ checkPairwise = function(x, ids = typedMembers(x), excludeInbred = TRUE,
     names(cols) = names(symbs)
 
     p = ribd::ibdTriangle(plotType = "plotly", ...)
+
     for(r in rev(levels(relgroup))) {
       datr = dat[dat$relgroup == r, , drop = FALSE]
       p = p |> plotly::add_markers(data = datr, x = ~k0, y = ~k2, customdata = ~idx,
@@ -334,6 +362,7 @@ checkPairwise = function(x, ids = typedMembers(x), excludeInbred = TRUE,
                   text= ~labs, hoverinfo = "text", name = r, legendrank = 2)
     }
     if(any(dat$err)) {
+
       # Invisible spacer trace
       p = p |> plotly::add_markers(x = 0, y = 0, name = " ", hoverinfo = "none",
                              marker = list(size = 0, color = 'rgba(0,0,0,0)'),
@@ -355,9 +384,8 @@ checkPairwise = function(x, ids = typedMembers(x), excludeInbred = TRUE,
       )
     return(p)
   }
-
-  invisible(NULL)
 }
+
 
 
 # Empiric cdf of GLR
