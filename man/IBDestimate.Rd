@@ -15,6 +15,7 @@ ibdEstimate(
   sigma = 0.5,
   contourPlot = FALSE,
   levels = NULL,
+  maxval = FALSE,
   verbose = TRUE
 )
 }
@@ -30,8 +31,7 @@ default, all pairs of genotyped members of \code{x} are included.}
 coefficients should be estimated.}
 
 \item{markers}{A vector with names or indices of markers attached to x,
-indicating which markers to include. By default, all markers are
-used.}
+indicating which markers to include. By default, all markers are used.}
 
 \item{start}{A probability vector (i.e., with nonnegative entries and sum 1)
 of length 3 (if \code{param = "kappa"}) or 9 (if \code{param = "delta"}), indicating
@@ -48,6 +48,9 @@ function are plotted overlaying the IBD triangle.}
 levels at which to draw contour lines. If NULL (default), the levels are
 chosen automatically.}
 
+\item{maxval}{A logical. If TRUE, the maximum log-likelihood value is
+included in the output. Default: FALSE}
+
 \item{verbose}{A logical.}
 }
 \value{
@@ -55,6 +58,7 @@ An object of class \code{ibdEst}, which is basically a data frame with
 either 6 columns (if \code{param = "kappa"}) or 12 columns (if \code{param = "delta"}). The first three columns are \code{id1} (label of first individual),
 \code{id2} (label of second individual) and \code{N} (the number of markers with no
 missing alleles). The remaining columns contain the coefficient estimates.
+If \code{maxval = T}, a column named \code{maxloglik} is added at the end.
 }
 \description{
 Estimate the IBD coefficients \eqn{\kappa = (\kappa_0, \kappa_1,

@@ -32,8 +32,7 @@
 #'   to characters, and must match uniquely against the ID labels of `x`. By
 #'   default, all pairs of genotyped members of `x` are included.
 #' @param markers A vector with names or indices of markers attached to x,
-#'   indicating which markers to include. By default, all markers are
-#'   used.
+#'   indicating which markers to include. By default, all markers are used.
 #' @param param Either "kappa" (default) or "delta"; indicating which set of
 #'   coefficients should be estimated.
 #' @param start A probability vector (i.e., with nonnegative entries and sum 1)
@@ -48,6 +47,8 @@
 #' @param levels (Only relevant if `contourPlot = TRUE`.) A numeric vector of
 #'   levels at which to draw contour lines. If NULL (default), the levels are
 #'   chosen automatically.
+#' @param maxval A logical. If TRUE, the maximum log-likelihood value is
+#'   included in the output. Default: FALSE
 #' @param verbose A logical.
 #'
 #' @return An object of class `ibdEst`, which is basically a data frame with
@@ -55,6 +56,7 @@
 #'   "delta"`). The first three columns are `id1` (label of first individual),
 #'   `id2` (label of second individual) and `N` (the number of markers with no
 #'   missing alleles). The remaining columns contain the coefficient estimates.
+#'   If `maxval = T`, a column named `maxloglik` is added at the end.
 #'
 #' @author Magnus Dehli Vigeland
 #'
@@ -102,7 +104,7 @@
 ibdEstimate = function(x, ids = typedMembers(x), param = c("kappa", "delta"),
                        markers = NULL, start = NULL, tol = sqrt(.Machine$double.eps),
                        beta = 0.5, sigma = 0.5, contourPlot = FALSE, levels = NULL,
-                       verbose = TRUE) {
+                       maxval = FALSE, verbose = TRUE) {
   st = Sys.time()
   param = match.arg(param)
 
@@ -158,6 +160,11 @@ ibdEstimate = function(x, ids = typedMembers(x), param = c("kappa", "delta"),
   res = structure(data.frame(ids, N, coefs),
                   names = c("id1", "id2", "N", if(param == "kappa") paste0("k", 0:2) else paste0("d", 1:9)),
                   class = c("ibdEst", "data.frame"))
+
+  if(maxval) {
+    ml = do.call(rbind, lapply(resList, function(r) r$loglik))
+    res = cbind(res, maxloglik = ml)
+  }
 
   if(contourPlot) {
     if(param == "delta")
