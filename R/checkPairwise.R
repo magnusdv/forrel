@@ -150,7 +150,7 @@ checkPairwise = function(x, ids = typedMembers(x), excludeInbred = TRUE,
   for(i in 1:NR) {
     rel = x |>
       verbalise(ids = kMerge[i, 1:2]) |>
-      format(cap = FALSE, simplify = TRUE, abbreviate = TRUE, collapse = " & ")
+      format(cap = TRUE, simplify = TRUE, abbreviate = TRUE, collapse = " & ")
     # TODO: remove when verbalise v0.7
     if(length(rel) > 1) rel = paste(rel, collapse = " & ")
 
@@ -166,10 +166,10 @@ checkPairwise = function(x, ids = typedMembers(x), excludeInbred = TRUE,
               "0.75-0"    = "First cousins/etc",
               "NA-NA"     = "Other",
               "1-0"       = "Unrelated")
-  relGroup = as.character(relLabs[kStr])
-  relGroup[is.na(relGroup)] = "Other"
-  relGroup = factor(relGroup, levels = .myintersect(relLabs, relGroup))
-  kMerge$relgroup = relGroup
+  relgroup = as.character(relLabs[kStr])
+  relgroup[is.na(relgroup)] = "Other"
+  relgroup = factor(relgroup, levels = .myintersect(relLabs, relgroup))
+  kMerge$relgroup = relgroup
 
   # GLR: compare estimate against pedigree claim
   logGLR = vapply(1:NR, function(i) {
@@ -232,13 +232,13 @@ checkPairwise = function(x, ids = typedMembers(x), excludeInbred = TRUE,
   ALLSHAPES = .setnames(c(2,3,4,5,8,6), relLabs)
 
   if(plotType == "base") {
-    cols = ALLCOLS[as.character(relGroup)]
-    pchs = ALLSHAPES[as.character(relGroup)]
+    cols = ALLCOLS[as.character(relgroup)]
+    pchs = ALLSHAPES[as.character(relgroup)]
 
     # Legend specifications
-    legtxt = levels(relGroup)
-    legcol = ALLCOLS[levels(relGroup)]
-    legpch = ALLSHAPES[levels(relGroup)]
+    legtxt = levels(relgroup)
+    legcol = ALLCOLS[levels(relgroup)]
+    legpch = ALLSHAPES[levels(relgroup)]
     legcex = rep(1, length(legcol))
 
     if(any(err, na.rm = T)) {
@@ -264,7 +264,7 @@ checkPairwise = function(x, ids = typedMembers(x), excludeInbred = TRUE,
         stop2("Package `ggplot2` must be installed for this option to work")
 
     p = ribd::ibdTriangle(plotType = "ggplot2", ...) +
-      ggplot2::geom_point(data = kMerge, ggplot2::aes(k0, k2, color = relGroup, shape = relGroup),
+      ggplot2::geom_point(data = kMerge, ggplot2::aes(k0, k2, color = relgroup, shape = relgroup),
                           size = 2, stroke = 1.5) +
       ggplot2::labs(color = "According to pedigree", shape = "According to pedigree") +
       ggplot2::scale_shape_manual(values = ALLSHAPES) +
@@ -287,7 +287,7 @@ checkPairwise = function(x, ids = typedMembers(x), excludeInbred = TRUE,
       kMerge$labs = paste(kMerge$id1, "-", kMerge$id2)
 
       p = p + ggrepel::geom_text_repel(data = kMerge,
-        ggplot2::aes(k0, k2, label = labs, color = relGroup), min.segment.length = 1.5, seed = seed, ...,
+        ggplot2::aes(k0, k2, label = labs, color = relgroup), min.segment.length = 1.5, seed = seed, ...,
         size = 4, max.overlaps = Inf, box.padding = 1, show.legend = FALSE)
     }
 
@@ -299,7 +299,7 @@ checkPairwise = function(x, ids = typedMembers(x), excludeInbred = TRUE,
         ggplot2::guides(shape = ggplot2::guide_legend(order = 1),
                         colour = ggplot2::guide_legend(order = 1))
         if(!isTRUE(labels) && !is.null(labels)) # if TRUE, all labs anyway
-          p = p + ggrepel::geom_text_repel(ggplot2::aes(k0, k2, label = labs, color = relGroup),
+          p = p + ggrepel::geom_text_repel(ggplot2::aes(k0, k2, label = labs, color = relgroup),
                                  data = errDat, size = 4, max.overlaps = Inf,
                                  box.padding = 1, show.legend = FALSE)
     }
@@ -326,8 +326,8 @@ checkPairwise = function(x, ids = typedMembers(x), excludeInbred = TRUE,
     names(cols) = names(symbs)
 
     p = ribd::ibdTriangle(plotType = "plotly", ...)
-    for(r in rev(levels(relGroup))) {
-      datr = dat[dat$relGroup == r, , drop = FALSE]
+    for(r in rev(levels(relgroup))) {
+      datr = dat[dat$relgroup == r, , drop = FALSE]
       p = p |> plotly::add_markers(data = datr, x = ~k0, y = ~k2, customdata = ~idx,
                                    symbol = I(symbs[r]), color = I(cols[r]),
                   marker = list(size = 12,line = list(width = if(r == "Other") 1 else 2)),
