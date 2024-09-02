@@ -2,19 +2,18 @@
 
 ## New features
 
+* The function `checkPairwise()` has undergone substantial revision, with plots implemented in both **ggplot2** and **plotly** in addition to the default base plot. A summary of the main changes are:
+    - a new argument `plotType` can be either "base" (default), "ggplot" or "plotly"
+    - the plotting is now done in a separate function `plotCP()` which is also exported
+    - a new argument `ids`, which when given restricts the checks to those individuals
+    - the output column `LR` is renamed to `GLR` (generalised likelihood ratio)
+    - new output column `pedrel` describing (in words) each relationship according to the pedigree. The descriptions are obtained with the **verbalisr** package
+    - estimation of P-values for each pairwise relationship, by parametric bootstrap simulations. This feature is controlled through new arguments `nsim`, `pvalThreshold` and `seed`. By default `nsim = 0`, meaning that no simulations are performed. The P-values are stored in the output column `pval`
+
+
 * New function `quickLR()` performs the most common kinship tests (paternity and sibship) for a pair of individuals. 
 
 * New function `ibdLoglik()` computes the pairwise likelihood for given set IBD coefficients (kappa or delta). It replaces the previous (unexported) `.IBDlikelihood` and versions of this.
-
-* `checkPairwise()` gains argument `plotType`, which can be either value is either "base" (default), "ggplot" or "plotly". 
-
-* In `checkPairwise()` the output column LR is renamed to GLR (generalised likelihood ratio).
-
-* `checkPairwise()` can now estimate p-values for each pairwise relationship, by simulating the distribution of GLR under the null. This feature is controlled through new arguments `nsim`, `pvalThreshold` and `seed`. By default `nsim = 0`, meaning that no simulations are performed.
-
-* `checkPairwise()` gains argument `ids`, allowing to restrict checks to those individuals.
-
-* `checkPairwise()` now contains a detailed description of each relationship according to the pedigree, obtained with the **verbalisr** package.
 
 * Improved progress bars using the `pbapply` package.
 
