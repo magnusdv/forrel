@@ -152,13 +152,8 @@ checkPairwise = function(x, ids = typedMembers(x), excludeInbred = TRUE,
 
   pedrel = character(NR)
   for(i in 1:NR) {
-    rel = x |>
-      verbalise(ids = cpRes[i, 1:2]) |>
+    pedrel[i] = verbalise(x, ids = cpRes[i, 1:2]) |>
       format(cap = TRUE, simplify = TRUE, abbreviate = TRUE, collapse = " & ")
-    # TODO: remove when verbalise v0.7
-    if(length(rel) > 1) rel = paste(rel, collapse = " & ")
-
-    pedrel[i] = rel
   }
   cpRes$pedrel = pedrel
 
