@@ -27,7 +27,6 @@ Depends:
 Imports:
     glue,
     pbapply,
-    pedFamilias,
     pedprobr (>= 0.8),
     ribd (>= 1.7.0),
     verbalisr

@@ -20,6 +20,7 @@
 ## Other
 
 * Refresh code in examples.
+* Removed deprecated functions `readFam()` etc, which have been moved to the **pedFamilias** package.
 
 * Removed (long deprecated) `IBDtriangle()`, replaced by `ribd::ibdTriangle()`.
 
