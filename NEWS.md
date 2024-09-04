@@ -8,25 +8,24 @@
     - a new argument `ids`, which when given restricts the checks to those individuals
     - the output column `LR` is renamed to `GLR` (generalised likelihood ratio)
     - new output column `pedrel` describing (in words) each relationship according to the pedigree. The descriptions are obtained with the **verbalisr** package
-    - estimation of P-values for each pairwise relationship, by parametric bootstrap simulations. This feature is controlled through new arguments `nsim`, `pvalThreshold` and `seed`. By default `nsim = 0`, meaning that no simulations are performed. The P-values are stored in the output column `pval`
+    - estimation of P-values for each pairwise relationship, by parametric bootstrap simulations. This feature is controlled through new arguments `nsim`, `pvalThreshold` and `seed`. By default `nsim = 0`, meaning that no simulations are performed. The P-values are stored in the output column `pval`.
 
 
 * New function `quickLR()` performs the most common kinship tests (paternity and sibship) for a pair of individuals. 
 
-* New function `ibdLoglik()` computes the pairwise likelihood for given set IBD coefficients (kappa or delta). It replaces the previous (unexported) `.IBDlikelihood` and versions of this.
+* New function `ibdLoglik()` computes the pairwise likelihood for given set IBD coefficients (kappa or delta).
 
 * Improved progress bars using the `pbapply` package.
 
 ## Other
 
-* Refresh code in examples.
-* Removed deprecated functions `readFam()` etc, which have been moved to the **pedFamilias** package.
-
 * Removed (long deprecated) `IBDtriangle()`, replaced by `ribd::ibdTriangle()`.
 
 * Improved `missingPersonPlot()` appearance.
 
-* Better removal of missing data in `ibdEstimate()`.
+* In `ibdEstimate()`, more efficient data prep, and better removal of missing data.
+
+* Refresh code in examples.
 
 
 # forrel 1.6.1
