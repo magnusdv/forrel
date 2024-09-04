@@ -22,7 +22,10 @@
 
   if(isList) {
     alsMat = do.call(rbind, lapply(x, function(cmp) matrix(unlist(cmp$MARKERS), ncol = 2*nMark)))
-    freqlist = lapply(nSeq, function(i) unname(afreq(x, i))) # checks consistency!
+
+    # freqlist = lapply(nSeq, function(i) unname(afreq(x, i))) # previous, slow but secure
+    x1 = x[[1]] # faster to use only 1st comp
+    freqlist = lapply(x1$MARKERS, function(m) attr(m, "afreq"))
   }
   else {
     alsMat = matrix(unlist(x$MARKERS), ncol = 2*nMark)
@@ -33,9 +36,8 @@
   alsMat = alsMat[ids, , drop = FALSE]
 
   maxAlNum = max(lengths(freqlist))
-  freqMat = matrix(unlist(lapply(freqlist, `length<-`, maxAlNum),
-                          recursive = FALSE, use.names = FALSE),
-                   ncol = nMark)
+  freqMat = unlist(lapply(freqlist, `length<-`, maxAlNum), recursive = FALSE, use.names = FALSE)
+  dim(freqMat) = c(maxAlNum, nMark)
 
   even = 2 * nSeq
   odd = even - 1
