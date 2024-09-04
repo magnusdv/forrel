@@ -28,6 +28,7 @@ Imports:
     glue,
     pbapply,
     pedprobr (>= 0.8),
+    pedFamilias,
     ribd (>= 1.7.0),
     verbalisr (>= 0.7.1)
 Suggests: 
