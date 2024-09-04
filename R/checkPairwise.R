@@ -182,7 +182,7 @@ checkPairwise = function(x, ids = typedMembers(x), excludeInbred = TRUE,
 
   cpRes$GLR = exp(logGLR)
 
-  # Empirical p-value
+  # Empirical p-values
   pval = rep(NA_real_, NR)
 
   if(nsim > 0) {
@@ -211,7 +211,7 @@ checkPairwise = function(x, ids = typedMembers(x), excludeInbred = TRUE,
     errtxt = sprintf("pval < %g", pvalThreshold)
   }
   else {
-    cpRes$err = err = !is.na(cpRes$GLR) & cpRes$GLR > GLRthreshold
+    cpRes$err = err = !is.na(cpRes$GLR) & cpRes$GLR >= GLRthreshold
     errtxt = sprintf("GLR > %g", GLRthreshold)
   }
 
