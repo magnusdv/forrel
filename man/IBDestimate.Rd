@@ -7,6 +7,7 @@
 ibdEstimate(
   x,
   ids = typedMembers(x),
+  acrossComps = TRUE,
   param = c("kappa", "delta"),
   markers = NULL,
   start = NULL,
@@ -26,6 +27,9 @@ ibdEstimate(
 columns, each row indicating a pair of individuals. The entries are coerced
 to characters, and must match uniquely against the ID labels of \code{x}. By
 default, all pairs of genotyped members of \code{x} are included.}
+
+\item{acrossComps}{A logical indicating if pairs of individuals in different
+components should be included. Default: TRUE.}
 
 \item{param}{Either "kappa" (default) or "delta"; indicating which set of
 coefficients should be estimated.}

@@ -19,14 +19,16 @@
 #' By default, inbred individuals are excluded from the analysis, since pairwise
 #' relationships involving inbred individuals have undefined kappa coefficients
 #' (and therefore no position in the triangle). In some cases it may still be
-#' informative to include their estimates; set `excludeInbred = FALSE` to
+#' informative to include their estimates; set `includeInbred = TRUE` to
 #' enforce this.
 #'
 #' @param x A `ped` object or a list of such.
 #' @param ids A vector of ID labels; the individuals to include in the check.
 #'   Default: All typed members of `x`.
-#' @param excludeInbred A logical, by default TRUE, indicating if inbred
+#' @param includeInbred A logical, by default FALSE, indicating if inbred
 #'   individuals should be excluded from the analysis.
+#' @param acrossComps A logical indicating if pairs of individuals in different
+#'   components should be considered. Default: TRUE.
 #' @param plotType Either "base" (default), "ggplot2", "plotly" or "none".
 #'   Abbreviations are allowed.
 #' @param labels A logical (default: FALSE). If TRUE, labels are included in the
@@ -44,7 +46,8 @@
 #' @param cpRes A data frame: the output from `checkPairwise()`.
 #' @param errtxt A character string to use for the error legend.
 #' @param plot Deprecated. To suppress the triangle plot, use `plotType =
-#'   "none"`
+#'   "none"`.
+#' @param excludeInbred Deprecated; renamed to ´includeInbred´.
 #' @param verbose A logical.
 #' @param ... Further parameters passed on to [ribd::ibdTriangle()].
 #'
@@ -55,7 +58,7 @@
 #'
 #'   If `plotType` is "ggplot2" or "plotly", the plot objects are returned.
 #'
-#' @seealso [ibdEstimate()]
+#' @seealso [ibdEstimate()].
 #'
 #' @examples
 #'
@@ -92,10 +95,10 @@
 #' @importFrom ribd inbreeding kappaIBD
 #' @importFrom verbalisr verbalise
 #' @export
-checkPairwise = function(x, ids = typedMembers(x), excludeInbred = TRUE,
+checkPairwise = function(x, ids = typedMembers(x), includeInbred = FALSE, acrossComps = TRUE,
                          plotType = c("base", "ggplot2", "plotly", "none"),
                          GLRthreshold = 1000, pvalThreshold = NULL, nsim = 0,
-                         seed = NULL, plot = TRUE, verbose = TRUE, ...) {
+                         seed = NULL, plot = TRUE, verbose = TRUE, excludeInbred = NULL, ...) {
 
   includeIds = .myintersect(ids, typedMembers(x))
   if(length(includeIds) < 2) {
@@ -107,6 +110,11 @@ checkPairwise = function(x, ids = typedMembers(x), excludeInbred = TRUE,
   if(isFALSE(plot)) {
     message("Argument `plot` is replaced with `plotType`. Use `plotType = 'none'` to suppress plotting")
     plotType = "none"
+  }
+
+  if(!is.null(excludeInbred)) {
+    message("Argument `excludeInbred` has been renamed to `includeInbred`")
+    includeInbred = !excludeInbred
   }
 
   # If pedlist, allow duplicated names among non-included indivs
@@ -123,23 +131,24 @@ checkPairwise = function(x, ids = typedMembers(x), excludeInbred = TRUE,
     }
   }
 
-  if(excludeInbred) {
+  if(!includeInbred) {
     inbr = names(which(inbreeding(x, includeIds) > 0))
     if(length(inbr) && verbose)
       message("Excluding inbred individuals: ", toString(inbr))
     includeIds = setdiff(includeIds, inbr)
   }
 
-  if(length(includeIds) < 2) {
-    if(verbose) message("No relationships to check: Less than 2 typed individuals included")
+  # Estimated coefficients
+  kEst = ibdEstimate(x, ids = includeIds, acrossComps = acrossComps, verbose = FALSE)
+
+  if(is.null(kEst) || nrow(kEst) == 0) {
+    if(verbose) message("No relationships to check")
     return(invisible())
   }
 
-  # Estimated coefficients
-  kEst = ibdEstimate(x, ids = includeIds, verbose = FALSE)
-
   # Pedigree coefficients
-  kTrue = kappaIBD(x, ids = includeIds, inbredAction = as.integer(verbose), simplify = FALSE)
+  kTrue = kappaIBD(x, ids = includeIds, acrossComps = acrossComps,
+                   inbredAction = as.integer(verbose), simplify = FALSE)
 
   # Merge (to ensure same pairing)
   cpRes = merge(kEst, kTrue, by = 1:2)
@@ -228,14 +237,19 @@ checkPairwise = function(x, ids = typedMembers(x), excludeInbred = TRUE,
 #' @importFrom graphics legend points
 #' @importFrom grDevices palette
 #' @export
-plotCP = function(cpRes, plotType = c("base", "ggplot2", "plotly"),
+plotCP = function(cpRes = NULL, plotType = c("base", "ggplot2", "plotly"),
                   labels = FALSE, errtxt = "Potential error",
                   seed = NULL, ...) {
+
+  plotType = match.arg(plotType)
+  if(is.null(cpRes)) {
+    return(ibdTriangle(plotType = plotType, ...))
+  }
+
   err = cpRes$err
   relgroup = cpRes$relgroup
   k0 = cpRes$k0
   k2 = cpRes$k2
-  plotType = match.arg(plotType)
 
   errDat = NULL
   if(any(err)) {

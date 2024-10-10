@@ -8,7 +8,8 @@
 checkPairwise(
   x,
   ids = typedMembers(x),
-  excludeInbred = TRUE,
+  includeInbred = FALSE,
+  acrossComps = TRUE,
   plotType = c("base", "ggplot2", "plotly", "none"),
   GLRthreshold = 1000,
   pvalThreshold = NULL,
@@ -16,11 +17,12 @@ checkPairwise(
   seed = NULL,
   plot = TRUE,
   verbose = TRUE,
+  excludeInbred = NULL,
   ...
 )
 
 plotCP(
-  cpRes,
+  cpRes = NULL,
   plotType = c("base", "ggplot2", "plotly"),
   labels = FALSE,
   errtxt = "Potential error",
@@ -34,8 +36,11 @@ plotCP(
 \item{ids}{A vector of ID labels; the individuals to include in the check.
 Default: All typed members of \code{x}.}
 
-\item{excludeInbred}{A logical, by default TRUE, indicating if inbred
+\item{includeInbred}{A logical, by default FALSE, indicating if inbred
 individuals should be excluded from the analysis.}
+
+\item{acrossComps}{A logical indicating if pairs of individuals in different
+components should be considered. Default: TRUE.}
 
 \item{plotType}{Either "base" (default), "ggplot2", "plotly" or "none".
 Abbreviations are allowed.}
@@ -54,9 +59,11 @@ p-values. If 0 (default), this step is skipped.}
 \item{seed}{An integer seed for the random number generator (optional, and
 only relevant if \code{nsim > 0}).}
 
-\item{plot}{Deprecated. To suppress the triangle plot, use \code{plotType = "none"}}
+\item{plot}{Deprecated. To suppress the triangle plot, use \code{plotType = "none"}.}
 
 \item{verbose}{A logical.}
+
+\item{excludeInbred}{Deprecated; renamed to ´includeInbred´.}
 
 \item{...}{Further parameters passed on to \code{\link[ribd:ibdTriangle]{ribd::ibdTriangle()}}.}
 
@@ -96,7 +103,7 @@ calling errors.
 By default, inbred individuals are excluded from the analysis, since pairwise
 relationships involving inbred individuals have undefined kappa coefficients
 (and therefore no position in the triangle). In some cases it may still be
-informative to include their estimates; set \code{excludeInbred = FALSE} to
+informative to include their estimates; set \code{includeInbred = TRUE} to
 enforce this.
 }
 \examples{
@@ -133,5 +140,5 @@ plotCP(res, labels = TRUE)
 
 }
 \seealso{
-\code{\link[=ibdEstimate]{ibdEstimate()}}
+\code{\link[=ibdEstimate]{ibdEstimate()}}.
 }

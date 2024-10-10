@@ -31,6 +31,8 @@
 #'   columns, each row indicating a pair of individuals. The entries are coerced
 #'   to characters, and must match uniquely against the ID labels of `x`. By
 #'   default, all pairs of genotyped members of `x` are included.
+#' @param acrossComps A logical indicating if pairs of individuals in different
+#'   components should be included. Default: TRUE.
 #' @param markers A vector with names or indices of markers attached to x,
 #'   indicating which markers to include. By default, all markers are used.
 #' @param param Either "kappa" (default) or "delta"; indicating which set of
@@ -101,7 +103,8 @@
 #' ribd::condensedIdentity(y, 5:6, simplify = FALSE)
 #'
 #' @export
-ibdEstimate = function(x, ids = typedMembers(x), param = c("kappa", "delta"),
+ibdEstimate = function(x, ids = typedMembers(x), acrossComps = TRUE,
+                       param = c("kappa", "delta"),
                        markers = NULL, start = NULL, tol = sqrt(.Machine$double.eps),
                        beta = 0.5, sigma = 0.5, contourPlot = FALSE, levels = NULL,
                        maxval = FALSE, verbose = TRUE) {
@@ -116,9 +119,18 @@ ibdEstimate = function(x, ids = typedMembers(x), param = c("kappa", "delta"),
     ids = .comb2(ids, vec = TRUE)
   else if(is.data.frame(ids))
     ids = as.matrix(ids)
-  if(!is.matrix(ids) || nrow(ids) == 0 || ncol(ids) != 2)
-      stop2("`ids` must be either a vector of length at least 2, or a matrix-like with 2 columns")
+  if(!is.matrix(ids) || ncol(ids) != 2)
+    stop2("`ids` must be either a vector of length at least 2, or a matrix-like with 2 columns")
   mode(ids) = "character"
+
+  if(!acrossComps) {
+    sameComp = getComponent(x, ids[,1]) == getComponent(x, ids[,2])
+    if(any(!sameComp))
+      ids = ids[sameComp, , drop = FALSE]
+  }
+
+  if(!nrow(ids))
+    return(invisible())
 
   # Convert to list of pairs
   pairs = lapply(seq_len(nrow(ids)), function(i) ids[i, ])
