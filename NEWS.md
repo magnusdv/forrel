@@ -43,7 +43,7 @@
 
 * New function `writeFam()`.
 
-* `readFam()` gains argument `fallbackModel` to be applied if the function encounters unrecognisable mutation models in the .fam file.
+* `readFam()` gains argument `fallbackModel` to be applied if the function encounters unrecognisable mutation models in the `.fam` file.
 
 ## Other
 
