@@ -242,7 +242,7 @@ plotCP = function(cpRes = NULL, plotType = c("base", "ggplot2", "plotly"),
                   seed = NULL, ...) {
 
   plotType = match.arg(plotType)
-  if(is.null(cpRes)) {
+  if(is.null(cpRes) || nrow(cpRes) == 0) {
     return(ibdTriangle(plotType = plotType, ...))
   }
 
