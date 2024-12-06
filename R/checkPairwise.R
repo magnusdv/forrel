@@ -365,10 +365,13 @@ plotCP = function(cpRes = NULL, plotType = c("base", "ggplot2", "plotly"),
 
     for(r in rev(levels(relgroup))) {
       datr = dat[dat$relgroup == r, , drop = FALSE]
-      p = p |> plotly::add_markers(data = datr, x = ~k0, y = ~k2, customdata = ~idx,
-                                   symbol = I(symbs[r]), color = I(cols[r]),
-                  marker = list(size = 12,line = list(width = if(r == "Other") 1 else 2)),
-                  text= ~labs, hoverinfo = "text", name = r, legendrank = 2)
+      p = p |>
+        plotly::add_markers(data = datr, x = ~k0, y = ~k2, customdata = ~idx,
+                            symbol = I(symbs[r]), color = I(cols[r]),
+                            cliponaxis = FALSE,
+                            marker = list(size = 12,
+                                          line = list(width = if(r == "Other") 1 else 2)),
+                            text= ~labs, hoverinfo = "text", name = r, legendrank = 2)
     }
     if(any(dat$err)) {
 
@@ -379,7 +382,7 @@ plotCP = function(cpRes = NULL, plotType = c("base", "ggplot2", "plotly"),
 
       # Error circles
       p = p |> plotly::add_markers(data = errDat, x = ~k0, y = ~k2,
-                                   name = errtxt,
+                                   name = errtxt, cliponaxis = FALSE,
                                    symbol = I("circle-open"), color = I("black"),
                                    marker = list(size = 22, line = list(width = 1)),
                                    hoverinfo = "none", legendrank = 1)
