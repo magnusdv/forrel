@@ -151,7 +151,7 @@ checkPairwise = function(x, ids = typedMembers(x), includeInbred = FALSE, across
                    inbredAction = as.integer(verbose), simplify = FALSE)
 
   # Merge (to ensure same pairing)
-  cpRes = merge(kEst, kTrue, by = 1:2)
+  cpRes = merge(kEst, kTrue, by = 1:2, sort = FALSE)
   k0 = cpRes$k0
   k2 = cpRes$k2
   kappa0 = cpRes$kappa0
