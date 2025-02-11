@@ -1,21 +1,25 @@
 #' Bootstrap estimation of IBD coefficients
 #'
 #' This function produces (parametric or nonparametric) bootstrap estimates of
-#' the IBD coefficients between two individuals. Both kappa and delta
-#' coefficients are supported (see [ibdEstimate()]).
+#' the IBD coefficients between two individuals; either the three \eqn{\kappa}
+#' -coefficients or the nine condensed identity coefficients \eqn{\Delta} (see
+#' [ibdEstimate()]).
 #'
 #' The parameter `method` controls how bootstrap estimates are obtained in each
-#' replication.
+#' replication:
 #'
-#' If `method = "parametric"`, new profiles for two individuals are simulated
+#' * "parametric": new profiles for two individuals are simulated
 #' from the input coefficients, followed by a re-estimation of the coefficients.
 #'
-#' If `method = "nonparametric"`, the original markers are sampled with
-#' replacement, before the coefficients are re-estimated.
+#' * "nonparametric": the original markers are sampled with replacement, before
+#' the coefficients are re-estimated.
 #'
-#' @param x A `ped` object. If `method = "parametric"`, this is only used to
-#'   extract the allele frequencies, and can be skipped if `freqList` is
-#'   provided.
+#' Note that the pedigree itself does not affect the output of this function;
+#' the role of `x` is simply to carry the marker data.
+#'
+#' @param x A `ped` object, or a list of such. If `method = "parametric"`, this
+#'   is only used to extract the allele frequencies, and can be skipped if
+#'   `freqList` is provided.
 #' @param ids A pair of ID labels.
 #' @param param Either NULL (default), "kappa" or "delta". (See below.)
 #' @param kappa,delta Probability vectors of length 3 (kappa) or 9 (delta).
@@ -32,8 +36,9 @@
 #' @param seed An integer seed for the random number generator (optional).
 #'
 #' @return A data frame with `N` rows containing the bootstrap estimates. The
-#'   last column (`dist`) gives the euclidean distance to the original
-#'   coefficients, viewed as a point in R^3 (kappa) or R^9 (delta).
+#'   last column, `dist`, gives the Euclidean distance to the original
+#'   coefficients (either specified by the user or estimated from the data),
+#'   viewed as a point in R^3 (kappa) or R^9 (delta).
 #'
 #' @seealso [ibdEstimate()]
 #'

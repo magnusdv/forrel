@@ -18,9 +18,9 @@ ibdBootstrap(
 )
 }
 \arguments{
-\item{x}{A \code{ped} object. If \code{method = "parametric"}, this is only used to
-extract the allele frequencies, and can be skipped if \code{freqList} is
-provided.}
+\item{x}{A \code{ped} object, or a list of such. If \code{method = "parametric"}, this
+is only used to extract the allele frequencies, and can be skipped if
+\code{freqList} is provided.}
 
 \item{ids}{A pair of ID labels.}
 
@@ -46,23 +46,28 @@ bootstrap estimates are plotted in the IBD triangle.}
 }
 \value{
 A data frame with \code{N} rows containing the bootstrap estimates. The
-last column (\code{dist}) gives the euclidean distance to the original
-coefficients, viewed as a point in R^3 (kappa) or R^9 (delta).
+last column, \code{dist}, gives the Euclidean distance to the original
+coefficients (either specified by the user or estimated from the data),
+viewed as a point in R^3 (kappa) or R^9 (delta).
 }
 \description{
 This function produces (parametric or nonparametric) bootstrap estimates of
-the IBD coefficients between two individuals. Both kappa and delta
-coefficients are supported (see \code{\link[=ibdEstimate]{ibdEstimate()}}).
+the IBD coefficients between two individuals; either the three \eqn{\kappa}
+-coefficients or the nine condensed identity coefficients \eqn{\Delta} (see
+\code{\link[=ibdEstimate]{ibdEstimate()}}).
 }
 \details{
 The parameter \code{method} controls how bootstrap estimates are obtained in each
-replication.
-
-If \code{method = "parametric"}, new profiles for two individuals are simulated
+replication:
+\itemize{
+\item "parametric": new profiles for two individuals are simulated
 from the input coefficients, followed by a re-estimation of the coefficients.
+\item "nonparametric": the original markers are sampled with replacement, before
+the coefficients are re-estimated.
+}
 
-If \code{method = "nonparametric"}, the original markers are sampled with
-replacement, before the coefficients are re-estimated.
+Note that the pedigree itself does not affect the output of this function;
+the role of \code{x} is simply to carry the marker data.
 }
 \examples{
 
