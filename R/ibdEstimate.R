@@ -96,16 +96,16 @@
 #' y = fullSibMating(1) |>
 #'   markerSim(ids = 5:6, N = 1000, alleles = 1:10, seed = 123)
 #'
-#' # Estimate
+#' # Estimate the condensed identity coefficients
 #' ibdEstimate(y, param = "delta")
 #'
 #' # Exact coefficient by `ribd`:
 #' ribd::condensedIdentity(y, 5:6, simplify = FALSE)
 #'
 #' @export
-ibdEstimate = function(x, ids = typedMembers(x), acrossComps = TRUE,
-                       param = c("kappa", "delta"),
-                       markers = NULL, start = NULL, tol = sqrt(.Machine$double.eps),
+ibdEstimate = function(x, ids = typedMembers(x), param = c("kappa", "delta"),
+                       acrossComps = TRUE, markers = NULL, start = NULL,
+                       tol = sqrt(.Machine$double.eps),
                        beta = 0.5, sigma = 0.5, contourPlot = FALSE, levels = NULL,
                        maxval = FALSE, verbose = TRUE) {
   st = Sys.time()

@@ -7,8 +7,8 @@
 ibdEstimate(
   x,
   ids = typedMembers(x),
-  acrossComps = TRUE,
   param = c("kappa", "delta"),
+  acrossComps = TRUE,
   markers = NULL,
   start = NULL,
   tol = sqrt(.Machine$double.eps),
@@ -28,11 +28,11 @@ columns, each row indicating a pair of individuals. The entries are coerced
 to characters, and must match uniquely against the ID labels of \code{x}. By
 default, all pairs of genotyped members of \code{x} are included.}
 
-\item{acrossComps}{A logical indicating if pairs of individuals in different
-components should be included. Default: TRUE.}
-
 \item{param}{Either "kappa" (default) or "delta"; indicating which set of
 coefficients should be estimated.}
+
+\item{acrossComps}{A logical indicating if pairs of individuals in different
+components should be included. Default: TRUE.}
 
 \item{markers}{A vector with names or indices of markers attached to x,
 indicating which markers to include. By default, all markers are used.}
@@ -115,7 +115,7 @@ ibdEstimate(x, ids = 3:4, contourPlot = TRUE)
 y = fullSibMating(1) |>
   markerSim(ids = 5:6, N = 1000, alleles = 1:10, seed = 123)
 
-# Estimate
+# Estimate the condensed identity coefficients
 ibdEstimate(y, param = "delta")
 
 # Exact coefficient by `ribd`:
