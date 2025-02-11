@@ -14,9 +14,8 @@ NULL
 
 
 #' @rdname familias
-#' @export
 readFam = function(...) {
   cat("Deprecated, use `pedFamilias::readFam()` instead.\n")
-  pedFamilias::readFam(...)
+  #pedFamilias::readFam(...)
 }
 
