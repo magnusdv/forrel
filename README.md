@@ -45,6 +45,17 @@ The most important analyses currently supported by **forrel** are:
   - `MPPsims()`
   - `powerPlot()`
 
+#### Related pedsuite packages
+
+- [**pedtools**](https://github.com/magnusdv/pedtools): Tools for
+  pedigree data management.
+- [**dvir**](https://github.com/magnusdv/dvir): Disaster victim
+  identification.
+- [**pedFamilias**](https://github.com/magnusdv/pedFamilias):
+  Import/export files used by the Familias software.
+- [**pedprobr**](https://github.com/magnusdv/pedprobr): Probability
+  computations in pedigrees.
+
 ## Installation
 
 To get the current official version of **forrel**, install from CRAN as
@@ -58,8 +69,8 @@ Alternatively, you can obtain the latest development version from
 GitHub:
 
 ``` r
-# install.packages("devtools") # install devtools if needed
-devtools::install_github("magnusdv/forrel")
+# install.packages("remotes") # if needed
+remotes::install_github("magnusdv/forrel")
 ```
 
 ## An example
@@ -105,7 +116,7 @@ x = markerSim(x, N = 100, alleles = 1:2, seed = 1234)
 #> 
 #> Simulation finished.
 #> Calls to `likelihood()`: 0.
-#> Total time used: 0.02 seconds.
+#> Total time used: 0.03 seconds.
 ```
 
 Note 1: The `seed` argument is passed onto the random number generator.
@@ -164,7 +175,7 @@ k = ibdEstimate(y, ids = c("bro1", "bro2"))
 #> Initial search value: (0.333, 0.333, 0.333)
 #> Pairs of individuals: 1
 #>   bro1 vs. bro2: estimate = (0.28, 0.54, 0.18), iterations = 10
-#> Total time: 0.00339 secs
+#> Total time: 0.00579 secs
 k
 #>    id1  id2   N      k0      k1      k2
 #> 1 bro1 bro2 100 0.28001 0.53998 0.18001

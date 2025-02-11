@@ -50,6 +50,14 @@ The most important analyses currently supported by **forrel** are:
     * `MPPsims()`
     * `powerPlot()`
 
+#### Related pedsuite packages 
+
+* [**pedtools**](https://github.com/magnusdv/pedtools): Tools for pedigree data management.
+* [**dvir**](https://github.com/magnusdv/dvir): Disaster victim identification.
+* [**pedFamilias**](https://github.com/magnusdv/pedFamilias): Import/export files used by the Familias software.
+* [**pedprobr**](https://github.com/magnusdv/pedprobr): Probability computations in pedigrees.
+
+
 ## Installation
 To get the current official version of **forrel**, install from CRAN as follows:
 ```{r, eval = FALSE}
@@ -57,8 +65,8 @@ install.packages("forrel")
 ```
 Alternatively, you can obtain the latest development version from GitHub:
 ```{r, eval = FALSE}
-# install.packages("devtools") # install devtools if needed
-devtools::install_github("magnusdv/forrel")
+# install.packages("remotes") # if needed
+remotes::install_github("magnusdv/forrel")
 ```
 
 ## An example
