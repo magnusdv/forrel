@@ -57,7 +57,7 @@ expectedLR = function(numeratorPed, denominatorPed, truePed = numeratorPed, ids,
     stop2("Argument `truePed` must be a connected `ped` object")
 
   # Wrapper (for simpler code)
-  OMD = function(ped) oneMarkerDistribution(ped, partialmarker = 1, ids = ids, verbose = FALSE)
+  OMD = function(ped) oneMarkerDistribution(ped, marker = 1, ids = ids, verbose = FALSE)
 
   # Numerator
   if(is.marker(marker))
