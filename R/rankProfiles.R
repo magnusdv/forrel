@@ -5,7 +5,7 @@
 #' wise to try first with `maxPerMarker = 1` to limit computation time,
 #' particularly if mutations are modelled.
 #'
-#' @param A `ped` object with attached markers.
+#' @param x A `ped` object with attached markers.
 #' @param id Name of the individual to be predicted.
 #' @param markers Names or indices of the markers to be included. Default: all.
 #' @param maxPerMarker The number of top candidates to be considered per marker.

@@ -7,6 +7,8 @@
 rankProfiles(x, id, markers = NULL, maxPerMarker = Inf, verbose = FALSE)
 }
 \arguments{
+\item{x}{A \code{ped} object with attached markers.}
+
 \item{id}{Name of the individual to be predicted.}
 
 \item{markers}{Names or indices of the markers to be included. Default: all.}
@@ -15,8 +17,6 @@ rankProfiles(x, id, markers = NULL, maxPerMarker = Inf, verbose = FALSE)
 Default: all.}
 
 \item{verbose}{A logical, by default TRUE.}
-
-\item{A}{\code{ped} object with attached markers.}
 }
 \value{
 A list with three components. The first, a data frame with profiles
