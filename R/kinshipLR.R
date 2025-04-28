@@ -27,6 +27,8 @@
 #'   an error.
 #' @param markers A vector of marker names or indices indicating which markers
 #'   should be included. If NULL (the default) all markers are used.
+#' @param likArgs An optional list of arguments to be passed to
+#'   [pedprobr::likelihood()], e.g. `likArgs = list(special = TRUE)`.
 #' @param linkageMap If this is non-NULL, the markers are interpreted as being
 #'   linked, and likelihoods will be computed by an external call to MERLIN.
 #'
@@ -43,7 +45,8 @@
 #'   given, MERLIN files are stored here, typically for debugging purposes.
 #' @param verbose A logical.
 #'
-#' @seealso [LRpower()], [pedprobr::likelihoodMerlin()]
+#' @seealso [LRpower()], [pedprobr::likelihood()],
+#'   [pedprobr::likelihoodMerlin()]
 #'
 #' @return A `LRresult` object, which is essentially a list with entries
 #'
@@ -125,8 +128,8 @@
 #' }}
 #'
 #' @export
-kinshipLR = function(..., ref = NULL, source = NULL, markers = NULL, linkageMap = NULL,
-                     keepMerlin = NULL, verbose = FALSE) {
+kinshipLR = function(..., ref = NULL, source = NULL, markers = NULL, likArgs = NULL,
+                     linkageMap = NULL, keepMerlin = NULL, verbose = FALSE) {
   st = proc.time()
 
   x = list(...)
@@ -226,6 +229,7 @@ kinshipLR = function(..., ref = NULL, source = NULL, markers = NULL, linkageMap 
 
 
   # Linked markers: MERLIN ---------------------------------------------
+
   if(hasLinkedMarkers(x[[1]]) && is.null(linkageMap))
     stop2("Linked markers detected, but no `linkageMap` provided")
 
@@ -289,6 +293,9 @@ kinshipLR = function(..., ref = NULL, source = NULL, markers = NULL, linkageMap 
     return(structure(res, class = "LRresult"))
   }
 
+
+  # Unlinked markers: pedprobr ----------------------------------------------
+
   # Break all loops (NB: rapply() doesn't work here, since is.list(ped) = TRUE)
   breaklp = function(a) {
     if(is.pedList(a))
@@ -301,7 +308,12 @@ kinshipLR = function(..., ref = NULL, source = NULL, markers = NULL, linkageMap 
   x_loopfree = lapply(x, breaklp)
 
   # compute likelihoods
-  liks = lapply(x_loopfree, function(xx) likelihood(xx, markers = markers))
+  if(is.null(likArgs))
+    likFun = function(xx) likelihood(xx, markers = markers)
+  else
+    likFun = function(xx) do.call(likelihood, c(list(xx, markers = markers), likArgs))
+
+  liks = lapply(x, likFun)
   likelihoodsPerMarker = do.call(cbind, liks)
 
   # LR per marker and total

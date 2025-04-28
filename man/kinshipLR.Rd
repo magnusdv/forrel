@@ -9,6 +9,7 @@ kinshipLR(
   ref = NULL,
   source = NULL,
   markers = NULL,
+  likArgs = NULL,
   linkageMap = NULL,
   keepMerlin = NULL,
   verbose = FALSE
@@ -35,6 +36,9 @@ an error.}
 
 \item{markers}{A vector of marker names or indices indicating which markers
 should be included. If NULL (the default) all markers are used.}
+
+\item{likArgs}{An optional list of arguments to be passed to
+\code{\link[pedprobr:likelihood]{pedprobr::likelihood()}}, e.g. \code{likArgs = list(special = TRUE)}.}
 
 \item{linkageMap}{If this is non-NULL, the markers are interpreted as being
 linked, and likelihoods will be computed by an external call to MERLIN.
@@ -143,7 +147,8 @@ if(requireNamespace("ibdsim2", quietly = TRUE) && pedprobr::checkMerlin()) {
 
 }
 \seealso{
-\code{\link[=LRpower]{LRpower()}}, \code{\link[pedprobr:merlin]{pedprobr::likelihoodMerlin()}}
+\code{\link[=LRpower]{LRpower()}}, \code{\link[pedprobr:likelihood]{pedprobr::likelihood()}},
+\code{\link[pedprobr:merlin]{pedprobr::likelihoodMerlin()}}
 }
 \author{
 Magnus Dehli Vigeland and Thore Egeland

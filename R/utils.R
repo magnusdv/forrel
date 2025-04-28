@@ -77,8 +77,7 @@ ftime = function(st, digits = 3)
     return(matrix(nrow = 0, ncol = 2))
 
   x = rep.int(seq_len(n - 1), (n - 1):1)
-  o = c(0, cumsum((n-2):1))
-  y = seq_along(x) + 1 - o[x]
+  y = sequence.default((n - 1):1, 2:n)
 
   if(vec)
     cbind(v[x], v[y], deparse.level = 0)
