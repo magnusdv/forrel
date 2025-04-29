@@ -21,8 +21,9 @@ profileSim(
 
 \item{N}{The number of complete simulations to be performed.}
 
-\item{ids}{A character (or coercible to character) with ID labels indicating
-whose genotypes should be simulated.}
+\item{ids}{A character (or coercible to character) of ID labels indicating
+whose genotypes should be simulated. Alternatively, a function taking \code{x}
+as input and returning a character vector of ID labels.}
 
 \item{markers}{Either a vector indicating a subset of markers attached to
 \code{x}, or a named list of frequency vectors. By default (\code{NULL}), all

@@ -6,8 +6,9 @@
 #'
 #' @param x A `ped` object or a list of such.
 #' @param N The number of complete simulations to be performed.
-#' @param ids A character (or coercible to character) with ID labels indicating
-#'   whose genotypes should be simulated.
+#' @param ids A character (or coercible to character) of ID labels indicating
+#'   whose genotypes should be simulated. Alternatively, a function taking `x`
+#'   as input and returning a character vector of ID labels.
 #' @param markers Either a vector indicating a subset of markers attached to
 #'   `x`, or a named list of frequency vectors. By default (`NULL`), all
 #'   attached markers are used. If a frequency list is given, marker objects are
@@ -92,6 +93,9 @@ profileSim = function(x, N = 1, ids = NULL, markers = NULL, seed = NULL,
     set.seed(seed)
 
   # Check that all `ids` are in x
+  if(is.function(ids))
+    ids = ids(x)
+
   labs = labels(x, unlist = TRUE)
   if(length(err <- setdiff(ids, labs)))
     stop2("Unknown ID label: ", err)
@@ -99,7 +103,7 @@ profileSim = function(x, N = 1, ids = NULL, markers = NULL, seed = NULL,
   # If pedlist input: Recurse over components
   if(is.pedList(x)) {
     if(is.marker(markers) || is.markerList(markers))
-      stop2("When `x` is a list of pedigrees, `markers` must be a vector of marker names/indices referring to attached markers")
+      stop2("When `x` is a list of pedigrees, `markers` must be a vector indicating to attached markers")
 
     res_compwise = lapply(x, function(comp)
       profileSim(comp, N = N, ids = if(!is.null(ids)) intersect(ids, comp$ID),

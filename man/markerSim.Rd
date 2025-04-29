@@ -21,11 +21,11 @@ markerSim(
 \arguments{
 \item{x}{A \code{ped} object or a list of such.}
 
-\item{N}{A positive integer: the number of (independent) markers to be
-simulated.}
+\item{N}{A positive integer: the number of markers to be simulated.}
 
-\item{ids}{A vector containing ID labels of those pedigree members whose
-genotypes should be simulated. By default, all individuals are included.}
+\item{ids}{A vector indicating the pedigree members whose genotypes should be
+simulated. Alternatively, a function taking \code{x} as input and returning a
+character vector of ID labels. Default: All individuals.}
 
 \item{alleles}{(Only if \code{partialmarker} is NULL.) A vector with allele
 labels. If NULL, the following are tried in order:
@@ -61,8 +61,8 @@ consists of the \code{N} simulated markers.
 Simulates marker genotypes conditional on the pedigree structure and known
 genotypes. Note: This function simulates independent realisations at a single
 locus. Equivalently, it can be thought of as independent simulations of
-identical, unlinked markers. For simulations of a \emph{set} of markers, see
-\code{\link[=profileSim]{profileSim()}}.
+identical, unlinked markers. For simulating profiles for a set of different
+markers, see \code{\link[=profileSim]{profileSim()}}.
 }
 \details{
 This implements (with various time savers) the algorithm used in SLINK of the

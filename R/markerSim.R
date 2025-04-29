@@ -3,18 +3,18 @@
 #' Simulates marker genotypes conditional on the pedigree structure and known
 #' genotypes. Note: This function simulates independent realisations at a single
 #' locus. Equivalently, it can be thought of as independent simulations of
-#' identical, unlinked markers. For simulations of a _set_ of markers, see
-#' [profileSim()].
+#' identical, unlinked markers. For simulating profiles for a set of different
+#' markers, see [profileSim()].
 #'
 #' This implements (with various time savers) the algorithm used in SLINK of the
 #' LINKAGE/FASTLINK suite. If `partialmarker` is NULL, genotypes are simulated
 #' by simple gene dropping, using [simpleSim()].
 #'
 #' @param x A `ped` object or a list of such.
-#' @param N A positive integer: the number of (independent) markers to be
-#'   simulated.
-#' @param ids A vector containing ID labels of those pedigree members whose
-#'   genotypes should be simulated. By default, all individuals are included.
+#' @param N A positive integer: the number of markers to be simulated.
+#' @param ids A vector indicating the pedigree members whose genotypes should be
+#'   simulated. Alternatively, a function taking `x` as input and returning a
+#'   character vector of ID labels. Default: All individuals.
 #' @param alleles (Only if `partialmarker` is NULL.) A vector with allele
 #'   labels. If NULL, the following are tried in order:
 #'
@@ -36,6 +36,7 @@
 #'   `partialmarker` is non-NULL. See [pedtools::breakLoops()].
 #' @param seed An integer seed for the random number generator (optional).
 #' @param verbose A logical.
+#'
 #' @return A `ped` object equal to `x` except its `MARKERS` entry, which
 #'   consists of the `N` simulated markers.
 #'
@@ -67,6 +68,9 @@ markerSim = function(x, N = 1, ids = NULL, alleles = NULL, afreq = NULL,
 
   if (!is.null(seed))
     set.seed(seed)
+
+  if(is.function(ids))
+    ids = ids(x)
 
   # if input is a list of ped objects: Apply markerSim recursively
   if (is.pedList(x))
