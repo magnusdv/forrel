@@ -27,7 +27,7 @@ Depends:
 Imports:
     glue,
     pbapply,
-    pedprobr (>= 0.9.6),
+    pedprobr (>= 1.0.0),
     ribd (>= 1.7.1),
     verbalisr (>= 0.7.1)
 Suggests: 
