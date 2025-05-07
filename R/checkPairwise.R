@@ -8,19 +8,19 @@
 #' where unlikely relationships are easy to spot.
 #'
 #' To identify potential pedigree errors, the function calculates the
-#' *generalised likelihood ratio* (GLR) of each pairwise relationship.
-#' This compares the likelihood of the estimated coefficients with that of the
-#' coefficients implied by the pedigree. By default, relationships whose GLR
-#' exceed 1000 are flagged as errors and shown with a circle in the plot.
-#' Alternatively, if arguments `nsim` and `pvalThreshold` are supplied, the
-#' p-value of each score is estimated by simulation, and used as threshold for
-#' calling errors.
+#' *generalised likelihood ratio* (GLR) for each pairwise relationship, as
+#' explained by Egeland & Vigeland (2025). This compares the likelihood of the
+#' estimated coefficients with that of the coefficients implied by the pedigree.
+#' By default, relationships whose GLR exceed 1000 are flagged as errors and
+#' shown with a circle in the plot. Alternatively, if arguments `nsim` and
+#' `pvalThreshold` are supplied, the p-value of each score is estimated by
+#' simulation, and used as threshold for calling errors.
 #'
 #' By default, inbred individuals are excluded from the analysis, since pairwise
 #' relationships involving inbred individuals have undefined kappa coefficients
 #' (and therefore no position in the triangle). In some cases it may still be
-#' informative to include their estimates; set `includeInbred = TRUE` to
-#' enforce this.
+#' informative to include their estimates; set `includeInbred = TRUE` to enforce
+#' this.
 #'
 #' @param x A `ped` object or a list of such.
 #' @param ids A vector of ID labels; the individuals to include in the check.
@@ -59,6 +59,9 @@
 #'   If `plotType` is "ggplot2" or "plotly", the plot objects are returned.
 #'
 #' @seealso [ibdEstimate()].
+#' @references T. Egeland and M.D. Vigeland, *Kinship cases with partially
+#'   specified hypotheses*. Forensic Science International: Genetics 78 (2025).
+#'   \doi{10.1016/j.fsigen.2025.103270}
 #'
 #' @examples
 #'

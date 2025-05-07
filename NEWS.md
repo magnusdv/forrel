@@ -1,3 +1,20 @@
+# forrel 1.8.0
+
+## New features
+
+* New function `rankProfiles()` predicting the most likely profile of an untyped pedigree member.
+
+* In `oneMarkerDistribution` and `twoMarkerDistribution`, the argument `partialmarker` has been renamed to `marker`.
+
+* In `profileSim()` and `markerSim()`, the argument `ids` can be the name of a function, e.g., `leaves`.
+
+* `kinshipLR` gains argument `likArgs` for passing arguments to `pedprobr::likelihood()`. The motivation for this is to give access to the special lumping methods recently implemented in `pedprobr`, for example `kinshipLR(..., likArgs = list(special = TRUE, alleleLimit = 20))`.
+
+## Other
+
+* Updated dependencies to pedtools 2.8.1, pedmut 0.9.0 and pedprobr 1.0.0 (all related to special lumping).
+
+
 # forrel 1.7.1
 
 * New argument `acrossComps` in `ibdEstimate()` and `checkParwise()`.
