@@ -44,6 +44,8 @@ The most important analyses currently supported by **forrel** are:
   - `missingPersonIP()`
   - `MPPsims()`
   - `powerPlot()`
+- Predict DNA profiles for untyped pedigree members
+  - `rankProfiles()`
 
 #### Related pedsuite packages
 
@@ -55,6 +57,10 @@ The most important analyses currently supported by **forrel** are:
   Import/export files used by the Familias software.
 - [**pedprobr**](https://github.com/magnusdv/pedprobr): Probability
   computations in pedigrees.
+- [**pedmut**](https://github.com/magnusdv/pedmut): Mutation modelling
+  for pedigree analysis.
+- [**KLINK**](https://github.com/magnusdv/KLINK): Kinship analysis with
+  linked markers.
 
 ## Installation
 
@@ -116,7 +122,7 @@ x = markerSim(x, N = 100, alleles = 1:2, seed = 1234)
 #> 
 #> Simulation finished.
 #> Calls to `likelihood()`: 0.
-#> Total time used: 0.03 seconds.
+#> Total time used: 0.07 seconds.
 ```
 
 Note 1: The `seed` argument is passed onto the random number generator.
@@ -175,7 +181,7 @@ k = ibdEstimate(y, ids = c("bro1", "bro2"))
 #> Initial search value: (0.333, 0.333, 0.333)
 #> Pairs of individuals: 1
 #>   bro1 vs. bro2: estimate = (0.28, 0.54, 0.18), iterations = 10
-#> Total time: 0.00579 secs
+#> Total time: 0.00512 secs
 k
 #>    id1  id2   N      k0      k1      k2
 #> 1 bro1 bro2 100 0.28001 0.53998 0.18001

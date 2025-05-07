@@ -49,6 +49,8 @@ The most important analyses currently supported by **forrel** are:
     * `missingPersonIP()`
     * `MPPsims()`
     * `powerPlot()`
+* Predict DNA profiles for untyped pedigree members
+    * `rankProfiles()`
 
 #### Related pedsuite packages 
 
@@ -56,6 +58,8 @@ The most important analyses currently supported by **forrel** are:
 * [**dvir**](https://github.com/magnusdv/dvir): Disaster victim identification.
 * [**pedFamilias**](https://github.com/magnusdv/pedFamilias): Import/export files used by the Familias software.
 * [**pedprobr**](https://github.com/magnusdv/pedprobr): Probability computations in pedigrees.
+* [**pedmut**](https://github.com/magnusdv/pedmut): Mutation modelling for pedigree analysis.
+* [**KLINK**](https://github.com/magnusdv/KLINK): Kinship analysis with linked markers.
 
 
 ## Installation
