@@ -57,6 +57,9 @@ Genetics Supplement Series, Volume 4 (1).
 NorwegianFrequencies
 }
 \description{
-A database of Norwegian allele frequencies for 35 STR markers.
+A database of Norwegian allele frequencies for 35 STR markers. NOTE: An
+updated database of these and other markers, are available in the \code{norSTR}
+package. The \code{NorwegianFrequencies} object is kept here for backward
+compatibility.
 }
 \keyword{datasets}
