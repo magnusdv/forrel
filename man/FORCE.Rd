@@ -3,7 +3,7 @@
 \docType{data}
 \name{FORCE}
 \alias{FORCE}
-\title{FORCE panel kinship SNPs}
+\title{FORCE panel kinship SNPs (autosomal)}
 \format{
 A data frame with 3915 rows and 6 columns:
 \itemize{
@@ -26,7 +26,7 @@ FORCE
 \description{
 A data frame describing (a subset of) the FORCE panel of SNPs designed for
 applications in forensic genetics (Tillmar et al., 2021). The subset included
-here are the SNPs recommended for kinship analysis. As the original
+here are the autosomal SNPs recommended for kinship analysis. As the original
 publication did not include allele frequencies, these were downloaded from
 Ensembl via the biomaRt package. 15 markers were removed as frequency
 information could not be retrieved.

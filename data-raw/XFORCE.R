@@ -23,16 +23,32 @@ info = getBM(
 ) |> as_tibble() |> print()
 
 filter(info, minor_allele == "")
-anyDuplicated(info$refsnp_id)
+
+# Add missing data based on ALFA frequencies from dbSNP Build 157
+# Manual lookup: https://www.ncbi.nlm.nih.gov/snp/rs2843604
+manual = tribble(
+  ~refsnp_id,  ~minor_allele, ~minor_allele_freq,
+  "rs2843604",  "C",          0.467,
+  "rs237496",   "G",          0.223,
+  "rs2005947",  "G",          0.413,
+  "rs2021895",  "G",          0.396,
+  "rs595026",   "T",          0.163,
+  "rs5986148",  "G",          0.320,
+  "rs6417903",  "C",          0.386,
+  "rs2205399",  "A",          0.436,
+  "rs5954221",  "G",          0.379
+)
+
+info = info |> rows_update(manual, by = "refsnp_id")
 
 y = left_join(x, info, by = c(MARKER = "refsnp_id")) |>
-  dplyr::filter(minor_allele != "") |>
+  # dplyr::filter(minor_allele != "") |>
   dplyr::mutate(
     MB = POS / 1e6,
     A1 = if_else(minor_allele == REF, ALT, REF),
     A2 = if_else(minor_allele == REF, REF, ALT),
     FREQ1 = 1 - minor_allele_freq
-  ) # |> print
+  ) |> print()
 
 # Checks
 filter(y, POS != chrom_start)
@@ -44,6 +60,5 @@ XFORCE = y |>
   dplyr::select(CHROM, MARKER, MB, A1, A2, FREQ1) |>
   as.data.frame()
 
-print(head(XFORCE))
-save
-# usethis::use_data(FORCE, overwrite = TRUE)
+head(XFORCE)
+usethis::use_data(XFORCE, overwrite = TRUE)
