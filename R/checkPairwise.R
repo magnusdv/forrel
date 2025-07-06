@@ -43,6 +43,7 @@
 #'   p-values. If 0 (default), this step is skipped.
 #' @param seed An integer seed for the random number generator (optional, and
 #'   only relevant if `nsim > 0`).
+#' @param legendData A data frame with columns `k0`, `k2`, `lab`, `col` and `shape`.
 #' @param cpRes A data frame: the output from `checkPairwise()`.
 #' @param errtxt A character string to use for the error legend.
 #' @param plot Deprecated. To suppress the triangle plot, use `plotType =
@@ -101,7 +102,8 @@
 checkPairwise = function(x, ids = typedMembers(x), includeInbred = FALSE, acrossComps = TRUE,
                          plotType = c("base", "ggplot2", "plotly", "none"),
                          GLRthreshold = 1000, pvalThreshold = NULL, nsim = 0,
-                         seed = NULL, plot = TRUE, verbose = TRUE, excludeInbred = NULL, ...) {
+                         seed = NULL, legendData = NULL, plot = TRUE, verbose = TRUE,
+                         excludeInbred = NULL, ...) {
 
   includeIds = .myintersect(ids, typedMembers(x))
   if(length(includeIds) < 2) {
@@ -109,11 +111,11 @@ checkPairwise = function(x, ids = typedMembers(x), includeInbred = FALSE, across
     return(invisible())
   }
 
-  plotType = match.arg(plotType)
   if(isFALSE(plot)) {
     message("Argument `plot` is replaced with `plotType`. Use `plotType = 'none'` to suppress plotting")
     plotType = "none"
   }
+  plotType = match.arg(plotType)
 
   if(!is.null(excludeInbred)) {
     message("Argument `excludeInbred` has been renamed to `includeInbred`")
@@ -169,14 +171,11 @@ checkPairwise = function(x, ids = typedMembers(x), includeInbred = FALSE, across
   }
   cpRes$pedrel = pedrel
 
-  # Relationship group (for legend)
-  kStr = paste(kappa0, kappa2, sep = "-")
-  relLabs = c("0-0"       = "Parent-offspring",
-              "0.25-0.25" = "Full siblings",
-              "0.5-0"     = "Half/Uncle/Grand",
-              "0.75-0"    = "First cousins/etc",
-              "NA-NA"     = "Other",
-              "1-0"       = "Unrelated")
+  # Relationship group
+  legendData = legendData %||% .LEGDATA
+  relLabs = .setnames(legendData$lab, paste(legendData$k0, legendData$k2))
+
+  kStr = paste(kappa0, kappa2)
   relgroup = as.character(relLabs[kStr])
   relgroup[is.na(relgroup)] = "Other"
   relgroup = factor(relgroup, levels = .myintersect(relLabs, relgroup))
@@ -207,7 +206,7 @@ checkPairwise = function(x, ids = typedMembers(x), includeInbred = FALSE, across
       # If ecdf not already computed: simulate
       if(!ks %in% names(ecdfList)) {
         if(verbose)
-          cat("Simulating null distribution for GLR at kappa =", ks, "\n")
+          cat("Simulating null distribution for GLR at kappa =", sub(ks," ","-"), "\n")
         kap = c(kappa0[i], kappa1[i], kappa2[i])
         ecdfList[[ks]] = ecdfGLR(kap, nsim = nsim, freqList = db, log = TRUE, seed = seed)
       }
@@ -228,7 +227,7 @@ checkPairwise = function(x, ids = typedMembers(x), includeInbred = FALSE, across
   }
 
   if(plotType != "none")
-    plotCP(cpRes, plotType = plotType, errtxt = errtxt, seed = seed, ...)
+    plotCP(cpRes, plotType = plotType, legendData = legendData, errtxt = errtxt, seed = seed, ...)
   else
     return(cpRes)
 }
@@ -241,7 +240,7 @@ checkPairwise = function(x, ids = typedMembers(x), includeInbred = FALSE, across
 #' @importFrom grDevices palette
 #' @export
 plotCP = function(cpRes = NULL, plotType = c("base", "ggplot2", "plotly"),
-                  labels = FALSE, errtxt = "Potential error",
+                  labels = FALSE, legendData = NULL, errtxt = "Potential error",
                   seed = NULL, ...) {
 
   plotType = match.arg(plotType)
@@ -260,15 +259,10 @@ plotCP = function(cpRes = NULL, plotType = c("base", "ggplot2", "plotly"),
     errDat$labs = labs = paste(errDat$id1, "-", errDat$id2)
   }
 
-  # Copied from checkPairwise()
-  relLabs = c("0-0"       = "Parent-offspring",
-              "0.25-0.25" = "Full siblings",
-              "0.5-0"     = "Half/Uncle/Grand",
-              "0.75-0"    = "First cousins/etc",
-              "NA-NA"     = "Other",
-              "1-0"       = "Unrelated")
-  ALLCOLS = .setnames(2:7, relLabs)
-  ALLSHAPES = .setnames(c(2,3,4,5,8,6), relLabs)
+  # Prepare legend
+  legendData = legendData %||% .LEGDATA
+  ALLCOLS = .setnames(legendData$col, legendData$lab)
+  ALLSHAPES = .setnames(legendData$shape, legendData$lab)
 
   if(plotType == "base") {
     cols = ALLCOLS[as.character(relgroup)]
@@ -308,8 +302,9 @@ plotCP = function(cpRes = NULL, plotType = c("base", "ggplot2", "plotly"),
       ggplot2::labs(color = "According to pedigree", shape = "According to pedigree") +
       ggplot2::scale_shape_manual(values = ALLSHAPES) +
       ggplot2::scale_color_manual(values = ALLCOLS) +
-      ggplot2::theme(legend.position = c(1,1),
-                     legend.justification = c(1, 1.1),
+      ggplot2::theme(legend.position = "inside",
+                     legend.position.inside = c(0.99, 0.97),
+                     legend.justification = c(1, 1),
                      legend.margin = ggplot2::margin(3,6,3,6),
                      legend.background = ggplot2::element_rect(fill = "whitesmoke"),
                      legend.text = ggplot2::element_text(size = 10),
@@ -354,15 +349,19 @@ plotCP = function(cpRes = NULL, plotType = c("base", "ggplot2", "plotly"),
     dat$idx = seq_len(nrow(cpRes))
     dat$labs = paste0("ID1: ", cpRes$id1, "<br>", "ID2: ", cpRes$id2)
 
-    symbs = c("Parent-offspring" = "triangle-up-open",
-              "Full siblings" = "cross-thin-open",
-              "Half/Uncle/Grand" = "x-thin-open",
-              "First cousins/etc" = "diamond-open",
-              "Other" = "asterisk-open",
-              "Unrelated" = "triangle-down-open")
+    # Convert default shapes to plotly
+    plotlySymb = c(
+      "2" = "triangle-up-open",
+      "3" = "cross-thin-open",
+      "4" = "x-thin-open",
+      "5" = "diamond-open",
+      "8" = "asterisk-open",
+      "6" = "triangle-down-open")
 
-    cols = c(palette()[2:7]) #c(2,3,4,7,5)],"#C8A2C8")
-    names(cols) = names(symbs)
+    if(is.numeric(ALLSHAPES)) {
+      idx = match(ALLSHAPES, names(plotlySymb), nomatch = 0)
+      ALLSHAPES[idx] = plotlySymb[idx]
+    }
 
     p = ribd::ibdTriangle(plotType = "plotly", ...)
 
@@ -370,7 +369,7 @@ plotCP = function(cpRes = NULL, plotType = c("base", "ggplot2", "plotly"),
       datr = dat[dat$relgroup == r, , drop = FALSE]
       p = p |>
         plotly::add_markers(data = datr, x = ~k0, y = ~k2, customdata = ~idx,
-                            symbol = I(symbs[r]), color = I(cols[r]),
+                            symbol = I(ALLSHAPES[r]), color = I(ALLCOLS[r]),
                             cliponaxis = FALSE,
                             marker = list(size = 12,
                                           line = list(width = if(r == "Other") 1 else 2)),
@@ -401,7 +400,15 @@ plotCP = function(cpRes = NULL, plotType = c("base", "ggplot2", "plotly"),
   }
 }
 
-
+# Legend data for the checkPairwise triangle plot
+.LEGDATA = data.frame(
+  k0 = c(0, 0.25, 0.5, 0.75, NA, 1),
+  k2 = c(0, 0.25, 0, 0, NA, 0),
+  lab = c("Parent-offspring", "Full siblings", "Half/Uncle/Grand",
+          "First cousins/etc", "Other", "Unrelated"),
+  col = 2:7,
+  shape = c(2, 3, 4, 5, 8, 6)
+)
 
 # Empiric cdf of GLR
 #' @importFrom stats ecdf

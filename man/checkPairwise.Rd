@@ -15,6 +15,7 @@ checkPairwise(
   pvalThreshold = NULL,
   nsim = 0,
   seed = NULL,
+  legendData = NULL,
   plot = TRUE,
   verbose = TRUE,
   excludeInbred = NULL,
@@ -25,6 +26,7 @@ plotCP(
   cpRes = NULL,
   plotType = c("base", "ggplot2", "plotly"),
   labels = FALSE,
+  legendData = NULL,
   errtxt = "Potential error",
   seed = NULL,
   ...
@@ -58,6 +60,8 @@ p-values. If 0 (default), this step is skipped.}
 
 \item{seed}{An integer seed for the random number generator (optional, and
 only relevant if \code{nsim > 0}).}
+
+\item{legendData}{A data frame with columns \code{k0}, \code{k2}, \code{lab}, \code{col} and \code{shape}.}
 
 \item{plot}{Deprecated. To suppress the triangle plot, use \code{plotType = "none"}.}
 
