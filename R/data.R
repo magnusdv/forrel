@@ -55,23 +55,32 @@
 "NorwegianFrequencies"
 
 
-#' FORCE panel kinship SNPs (autosomal)
+#' FORCE panel SNP data
 #'
-#' A data frame describing (a subset of) the FORCE panel of SNPs designed for
-#' applications in forensic genetics (Tillmar et al., 2021). The subset included
-#' here are the autosomal SNPs recommended for kinship analysis. As the original
-#' publication did not include allele frequencies, these were downloaded from
-#' Ensembl via the biomaRt package. 15 markers were removed as frequency
-#' information could not be retrieved.
+#' Data frames describing the FORCE panel of SNPs for forensic genetics (Tillmar
+#' et al., 2021). We provide here two subsets of the complete panel: the
+#' autosomal kinship SNPs: The autosomal kinship SNPs (`FORCE`, n = 3930) and
+#' the X-chromosomal SNPs (`XFORCE`, n = 246). To attach the markers to a
+#' pedigree, use [pedtools::setSNPs()] (see Examples).
 #'
-#' To attach the FORCE markers to a pedigree, use [pedtools::setSNPs()] (see
-#' Examples).
+#' Allele frequencies were retrieved from Ensembl using the REST API, with the
+#' population `1000GENOMES:phase_3:ALL` as primary source. For 9 SNPs where this
+#' was unavailable, `gnomADg:ALL` was used instead. The SNP rs2323964 was
+#' excluded due to lack of Ensembl support.
 #'
-#' @format A data frame with 3915 rows and 6 columns:
+#' The autosomal dataset (`FORCE`) was updated in version 1.8.1, adding 15
+#' markers that were previously missing and revising some frequencies. The
+#' previous version is available via `system.file("FORCE_old", package =
+#' "forrel")`.
 #'
-#'   * `CHROM`: Chromosome (1-22)
+#' For details, the code used to download and process the data is available in
+#' the `data-raw` folder on GitHub:
+#' https://github.com/magnusdv/forrel/tree/master/data-raw
+#'
+#' @format Both `FORCE` and `XFORCE` are data frames with the following columns:
+#'   * `CHROM`: Chromosome
 #'   * `MARKER`: Marker name (rs number)
-#'   * `MB`: Physical position in megabases (build GRCh38)
+#'   * `MB`: Physical position in megabases (GRCh38)
 #'   * `A1`: First allele
 #'   * `A2`: Second allele
 #'   * `FREQ1`: Allele frequency of `A1`
@@ -84,41 +93,12 @@
 #' x = setSNPs(nuclearPed(), snpData = FORCE)
 #' summary(x)
 #'
-#' getMap(x, markers = 1:5)
-#' getFreqDatabase(x, markers = 1:5)
+#' getMap(x, markers = 1:3)
+#' getFreqDatabase(x, markers = 1:3)
 #'
 "FORCE"
 
 
-#' FORCE panel kinship SNPs (X-chromosomal)
-#'
-#' A data frame describing the 246 X-chromosomal SNPs included on the FORCE
-#' panel for forensic genetics (Tillmar et al., 2021). As the original
-#' publication did not include allele frequencies, these were downloaded from
-#' Ensembl via the biomaRt package. For 9 markers the frequencies were obtained
-#' manually from dbSNP.
-#'
-#' To attach the XFORCE markers to a pedigree, use [pedtools::setSNPs()] (see
-#' Examples).
-#'
-#' @format A data frame with 246 rows and 6 columns:
-#'
-#'   * `CHROM`: Chromosome (all equal to "X")
-#'   * `MARKER`: Marker name (rs number)
-#'   * `MB`: Physical position in megabases (build GRCh37)
-#'   * `A1`: First allele
-#'   * `A2`: Second allele
-#'   * `FREQ1`: Allele frequency of `A1`
-#'
-#' @source Tillmar et al. The FORCE Panel: An All-in-One SNP Marker Set for
-#'   Confirming Investigative Genetic Genealogy Leads and for General Forensic
-#'   Applications. Genes. (2021)
-#'
-#' @examples
-#' x = setSNPs(nuclearPed(), snpData = XFORCE)
-#' summary(x)
-#'
-#' getMap(x, markers = 1:5)
-#' getFreqDatabase(x, markers = 1:5)
-#'
+#' @rdname FORCE
+#' @format NULL
 "XFORCE"

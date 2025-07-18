@@ -3,13 +3,14 @@
 \docType{data}
 \name{FORCE}
 \alias{FORCE}
-\title{FORCE panel kinship SNPs (autosomal)}
+\alias{XFORCE}
+\title{FORCE panel SNP data}
 \format{
-A data frame with 3915 rows and 6 columns:
+Both \code{FORCE} and \code{XFORCE} are data frames with the following columns:
 \itemize{
-\item \code{CHROM}: Chromosome (1-22)
+\item \code{CHROM}: Chromosome
 \item \code{MARKER}: Marker name (rs number)
-\item \code{MB}: Physical position in megabases (build GRCh38)
+\item \code{MB}: Physical position in megabases (GRCh38)
 \item \code{A1}: First allele
 \item \code{A2}: Second allele
 \item \code{FREQ1}: Allele frequency of \code{A1}
@@ -22,25 +23,36 @@ Applications. Genes. (2021)
 }
 \usage{
 FORCE
+
+XFORCE
 }
 \description{
-A data frame describing (a subset of) the FORCE panel of SNPs designed for
-applications in forensic genetics (Tillmar et al., 2021). The subset included
-here are the autosomal SNPs recommended for kinship analysis. As the original
-publication did not include allele frequencies, these were downloaded from
-Ensembl via the biomaRt package. 15 markers were removed as frequency
-information could not be retrieved.
+Data frames describing the FORCE panel of SNPs for forensic genetics (Tillmar
+et al., 2021). We provide here two subsets of the complete panel: the
+autosomal kinship SNPs: The autosomal kinship SNPs (\code{FORCE}, n = 3930) and
+the X-chromosomal SNPs (\code{XFORCE}, n = 246). To attach the markers to a
+pedigree, use \code{\link[pedtools:setSNPs]{pedtools::setSNPs()}} (see Examples).
 }
 \details{
-To attach the FORCE markers to a pedigree, use \code{\link[pedtools:setSNPs]{pedtools::setSNPs()}} (see
-Examples).
+Allele frequencies were retrieved from Ensembl using the REST API, with the
+population \verb{1000GENOMES:phase_3:ALL} as primary source. For 9 SNPs where this
+was unavailable, \code{gnomADg:ALL} was used instead. The SNP rs2323964 was
+excluded due to lack of Ensembl support.
+
+The autosomal dataset (\code{FORCE}) was updated in version 1.8.1, adding 15
+markers that were previously missing and revising some frequencies. The
+previous version is available via \code{system.file("FORCE_old", package = "forrel")}.
+
+For details, the code used to download and process the data is available in
+the \code{data-raw} folder on GitHub:
+https://github.com/magnusdv/forrel/tree/master/data-raw
 }
 \examples{
 x = setSNPs(nuclearPed(), snpData = FORCE)
 summary(x)
 
-getMap(x, markers = 1:5)
-getFreqDatabase(x, markers = 1:5)
+getMap(x, markers = 1:3)
+getFreqDatabase(x, markers = 1:3)
 
 }
 \keyword{datasets}
