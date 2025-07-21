@@ -29,23 +29,28 @@ XFORCE
 \description{
 Data frames describing the FORCE panel of SNPs for forensic genetics (Tillmar
 et al., 2021). We provide here two subsets of the complete panel: the
-autosomal kinship SNPs: The autosomal kinship SNPs (\code{FORCE}, n = 3930) and
-the X-chromosomal SNPs (\code{XFORCE}, n = 246). To attach the markers to a
-pedigree, use \code{\link[pedtools:setSNPs]{pedtools::setSNPs()}} (see Examples).
+autosomal kinship SNPs (\code{FORCE}, n = 3930) and the X-chromosomal SNPs
+(\code{XFORCE}, n = 246). To attach the markers to a pedigree, use
+\code{\link[pedtools:setSNPs]{pedtools::setSNPs()}} (see Examples).
 }
 \details{
 Allele frequencies were retrieved from Ensembl using the REST API, with the
 population \verb{1000GENOMES:phase_3:ALL} as primary source. For 9 SNPs where this
-was unavailable, \code{gnomADg:ALL} was used instead. The SNP rs2323964 was
-excluded due to lack of Ensembl support.
+was unavailable, \code{gnomADg:ALL} was used instead.
 
-The autosomal dataset (\code{FORCE}) was updated in version 1.8.1, adding 15
-markers that were previously missing and revising some frequencies. The
-previous version is available via \code{system.file("FORCE_old", package = "forrel")}.
+One SNP - rs2323964 - was excluded due to lack of Ensembl/dbSNP support.
 
 For details, the code used to download and process the data is available in
 the \code{data-raw} folder on GitHub:
 https://github.com/magnusdv/forrel/tree/master/data-raw
+
+\emph{Note}: The autosomal dataset (\code{FORCE}) was updated in version 1.8.1, adding 15
+markers that were previously missing and revising some frequencies. The
+previous version is available via:
+
+\if{html}{\out{<div class="sourceCode">}}\preformatted{pth = system.file("extdata/FORCE_old.txt", package = "forrel")
+oldforce = read.table(pth, header = TRUE)
+}\if{html}{\out{</div>}}
 }
 \examples{
 x = setSNPs(nuclearPed(), snpData = FORCE)
