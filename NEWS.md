@@ -1,3 +1,13 @@
+# forrel 1.8.1
+
+## New features
+
+* The dataset FORCE, containing positions and allele frequencies for the FORCE SNP panel (Tillmar et al, 2021, doi:10.3390/genes12121968)), has been updated to include 15 SNPs that were previously excluded due to missing frequency information. The current dataset contains all of the 3931 autosomal kinship SNPs in the original publication, except 1 (rs2323964) which is no longer supported by dbSNP.
+
+* A new dataset XFORCE has been added, annotating the 246 X-chromosomal SNPs on the FORCE panel.
+
+* The function `checkPairwise()` gains a new argument `legendData` making it easier to customise the legend.
+
 # forrel 1.8.0
 
 ## New features
