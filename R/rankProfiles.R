@@ -34,7 +34,7 @@
 #'    markerSim(N = 4, alleles = c("a", "b", "c"), seed = 1, verbose = FALSE)
 #' x
 #' # Remove data for father
-#' y = setAlleles(x, ids = 1, alleles = 0)
+#' y = removeGenotypes(x, ids = 1)
 #'
 #' # Most likely profiles of father
 #' rankProfiles(y, id = 1)

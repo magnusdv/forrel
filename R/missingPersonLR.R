@@ -104,7 +104,7 @@ missingPersonLR = function(reference, missing, poi = NULL, verbose = TRUE, ...) 
     # Hyp2
     if(verbose)
       cat(sprintf("\nForming H2 from reference:\n  * Extracting `%s` as singleton named `POI`\n", missing))
-    poiSingleton = subset(reference, missing) |>
+    poiSingleton = extractSingletons(reference, missing) |>
       relabel(old = missing, new = "POI")
     H2 = list(reference, poiSingleton)
   }
@@ -128,7 +128,7 @@ missingPersonLR = function(reference, missing, poi = NULL, verbose = TRUE, ...) 
   if(missing %in% typedMembers(H2)) {
     if(verbose)
       cat(sprintf("  * Removing genotypes from `%s`\n", missing))
-    H2 = setAlleles(H2, missing, alleles = 0)
+    H2 = removeGenotypes(H2, missing)
   }
 
   if(verbose) cat("\n")
