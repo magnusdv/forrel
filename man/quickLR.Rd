@@ -4,18 +4,18 @@
 \alias{quickLR}
 \title{LR calculations for paternity and sibship}
 \usage{
-quickLR(x, ids = typedMembers(x), test = c("pat", "sib", "half"))
+quickLR(x, ids = typedMembers(x), test = c("pat", "sib", "half", "cous"))
 }
 \arguments{
-\item{x}{A ped object or a list of such.}
+\item{x}{A \code{ped} object or a list of such.}
 
 \item{ids}{A vector of two typed members of \code{x}. If not given, the typed
 members of \code{x} are selected by default, but note that this gives an error
 if the number of such individuals is not 2.}
 
-\item{test}{The hypotheses to be tested (against 'unrelatedness'). Allowed
-values are "pat" (=paternity), "sib" (=full siblings), and "half" (=half
-siblings). By default, all three are included.}
+\item{test}{The hypotheses to be tested against unrelatedness. Allowed values
+are "pat" (= paternity), "sib" (= full siblings), "half" (= half siblings)
+and "cous" (= first cousins). By default, all are included.}
 }
 \value{
 A (slightly simplified) \code{LRresult} object, as described in
@@ -23,13 +23,13 @@ A (slightly simplified) \code{LRresult} object, as described in
 }
 \description{
 A thin wrapper around \code{\link[=kinshipLR]{kinshipLR()}} for the common scenario of testing a pair
-of individuals for paternity and/or sibship, against being unrelated.
+of individuals for paternity or sibship against being unrelated.
 }
 \examples{
 # Simulate 100 markers for half siblings
 x = halfSibPed() |> markerSim(N = 100, ids = 4:5, alleles = 1:3, seed = 1)
 
-# Test paternity, full sib, half sib
+# Test for paternity, full sibs, half sibs, 1st cousins
 quickLR(x)
 
 }
