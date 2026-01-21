@@ -63,19 +63,22 @@
 #'
 #' @examples
 #'
-#' # Simulate DNA profile for child of full sibs
+#' # Simulate genotype for 100 SNPs, for a child of full sibs
 #' x = nuclearPed(2, sex = 1:2) |> addSon(3:4) |>
-#'   profileSim(ids = 5, markers = NorwegianFrequencies, seed = 123)
+#'   markerSim(N = 100, ids = 5, alleles = 1:2, afreq = c(0.3, 0.7), seed = 123)
 #' x
 #'
-#' # Estimate inbreeding coefficient (expected: 0.0625)
-#' fEstimate(x)
+#' # Estimate inbreeding coefficient (pedigree: 0.25)
+#' fEstimate(x) # MLE
+#' fEstimate(x, method = "simple")
+#' fEstimate(x, method = "ritland")
+#'
 #'
 #' #-----------------------------
 #' # Compare different estimators
 #' #-----------------------------
 #'
-#' # Simulate 200 DNA profiles for a child of half-sibs
+#' # Simulate 200 DNA profiles (35 STR markers) for a child of half-sibs
 #' x = halfSibPed(sex2 = 2) |> addSon(4:5) |>
 #'   profileSim(N = 200, ids = 6, markers = NorwegianFrequencies, seed = 123)
 #'
@@ -86,7 +89,7 @@
 #'   rit = sapply(x, fEstimate, method = "ritland")
 #' )
 #'
-#' # Mean estimates
+#' # Mean estimates (expected: 0.125)
 #' apply(fhat, 2, mean)
 #'
 #' # RMSE
