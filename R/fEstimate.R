@@ -199,3 +199,128 @@ fEstimate = function(x, ids = typedMembers(x), method = c("mle", "simple", "ritl
   dat$miss = integer(0)
   dat
 }
+
+
+# Special likelihood functions ------------------------------------------
+
+
+#' Parent-child pedigree likelihoods
+#'
+#' Fast likelihood computation of pedigrees in which the only genotyped
+#' individuals are a (noninbred) parent and their (possibly inbred) child. In
+#' this case the pedigree information is fully captured by the inbreeding
+#' coefficient \eqn{f} of the child, enabling efficient calculations by
+#' vectorising over the markers.
+#'
+#' @param x A `ped` object with exactly two typed members.
+#' @param parent ID of parent; identified automatically if missing.
+#' @param child ID of child; identified automatically if missing.
+#' @param f Inbreeding coefficient of child, calculated with
+#'   `ribd::inbreeding()` if missing.
+#' @param check A logical indicating whether to check parent and child in `x`.
+#'
+#' @returns A numeric vector with per-marker likelihoods P(parent & child
+#'   genotypes | f).
+#'
+#' @examples
+#'
+#' db = NorwegianFrequencies[1:10]
+#'
+#' # Simulate genotypes for a child of first cousins, and his mother
+#' x = cousinPed(1, child = TRUE) |> profileSim(ids = 8:9, markers = db)
+#'
+#' plot(x, hatched = typedMembers)
+#'
+#' liks = parentChildLikelihood(x)
+#'
+#' # Compare with standard likelihood calculation, requiring loop breaking etc.
+#' stopifnot(all.equal(liks, pedprobr::likelihood(x)))
+#'
+#' # bench::mark(parentChildLikelihood(x), pedprobr::likelihood(x))
+#'
+#' @export
+#' @importFrom ribd inbreeding
+parentChildLikelihood = function(x, parent = NULL, child = NULL, f = NULL, check = TRUE) {
+  if(check || is.null(parent) || is.null(child)) {
+    dat = .checkParentChild(x, parent, child)
+    parent = dat$parent
+    child = dat$child
+  }
+
+  if(is.null(f))
+    f = inbreeding(x, child)
+
+  d = .prepAlleleData(x, c(parent, child))
+  m = d[[parent]]
+  c = d[[child]]
+
+  moHom = m$a1 == m$a2
+  chHom = c$a1 == c$a2
+
+  m1c1 = c$a1 == m$a1
+  m1c2 = c$a2 == m$a1
+  m2c1 = c$a1 == m$a2
+  m2c2 = c$a2 == m$a2
+
+  # Mother genotype under HWE (per marker)
+  pm = 2*m$f1*m$f2
+  pm[moHom] = m$f1[moHom]^2
+
+  # P(father -> child allele | mother genotype); "IBD with one of mother's alleles" has prob 2f
+  pt1 = (1 - 2*f)*c$f1 + f * (m1c1 + m2c1)
+  pt2 = (1 - 2*f)*c$f2 + f * (m1c2 + m2c2)
+
+  # Maternal transmission weights: (1,0) if homozygous; (0.5,0.5) otherwise
+  w1 = 0.5 + moHom/2
+  w2 = 1 - w1
+
+  # Child genotype given maternal transmitted allele u = m1 (pc1) or u = m2 (pc2)
+  pc1 = m1c1 * pt2 + m1c2 * pt1
+  pc2 = m2c1 * pt2 + m2c2 * pt1
+  pc1[chHom] = m1c1[chHom] * pt1[chHom]
+  pc2[chHom] = m2c1[chHom] * pt1[chHom]
+
+  pm * (w1*pc1 + w2*pc2)
+}
+
+
+.checkParentChild = function(x, parent = NULL, child = NULL) {
+    typed = typedMembers(x)
+    hasPar = !is.null(parent)
+    hasCh = !is.null(child)
+
+    if(length(typed) != 2)
+      stop2("The pedigree must contain exactly two typed members")
+
+    if(hasPar && !(parent %in% typed))
+      stop2("The indicated parent is not typed")
+    if(hasCh && !(child %in% typed))
+      stop2("The indicated child is not typed")
+
+    if(!hasPar && !hasCh) {
+      if(typed[1] %in% parents(x, typed[2]))
+        return(list(parent = typed[1], child = typed[2]))
+      if(typed[2] %in% parents(x, typed[1]))
+        return(list(parent = typed[2], child = typed[1]))
+      stop2("Typed members are not in a parent-child relationship")
+    }
+
+    if(!hasPar) {
+      parent = intersect(typed, parents(x, child))
+      if(!length(parent))
+        stop2("The indicated child has no typed parents")
+      return(list(parent = parent, child = child))
+    }
+
+    if(!hasCh) {
+      child = intersect(typed, children(x, parent))
+      if(!length(child))
+        stop2("Could not uniquely identify child of parent '", parent, "'")
+      return(list(parent = parent, child = child))
+    }
+
+    if(!(parent %in% parents(x, child)))
+      stop2("The indicated parent is not a parent of the indicated child")
+
+    list(parent = parent, child = child)
+}
