@@ -141,14 +141,15 @@ fEstimate = function(x, ids = typedMembers(x), method = c("mle", "simple", "ritl
 .fest_mle = function(dat) {
 
   dat = .removeMiss1(dat)
+  n = length(dat$a1)
+  het = dat$a1 != dat$a2
+  p1 = dat$f1
+  p2 = dat$f2
+  p1sq = p1^2
 
   loglik = function(f) {
-    hom = dat$a1 == dat$a2
-    p1 = dat$f1
-    p2 = dat$f2
-    lik = numeric(length(hom))
-    lik[hom] = p1 * (1 + (1-p1) * f) # = f * p1 + (1-f) * p1^2
-    lik[!hom] = (1-f) * 2 * p1 * p2
+    lik = f * p1 + (1-f) * p1sq  #hom
+    lik[het] = (1-f) * 2 * p1[het] * p2[het]
     sum(log(lik), na.rm = TRUE)
   }
   opt = optimise(loglik, interval = c(0,1), maximum = TRUE)
