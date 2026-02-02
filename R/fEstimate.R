@@ -146,8 +146,9 @@ fEstimate = function(x, ids = typedMembers(x), method = c("mle", "simple", "ritl
     hom = dat$a1 == dat$a2
     p1 = dat$f1
     p2 = dat$f2
-    n = length(hom)
-    lik = ifelse(hom, f * p1 + (1-f) * p1^2, (1-f) * 2 * p1 * p2)
+    lik = numeric(length(hom))
+    lik[hom] = p1 * (1 + (1-p1) * f) # = f * p1 + (1-f) * p1^2
+    lik[!hom] = (1-f) * 2 * p1 * p2
     sum(log(lik), na.rm = TRUE)
   }
   opt = optimise(loglik, interval = c(0,1), maximum = TRUE)
