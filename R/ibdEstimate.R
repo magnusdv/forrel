@@ -324,7 +324,7 @@ as.double.ibdEst = function(x, ...) {
 # This function is (optionally) called from within `ibdEstimate()`.
 #' @importFrom stats quantile
 #' @importFrom graphics contour
-contoursKappaML = function(x, ids, peak = NA, levels = NULL) {
+contoursKappaML = function(x, ids, peak = NA, levels = NULL, ...) {
   ids = as.character(ids)
   if(length(ids) != 2)
     stop2("Contour plots require `ids` to be a single pair of individuals")
@@ -369,7 +369,7 @@ contoursKappaML = function(x, ids, peak = NA, levels = NULL) {
     levels = unique.default(round(levs, d+1))
   }
 
-  ribd::ibdTriangle()
+  ribd::ibdTriangle(...)
   contour(k0, k2, z = loglikMat, add = TRUE, levels = levels)
   if(!is.null(peak))
     ribd::showInTriangle(peak, new = FALSE)
