@@ -141,6 +141,11 @@ checkPairwise = function(x, ids = typedMembers(x), includeInbred = FALSE, across
     if(length(inbr) && verbose)
       message("Excluding inbred individuals: ", toString(inbr))
     includeIds = setdiff(includeIds, inbr)
+
+    if(length(includeIds) < 2) {
+      if(verbose) message("No relationships to check: Less than 2 typed individuals included")
+      return(invisible())
+    }
   }
 
   # Estimated coefficients
@@ -206,7 +211,7 @@ checkPairwise = function(x, ids = typedMembers(x), includeInbred = FALSE, across
       # If ecdf not already computed: simulate
       if(!ks %in% names(ecdfList)) {
         if(verbose)
-          cat("Simulating null distribution for GLR at kappa =", sub(ks," ","-"), "\n")
+          cat("Simulating null distribution for GLR at kappa =", sub(" ", "-", ks, fixed = TRUE), "\n")
         kap = c(kappa0[i], kappa1[i], kappa2[i])
         ecdfList[[ks]] = ecdfGLR(kap, nsim = nsim, freqList = db, log = TRUE, seed = seed)
       }
@@ -222,7 +227,7 @@ checkPairwise = function(x, ids = typedMembers(x), includeInbred = FALSE, across
     errtxt = sprintf("pval < %g", pvalThreshold)
   }
   else {
-    cpRes$err = err = !is.na(cpRes$GLR) & cpRes$GLR >= GLRthreshold
+    cpRes$err = err = !is.na(logGLR) & logGLR >= log(GLRthreshold)
     errtxt = sprintf("GLR > %g", GLRthreshold)
   }
 
@@ -249,12 +254,14 @@ plotCP = function(cpRes = NULL, plotType = c("base", "ggplot2", "plotly"),
   }
 
   err = cpRes$err
+  hasErr = isTRUE(any(err, na.rm = TRUE))
+
   relgroup = cpRes$relgroup
   k0 = cpRes$k0
   k2 = cpRes$k2
 
   errDat = NULL
-  if(any(err)) {
+  if(hasErr) {
     errDat = cpRes[err, , drop = FALSE]
     errDat$labs = labs = paste(errDat$id1, "-", errDat$id2)
   }
@@ -274,7 +281,7 @@ plotCP = function(cpRes = NULL, plotType = c("base", "ggplot2", "plotly"),
     legpch = ALLSHAPES[levels(relgroup)]
     legcex = rep(1, length(legcol))
 
-    if(any(err, na.rm = T)) {
+    if(hasErr) {
       legtxt = c(legtxt, NA, errtxt)
       legcol = c(legcol, NA, 1)
       legpch = c(legpch, NA, 1)
@@ -311,7 +318,7 @@ plotCP = function(cpRes = NULL, plotType = c("base", "ggplot2", "plotly"),
                      legend.title = ggplot2::element_text(size = 12)
                      )
 
-    if(isTRUE(labels) || !is.null(errDat)) {
+    if(isTRUE(labels) || hasErr) {
       if(!requireNamespace("ggrepel", quietly = TRUE))
         stop2("Package `ggrepel` must be installed for this option to work")
     }
@@ -325,7 +332,7 @@ plotCP = function(cpRes = NULL, plotType = c("base", "ggplot2", "plotly"),
         size = 4, max.overlaps = Inf, box.padding = 1, show.legend = FALSE)
     }
 
-    if(!is.null(errDat)) {
+    if(hasErr) {
       p = p +
         ggplot2::geom_point(data = errDat, ggplot2::aes(k0, k2, size = "big"),
                           shape = 1, stroke = 1, col = 1) +
@@ -360,7 +367,7 @@ plotCP = function(cpRes = NULL, plotType = c("base", "ggplot2", "plotly"),
 
     if(is.numeric(ALLSHAPES)) {
       idx = match(ALLSHAPES, names(plotlySymb), nomatch = 0)
-      ALLSHAPES[idx] = plotlySymb[idx]
+      ALLSHAPES[idx > 0] = unname(plotlySymb[idx[idx > 0]])
     }
 
     p = ribd::ibdTriangle(plotType = "plotly", ...)
@@ -375,7 +382,7 @@ plotCP = function(cpRes = NULL, plotType = c("base", "ggplot2", "plotly"),
                             text = ~labs, hoverinfo = "text", name = r, legendrank = 2)
     }
 
-    if(any(dat$err)) {
+    if(hasErr) {
 
       # Invisible spacer trace
       p = p |>
