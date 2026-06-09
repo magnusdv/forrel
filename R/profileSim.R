@@ -55,8 +55,7 @@
 #'
 #'
 #'
-#' @importFrom parallel makeCluster stopCluster detectCores parLapply
-#'   clusterEvalQ clusterExport clusterSetRNGStream
+#' @importFrom parallel makeCluster stopCluster detectCores parLapply clusterEvalQ clusterExport clusterSetRNGStream
 #' @export
 profileSim = function(x, N = 1, ids = NULL, markers = NULL, seed = NULL,
                       numCores = 1, simplify1 = TRUE, verbose = TRUE, ...){

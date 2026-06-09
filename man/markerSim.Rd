@@ -47,7 +47,7 @@ marker object (on which the simulation should be conditioned) or the name
 
 \item{loopBreakers}{A numeric containing IDs of individuals to be used as
 loop breakers. Relevant only if the pedigree has loops, and only if
-\code{partialmarker} is non-NULL. See \code{\link[pedtools:inbreedingLoops]{pedtools::breakLoops()}}.}
+\code{partialmarker} is non-NULL. See \code{\link[pedtools:breakLoops]{pedtools::breakLoops()}}.}
 
 \item{seed}{An integer seed for the random number generator (optional).}
 

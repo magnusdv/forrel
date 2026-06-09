@@ -79,8 +79,7 @@
 #'
 #' }
 #'
-#' @importFrom parallel makeCluster stopCluster detectCores parLapply
-#'   clusterEvalQ clusterExport clusterSetRNGStream
+#' @importFrom parallel makeCluster stopCluster detectCores parLapply clusterEvalQ clusterExport clusterSetRNGStream
 #' @export
 MPPsims = function(reference, missing = "MP", selections, ep = TRUE, ip = TRUE,
                    addBaseline = TRUE, nProfiles = 1, lrSims = 1, thresholdIP = NULL,

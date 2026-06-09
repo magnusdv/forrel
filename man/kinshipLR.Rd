@@ -148,7 +148,7 @@ if(requireNamespace("ibdsim2", quietly = TRUE) && pedprobr::checkMerlin()) {
 }
 \seealso{
 \code{\link[=LRpower]{LRpower()}}, \code{\link[pedprobr:likelihood]{pedprobr::likelihood()}},
-\code{\link[pedprobr:merlin]{pedprobr::likelihoodMerlin()}}
+\code{\link[pedprobr:likelihoodMerlin]{pedprobr::likelihoodMerlin()}}
 }
 \author{
 Magnus Dehli Vigeland and Thore Egeland
