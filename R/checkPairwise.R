@@ -369,25 +369,28 @@ plotCP = function(cpRes = NULL, plotType = c("base", "ggplot2", "plotly"),
       datr = dat[dat$relgroup == r, , drop = FALSE]
       p = p |>
         plotly::add_markers(data = datr, x = ~k0, y = ~k2, customdata = ~idx,
-                            symbol = I(ALLSHAPES[r]), color = I(ALLCOLS[r]),
-                            cliponaxis = FALSE,
-                            marker = list(size = 12,
+                            color = I(ALLCOLS[r]), cliponaxis = FALSE,
+                            marker = list(symbol = unname(ALLSHAPES[r]), size = 12,
                                           line = list(width = if(r == "Other") 1 else 2)),
-                            text= ~labs, hoverinfo = "text", name = r, legendrank = 2)
+                            text = ~labs, hoverinfo = "text", name = r, legendrank = 2)
     }
+
     if(any(dat$err)) {
 
       # Invisible spacer trace
-      p = p |> plotly::add_markers(x = 0, y = 0, name = " ", hoverinfo = "none",
-                             marker = list(size = 0, color = 'rgba(0,0,0,0)'),
-                             showlegend = TRUE, legendrank = 1.5)
+      p = p |>
+        plotly::add_markers(x = 0, y = 0, name = " ", hoverinfo = "none",
+                            marker = list(size = 0, color = 'rgba(0,0,0,0)'),
+                            showlegend = TRUE, legendrank = 1.5)
 
       # Error circles
-      p = p |> plotly::add_markers(data = errDat, x = ~k0, y = ~k2,
-                                   name = errtxt, cliponaxis = FALSE,
-                                   symbol = I("circle-open"), color = I("black"),
-                                   marker = list(size = 22, line = list(width = 1)),
-                                   hoverinfo = "none", legendrank = 1)
+      p = p |>
+        plotly::add_markers(data = errDat, x = ~k0, y = ~k2,
+                            name = errtxt, cliponaxis = FALSE,
+                            color = I("black"),
+                            marker = list(symbol = "circle-open", size = 22,
+                                          line = list(width = 1)),
+                            hoverinfo = "none", legendrank = 1)
     }
 
     p = p |> plotly::layout(
