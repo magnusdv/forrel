@@ -262,7 +262,7 @@ plotCP = function(cpRes = NULL, plotType = c("base", "ggplot2", "plotly"),
 
   errDat = NULL
   if(hasErr) {
-    errDat = cpRes[err, , drop = FALSE]
+    errDat = cpRes[err %in% TRUE, , drop = FALSE]
     errDat$labs = labs = paste(errDat$id1, "-", errDat$id2)
   }
 
@@ -290,7 +290,8 @@ plotCP = function(cpRes = NULL, plotType = c("base", "ggplot2", "plotly"),
 
     ribd::showInTriangle(cpRes[1:6], plotType = "base", col = cols, pch = pchs,
                          labels = labels, ...)
-    points(errDat$k0, errDat$k2, pch = 1, lwd = 1.8, cex = 3)
+    if(hasErr)
+      points(errDat$k0, errDat$k2, pch = 1, lwd = 1.8, cex = 3)
 
     legend("topright", title = " According to pedigree", title.adj = 0,
            bg = "whitesmoke", legend = legtxt, col = legcol, pch = legpch,
