@@ -87,7 +87,7 @@ missingPersonLR = function(reference, missing, poi = NULL, verbose = TRUE, ...) 
   # Case I: poi data is attached to MP in the pedigree
   if(is.null(poi)) {
 
-    if(!missing %in% typedMembers(reference))
+    if(missing %notin% typedMembers(reference))
       stop2(sprintf("Interpreting `%s` as POI, but this individual is not typed", missing))
 
     if(verbose)

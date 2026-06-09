@@ -222,7 +222,7 @@ kinshipLR = function(..., ref = NULL, source = NULL, markers = NULL, likArgs = N
     unnamed = hypnames == "" | is.na(hypnames)
     hypnames[unnamed] = paste0("H", which(unnamed))
   }
-  if(dup <- anyDuplicated(hypnames))
+  if(dup <- anyDuplicated.default(hypnames))
     stop2("Duplicated hypothesis name: ", hypnames[dup])
 
   names(x) = hypnames

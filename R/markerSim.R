@@ -383,7 +383,7 @@ markerSim = function(x, N = 1, ids = NULL, alleles = NULL, afreq = NULL,
   # removing genotypes for individuals that are i) originally untyped and ii) unavailable
   typedTF[forcedTF] = FALSE
 
-  unavailable = !labels(x) %in% ids
+  unavailable = labels(x) %notin% ids
   markers[!typedTF & unavailable, ] = 0
   attrib = attributes(morig)
   attrib$name = NA_character_
@@ -574,7 +574,7 @@ simpleSim = function(x, N, alleles, afreq, ids, Xchrom = FALSE,
     m = .genedrop_AUT(x, N, nall, afreq, mutmod, seed)
 
   # Remove genotypes for individuals not in `ids`
-  m[!labels(x) %in% ids, ] = 0L
+  m[labels(x) %notin% ids, ] = 0L
 
   # Odd column numbers (needed several times below)
   odd = seq_len(N) * 2 - 1

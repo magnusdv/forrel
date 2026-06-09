@@ -123,7 +123,7 @@ checkPairwise = function(x, ids = typedMembers(x), includeInbred = FALSE, across
   }
 
   # If pedlist, allow duplicated names among non-included indivs
-  if(is.pedList(x) && anyDuplicated(labs <- labels(x, unlist = TRUE))) {
+  if(is.pedList(x) && anyDuplicated.default(labs <- labels(x, unlist = TRUE))) {
     dups = unique.default(labs[duplicated.default(labs)])
     if(any(dups %in% includeIds))
       stop2("Duplicated ID label: ", intersect(dups, includeIds))

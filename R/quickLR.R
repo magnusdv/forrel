@@ -26,11 +26,11 @@ quickLR = function(x, ids = typedMembers(x), test = c("pat", "sib", "half", "cou
   if(length(ids) != 2)
     stop2("Please indicate exactly two individuals. Received: ", ids)
 
-  if(!all(ids %in% typedMembers(x)))
+  if(anyNA(match(ids, typedMembers(x))))
     stop2("Individual is not typed: ", setdiff(ids, typedMembers(x)))
 
   rels = c("pat", "sib", "half", "cous")
-  if(!all(test %in% rels))
+  if(anyNA(match(test, rels)))
     stop2("Illegal value of `test`: ", setdiff(test, rels),
           "\nAllowed inputs are 'pat', 'sib', 'half', 'cous'")
 

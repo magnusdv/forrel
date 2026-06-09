@@ -136,8 +136,8 @@ ibdEstimate = function(x, ids = typedMembers(x), param = c("kappa", "delta"),
   pairs = lapply(seq_len(nrow(ids)), function(i) ids[i, ])
 
   allids = unique.default(unlist(pairs))
-  if(!all(allids %in% typedMembers(x)))
-    stop2("Untyped pedigree member: ", setdiff(allids, typedMembers(x)))
+  if(anyNA(match(allids, typedMembers(x))))
+    stop2("Untyped pedigree member: ", .mysetdiff(allids, typedMembers(x)))
 
   # Alleles and frequencies
   alleleData = .prepAlleleData(x, ids = allids)

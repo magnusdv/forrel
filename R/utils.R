@@ -52,6 +52,10 @@ pluralise = function(noun = "", n) {
   y[match(x, y, 0L)]
 }
 
+.mysetequal = function(x, y) {
+  !anyNA(match(x, y)) && !anyNA(match(y, x))
+}
+
 #random 0/1 vector of length n.
 .rand01 = function(n) {
   sample.int(2, size = n, replace = TRUE) - 1L

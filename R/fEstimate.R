@@ -105,8 +105,8 @@ fEstimate = function(x, ids = typedMembers(x), method = c("mle", "simple", "ritl
     x = selectMarkers(x, markers)
 
   ids = as.character(ids)
-  if(!all(ids %in% typedMembers(x)))
-    stop2("Untyped pedigree member: ", setdiff(ids, typedMembers(x)))
+  if(anyNA(match(ids, typedMembers(x))))
+    stop2("Untyped pedigree member: ", .mysetdiff(ids, typedMembers(x)))
 
   # Alleles and frequencies
   alleleData = .prepAlleleData(x, ids = ids)
@@ -294,9 +294,9 @@ parentChildLikelihood = function(x, parent = NULL, child = NULL, f = NULL, check
     if(length(typed) != 2)
       stop2("The pedigree must contain exactly two typed members")
 
-    if(hasPar && !(parent %in% typed))
+    if(hasPar && parent %notin% typed)
       stop2("The indicated parent is not typed")
-    if(hasCh && !(child %in% typed))
+    if(hasCh && child %notin% typed)
       stop2("The indicated child is not typed")
 
     if(!hasPar && !hasCh) {
@@ -308,20 +308,20 @@ parentChildLikelihood = function(x, parent = NULL, child = NULL, f = NULL, check
     }
 
     if(!hasPar) {
-      parent = intersect(typed, parents(x, child))
+      parent = .myintersect(typed, parents(x, child))
       if(!length(parent))
         stop2("The indicated child has no typed parents")
       return(list(parent = parent, child = child))
     }
 
     if(!hasCh) {
-      child = intersect(typed, children(x, parent))
+      child = .myintersect(typed, children(x, parent))
       if(!length(child))
         stop2("Could not uniquely identify child of parent '", parent, "'")
       return(list(parent = parent, child = child))
     }
 
-    if(!(parent %in% parents(x, child)))
+    if(parent %notin% parents(x, child))
       stop2("The indicated parent is not a parent of the indicated child")
 
     list(parent = parent, child = child)
