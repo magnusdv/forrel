@@ -356,9 +356,14 @@ print.LRresult = function(x, ...) {
   # Split marker map by chromosome (keep original chrom order)
   chromSplit = split(physMap, factor(physMap$CHROM, levels = unique(physMap$CHROM)))
 
+  # Use sex-averaging unless X-chrom
+  isX = names(chromSplit) %in% c("X", "23")
+  usesex = ifelse(isX, "female", "average")
+
   # Convert positions in each chrom
-  newmap = lapply(chromSplit, function(chrmap) {
-    CM = ibdsim2::convertPos(chrmap$CHROM, Mb = chrmap$MB, map = genMap, sex = "average")
+  newmap = lapply(seq_along(chromSplit), function(i) {
+    chrmap = chromSplit[[i]]
+    CM = ibdsim2::convertPos(chrmap$CHROM, Mb = chrmap$MB, map = genMap, sex = usesex[i])
     cbind(chrmap, CM = CM)[c("CHROM", "MARKER", "CM", "MB")] # 3 first cols as used by MERLIN
   })
 
