@@ -436,13 +436,13 @@ print.EPresult = function(x, ...) {
   ### Step 1
   # Incompatible combinations in each component
   I.g.list = lapply(seq_along(claim), function(i) {
-    if(!any(compsClaim == i))
+    ids.i = ids[compsClaim == i]
+    if(!length(ids.i))
       return(NULL)
 
-    omd = oneMarkerDistribution(claim[[i]], ids = ids[compsClaim == i],
-                                marker = 1, verbose = FALSE)
+    omd = oneMarkerDistribution(claim[[i]], ids = ids.i, marker = 1, verbose = FALSE)
     omd == 0
-    })
+  })
 
   # Remove NULLs
   I.g.list = I.g.list[lengths(I.g.list) > 0]
@@ -454,6 +454,15 @@ print.EPresult = function(x, ...) {
   # If no incompatibilities, return 0
   if(!any(I.g))
     return(0)
+
+  # Reorder claim array axes to original `ids` order
+  idsClaim = unlist(lapply(seq_along(claim), \(i) ids[compsClaim == i]), use.names = FALSE)
+  names(dimnames(I.g)) = idsClaim
+
+  if(!identical(idsClaim, ids)) {
+    I.g = aperm(I.g, match(ids, idsClaim))
+    names(dimnames(I.g)) = ids
+  }
 
   # Extract the TRUE positions (= incompatible combinations)
   incomp = which(I.g, arr.ind = TRUE, useNames = FALSE)
@@ -470,8 +479,8 @@ print.EPresult = function(x, ...) {
 
   ### Step 2: Probability of incomp under `true` pedigree
 
-  # Grid to be used as input to oneMarkerDistribution
-  # Recall: Entries now refers to rows in allGenotypes(n)
+  # Grid to be used as input to oneMarkerDistribution()
+  # Entries refer to rows in allGenotypes(n)
   incomp.grid = incomp
 
   # If X: Modify male columns.  TODO: would be nice to clean this up a bit.
@@ -503,6 +512,13 @@ print.EPresult = function(x, ...) {
 
   # Reduce to array
   p.g = Reduce("%o%", p.g.list)
+
+  # Ensure correct axis order
+  idsTrue = unlist(lapply(seq_along(true), \(i) ids[compsTrue == i]), use.names = FALSE)
+  names(dimnames(p.g)) = idsTrue
+
+  if(!identical(idsTrue, ids))
+    p.g = aperm(p.g, match(ids, idsTrue))
 
   # The entries corresponding to exclusions
   excl = p.g[I.g]
