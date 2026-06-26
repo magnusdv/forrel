@@ -360,11 +360,12 @@ markerSim = function(x, N = 1, ids = NULL, alleles = NULL, afreq = NULL,
     }
 
     # Founder inbreeding
-    fou_inb = founderInbreeding(x)
-    fi = which(fou_inb > 0)
-    for(i in fi) {
-      copy = as.logical(rbinom(N, 1, prob = fou_inb[i]))
-      markers[simple.founders_int[i], odd[copy] + 1] = markers[simple.founders_int[i], odd[copy]]
+    simple_fou_inb = founderInbreeding(x, ids = x$ID[simple_founders_int])
+
+    for(i in which(simple_fou_inb > 0)) {
+      copy = as.logical(rbinom(N, 1, simple_fou_inb[i]))
+      f = simple_founders_int[i]
+      markers[f, odd[copy] + 1] = markers[f, odd[copy]]
     }
 
     # Genotypes of the duplicated individuals. Some of these may be ungenotyped...save time by excluding these?
