@@ -169,14 +169,15 @@ ibdEstimate = function(x, ids = typedMembers(x), param = c("kappa", "delta"),
   ids = do.call(rbind, lapply(resList, function(r) r$ids))
   N = unlist(lapply(resList, function(r) r$nMarkers))
 
-  res = structure(data.frame(ids, N, coefs),
-                  names = c("id1", "id2", "N", if(param == "kappa") paste0("k", 0:2) else paste0("d", 1:9)),
-                  class = c("ibdEst", "data.frame"))
+  res = data.frame(ids, N, coefs)
+  names(res) = c("id1", "id2", "N", if(param == "kappa") paste0("k", 0:2) else paste0("d", 1:9))
 
   if(maxval) {
     ml = do.call(rbind, lapply(resList, function(r) r$loglik))
     res = cbind(res, maxloglik = ml)
   }
+
+  class(res) = c("ibdEst", class(res))
 
   if(contourPlot) {
     if(param == "delta")
