@@ -77,8 +77,9 @@ markerSim = function(x, N = 1, ids = NULL, alleles = NULL, afreq = NULL,
     return(lapply(x, function(xi) markerSim(xi, N = N,
                                             ids = intersect(xi$ID, ids),
                                             alleles = alleles, afreq = afreq,
+                                            mutmod = mutmod, rate = rate,
                                             partialmarker = partialmarker,
-                                            loopBreakers = loopBreakers,
+                                            loopBreakers = loopBreakers[loopBreakers %in% xi$ID],
                                             verbose = verbose)))
 
   starttime = proc.time()
