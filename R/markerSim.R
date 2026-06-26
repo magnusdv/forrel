@@ -285,44 +285,64 @@ markerSim = function(x, N = 1, ids = NULL, alleles = NULL, afreq = NULL,
   dim(markers) = c(pedsize(x), 2 * N)
   odd = seq_len(N) * 2 - 1
 
-  if (length(joint_int) > 0) {
-    allgenos_row_grid = t.default(pedprobr:::fastGrid(gridlist[joint_int])) # Cartesian product. Each row contains 'init' row numbers of allgenos.
-    jointp = apply(allgenos_row_grid, 2, function(rownrs) {
-      partial = m
-      partial[joint_int, ] = allgenos[rownrs, ]
-      likelihood(x, markers = partial)
-    })
-    likel_counter = likel_counter + length(jointp)
-    if (identical(sum(jointp), 0))
-      stop2("When trying to pre-compute joint probabilities: All probabilities zero. Mendelian error?")
+  # Step 1: Compute joint distribution of the 'joint' individuals
+  if(length(joint_int) > 0) {
+    # Each row contains allGenotypes() row numbers for the joint individuals
+    jointIds = labels(x)[joint_int]
+    grid = pedprobr::genoCombinations(x, m, ids = jointIds, make.grid = TRUE)
 
-    # fill the rows of the 'joint' individuals
-    sample_rows = allgenos_row_grid[, suppressWarnings(sample.int(length(jointp), size = N,
-      replace = TRUE, prob = jointp))]
+    # Batch calculation of likelihoods for all candidate genotype combinations
+    candidates = lapply(seq_len(nrow(grid)), function(j) {
+      candidate = m
+      candidate[joint_int, ] = allgenos[grid[j, ], ]
+      candidate
+    })
+
+    y = setMarkers(x, candidates, checkCons = FALSE)
+    lnp = likelihood(y, logbase = exp(1))
+
+    if(all(lnp == -Inf))
+      stop2("All candidate genotype combinations are impossible")
+
+    jointp = exp(lnp - max(lnp))
+    nj = length(jointp)
+    likel_counter = likel_counter + nj
+
+    # Fill the rows of the 'joint' individuals
+    sample_rows = grid[sample.int(nj, N, replace = TRUE, prob = jointp), , drop = FALSE] |>
+      t.default()
+
     markers[joint_int, odd] = allgenos[sample_rows, 1]
     markers[joint_int, odd + 1] = allgenos[sample_rows, 2]
   }
 
-  if (length(bruteforce_int) > 0) {
-    for (i in bruteforce_int) {
+  # Step 2: Brute force
+  if(length(bruteforce_int) > 0) {
+    for(i in bruteforce_int) {
       gridi = gridlist[[i]]
-      rowsample = unlist(lapply(2 * seq_len(N), function(mi) {
+      nG = length(gridi)
+      candidates = lapply(seq_len(N), function(j) {
         partial = m
-        partial[] = markers[, c(mi - 1, mi)]  # preserves all attributes of the m.
-        probs = unlist(lapply(gridi, function(r) {
-          partial[i, ] = allgenos[r, ]
-          li = likelihood(x, markers = partial)
-        }))
+        partial[] = markers[, 2*j + c(-1, 0)]
+        lapply(gridi, function(r) {partial[i, ] = allgenos[r, ]; partial})
+      }) |> unlist(recursive = FALSE)
 
-        if (sum(probs) == 0) {
-          print(partial)
-          stop2("\nIndividual ", labels(x)[i], ": All genotype probabilities zero. Mendelian error?")
-        }
-        sample(gridi, size = 1, prob = probs)
-      }))
+      lnp = likelihood(x, markers = candidates, logbase = exp(1))
+      dim(lnp) = c(nG, N)
+
+      bad = .colSums(is.finite(lnp), nG, N) == 0L
+      if(any(bad))
+        stop2("All genotype probabilities zero for individual ", labels(x)[i])
+
+      rowsample = vapply(seq_len(N), function(j) {
+        w = exp(lnp[, j] - max(lnp[, j]))
+        sample(gridi, size = 1, prob = w)
+      }, integer(1))
+
       markers[i, odd] = allgenos[rowsample, 1]
       markers[i, odd + 1] = allgenos[rowsample, 2]
     }
+
     likel_counter = likel_counter + N * sum(ngrid[bruteforce_int])
   }
 
