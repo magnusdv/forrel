@@ -187,7 +187,7 @@ exclusionPower = function(claimPed, truePed, ids, markers = NULL, source = "clai
       alleles = seq_len(alleles)
 
     # Create and attach locus to both pedigrees
-    locus = list(alleles = alleles, afreq = afreq, chrom = if (Xchrom) 23 else NA)
+    locus = list(alleles = alleles, afreq = afreq, chrom = if(Xchrom) 23 else NA)
     claimPed = setMarkers(claimPed, alleleMatrix = am, locusAttributes = locus)
     truePed = setMarkers(truePed, alleleMatrix = am, locusAttributes = locus)
 
@@ -231,7 +231,7 @@ exclusionPower = function(claimPed, truePed, ids, markers = NULL, source = "clai
   }
 
   # Plot
-  if (isTRUE(plot) || plot == "plotOnly") {
+  if(isTRUE(plot) || plot == "plotOnly") {
     plotPedList(list(claimPed, truePed),
                 newdev = TRUE,
                 titles = c("Claim", "True"),
@@ -239,7 +239,7 @@ exclusionPower = function(claimPed, truePed, ids, markers = NULL, source = "clai
                 col = list(red = allids),
                 marker = match(plotMarkers, markers))
 
-    if (plot == "plotOnly")
+    if(plot == "plotOnly")
       return()
   }
 
@@ -370,7 +370,7 @@ summariseEP = function(epvec) {
     distrib = c(`0` = 1)
   else {
     distrib = setNames(rep(NA_real_, n.nonz + 1), 0:n.nonz)
-    if (requireNamespace("poibin", quietly = TRUE))
+    if(requireNamespace("poibin", quietly = TRUE))
       distrib[] = poibin::dpoibin(kk = 0:n.nonz, pp = epvec[!is.na(epvec) & epvec > 0])
     else
       warning("Package `poibin` not found. Cannot compute the distribution of exclusion counts without this; returning NA's")
@@ -404,18 +404,18 @@ print.EPresult = function(x, ...) {
 
 }
 
-  ###############################
-  ### Computations start here ###
-  ###############################
+###############################
+### Computations start here ###
+###############################
 
 .EPsingleMarker = function(claimPed, truePed, ids, marker, verbose = TRUE) {
 
   # Step 1: Genotype combinations incompatible with "claim"
   # Step 2: Probability of incomp under `true` pedigree
 
-  if (is.ped(claimPed))
+  if(is.ped(claimPed))
     claimPed = list(claimPed)
-  if (is.ped(truePed))
+  if(is.ped(truePed))
     truePed = list(truePed)
 
   claim = selectMarkers(claimPed, marker)

@@ -116,7 +116,7 @@ LRpower = function(numeratorPed, denominatorPed, truePed = numeratorPed, ids, ma
       alleles = seq_len(alleles)
 
     # Create and attach locus to both pedigrees
-    locus = list(alleles = alleles, afreq = afreq, chrom = if (Xchrom) 23 else NA)
+    locus = list(alleles = alleles, afreq = afreq, chrom = if(Xchrom) 23 else NA)
     truePed = setMarkers(truePed, alleleMatrix = am, locusAttributes = locus)
 
     markers = 1
@@ -157,7 +157,7 @@ LRpower = function(numeratorPed, denominatorPed, truePed = numeratorPed, ids, ma
   }
 
   # Plot
-  if (isTRUE(plot) || plot == "plotOnly") {
+  if(isTRUE(plot) || plot == "plotOnly") {
     tp = selectMarkers(truePed, NULL)
     if(identical(tp, selectMarkers(numeratorPed, NULL))) {
       peds = list(numeratorPed, denominatorPed)
@@ -177,7 +177,7 @@ LRpower = function(numeratorPed, denominatorPed, truePed = numeratorPed, ids, ma
                 fill = list(green = allids),
                 marker = match(plotMarkers, markers))
 
-    if (plot == "plotOnly")
+    if(plot == "plotOnly")
       return()
   }
 

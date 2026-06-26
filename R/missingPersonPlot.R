@@ -101,7 +101,7 @@ missingPersonPlot = function(reference, missing, labs = labels(reference),
   # Labels
   mp_poi = if(MP.label != "") sprintf("%s=%s", POI.label, MP.label) else POI.label
   mp_label = setNames(missing, mp_poi)
-  if (is.null(labs) || identical(labs, ""))
+  if(is.null(labs) || identical(labs, ""))
     labs1 = mp_label
   else
     labs1 = c(mp_label, labs[labs != missing])

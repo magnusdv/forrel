@@ -15,7 +15,7 @@ xraw = readxl::read_xlsx("data-raw/FORCE-data.xlsx",
     req_headers(Accept = "application/json") |>
     req_perform()
 
-  if (resp_status(resp) == 200)
+  if(resp_status(resp) == 200)
     resp |> resp_body_string() |> fromJSON()
 }
 

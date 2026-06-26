@@ -63,17 +63,17 @@ markerSim = function(x, N = 1, ids = NULL, alleles = NULL, afreq = NULL,
                      mutmod = NULL, rate = NULL, partialmarker = NULL,
                      loopBreakers = NULL, seed = NULL, verbose = TRUE) {
 
-  if (!is.ped(x) && !is.pedList(x))
+  if(!is.ped(x) && !is.pedList(x))
     stop2("x must be either a `ped` object or a list of such")
 
-  if (!is.null(seed))
+  if(!is.null(seed))
     set.seed(seed)
 
   if(is.function(ids))
     ids = ids(x)
 
   # if input is a list of ped objects: Apply markerSim recursively
-  if (is.pedList(x))
+  if(is.pedList(x))
     return(lapply(x, function(xi) markerSim(xi, N = N,
                                             ids = intersect(xi$ID, ids),
                                             alleles = alleles, afreq = afreq,
@@ -95,22 +95,22 @@ markerSim = function(x, N = 1, ids = NULL, alleles = NULL, afreq = NULL,
   m = partialmarker
   if(!is.null(m)) {
 
-    if (!is.null(alleles) || !is.null(afreq))
+    if(!is.null(alleles) || !is.null(afreq))
       stop2("When `partialmarker` is given, both `alleles` and `afreq` must be NULL.")
 
     if(is.marker(m)) { # TODO (fix/export from pedtools ?
       # validateMarker(m)
       # checkConsistency(x, list(m))
     }
-    else if (is.atomic(m) && length(m) == 1) {
+    else if(is.atomic(m) && length(m) == 1) {
       m = getMarkers(x, markers = m)[[1]]
     }
     else
       stop2("Argument `partialmarker` must be a `marker` object, or the name (or index) of a single marker attached to `x`")
 
-    if (!allowsMutations(m)) {
+    if(!allowsMutations(m)) {
       err = mendelianCheck(setMarkers(x, m), verbose = FALSE)
-      if (length(err) > 0)
+      if(length(err) > 0)
         stop2("The given marker data has a Mendelian error")
     }
   }
@@ -129,7 +129,7 @@ markerSim = function(x, N = 1, ids = NULL, alleles = NULL, afreq = NULL,
     stop2("X chromosomal simulations are not implemented for pedigrees with inbred founders")
 
 
-  if (all(m == 0)) {
+  if(all(m == 0)) {
     return(simpleSim(x, N, alleles = alleles, afreq = afreq,
                      ids = ids, Xchrom = Xchrom,
                      mutmod = mut, seed = seed, verbose = verbose))
@@ -150,7 +150,7 @@ markerSim = function(x, N = 1, ids = NULL, alleles = NULL, afreq = NULL,
   gridlist = pedprobr::genoCombinations(x, m, labels(x), make.grid = FALSE)
 
 
-  if (verbose) {
+  if(verbose) {
     locus = if(!Xchrom) 'autosomal' else 'X-linked'
     plural_s = if(N>1) "s" else ""
 
@@ -164,14 +164,14 @@ markerSim = function(x, N = 1, ids = NULL, alleles = NULL, afreq = NULL,
 
   # Forced genotypes:
   forcedTF = (m[, 1] == 0 | m[, 2] == 0) & (lengths(gridlist) == 1)
-  for (id in (1:pedsize(x))[forcedTF])
+  for(id in (1:pedsize(x))[forcedTF])
     m[id, ] = allgenos[gridlist[[id]], ]
 
   if(verbose && any(forcedTF)) {
     cat("\nForced genotypes\n================\n")
-    for (id in (1:pedsize(x))[forcedTF]) {
+    for(id in (1:pedsize(x))[forcedTF]) {
       allelchars = alleles[m[id, ]]
-      if (Xchrom) allelchars = allelchars[1]
+      if(Xchrom) allelchars = allelchars[1]
       cat(sprintf("Individual %s: %s\n", labels(x)[id], paste(allelchars, collapse = "/")))
     }
   }
@@ -209,7 +209,7 @@ markerSim = function(x, N = 1, ids = NULL, alleles = NULL, afreq = NULL,
 
   # Target individuals: untyped individuals that we seek to simulate
   targets = .mysetdiff(ids, typed)
-  untyped_breakers = if (loops) .mysetdiff(loopBreakers, typed) else NULL
+  untyped_breakers = if(loops) .mysetdiff(loopBreakers, typed) else NULL
 
   # Method 2: Compute joint dist of some target individuals, brute force on the remaining
   hardsim.method2 = unique.default(c(untyped_breakers, targets))
@@ -256,7 +256,7 @@ markerSim = function(x, N = 1, ids = NULL, alleles = NULL, afreq = NULL,
     v.ordered = numeric()
     while (length(v) > 0) {
       i = match(TRUE, (FIDX[v] %in% done) & (MIDX[v] %in% done))
-      if (is.na(i))
+      if(is.na(i))
         stop2("Could not determine sensible order for gene dropping.")
       v.ordered = c(v.ordered, v[i])
       done = c(done, v[i])
@@ -268,7 +268,7 @@ markerSim = function(x, N = 1, ids = NULL, alleles = NULL, afreq = NULL,
   }
 
   if(verbose) {
-    .printLabels = function(v) if (length(v) > 0) toString(labels(x)[v]) else "None"
+    .printLabels = function(v) if(length(v) > 0) toString(labels(x)[v]) else "None"
 
     print(glue::glue("\n
       Simulation strategy
@@ -347,9 +347,9 @@ markerSim = function(x, N = 1, ids = NULL, alleles = NULL, afreq = NULL,
     likel_counter = likel_counter + N * sum(ngrid[bruteforce_int])
   }
 
-  if (length(simpledrop) > 0) {
+  if(length(simpledrop) > 0) {
     # HW sampling of founders
-    if (!Xchrom) {
+    if(!Xchrom) {
       markers[simple_founders_int, ] = sample.int(nall, size = 2 * N * length(simple_founders_int),
                                                   replace = TRUE, prob = afreq)
     }
@@ -369,27 +369,28 @@ markerSim = function(x, N = 1, ids = NULL, alleles = NULL, afreq = NULL,
       markers[f, odd[copy] + 1] = markers[f, odd[copy]]
     }
 
-    # Genotypes of the duplicated individuals. Some of these may be ungenotyped...save time by excluding these?
+    # Genotypes of the duplicated individuals.
+    # Some of these may be ungenotyped...save time by excluding these?
     markers[lb_copy_int, ] = markers[lb_int, ]
 
-    for (id in simple.nonfounders_int) {
-      if (!Xchrom) {
+    for(id in simple.nonfounders_int) {
+      if(!Xchrom) {
         paternal = markers[FIDX[id], odd + .rand01(N)]
         maternal = markers[MIDX[id], odd + .rand01(N)]
-        if (mutations) {
+        if(mutations) {
           paternal = .mutate(paternal, mut$male)
           maternal = .mutate(maternal, mut$female)
         }
       } else {
         maternal = markers[MIDX[id], odd + .rand01(N)]
-        if (mutations)
+        if(mutations)
           maternal = .mutate(maternal, mut$female)
 
-        if (SEX[id] == 1)
+        if(SEX[id] == 1)
           paternal = maternal  # if boy, only maternal
         else {
           paternal = markers[FIDX[id], odd]  # if girl, fathers allele is forced
-          if (mutations)
+          if(mutations)
             paternal = .mutate(paternal, mut$male)
         }
       }
@@ -398,7 +399,7 @@ markerSim = function(x, N = 1, ids = NULL, alleles = NULL, afreq = NULL,
     }
   }
 
-  if (loops) {
+  if(loops) {
     markers = markers[-x$LOOP_BREAKERS[, 2], ]
     x = tieLoops(x)
   }
@@ -437,7 +438,7 @@ markerSim = function(x, N = 1, ids = NULL, alleles = NULL, afreq = NULL,
   if(reorder)
     x = reorderPed(x, internalID(x, ORIGINAL_ORDER), internal = TRUE)
 
-  if (verbose) {
+  if(verbose) {
     seconds = (proc.time() - starttime)[["elapsed"]]
     print(glue::glue("
       Simulation finished
@@ -467,9 +468,9 @@ markerSim = function(x, N = 1, ids = NULL, alleles = NULL, afreq = NULL,
 
 
 .optimal.precomputation = function(target_int, Nsim, gridlist, Xchrom, SEX = NULL) {
-  if (length(target_int) == 0)
+  if(length(target_int) == 0)
     return(list(calls = 0, id_int = target_int))
-  if (!Xchrom) {
+  if(!Xchrom) {
     nT = length(target_int)
     ngrid_target = lengths(gridlist[target_int])
     callsCum = sapply(1:nT, function(ci)
@@ -487,7 +488,7 @@ markerSim = function(x, N = 1, ids = NULL, alleles = NULL, afreq = NULL,
 
     # Find optimal 'init' values for males/females (fewest likelihood calls)
     callsCum = matrix(nrow = nM + 1, ncol = nF + 1)
-    for (ma in 0:nM) for (fe in 0:nF)
+    for(ma in 0:nM) for(fe in 0:nF)
       callsCum[ma + 1, fe + 1] = prod(ngrid_m[seq_len(ma)]) * prod(ngrid_f[seq_len(fe)]) +
         Nsim * sum(c(ngrid_m[seq_len(nM - ma) + ma], ngrid_f[seq_len(nF - fe) + fe]))
 
@@ -544,27 +545,27 @@ simpleSim = function(x, N, alleles, afreq, ids, Xchrom = FALSE,
 
   starttime = proc.time()
 
-  if (missing(alleles)) {
-    if (missing(afreq))
+  if(missing(alleles)) {
+    if(missing(afreq))
       stop2("Arguments `alleles` and `afreq` cannot both be missing")
     alleles = seq_along(afreq)
   }
 
   nall = length(alleles)
-  if (missing(afreq))
+  if(missing(afreq))
     afreq = rep(1, nall)/nall
 
   variableSNPfreqs = nall == 2 && length(afreq) != 2 && !Xchrom
-  if (variableSNPfreqs)
+  if(variableSNPfreqs)
     afreq = rep(afreq, length = N)
 
-  if (missing(ids))
+  if(missing(ids))
     ids = labels(x)
 
   mutations = !is.null(mutmod)
-  # if (mutations) {
+  # if(mutations) {
     # If single matrix given: make sex specific list
-    # if (is.matrix(mutmod))
+    # if(is.matrix(mutmod))
     #  mutmod = pedmut::mutationModel("custom", matrix = mutmod)
 
     # Always validate
@@ -579,7 +580,7 @@ simpleSim = function(x, N, alleles, afreq, ids, Xchrom = FALSE,
     x = parentsBeforeChildren(x)
   }
 
-  if (verbose) {
+  if(verbose) {
     locus = if(!Xchrom) 'autosomal' else 'X-linked'
     plural_s = if(N>1) "s" else ""
 
@@ -587,7 +588,7 @@ simpleSim = function(x, N, alleles, afreq, ids, Xchrom = FALSE,
     Unconditional simulation of {N} {locus} marker{plural_s}.
     Individuals: {toString(ids)}
     "))
-    if (variableSNPfreqs) {
+    if(variableSNPfreqs) {
       cat("Alleles:", toString(alleles), "\n")
       cat("Variable frequencies: p =", toString(head(afreq, 5)), ifelse(N > 5, "...\n", "\n"))
     }
@@ -600,7 +601,7 @@ simpleSim = function(x, N, alleles, afreq, ids, Xchrom = FALSE,
     cat("Mutation model:", if(mutations) "Yes" else "No", "\n\n")
   }
 
-  if (Xchrom)
+  if(Xchrom)
     m = .genedrop_X(x, N, nall, afreq, mutmod, seed)
   else
     m = .genedrop_AUT(x, N, nall, afreq, mutmod, seed)
@@ -620,7 +621,7 @@ simpleSim = function(x, N, alleles, afreq, ids, Xchrom = FALSE,
   m[, odd + 1][swap] = a1[swap]
 
   # Create marker objects
-  if (variableSNPfreqs) {
+  if(variableSNPfreqs) {
     frqs = as.vector(rbind(afreq, 1 - afreq))
     attrib = attributes(marker(x, alleles = alleles, afreq = NULL,
                                chrom = NA, mutmod = mutmod))
@@ -651,7 +652,7 @@ simpleSim = function(x, N, alleles, afreq, ids, Xchrom = FALSE,
     x = reorderPed(x, internalID(x, ORIGINAL_ORDER), internal = TRUE)
   }
 
-  if (verbose) {
+  if(verbose) {
     seconds = (proc.time() - starttime)[["elapsed"]]
     print(glue::glue("
       Simulation finished.
@@ -670,7 +671,8 @@ simpleSim = function(x, N, alleles, afreq, ids, Xchrom = FALSE,
   NONFOU = nonfounders(x, internal = TRUE)
   mutations = !is.null(mutmod)
 
-  if (!is.null(seed)) set.seed(seed)
+  if(!is.null(seed))
+    set.seed(seed)
 
   # Initialise the marker matrix
   m = matrix(0L, ncol = 2 * N, nrow = pedsize(x))
@@ -678,7 +680,7 @@ simpleSim = function(x, N, alleles, afreq, ids, Xchrom = FALSE,
 
   # Sample alleles for the founders
   variableSNPfreqs = nall == 2 && length(afreq) != 2
-  if (variableSNPfreqs)
+  if(variableSNPfreqs)
     fou_alleles = unlist(lapply(afreq, function(f)
       sample.int(2, length(FOU)*2, replace = TRUE, prob = c(f, 1 - f))))
   else
@@ -697,10 +699,10 @@ simpleSim = function(x, N, alleles, afreq, ids, Xchrom = FALSE,
   }
 
   # Drop alleles down through the pedigree
-  for (id in NONFOU) {
+  for(id in NONFOU) {
     paternal = m[FIDX[id], odd + .rand01(N)]
     maternal = m[MIDX[id], odd + .rand01(N)]
-    if (mutations) {
+    if(mutations) {
       paternal = .mutate(paternal, mutmod$male)
       maternal = .mutate(maternal, mutmod$female)
     }
@@ -722,25 +724,26 @@ simpleSim = function(x, N, alleles, afreq, ids, Xchrom = FALSE,
   m = matrix(0L, ncol = 2 * N, nrow = pedsize(x))
   odd = seq_len(N) * 2 - 1
 
-  if (!is.null(seed)) set.seed(seed)
+  if(!is.null(seed))
+    set.seed(seed)
 
-  for (f in FOU) {
-    if (SEX[f] == 1)
+  for(f in FOU) {
+    if(SEX[f] == 1)
       m[f, ] = rep(sample.int(nall, size = N, replace = TRUE, prob = afreq), each = 2)
-    if (SEX[f] == 2)
+    if(SEX[f] == 2)
       m[f, ] = sample.int(nall, size = 2 * N, replace = TRUE, prob = afreq)
   }
-  for (id in NONFOU) {
+  for(id in NONFOU) {
     maternal = m[MIDX[id], odd + .rand01(N)]
-    if (mutations)
+    if(mutations)
       maternal = .mutate(maternal, mutmod$female)
 
-    if (SEX[id] == 1) {
+    if(SEX[id] == 1) {
       paternal = maternal  # if boy, only maternal
     }
     else {
       paternal = m[FIDX[id], odd]  # if girl, fathers allele is forced
-      if (mutations)
+      if(mutations)
         paternal = .mutate(paternal, mutmod$male)
     }
     m[id, odd] = paternal

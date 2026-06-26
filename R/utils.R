@@ -82,7 +82,7 @@ ftime = function(st, digits = 3)
     v = n
     n = length(v)
   }
-  if (n < 2)
+  if(n < 2)
     return(matrix(nrow = 0, ncol = 2))
 
   x = rep.int(seq_len(n - 1), (n - 1):1)
