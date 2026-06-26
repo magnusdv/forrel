@@ -58,20 +58,23 @@ test_that("kinshipLR() returns complete unlinked output", {
 
 
 test_that("kinshipLR() keeps undefined impossible-data ratios", {
-  bad = nuclearPed(fa = "fa", mo = "mo", child = "ch")
+  ok = singletons(1:3) |>
+    addMarker("1" = "1/1", "2" = "1/1", "3" = "2/2", alleles = 1:2)
+  bad = nuclearPed()
 
-  ok = singletons(c("fa", "mo", "ch")) |>
-    addMarker(fa = "1/1", mo = "1/1", ch = "2/2", alleles = 1:2)
-
-  res = NULL
-  expect_silent(res <- kinshipLR(bad1 = bad, ok = ok, bad2 = bad,
-                                 ref = "bad2", source = "ok", verbose = FALSE))
+  res = kinshipLR(bad1 = bad, ok = ok, bad2 = bad,
+                  ref = "bad2", source = "ok", verbose = FALSE)
 
   expect_equal(res$likelihoodsPerMarker[1, c("bad1", "bad2")], c(bad1 = 0, bad2 = 0))
   expect_gt(res$likelihoodsPerMarker[1, "ok"], 0)
+
   expect_true(is.nan(res$LRperMarker[1, "bad1:bad2"]))
   expect_true(is.infinite(res$LRperMarker[1, "ok:bad2"]))
   expect_true(is.nan(res$LRperMarker[1, "bad2:bad2"]))
+
+  expect_true(is.nan(res$LRtotal["bad1:bad2"]))
+  expect_true(is.infinite(res$LRtotal["ok:bad2"]))
+  expect_true(is.nan(res$LRtotal["bad2:bad2"]))
 })
 
 

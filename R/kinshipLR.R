@@ -296,24 +296,27 @@ kinshipLR = function(..., ref = NULL, source = NULL, markers = NULL, likArgs = N
 
   # Unlinked markers: pedprobr ----------------------------------------------
 
+  likArgs = likArgs %||% list()
+  prohib = .myintersect(names(likArgs), c("x", "markers", "marker", "logbase", "peelOrder"))
 
-  # compute likelihoods
-  if(is.null(likArgs))
-    likFun = function(xx) likelihood(xx, markers = markers)
-  else
-    likFun = function(xx) do.call(likelihood, c(list(xx, markers = markers), likArgs))
+  if(length(prohib))
+    stop2("Cannot pass argument in `likArgs`: ", prohib)
 
-  liks = lapply(x, likFun)
-  likelihoodsPerMarker = do.call(cbind, liks)
 
-  # LR per marker and total
-  LRperMarker = do.call(cbind, lapply(1:length(x), function(j) liks[[j]]/liks[[refIdx]]))
+  lnLik = lapply(x, \(xx) do.call(likelihood,
+    c(list(x = xx, markers = markers, logbase = exp(1)), likArgs)))
 
-  # Create names for LR comparisons
-  colnames(LRperMarker) = paste0(hypnames, ":", hypnames[refIdx])
+  lnLikPerMarker = do.call(cbind, lnLik)
+  colnames(lnLikPerMarker) = hypnames
 
-  # Total LR
-  LRtotal = apply(LRperMarker, 2, prod)
+  lnLRperMarker = sweep(lnLikPerMarker, 1, lnLikPerMarker[, refIdx], "-")
+  lnLRtotal = colSums(lnLRperMarker)
+
+  LRperMarker = exp(lnLRperMarker)
+  LRtotal = exp(lnLRtotal)
+  likelihoodsPerMarker = exp(lnLikPerMarker)
+
+  names(LRtotal) = colnames(LRperMarker) = paste0(hypnames, ":", hypnames[refIdx])
 
   # Use marker names in output
   markernames = name(x[[1]], markers)
