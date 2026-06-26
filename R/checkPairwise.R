@@ -26,7 +26,7 @@
 #' @param ids A vector of ID labels; the individuals to include in the check.
 #'   Default: All typed members of `x`.
 #' @param includeInbred A logical, by default FALSE, indicating if inbred
-#'   individuals should be excluded from the analysis.
+#'   individuals should be included in the analysis.
 #' @param acrossComps A logical indicating if pairs of individuals in different
 #'   components should be considered. Default: TRUE.
 #' @param plotType Either "base" (default), "ggplot2", "plotly" or "none".

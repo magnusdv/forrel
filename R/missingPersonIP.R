@@ -28,8 +28,6 @@
 #'   of `threshold`, the fraction of simulations resulting in a LR exceeding the
 #'   given number.
 #'
-#'   * `time`: The total computation time.
-#'
 #'   * `params`: A list containing the input parameters `missing`, `markers`,
 #'   `nsim`, `threshold` and `disableMutations`
 #'
@@ -69,7 +67,7 @@ missingPersonIP = function(reference, missing, markers, nsim = 1, threshold = NU
       markers = 1:nmark
   }
 
-  # Do any of the markers model mutatinos?
+  # Do any of the markers model mutations?
   hasMut = allowsMutations(reference, markers)
 
   # For which marker should mutations be disabled?
@@ -157,8 +155,8 @@ missingPersonIP = function(reference, missing, markers, nsim = 1, threshold = NU
                 disableMutations = disableMutations)
 
   structure(list(LRperSim = LRperSim, meanLRperMarker = meanLRperMarker,
-                 meanLR = meanLR, meanLogLR = meanLogLR, IP = IP,
-                 time = time, params = params), class = "LRpowerResult")
+                 meanLR = meanLR, meanLogLR = meanLogLR, IP = IP, params = params),
+            class = c("mpIP", "LRpowerResult"))
 }
 
 

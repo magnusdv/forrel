@@ -148,7 +148,6 @@ powerPlot = function(ep, ip = NULL, type = 1, majorpoints = TRUE, minorpoints = 
   if(!requireNamespace("scales", quietly = TRUE))
     stop2("This function needs the `scales` package, which does not seem to be available. Please install `scales` and try again.")
 
-  # TODO: simplify
   if(inherits(ep, "MPPsim")) {
     if(all(c("ep","ip") %in% names(ep))) {
       ip = ep$ip

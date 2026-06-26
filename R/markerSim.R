@@ -20,7 +20,7 @@
 #'
 #'   * `names(afreq)`
 #'
-#'   * `seq_along(afreq)'
+#'   * `seq_along(afreq)`
 #'
 #'   * `1:2` (Fallback if both `alleles` and `afreq` are NULL.)
 #'
@@ -85,7 +85,7 @@ markerSim = function(x, N = 1, ids = NULL, alleles = NULL, afreq = NULL,
 
   likel_counter = 0
 
-  if (!is.null(x$LOOP_BREAKERS))
+  if(!is.null(x$LOOP_BREAKERS))
     stop2("`ped` objects with pre-broken loops are not allowed as input to `markerSim()`")
   if(is.null(ids))
     ids = labels(x)
@@ -97,7 +97,7 @@ markerSim = function(x, N = 1, ids = NULL, alleles = NULL, afreq = NULL,
     if (!is.null(alleles) || !is.null(afreq))
       stop2("When `partialmarker` is given, both `alleles` and `afreq` must be NULL.")
 
-    if(is.marker(m)) { # TODO (fix/export from pedtools
+    if(is.marker(m)) { # TODO (fix/export from pedtools ?
       # validateMarker(m)
       # checkConsistency(x, list(m))
     }

@@ -39,7 +39,7 @@ plotCP(
 Default: All typed members of \code{x}.}
 
 \item{includeInbred}{A logical, by default FALSE, indicating if inbred
-individuals should be excluded from the analysis.}
+individuals should be included in the analysis.}
 
 \item{acrossComps}{A logical indicating if pairs of individuals in different
 components should be considered. Default: TRUE.}

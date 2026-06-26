@@ -375,6 +375,7 @@ contoursKappaML = function(x, ids, peak = NA, levels = NULL, ...) {
     ribd::showInTriangle(peak, new = FALSE)
 }
 
+# Not used?
 add = function(v, col = 2, pch = 16) points(v[1], v[3], col = col, pch = pch)
 
 

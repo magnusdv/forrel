@@ -13,7 +13,7 @@ The following markers are included:
 \item \code{D3S1358}: 12 alleles
 \item \code{TH01}: 10 alleles
 \item \code{D21S11}: 26 alleles
-\item \code{D18S51 }: 23 alleles
+\item \code{D18S51}: 23 alleles
 \item \code{PENTA_E}: 21 alleles
 \item \code{D5S818}: 9 alleles
 \item \code{D13S317}: 9 alleles

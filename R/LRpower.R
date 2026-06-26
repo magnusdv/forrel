@@ -39,10 +39,8 @@
 #'   of `threshold`, the fraction of simulations resulting in a LR exceeding the
 #'   given number.
 #'
-#'   * `time`: The total computation time.
-#'
-#'   * `params`: A list containing the input parameters `missing`, `markers`,
-#'   `nsim`, `threshold` and `disableMutations`
+#'   * `params`: A list containing the input parameters `markers`, `nsim`,
+#'   `threshold` and `disableMutations`
 #'
 #' @examples
 #'
@@ -143,12 +141,13 @@ LRpower = function(numeratorPed, denominatorPed, truePed = numeratorPed, ids, ma
         markers = 1:nmTot
     }
 
-    # Check for already typed members. TODO: Support for partially typed members
+    # Check for already typed members.
+    # TODO (minor): Support for partially typed members
     typed = typedMembers(sourcePed)
     if(length(bad <- intersect(allids, typed)))
       stop2("Individual is already genotyped: ", toString(bad))
 
-    # Select markers from source and transfer to truePed (if neccessary)
+    # Select markers from source and transfer to truePed (if necessary)
     truePed = switch(source,
        true = selectMarkers(truePed, markers),
        numerator = transferMarkers(from = selectMarkers(numeratorPed, markers),

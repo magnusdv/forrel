@@ -14,7 +14,7 @@
 #'   * `D3S1358`: 12 alleles
 #'   * `TH01`: 10 alleles
 #'   * `D21S11`: 26 alleles
-#'   * `D18S51 `: 23 alleles
+#'   * `D18S51`: 23 alleles
 #'   * `PENTA_E`: 21 alleles
 #'   * `D5S818`: 9 alleles
 #'   * `D13S317`: 9 alleles

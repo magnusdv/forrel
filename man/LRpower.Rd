@@ -77,9 +77,8 @@ each simulation.
 \item \code{IP}: A named numeric of the same length as \code{threshold}. For each element
 of \code{threshold}, the fraction of simulations resulting in a LR exceeding the
 given number.
-\item \code{time}: The total computation time.
-\item \code{params}: A list containing the input parameters \code{missing}, \code{markers},
-\code{nsim}, \code{threshold} and \code{disableMutations}
+\item \code{params}: A list containing the input parameters \code{markers}, \code{nsim},
+\code{threshold} and \code{disableMutations}
 }
 }
 \description{

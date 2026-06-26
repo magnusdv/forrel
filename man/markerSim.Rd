@@ -31,7 +31,7 @@ character vector of ID labels. Default: All individuals.}
 labels. If NULL, the following are tried in order:
 \itemize{
 \item \code{names(afreq)}
-\item `seq_along(afreq)'
+\item \code{seq_along(afreq)}
 \item \code{1:2} (Fallback if both \code{alleles} and \code{afreq} are NULL.)
 }}
 

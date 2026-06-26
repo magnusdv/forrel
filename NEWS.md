@@ -27,7 +27,7 @@
 
 # forrel 1.7.1
 
-* New argument `acrossComps` in `ibdEstimate()` and `checkParwise()`.
+* New argument `acrossComps` in `ibdEstimate()` and `checkPairwise()`.
 
 * `readFam()` is no longer exported from forrel; see `pedFamilias::readFam()`.
 
