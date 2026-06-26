@@ -255,12 +255,9 @@ exclusionPower = function(claimPed, truePed, ids, markers = NULL, source = "clai
     if(isTRUE(disableMutations))
       disableMutations = which(hasMut)
     else if(identical(disableMutations, NA)) {
-      # Disable mutations for markers consistent in both true and claim
-      cons = consistentMarkers(claimPed, hasMut) & consistentMarkers(truePed, hasMut)
-
-      disableTF = logical(nMark)
-      disableTF[hasMut] = cons
-      disableMutations = which(disableTF)
+      # Disable if consistent in both true and claim
+      cons = consistentMarkers(truePed, hasMut) & consistentMarkers(claimPed, hasMut)
+      disableMutations = which(hasMut)[cons]
     }
     else {# if numeric or character: Use original pedigree, i.e. before selection
       midx_orig = whichMarkers(sourcePed, markers)
@@ -275,9 +272,9 @@ exclusionPower = function(claimPed, truePed, ids, markers = NULL, source = "clai
     }
   }
 
-  ### Baseline likelihoods
-  trueBase = likelihood(truePed, markers = seq_len(nMark))
-  claimBase = likelihood(claimPed, markers = seq_len(nMark))
+  ### Baseline consistency (possibly after mutation disabling)
+  trueCons = consistentMarkers(truePed, removeMut = FALSE)
+  claimCons = consistentMarkers(claimPed, removeMut = FALSE)
 
   ### Compute the exclusion power of each marker.
   # The result is rectangular, with nMark columns and NI rows
@@ -294,14 +291,14 @@ exclusionPower = function(claimPed, truePed, ids, markers = NULL, source = "clai
     }
 
     # If impossible in true, return NA
-    if(trueBase[i] == 0) {
+    if(!trueCons[i]) {
       if(verbose)
         message("*** INCOMPATIBLE WITH TRUE PEDIGREE ***\nEP = NA")
       return(rep(NA_real_, NI))
     }
 
     # If impossible in claim, return 1
-    if(claimBase[i] == 0) {
+    if(!claimCons[i]) {
       if(verbose)
         message("*** INCOMPATIBLE WITH CLAIMED PEDIGREE ***\nEP = 1")
       return(rep(1, NI))
@@ -319,8 +316,8 @@ exclusionPower = function(claimPed, truePed, ids, markers = NULL, source = "clai
 
       this.ep = unlist(lapply(ids, function(idvec) {
         claimSims = transferMarkers(trueSims, claimPed, ids = c(typed, idvec))
-        liks = likelihood(claimSims, markers = 1:nsim)
-        mean(liks == 0)
+        isInc = inconsistentMarkers(claimSims, names = FALSE, removeMut = FALSE)
+        mean(isInc)
       }))
     }
 

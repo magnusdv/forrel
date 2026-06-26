@@ -24,9 +24,8 @@
 #' findExclusions(x, id = 5, candidate = poi)   # D21S11
 #'
 #' # Inspect
-#' plotPedList(list(x, poi), marker = "D21S11", hatched = typedMembers)
+#' plot(list(x, poi), marker = "D21S11", hatched = typedMembers)
 #'
-#' @importFrom pedprobr likelihood
 #' @export
 findExclusions = function(x, id, candidate, removeMut = TRUE) {
 
@@ -34,15 +33,40 @@ findExclusions = function(x, id, candidate, removeMut = TRUE) {
   y = transferMarkers(from = candidate, to = x, erase = FALSE,
                       idsFrom = labels(candidate), idsTo = id)
 
+  inconsistentMarkers(y, names = TRUE, removeMut = removeMut)
+}
+
+
+# Test if genotypes are consistent with ped
+# (A better, but slower, alternative to `mendelianCheck()`)
+consistentMarkers = function(x, markers = NULL, names = FALSE, removeMut = TRUE) {
+  if(!is.null(markers))
+    x = selectMarkers(x, markers)
+
   if(removeMut)
-    y = setMutmod(y, model = NULL)
+    x = setMutmod(x, model = NULL) # works also with 0 markers
 
-  # Vector of marker names
-  mvec = name(y)
+  # Log-likelihood of each marker
+  logliks = pedprobr::likelihood(x, logbase = exp(1))
+  cons = logliks > -Inf
 
-  # Likelihood of each marker
-  lik = likelihood(y, markers = mvec)
+  # Return logical vector or names of consistent markers
+  if(names) name(x)[cons] else cons
+}
 
-  # Return names of markers with zero likelihood
-  mvec[lik == 0]
+# Test if genotypes are consistent with ped
+# (A better, but slower, alternative to `mendelianCheck()`)
+inconsistentMarkers = function(x, markers = NULL, names = FALSE, removeMut = TRUE) {
+  if(!is.null(markers))
+    x = selectMarkers(x, markers)
+
+  if(removeMut)
+    x = setMutmod(x, model = NULL) # works also with 0 markers
+
+  # Log-likelihood of each marker
+  logliks = pedprobr::likelihood(x, logbase = exp(1))
+  incons = logliks == -Inf
+
+  # Return logical vector or names of consistent markers
+  if(names) name(x)[incons] else incons
 }

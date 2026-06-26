@@ -100,23 +100,6 @@ isIP = function(x) {
   inherits(x, "LRpowerResult") || inherits(x, "mpIP")
 }
 
-# Test if genotypes are consistent with ped
-# (A better, but slower, alternative to `mendelianCheck()`)
-consistentMarkers = function(x, markers = seq_len(nMarkers(x))) {
-
-  # `marker` may be numeric, character or logical
-  y = selectMarkers(x, markers)
-  nMark = nMarkers(y)
-
-  if(!nMark)
-    return(TRUE)
-
-  mutmod(y, 1:nMark) = NULL
-  liks = likelihood(y, markers = 1:nMark)
-
-  # Return TRUE if likelihood is nonzero
-  liks > 0
-}
 
 # Disable mutations
 disableMutationModels = function(x, disable, verbose = FALSE) {

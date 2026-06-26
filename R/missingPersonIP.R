@@ -77,12 +77,8 @@ missingPersonIP = function(reference, missing, markers, nsim = 1, threshold = NU
 
   if(disALL)
     disable = markers[hasMut]
-  else if(disGOOD) { # disable only if consistent
-    refNoMut = reference
-    mutmod(refNoMut, markers[hasMut]) = NULL
-    liksNoMut = likelihood(refNoMut, markers = markers[hasMut])
-    disable = markers[hasMut][liksNoMut > 0]
-  }
+  else if(disGOOD) # disable only if consistent
+    disable = consistentMarkers(reference, hasMut, names = TRUE)
   else if(disSELECT)
     disable = whichMarkers(reference, disableMutations)
   else
@@ -102,9 +98,9 @@ missingPersonIP = function(reference, missing, markers, nsim = 1, threshold = NU
   unrelatedPed = list(reference, singleton(poiLabel, sex = getSex(reference, missing)))
 
   # Raise error if impossible markers
-  liks = likelihood(reference, markers = midx)
-  if(any(liks == 0))
-    stop2("Marker incompatible with reference pedigree: ", markers[liks == 0],
+  imp = inconsistentMarkers(reference, markers = midx, names = TRUE, removeMut = FALSE)
+  if(length(imp))
+    stop2("Marker incompatible with reference pedigree: ", imp,
           "\nThis makes conditional simulations impossible. Exclude the marker from the computation or add a mutation model")
 
   # Set seed once
