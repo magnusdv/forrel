@@ -228,7 +228,7 @@ markerSim = function(x, N = 1, ids = NULL, alleles = NULL, afreq = NULL,
   hardsim.method3_int = internalID(x, hardsim.method3)
   method3 = .optimal.precomputation(hardsim.method3_int, N, gridlist, Xchrom, SEX = SEX)
 
-  if (method2$calls <= method3$calls) {
+  if(method2$calls <= method3$calls) {
     joint_int = method2$id_int
     bruteforce_int = .mysetdiff(hardsim.method2_int, joint_int)
     simpledrop = numeric()
@@ -239,13 +239,13 @@ markerSim = function(x, N = 1, ids = NULL, alleles = NULL, afreq = NULL,
   }
 
   simpledrop_int = internalID(x, simpledrop)
-  simple.founders_int = intersect(simpledrop_int, FOU)
+  simple_founders_int = intersect(simpledrop_int, FOU)
   simple.nonfounders_int = intersect(simpledrop_int, NONFOU)
 
   # Ensure sensible ordering of nonfounders (for gene dropping)
-  if (length(simple.nonfounders_int) > 0) {
+  if(length(simple.nonfounders_int) > 0) {
     typed_int = internalID(x, typed)
-    done = c(typed_int, joint_int, bruteforce_int, simple.founders_int)
+    done = c(typed_int, joint_int, bruteforce_int, simple_founders_int)
 
     if(loops) {
       done_copies_int = lb_copy_int[lb_int %in% done]
@@ -267,7 +267,7 @@ markerSim = function(x, N = 1, ids = NULL, alleles = NULL, afreq = NULL,
     simple.nonfounders_int = v.ordered
   }
 
-  if (verbose) {
+  if(verbose) {
     .printLabels = function(v) if (length(v) > 0) toString(labels(x)[v]) else "None"
 
     print(glue::glue("\n
@@ -275,7 +275,7 @@ markerSim = function(x, N = 1, ids = NULL, alleles = NULL, afreq = NULL,
       ===================
       Pre-computed joint distribution: {.printLabels(joint_int)}
       Brute force conditional simulation: {.printLabels(bruteforce_int)}
-      Hardy-Weinberg sampling (founders): {.printLabels(simple.founders_int)}
+      Hardy-Weinberg sampling (founders): {.printLabels(simple_founders_int)}
       Simple gene dropping: {.printLabels(simple.nonfounders_int)}
       Required likelihood computations: {min(method2$calls, method3$calls)}
       \n"))
@@ -350,11 +350,11 @@ markerSim = function(x, N = 1, ids = NULL, alleles = NULL, afreq = NULL,
   if (length(simpledrop) > 0) {
     # HW sampling of founders
     if (!Xchrom) {
-      markers[simple.founders_int, ] = sample.int(nall, size = 2 * N * length(simple.founders_int),
+      markers[simple_founders_int, ] = sample.int(nall, size = 2 * N * length(simple_founders_int),
                                                   replace = TRUE, prob = afreq)
     }
     else {
-      for (f in simple.founders_int)
+      for(f in simple_founders_int)
         markers[f, ] = switch(SEX[f],
           rep(sample.int(nall, size = N, replace = TRUE, prob = afreq), each = 2),
           sample.int(nall, size = 2 * N, replace = TRUE, prob = afreq))

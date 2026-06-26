@@ -69,7 +69,7 @@ profileSim = function(x, N = 1, ids = NULL, markers = NULL, seed = NULL,
             "(You may want to use `ibdsim2::profileSimIBD()` instead.)", call. = FALSE)
 
   # If `markers` is a list of frequency vectors, attach as new markers
-  if(is.list(markers) && !is.marker(markers[[1]]) && is.numeric(markers[[1]])) {
+  if(length(markers) && is.list(markers) && !is.marker(markers[[1]]) && is.numeric(markers[[1]])) {
     nms = names(markers)
     if(is.null(nms <- names(markers)))
       stop2("`markers` appears to be a list of frequency vectors, but marker names are missing")
@@ -133,7 +133,7 @@ profileSim = function(x, N = 1, ids = NULL, markers = NULL, seed = NULL,
 
   if(length(markers) == 0) {
     message("Empty profile; returning `ped` object unchanged")
-    return(x)
+    return(if(simplify1 && N == 1) x else rep(list(x), N))
   }
 
   # Marker names/positions are lost in the sims - must be re-added

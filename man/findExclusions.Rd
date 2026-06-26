@@ -37,6 +37,6 @@ poi = singleton("POI") |>
 findExclusions(x, id = 5, candidate = poi)   # D21S11
 
 # Inspect
-plotPedList(list(x, poi), marker = "D21S11", hatched = typedMembers)
+plot(list(x, poi), marker = "D21S11", hatched = typedMembers)
 
 }

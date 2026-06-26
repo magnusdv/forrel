@@ -15,6 +15,7 @@ isNumber = function(x, minimum = NA, maximum = NA) {
 # Faster alternative to suppressWarnings(as.numeric(v))
 # NB: doesn't catch scientific notation 1e-4.
 asNum = function(v) {
+  if(is.numeric(v)) return(v)
   num = grep("[^-0-9.]", v, invert = TRUE)
   u = rep(NA_real_, length(v))
   u[num] = as.numeric(v[num])
@@ -24,8 +25,9 @@ asNum = function(v) {
 # Faster alternative to suppressWarnings(as.integer(v))
 # NB: doesn't catch scientific notation 1e+12.
 asInt = function(v) {
+  if(is.numeric(v)) return(as.integer(v))
   num = grep("[^-0-9]", v, invert = TRUE)
-  u = rep(NA_real_, length(v))
+  u = rep(NA_integer_, length(v))
   u[num] = as.integer(v[num])
   u
 }
@@ -152,10 +154,8 @@ fixAllelesAndFreqs = function(alleles = NULL, afreq = NULL,
   names(afreq) = names(afreq) %||% als
 
   # Sort alleles and frequencies (numerical sorting if appropriate)
-  if (!is.numeric(als) && !anyNA(suppressWarnings(as.numeric(als))))
-    ord = order(as.numeric(als))
-  else
-    ord = order(als)
+  numAls = asNum(als)
+  ord = if(!anyNA(numAls)) ord = order(numAls) else order(als)
 
   # Return ordered, named frequencies
   afreq[ord]
