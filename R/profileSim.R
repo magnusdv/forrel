@@ -167,8 +167,8 @@ profileSim = function(x, N = 1, ids = NULL, markers = NULL, seed = NULL,
   on.exit(pboptions(op), add = TRUE)
 
   sims_markerwise = pblapply(markers, cl = cl, FUN = function(pm)
-    markerSim(x, N = N, ids = ids, partialmarker = pm, verbose = FALSE))
-  pboptions(op)
+    markerSim(x, N = N, ids = ids, partialmarker = pm, verbose = FALSE, ...))
+
 
   ### Transpose: Extract i'th marker from each sim above.
   # Output: List of N `ped`s, each with length(markers) attached markers
