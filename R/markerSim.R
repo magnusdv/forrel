@@ -179,11 +179,12 @@ markerSim = function(x, N = 1, ids = NULL, alleles = NULL, afreq = NULL,
   xorig = setMarkers(x, NULL)
   morig = m
 
-  if (loops <- x$UNBROKEN_LOOPS) {
-    orig_ids = labels(x)
-    x = breakLoops(setMarkers(x, m), loopBreakers = loopBreakers, verbose = verbose)
+  if(loops <- x$UNBROKEN_LOOPS) {
+    orig_ids = x$ID
+    x = breakLoops(setMarkers(x, m), loopBreakers = loopBreakers,
+                   allowFounder = TRUE, allowRepeated = TRUE, verbose = verbose)
     m = x$MARKERS[[1]]
-    loopBreakers = labels(x)[x$LOOP_BREAKERS[, 'orig']] # NB: LOOP_BREAKERS are internal ints
+    loopBreakers = x$ID[x$LOOP_BREAKERS[, 'orig']] # NB: LOOP_BREAKERS are internal ints
     gridlist = gridlist[sort.int(match(c(orig_ids, loopBreakers), orig_ids))]
   }
 
@@ -259,7 +260,7 @@ markerSim = function(x, N = 1, ids = NULL, alleles = NULL, afreq = NULL,
       v.ordered = c(v.ordered, v[i])
       done = c(done, v[i])
       if(loops)
-        done = c(done, lb_copy_int[match(v[i], lb_int)])
+        done = c(done, lb_copy_int[lb_int == v[i]])
       v = v[-i]
     }
     simple.nonfounders_int = v.ordered
