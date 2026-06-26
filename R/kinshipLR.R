@@ -296,16 +296,6 @@ kinshipLR = function(..., ref = NULL, source = NULL, markers = NULL, likArgs = N
 
   # Unlinked markers: pedprobr ----------------------------------------------
 
-  # Break all loops (NB: rapply() doesn't work here, since is.list(ped) = TRUE)
-  breaklp = function(a) {
-    if(is.pedList(a))
-      return(lapply(a, breaklp))
-    if(is.singleton(a))
-      return(a)
-    breakLoops(a, verbose = FALSE)
-  }
-
-  x_loopfree = lapply(x, breaklp)
 
   # compute likelihoods
   if(is.null(likArgs))
