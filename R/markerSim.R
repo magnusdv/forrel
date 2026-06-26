@@ -449,12 +449,21 @@ markerSim = function(x, N = 1, ids = NULL, alleles = NULL, afreq = NULL,
   x
 }
 
-.mutate = function(allele_vec, mutmatrix) {
-  nall = ncol(mutmatrix)
-  vapply(allele_vec,
-       function(a) sample.int(nall, size = 1, prob = mutmatrix[a,]),
-       FUN.VALUE = 1L)
+
+
+
+.mutate = function(a, mutmat) {
+  out = integer(length(a))
+  nc = ncol(mutmat)
+
+  for(k in unique.default(a)) {
+    idx = which(a == k)
+    out[idx] = sample.int(nc, length(idx), prob = mutmat[k, ], replace = TRUE)
+  }
+
+  out
 }
+
 
 .optimal.precomputation = function(target_int, Nsim, gridlist, Xchrom, SEX = NULL) {
   if (length(target_int) == 0)
