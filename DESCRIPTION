@@ -22,14 +22,14 @@ License: GPL (>= 2)
 URL: https://github.com/magnusdv/forrel
 BugReports: https://github.com/magnusdv/forrel/issues
 Depends: 
-    pedtools (>= 2.8.1),
+    pedtools (>= 2.11.0),
     R (>= 4.2.0)
 Imports:
     glue,
     pbapply,
-    pedprobr (>= 1.0.0),
-    ribd (>= 1.7.1),
-    verbalisr (>= 0.7.1)
+    pedprobr (>= 1.1.0),
+    ribd,
+    verbalisr
 Suggests: 
     ggplot2,
     ggrepel,
