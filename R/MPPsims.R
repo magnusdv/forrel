@@ -114,7 +114,8 @@ MPPsims = function(reference, missing = "MP", selections, ep = TRUE, ip = TRUE,
   ipfun = function(x) missingPersonIP(x, missing = missing, disableMutations = FALSE, nsim = lrSims,
                                       threshold = thresholdIP, verbose = FALSE)
 
-  set.seed(seed)
+  if(!is.null(seed))
+    set.seed(seed)
 
   # Setup parallelisation
   if(is.na(numCores))
@@ -178,7 +179,7 @@ MPPsims = function(reference, missing = "MP", selections, ep = TRUE, ip = TRUE,
 #' @export
 `[.MPPsim` = function(x, i) {
   structure(unclass(x)[i],
-            reference = attr(x, 'reference'),
+            reference = attr(x, 'reference')[i],
             selections = attr(x, 'selections')[i],
             nProfiles = attr(x, 'nProfiles'),
             lrSims = attr(x, 'lrSims'),

@@ -276,6 +276,10 @@ exclusionPower = function(claimPed, truePed, ids, markers = NULL, source = "clai
   trueCons = consistentMarkers(truePed, removeMut = FALSE)
   claimCons = consistentMarkers(claimPed, removeMut = FALSE)
 
+  # Set seed once
+  if(!is.null(seed))
+    set.seed(seed)
+
   ### Compute the exclusion power of each marker.
   # The result is rectangular, with nMark columns and NI rows
   ep = vapply(seq_len(nMark), function(i) {
@@ -311,8 +315,7 @@ exclusionPower = function(claimPed, truePed, ids, markers = NULL, source = "clai
       }))
     }
     else {
-      trueSims = markerSim(truePed, ids = allids, N = nsim, partialmarker = i,
-                           seed = seed, verbose = FALSE)
+      trueSims = markerSim(truePed, ids = allids, N = nsim, partialmarker = i, verbose = FALSE)
 
       this.ep = unlist(lapply(ids, function(idvec) {
         claimSims = transferMarkers(trueSims, claimPed, ids = c(typed, idvec))

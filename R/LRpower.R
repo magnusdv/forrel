@@ -182,7 +182,8 @@ LRpower = function(numeratorPed, denominatorPed, truePed = numeratorPed, ids, ma
   }
 
   # Set seed once
-  set.seed(seed)
+  if(!is.null(seed))
+    set.seed(seed)
 
   # Simulate nsim complete profiles from truePed
   if(verbose)

@@ -104,7 +104,8 @@ missingPersonIP = function(reference, missing, markers, nsim = 1, threshold = NU
           "\nThis makes conditional simulations impossible. Exclude the marker from the computation or add a mutation model")
 
   # Set seed once
-  set.seed(seed)
+  if(!is.null(seed))
+    set.seed(seed)
 
   # Simulate nsim complete profiles of relatedPed
   if(verbose)
