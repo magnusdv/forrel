@@ -79,3 +79,20 @@ test_that("EP works in paternity case with parents typed", {
   ep_X = quickEP(claim, true, ids = 3, markers = 2)
   expect_equal(ep_X, 1 - 2*afr[1]*afr[2])
 })
+
+
+test_that("exclusionPower preserves ID order across component arrays", {
+  claim = list(nuclearPed(father = "A", children = "C"),
+               singleton("B"))
+
+  true = list(nuclearPed(father = "A", children = "B"),
+              singleton("C"))
+
+  afr = c(.3, .7)
+
+  ep = exclusionPower(claim, true, ids = c("A", "B", "C"),
+                      alleles = 1:2, afreq = afr,
+                      plot = FALSE, verbose = FALSE)
+
+  expect_equal(ep$EPtotal, 2 * afr[1]^2 * afr[2]^2)
+})

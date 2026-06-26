@@ -27,8 +27,62 @@ test_that("kinshipLR() computes correctly in paternity case", {
     addMarker(name = "M2", fa = "A/A", ch = "A/A", afreq = c(A=0.1, B=0.9))
   H2 = singletons(c("fa", "ch"))
 
-  expect_equal(kinshipLR(H1, H2, source = 1)$LRtotal[[1]], 20*10)
-  expect_equal(kinshipLR(H1, H2, markers = "M1")$LRtotal[[1]], 20)
-  expect_equal(kinshipLR(H1, H2, markers = -1, source = 1)$LRtotal[[1]], 10)
+  expect_equal(kinshipLR(H1, H2, source = 1, verbose = F)$LRtotal[[1]], 20*10)
+  expect_equal(kinshipLR(H1, H2, markers = "M1", verbose = F)$LRtotal[[1]], 20)
+  expect_equal(kinshipLR(H1, H2, markers = -1, source = 1, verbose = F)$LRtotal[[1]], 10)
 })
 
+
+test_that("kinshipLR() returns complete unlinked output", {
+  Hpat = nuclearPed(fa = "fa", child = "ch") |>
+    addMarker(name = "M1", fa = "A/A", ch = "A/A", afreq = c(A = .05, B = .95)) |>
+    addMarker(name = "M2", fa = "A/A", ch = "A/A", afreq = c(A = .10, B = .90))
+
+  Hunrel = singletons(c("fa", "ch"))
+  res = kinshipLR(Hpat = Hpat, Hunrel = Hunrel, source = "Hpat", verbose = FALSE)
+
+  expect_is(res, "LRresult")
+  expect_identical(names(res), c("LRtotal", "LRperMarker", "likelihoodsPerMarker", "time"))
+  expect_identical(names(res$LRtotal), c("Hpat:Hunrel", "Hunrel:Hunrel"))
+  expect_identical(rownames(res$LRperMarker), c("M1", "M2"))
+  expect_identical(colnames(res$LRperMarker), names(res$LRtotal))
+  expect_identical(rownames(res$likelihoodsPerMarker), c("M1", "M2"))
+  expect_identical(colnames(res$likelihoodsPerMarker), c("Hpat", "Hunrel"))
+
+  expect_equal(res$LRperMarker[, "Hpat:Hunrel"], c(M1 = 20, M2 = 10))
+  expect_equal(res$LRperMarker[, "Hunrel:Hunrel"], c(M1 = 1, M2 = 1))
+  expect_equal(res$LRtotal, c(`Hpat:Hunrel` = 200, `Hunrel:Hunrel` = 1))
+  expect_equal(apply(res$LRperMarker, 2, prod), res$LRtotal)
+  expect_equal(res$likelihoodsPerMarker[, "Hpat"], pedprobr::likelihood(Hpat), check.names = F)
+})
+
+
+test_that("kinshipLR() keeps undefined impossible-data ratios", {
+  bad = nuclearPed(fa = "fa", mo = "mo", child = "ch")
+
+  ok = singletons(c("fa", "mo", "ch")) |>
+    addMarker(fa = "1/1", mo = "1/1", ch = "2/2", alleles = 1:2)
+
+  res = NULL
+  expect_silent(res <- kinshipLR(bad1 = bad, ok = ok, bad2 = bad,
+                                 ref = "bad2", source = "ok", verbose = FALSE))
+
+  expect_equal(res$likelihoodsPerMarker[1, c("bad1", "bad2")], c(bad1 = 0, bad2 = 0))
+  expect_gt(res$likelihoodsPerMarker[1, "ok"], 0)
+  expect_true(is.nan(res$LRperMarker[1, "bad1:bad2"]))
+  expect_true(is.infinite(res$LRperMarker[1, "ok:bad2"]))
+  expect_true(is.nan(res$LRperMarker[1, "bad2:bad2"]))
+})
+
+
+test_that("quickLR() keeps LRresult layout", {
+  x = nuclearPed(fa = "fa", child = "ch", sex = 1) |>
+    addMarker(fa = "1/1", ch = "1/1", afreq = c("1" = .1, "2" = .9))
+
+  r = quickLR(x, ids = c("fa", "ch"), test = c("pat", "sib"))
+
+  expect_is(r, "LRresult")
+  expect_identical(names(r$LRtotal), c("pat:unrel", "sib:unrel"))
+  expect_identical(colnames(r$LRperMarker), names(r$LRtotal))
+  expect_equal(r$LRperMarker[1, "pat:unrel"], 10)
+})

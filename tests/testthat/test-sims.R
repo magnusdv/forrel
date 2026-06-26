@@ -1,6 +1,6 @@
 
 mSim = function(...) markerSim(..., verbose = FALSE)
-pSim = function(...) profileSim(..., numCores = 1, verbose = FALSE)
+pSim = function(...) profileSim(..., verbose = FALSE)
 sSim = function(...) simpleSim(..., verbose = FALSE)
 
 test_that("simpleSim() runs in trivial example", {
@@ -51,20 +51,22 @@ test_that("profileSim() keeps marker names", {
   expect_identical(name(s2, 1:2), rep(NA_character_, 2))
 })
 
+
 test_that("profileSim() treats pedlists as expected", {
   x = singleton(1) |> addMarker(alleles = 1:5, name = "M")
   y = relabel(x, 2)
-  SEED = 777
 
-  sim_pedlist = pSim(list(x, y), N = 3, markers = "M", seed = SEED)
+  set.seed(777)
+  sim_pedlist = pSim(list(x, y), N = 3, markers = "M")
 
-  set.seed(SEED)
+  set.seed(777)
   sim_compwise = list(pSim(x, N = 3, markers = "M"),
                       pSim(y, N = 3, markers = "M"))
 
   # Check third sim
   expect_identical(sim_pedlist[[3]], lapply(sim_compwise, `[[`, 3))
 })
+
 
 test_that("markerSim() works with peds in non-standard ordering", {
 x = reorderPed(nuclearPed(2), 4:1)
@@ -110,3 +112,88 @@ test_that("markerSim() works in looped pedigree 3", {
   expect_equal(as.numeric(getAlleles(y2)), c(2,1,1,1,1,2,1,2,2,2))
 })
 
+
+# Added regression tests 2026 -----------------------------------------------------------------
+
+
+test_that("markerSim() indexes founder inbreeding after subsetting", {
+  x = halfSibPed()
+  founderInbreeding(x, 1) = 1
+  m = marker(x, `4` = "1/1", alleles = 1:2)
+
+  y = mSim(x, N = 40, ids = 3, partialmarker = m, seed = 1)
+  geno = as.matrix(as.data.frame(y)[internalID(y, 3), -(1:4)])
+
+  expect_true(any(geno == "1/2"))
+})
+
+test_that("markerSim() supports founder loop breakers", {
+
+  # Pure marriage loop, can only be broken by founder
+  x = quadHalfFirstCousins() |> removeIndividuals(9:10, verbose = F) |>
+    addMarker(`5` = "1/1", alleles = 1:2, afreq = c(0.0001, 0.9999))
+
+  # plot(x, marker = 1, arr = T)
+
+  y = mSim(x, N = 3, partialmarker = 1, seed = 2)
+
+  # Both parents of 5 should carry allele "1"
+  g = getGenotypes(y, parents(y, 5)) |> as.character()
+  expect_all_true(g == "1/2")
+})
+
+test_that("markerSim() on pedlists uses all ids by default", {
+  x = singletons(1:2)
+  y = mSim(x, N = 3, alleles = 1:2, seed = 3)
+  z = mSim(x, N = 3, ids = 2, alleles = 1:2, seed = 3)
+
+  expect_equal(nMarkers(y), 3)
+  expect_equal(typedMembers(y), c("1", "2"))
+  expect_equal(typedMembers(z), "2")
+})
+
+test_that("markerSim() on pedlists forwards mutation arguments", {
+  x = list(nuclearPed(1), relabel(nuclearPed(1), 4:6))
+
+  y = mSim(x, N = 2, alleles = 1:2, afreq = c(1, 0), mutmod = "equal", rate = 1, seed = 4)
+  expect_false(is.null(mutmod(y[[1]],1)))
+  expect_false(is.null(mutmod(y[[2]],1)))
+
+  childGenos = as.character(getGenotypes(y, c(3,6)))
+  expect_all_true(childGenos == "2/2")
+})
+
+test_that("profileSim() returns N outputs when markers are empty", {
+  x = nuclearPed(1) |> addMarker(alleles = 1:2)
+
+  y = suppressMessages(pSim(x, N = 3, markers = integer(0)))
+
+  expect_equal(length(y), 3)
+  expect_identical(y, list(x, x, x))
+})
+
+test_that("profileSim() forwards loopBreakers", {
+  x = halfCousinPed(1, child = TRUE) |>
+    addMarker(`10` = "1/1", alleles = 1:2)
+
+  a = pSim(x, loopBreakers = 2, seed = 1)
+  b = pSim(x, loopBreakers = 4, seed = 1)
+  expect_true(!identical(a, b))
+})
+
+test_that(".mutate() respects source-specific mutation rows", {
+  M = rbind(c(0, 1, 0),
+            c(0, 0, 1),
+            c(1, 0, 0))
+
+  expect_identical(.mutate(c(1L, 2L, 3L, 1L, 2L), M),
+                   c(2L, 3L, 1L, 2L, 3L))
+})
+
+test_that("markerSim() applies mutation model in gene drops", {
+  x = nuclearPed(1)
+
+  y = mSim(x, N = 3, alleles = 1:2, afreq = c(1, 0), mutmod = "equal", rate = 1, seed = 1)
+
+  expect_equal(as.character(getGenotypes(y, ids = 3)), rep("2/2", 3))
+})
