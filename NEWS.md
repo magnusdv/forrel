@@ -1,3 +1,34 @@
+# forrel 1.9.0
+
+## New features
+
+* Updated loop handling throughout the package, syncing with **pedtools** 2.11.0 and **pedprobr** 1.1.0. In particular, this enables analyses of certain complex pedigrees that were previously intractable.
+
+* `profileSim()` now uses [**mirai**](https://mirai.r-lib.org/) for parallel computations. To activate parallelisation, users must start workers with `mirai::daemons()` before calling `profileSim()`. See `?profileSim` for details and code examples.
+
+* Simulations with `profileSim()` and `markerSim()` are significantly faster in many cases, due to better organisation of the internal likelihood calculations.
+
+* `profileSim()` no longer preserves map attributes (chromosome and position) of the markers. This was an expensive operation that is rarely needed, and can be done afterwards with `setMap()` if required.
+
+* New function `fEstimate()` for estimating the inbreeding coefficient of an individual from marker data.
+
+* New function `parentChildLikelihood()` for fast likelihood calculations in simple parent-child cases.
+
+* `quickLR()` now includes a first-cousin hypothesis by default.
+
+* IBD contour plots gain support for additional graphical arguments.
+
+
+## Other
+
+* Updated dependencies to **pedtools** 2.11.0 and **pedprobr** 1.1.0.
+* Reduced risk of underflow in `kinshipLR()` by using log-likelihoods internally.
+* Fixed an ordering bug in `exclusionPower()` affecting pedigrees with multiple components.
+* Fixed handling of X-chromosomal maps.
+* `ibdEstimate()` now preserves class "ibdEst" when adding maximum log-likelihood values.
+* Removed the long-deprecated `readFam()` function.
+
+
 # forrel 1.8.1
 
 ## New features
@@ -23,6 +54,7 @@
 ## Other
 
 * Updated dependencies to pedtools 2.8.1, pedmut 0.9.0 and pedprobr 1.0.0 (all related to special lumping).
+
 
 
 # forrel 1.7.1

@@ -1,7 +1,7 @@
 Type: Package
 Package: forrel
 Title: Forensic Pedigree Analysis and Relatedness Inference
-Version: 1.8.1.9001
+Version: 1.9.0
 Authors@R: c(
     person("Magnus Dehli", "Vigeland", , "m.d.vigeland@medisin.uio.no", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-9134-4962")),
@@ -26,7 +26,7 @@ Depends:
     R (>= 4.2.0)
 Imports:
     glue,
-    pbapply,
+    mirai,
     pedprobr (>= 1.1.0),
     ribd,
     verbalisr
