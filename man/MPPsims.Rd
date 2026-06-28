@@ -15,8 +15,8 @@ MPPsims(
   lrSims = 1,
   thresholdIP = NULL,
   disableMutations = NA,
-  numCores = 1,
   seed = NULL,
+  numCores = 1,
   verbose = TRUE
 )
 }
@@ -55,9 +55,9 @@ error if any markers are inconsistent.
 mutations should be disabled.
 }}
 
-\item{numCores}{The number of cores used for parallelisation, by default 1.}
-
 \item{seed}{An integer seed for the random number generator (optional).}
+
+\item{numCores}{Deprecated and ignored.}
 
 \item{verbose}{A logical.}
 }

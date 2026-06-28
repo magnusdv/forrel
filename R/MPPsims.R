@@ -15,7 +15,7 @@
 #'   "Baseline", is added as the first element of `selection`.
 #' @param nProfiles The number of profile simulations for each selection.
 #' @param lrSims,thresholdIP Parameters passed onto [missingPersonIP()].
-#' @param numCores The number of cores used for parallelisation, by default 1.
+#' @param numCores Deprecated and ignored.
 #'
 #' @return An object of class "MPPsim", which is basically a list with one entry
 #'   for each element of `selections`. Each entry has elements `ep` and `ip`,
@@ -79,11 +79,13 @@
 #'
 #' }
 #'
-#' @importFrom parallel makeCluster stopCluster detectCores parLapply clusterEvalQ clusterExport clusterSetRNGStream
 #' @export
 MPPsims = function(reference, missing = "MP", selections, ep = TRUE, ip = TRUE,
                    addBaseline = TRUE, nProfiles = 1, lrSims = 1, thresholdIP = NULL,
-                   disableMutations = NA, numCores = 1, seed = NULL, verbose = TRUE) {
+                   disableMutations = NA, seed = NULL, numCores = 1, verbose = TRUE) {
+  if(numCores != 1)
+    warning("`numCores` is deprecated and is currently ignored", call. = FALSE)
+
   st = Sys.time()
 
   if(!is.list(selections))
@@ -117,20 +119,20 @@ MPPsims = function(reference, missing = "MP", selections, ep = TRUE, ip = TRUE,
   if(!is.null(seed))
     set.seed(seed)
 
-  # Setup parallelisation
-  if(is.na(numCores))
-    numCores = max(detectCores() - 1, 1)
-
-  if(numCores > 1) {
-    cl = makeCluster(numCores)
-    on.exit(stopCluster(cl))
-    if(verbose) {
-      message("Preparing parallelisation using ", length(cl), " cores")
-    }
-    clusterEvalQ(cl, library(forrel))
-    clusterExport(cl, c("missingPersonEP", "missingPersonIP", "lrSims", "thresholdIP"), envir = environment())
-    clusterSetRNGStream(cl, iseed = sample.int(1e6,1))
-  }
+  # # Setup parallelisation
+  # if(is.na(numCores))
+  #   numCores = max(detectCores() - 1, 1)
+  #
+  # if(numCores > 1) {
+  #   cl = makeCluster(numCores)
+  #   on.exit(stopCluster(cl))
+  #   if(verbose) {
+  #     message("Preparing parallelisation using ", length(cl), " cores")
+  #   }
+  #   clusterEvalQ(cl, library(forrel))
+  #   clusterExport(cl, c("missingPersonEP", "missingPersonIP", "lrSims", "thresholdIP"), envir = environment())
+  #   clusterSetRNGStream(cl, iseed = sample.int(1e6,1))
+  # }
 
   powSims = lapply(seq_along(selections), function(i) {
     ref = reference[[i]]
@@ -147,18 +149,12 @@ MPPsims = function(reference, missing = "MP", selections, ep = TRUE, ip = TRUE,
     }
 
     # Simulate profile for `ids`
-    sims = profileSim(ref, ids = ids, N = nProfiles, numCores = 1, simplify1 = FALSE, verbose = FALSE)
+    sims = profileSim(ref, ids = ids, N = nProfiles, simplify1 = FALSE, verbose = FALSE)
 
 
     # Compute updated EP and IP for each profile
-    if(numCores == 1) {
-      epRes = if(ep) lapply(sims, epfun) else NULL
-      ipRes = if(ip) lapply(sims, ipfun) else NULL
-    }
-    else {
-      epRes = if(ep) parLapply(cl, sims, epfun) else NULL
-      ipRes = if(ip) parLapply(cl, sims, ipfun) else NULL
-    }
+    epRes = if(ep) lapply(sims, epfun) else NULL
+    ipRes = if(ip) lapply(sims, ipfun) else NULL
     list(ep = epRes, ip = ipRes)
   })
 
