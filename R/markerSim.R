@@ -108,6 +108,9 @@ markerSim = function(x, N = 1, ids = NULL, alleles = NULL, afreq = NULL,
     else
       stop2("Argument `partialmarker` must be a `marker` object, or the name (or index) of a single marker attached to `x`")
 
+    # Avoid duplicated names in temporary candidate markers
+    attr(m, "name") = NA_character_
+
     if(!allowsMutations(m)) {
       err = mendelianCheck(setMarkers(x, m), verbose = FALSE)
       if(length(err) > 0)
