@@ -31,7 +31,7 @@
 #' @param partialmarker Either NULL (resulting in unconditional simulation), a
 #'   marker object (on which the simulation should be conditioned) or the name
 #'   (or index) of a marker attached to `x`.
-#' @param loopBreakers A numeric containing IDs of individuals to be used as
+#' @param loopBreakers A vector containing IDs of individuals to be used as
 #'   loop breakers. Relevant only if the pedigree has loops, and only if
 #'   `partialmarker` is non-NULL. See [pedtools::breakLoops()].
 #' @param seed An integer seed for the random number generator (optional).

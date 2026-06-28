@@ -40,15 +40,16 @@ test_that("markerSim() works with partial with mutations", {
 
 test_that("profileSim() keeps marker names", {
   x = nuclearPed(1)
-  m = marker(x)
-  x = setMarkers(x, list(m, m))
-  name(x, 1:2) = c("m1", "m2")
+  db = list(m1 = c(a=0.5, b = 0.5),
+            m2 = c(c=0.5, d = 0.5))
+  y = pSim(x, N = 2, ids = 3, markers = db)
 
-  s = pSim(x, N = 1)
-  expect_identical(name(s, 1:2), c("m1", "m2"))
+  expect_identical(name(y), c("m1", "m2"))
 
-  s2 = pSim(x, N = 1, markers = list(m, m))
-  expect_identical(name(s2, 1:2), rep(NA_character_, 2))
+  z1 = pSim(y[[1]], N = 2, markers = "m2")
+  z2 = pSim(y[[1]], N = 2, markers = 2)
+  expect_identical(name(z1), "m2")
+  expect_identical(name(z2), "m2")
 })
 
 
@@ -165,11 +166,12 @@ test_that("markerSim() on pedlists forwards mutation arguments", {
 
 test_that("profileSim() returns N outputs when markers are empty", {
   x = nuclearPed(1) |> addMarker(alleles = 1:2)
+  xEmpty = x |> removeMarkers(1)
 
-  y = suppressMessages(pSim(x, N = 3, markers = integer(0)))
+  y = pSim(x, N = 3, markers = integer(0))
 
   expect_equal(length(y), 3)
-  expect_identical(y, list(x, x, x))
+  expect_false(hasMarkers(y))
 })
 
 test_that("profileSim() forwards loopBreakers", {

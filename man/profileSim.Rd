@@ -9,11 +9,11 @@ profileSim(
   N = 1,
   ids = NULL,
   markers = NULL,
+  loopBreakers = NULL,
   seed = NULL,
   numCores = 1,
   simplify1 = TRUE,
-  verbose = TRUE,
-  ...
+  verbose = TRUE
 )
 }
 \arguments{
@@ -26,23 +26,28 @@ whose genotypes should be simulated. Alternatively, a function taking \code{x}
 as input and returning a character vector of ID labels.}
 
 \item{markers}{Either a vector indicating a subset of markers attached to
-\code{x}, or a named list of frequency vectors. By default (\code{NULL}), all
-attached markers are used. If a frequency list is given, marker objects are
-created and attached to \code{x}. Simulations are conditional on the locus
-attributes (allele frequencies, mutation models, etc) and any existing
-genotypes in the indicated markers.}
+\code{x} (default: all), or a named list of frequency vectors. In the former
+case, simulations are conditional on all locus attributes (allele
+frequencies, mutation models, etc) and any existing genotypes in the
+indicated markers. If \code{markers} is a list of frequency vectors, these
+are attached as new markers to \code{x} (removing any existing markers) and
+used for unconditional simulations.}
 
-\item{seed}{An integer seed for the random number generator (optional).}
+\item{loopBreakers}{A vector containing IDs of individuals to be used as
+loop breakers. Can usually be left as NULL, in which case automatic loop
+breaking is applied. See \code{\link[pedtools:breakLoops]{pedtools::breakLoops()}}.}
 
-\item{numCores}{The number of cores to be used. The default is 1, i.e., no
-parallelisation.}
+\item{seed}{An integer seed for the random number generator. Used only when
+no mirai workers are set. For parallel simulations, set the seed in
+\code{\link[mirai:daemons]{mirai::daemons()}}.}
+
+\item{numCores}{Deprecated. Use \code{\link[mirai:daemons]{mirai::daemons()}} to set the number of
+workers.}
 
 \item{simplify1}{A logical, by default TRUE, removing the outer list layer
 when \code{N = 1}. See Value.}
 
 \item{verbose}{A logical, by default TRUE.}
-
-\item{...}{Further arguments passed on to \code{\link[=markerSim]{markerSim()}}.}
 }
 \value{
 A list of \code{N} objects similar to \code{x}, but with simulated genotypes.
@@ -62,6 +67,31 @@ Simulation of DNA profiles for specified pedigree members. Some pedigree
 members may already be genotyped; in that case the simulation is conditional
 on these. The main work of this function is done by \code{\link[=markerSim]{markerSim()}}.
 }
+\details{
+\subsection{Parallel profile simulation}{
+
+Simulations can be distributed across several R processes using the
+\strong{mirai} package. To use this, start mirai workers before calling
+\code{profileSim()}:
+
+\if{html}{\out{<div class="sourceCode r">}}\preformatted{mirai::daemons(8, seed = 123)
+
+x = nuclearPed()
+db = NorwegianFrequencies
+res = profileSim(x, N = 100, markers = db)
+
+mirai::daemons(0)
+}\if{html}{\out{</div>}}
+
+The call to \code{mirai::daemons(8, seed = 123)} starts 8 persistent workers and
+configures reproducible parallel RNG. These workers remain available for
+later calls until stopped with \code{mirai::daemons(0)}.
+
+If no mirai daemons are set, \code{profileSim()} runs normally, and the \code{seed}
+argument works as before. When mirai daemons are used, set the seed in
+\code{mirai::daemons(n, seed = ...)} and omit the \code{seed} argument to \code{profileSim()}.
+}
+}
 \examples{
 # Example pedigree with two brothers
 x = nuclearPed(children = c("B1", "B2"))
@@ -78,7 +108,5 @@ y = x |>
 
 # Simulate 2 profiles of B2 conditional on the above
 profileSim(y, N = 2, ids = "B2", seed = 123)
-
-
 
 }

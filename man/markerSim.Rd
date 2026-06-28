@@ -45,7 +45,7 @@ frequencies, possibly named with allele labels.}
 marker object (on which the simulation should be conditioned) or the name
 (or index) of a marker attached to \code{x}.}
 
-\item{loopBreakers}{A numeric containing IDs of individuals to be used as
+\item{loopBreakers}{A vector containing IDs of individuals to be used as
 loop breakers. Relevant only if the pedigree has loops, and only if
 \code{partialmarker} is non-NULL. See \code{\link[pedtools:breakLoops]{pedtools::breakLoops()}}.}
 
