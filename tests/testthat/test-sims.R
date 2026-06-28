@@ -99,17 +99,17 @@ test_that("markerSim() works in looped pedigree 2", {
   y2 = mSim(x2, partialmarker = 2)
   expect_identical(genotype(y2, id = 2, marker = 1), c("1", "2")) # Forced!
 
-  y3 = mSim(x2, partialmarker = 2, loopBreaker = "5")
+  y3 = mSim(x2, partialmarker = 2, loopBreakers = "5")
   expect_identical(genotype(y3, id = 2, marker = 1), c("1", "2")) # Forced!
 })
 
 test_that("markerSim() works in looped pedigree 3", {
   x = cousinPed(0, child = T) |> relabel(new = letters[1:5]) |> addMarker(c = 1:2)
 
-  y1 = mSim(x, partial = 1, loopBreaker = "c", seed = 1234)
+  y1 = mSim(x, partial = 1, loopBreakers = "c", seed = 1234)
   expect_equal(as.numeric(getAlleles(y1)), c(1,2,1,2,1,2,2,2,2,2))
 
-  y2 = mSim(x, partial = 1, loopBreaker = "d", seed = 1234)
+  y2 = mSim(x, partial = 1, loopBreakers = "d", seed = 1234)
   expect_equal(as.numeric(getAlleles(y2)), c(2,1,1,1,1,2,1,2,2,2))
 })
 

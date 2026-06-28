@@ -95,37 +95,46 @@ profileSim = function(x, N = 1, ids = NULL, markers = NULL, loopBreakers = NULL,
   if(!missing(numCores))
     warning("`numCores` is deprecated; use `mirai::daemons()` for parallelisation.", call. = FALSE)
 
-  # If `markers` is a list of frequency vectors, attach as new markers
-  if(length(markers) && is.list(markers) && !is.marker(markers[[1]]) && is.numeric(markers[[1]])) {
-    nms = names(markers)
-    if(is.null(nms <- names(markers)))
-      stop2("`markers` appears to be a list of frequency vectors, but marker names are missing")
+  newdb = FALSE
 
-    checkFreqs = vapply(markers, function(m) is.numeric(m) && round(sum(m)) == 1,
-                        FUN.VALUE = TRUE, USE.NAMES = FALSE)
+  if(!is.null(markers)) {
 
-    if(!all(checkFreqs))
-      stop2("`markers` appears to be a list of frequency vectors, but some entries do not sum to 1: ",
-            nms[!checkFreqs])
+    if(is.marker(markers) || is.markerList(markers))
+      stop2("`markers` must be marker names/indices or a named list of frequency vectors")
 
-    x = setMarkers(x, locusAttributes = markers, checkCons = FALSE)
-    markers = nms
-    if(verbose)
-      message(sprintf("Attached %d markers based on frequency database", length(nms)))
-  }
-  else {
-    if(!is.null(markers))
+    # If `markers` is a list of frequency vectors, attach as new markers
+    if(is.list(markers)) {
+      nms = names(markers)
+      if(is.null(nms) || anyNA(nms) || any(!nzchar(nms)))
+        stop2("`markers` appears to be a list of frequency vectors, but marker names are missing")
+      if(dup <- anyDuplicated(nms))
+        stop2("Duplicated marker name: ", nms[dup])
+
+      checks = .checkFreqs(markers)
+      if(!all(checks))
+        stop2("`markers` appears to be a list of frequency vectors, but some entries are invalid: ",
+              nms[!checks])
+
+      x = setMarkers(x, locusAttributes = markers, checkCons = FALSE)
+      markers = NULL
+      newdb = TRUE
+      if(verbose)
+        message(sprintf("Attached %d markers based on frequency database", length(nms)))
+    }
+    else {
       x = selectMarkers(x, markers)
-
-    if(hasLinkedMarkers(x))
-      warning("Linked markers detected. Be aware that this function ignores linkage.\n",
-              "(You may want to use `ibdsim2::profileSimIBD()` instead.)", call. = FALSE)
+      markers = NULL
+    }
   }
 
   if(!hasMarkers(x)) {
     if(verbose) message("Empty profile; returning pedigree unchanged")
     return(if(simplify1 && N == 1) x else rep(list(x), N))
   }
+
+  if(!newdb && hasLinkedMarkers(x))
+    warning("Linked markers detected. Be aware that this function ignores linkage.\n",
+            "(You may want to use `ibdsim2::profileSimIBD()` instead.)", call. = FALSE)
 
   # Check that all `ids` are in x
   if(is.function(ids))
@@ -136,8 +145,8 @@ profileSim = function(x, N = 1, ids = NULL, markers = NULL, loopBreakers = NULL,
     stop2("Unknown ID label: ", err)
 
   # Parallelisation
-  useMirai = mirai::daemons_set()
-  nworkers = mirai::info()[["connections"]] %||% 0L
+  nworkers = .miraiWorkers()
+  useMirai = nworkers > 0L
 
   if(verbose) {
     if(useMirai)
@@ -224,6 +233,11 @@ profileSim = function(x, N = 1, ids = NULL, markers = NULL, loopBreakers = NULL,
     message(sprintf("Simulated %d %s in %s", N, pluralise("profile", N),
                     format(Sys.time() - st, digits = 2)))
   sims
+}
+
+.checkFreqs = function(db) {
+  vapply(db, FUN.VALUE = TRUE, USE.NAMES = FALSE, function(m)
+    is.numeric(m) && all(is.finite(m)) && all(m >= 0) && abs(sum(m) - 1) < 1e-8)
 }
 
 .profileSimMarker = function(j, x, N, ids, lb = NULL)

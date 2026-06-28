@@ -71,6 +71,11 @@ pluralise = function(noun = "", n) {
   x
 }
 
+.miraiWorkers = function() {
+  if(!mirai::daemons_set())
+    return(0L)
+  mirai::info()[["connections"]] %||% 0L
+}
 
 ftime = function(st, digits = 3)
   format(Sys.time() - st, digits = digits)

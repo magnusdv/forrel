@@ -68,7 +68,7 @@ interval \eqn{[0,1]}.
 
 The MLE approach is described explicitly in Section 3.2 of Thompson (1986).
 Ritland (1996) introduces the Ritland estimator, and also mentions both the
-simple estimator and the MLE. Note that Ritlands formulation of the MLE is
+simple estimator and the MLE. Note that Ritland's formulation of the MLE is
 slightly different (but equivalent) to Thompson's.
 }
 \examples{

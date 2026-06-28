@@ -182,8 +182,11 @@ LRpower = function(numeratorPed, denominatorPed, truePed = numeratorPed, ids, ma
   }
 
   # Set seed once
-  if(!is.null(seed))
+  if(!is.null(seed)) {
+    if(.miraiWorkers() > 0L)
+      stop2("`seed` is incompatible with mirai workers; set with `mirai::daemons(n, seed = ...)`")
     set.seed(seed)
+  }
 
   # Simulate nsim complete profiles from truePed
   if(verbose)

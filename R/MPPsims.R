@@ -116,23 +116,11 @@ MPPsims = function(reference, missing = "MP", selections, ep = TRUE, ip = TRUE,
   ipfun = function(x) missingPersonIP(x, missing = missing, disableMutations = FALSE, nsim = lrSims,
                                       threshold = thresholdIP, verbose = FALSE)
 
-  if(!is.null(seed))
+  if(!is.null(seed)) {
+    if(.miraiWorkers() > 0L)
+      stop2("`seed` is incompatible with mirai workers; set with `mirai::daemons(n, seed = ...)`")
     set.seed(seed)
-
-  # # Setup parallelisation
-  # if(is.na(numCores))
-  #   numCores = max(detectCores() - 1, 1)
-  #
-  # if(numCores > 1) {
-  #   cl = makeCluster(numCores)
-  #   on.exit(stopCluster(cl))
-  #   if(verbose) {
-  #     message("Preparing parallelisation using ", length(cl), " cores")
-  #   }
-  #   clusterEvalQ(cl, library(forrel))
-  #   clusterExport(cl, c("missingPersonEP", "missingPersonIP", "lrSims", "thresholdIP"), envir = environment())
-  #   clusterSetRNGStream(cl, iseed = sample.int(1e6,1))
-  # }
+  }
 
   powSims = lapply(seq_along(selections), function(i) {
     ref = reference[[i]]
