@@ -123,6 +123,14 @@ LRpower = function(numeratorPed, denominatorPed, truePed = numeratorPed, ids, ma
     typed = typedMembers(truePed)
     disableMutations = FALSE # don't do anything
   }
+  else if(is.list(markers)) {
+    .checkFreqDB(markers)
+    numeratorPed = setMarkers(numeratorPed, locusAttributes = markers, checkCons = FALSE)
+    denominatorPed = setMarkers(denominatorPed, locusAttributes = markers, checkCons = FALSE)
+    truePed = setMarkers(truePed, locusAttributes = markers, checkCons = FALSE)
+    markers = names(markers)
+    typed = character(0)
+  }
   else {
     source = match.arg(source, c("true", "numerator", "denominator"))
     sourcePed = switch(source, true = truePed, numerator = numeratorPed, denominator = denominatorPed,

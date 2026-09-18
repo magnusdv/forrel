@@ -20,10 +20,14 @@ missingPersonIP(
 
 \item{missing}{The ID label of the missing pedigree member.}
 
-\item{markers}{A vector indicating the names or indices of markers attached
-to the source pedigree. If NULL (default), then all markers attached to the
-source pedigree are used. If \code{alleles} or \code{afreq} is non-NULL, then this
-parameter is ignored.}
+\item{markers}{Marker input. Either:
+\itemize{
+\item \code{NULL} (default): Use all markers attached to the source pedigree.
+\item A vector of names or indices selecting attached markers.
+\item A named list of frequency vectors, replacing all existing marker data.
+}
+
+Ignored if \code{alleles} or \code{afreq} is given.}
 
 \item{nsim}{A positive integer: the number of simulations}
 
