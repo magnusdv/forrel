@@ -7,6 +7,7 @@ S3method(print,EPresult)
 S3method(print,LRpowerResult)
 S3method(print,LRresult)
 S3method(print,ibdEst)
+export(LRdistribPlot)
 export(LRpower)
 export(MPPsims)
 export(checkPairwise)
@@ -38,22 +39,32 @@ export(simpleSim)
 import(pedprobr)
 import(pedtools)
 importFrom(grDevices,palette)
-importFrom(graphics,contour)
-importFrom(graphics,legend)
-importFrom(graphics,points)
-importFrom(pedprobr,likelihood)
-importFrom(pedprobr,oneMarkerDistribution)
-importFrom(ribd,ibdTriangle)
-importFrom(ribd,inbreeding)
-importFrom(ribd,kappaIBD)
-importFrom(ribd,showInTriangle)
-importFrom(stats,aggregate)
-importFrom(stats,ecdf)
-importFrom(stats,optimise)
-importFrom(stats,quantile)
-importFrom(stats,rbinom)
-importFrom(stats,setNames)
-importFrom(utils,head)
-importFrom(utils,setTxtProgressBar)
-importFrom(utils,txtProgressBar)
+importFrom(graphics,
+  contour,
+  legend,
+  points
+)
+importFrom(pedprobr,
+  likelihood,
+  oneMarkerDistribution
+)
+importFrom(ribd,
+  ibdTriangle,
+  inbreeding,
+  kappaIBD,
+  showInTriangle
+)
+importFrom(stats,
+  aggregate,
+  ecdf,
+  optimise,
+  quantile,
+  rbinom,
+  setNames
+)
+importFrom(utils,
+  head,
+  setTxtProgressBar,
+  txtProgressBar
+)
 importFrom(verbalisr,verbalise)

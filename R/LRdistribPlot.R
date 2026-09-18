@@ -18,8 +18,6 @@
 #'   from the pooled simulations. Increase `bw` for smoother curves and decrease
 #'   it to show more detail.
 #' @param col Two colours for the H1-true and H2-true distributions.
-#' @param threshold LR value at which to draw a vertical line. Set to NULL to
-#'   omit the line.
 #' @param verbose A logical.
 #'
 #' @return A `ggplot` object, or if `returnData = TRUE`, a data frame with
