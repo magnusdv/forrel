@@ -90,10 +90,10 @@
 #'   missingPersonIP(y, missing = "MP", nsim = 5, threshold = 10, verbose = FALSE))
 #'
 #' # Plot
-#' powerPlot(ep, ip, size = 2)
+#' MPpowerPlot(ep, ip, size = 2)
 #'
 #' # Different plot type, not dependent of `threshold`
-#' powerPlot(ep, ip, size = 2, type = 3)
+#' MPpowerPlot(ep, ip, size = 2, type = 3)
 #'
 #'
 #' \donttest{
@@ -113,33 +113,33 @@
 #'                   thresholdIP = 2, seed = 123, numCores = 1)
 #'
 #' # Power plot 1: EP vs IP
-#' powerPlot(simData, type = 1)
-#' powerPlot(simData, type = 1, minorpoints = FALSE, hline = 0.8)
+#' MPpowerPlot(simData, type = 1)
+#' MPpowerPlot(simData, type = 1, minorpoints = FALSE, hline = 0.8)
 #' }
 #'
 #' \donttest{
 #'
 #' # Change shape, and modify legend order
-#' powerPlot(simData[3:1], type = 1, shape = c("ci", "sq", "di"))
+#' MPpowerPlot(simData[3:1], type = 1, shape = c("ci", "sq", "di"))
 #'
 #' # Zoom in, and add threshold lines
-#' powerPlot(simData, type = 1, xlim = c(0.2, 1), ylim = c(0.5, 1),
+#' MPpowerPlot(simData, type = 1, xlim = c(0.2, 1), ylim = c(0.5, 1),
 #'           hline = 0.8, vline = 0.8)
 #'
 #' # Power plot 3: Expected number of exclusions vs E[log LR]
-#' powerPlot(simData, type = 3)
+#' MPpowerPlot(simData, type = 3)
 #'
 #' # With horizontal/vertical lines
-#' powerPlot(simData, type = 3, hline = log10(2), vline = 1)
+#' MPpowerPlot(simData, type = 3, hline = log10(2), vline = 1)
 #'
 #' # Plot 4: Illustrating the general inequality ELR > 1/(1-EP)
-#' powerPlot(simData, type = 4)
+#' MPpowerPlot(simData, type = 4)
 #'
 #' }
 #'
 #' @importFrom stats aggregate
 #' @export
-powerPlot = function(ep, ip = NULL, type = 1, majorpoints = TRUE, minorpoints = TRUE,
+MPpowerPlot = function(ep, ip = NULL, type = 1, majorpoints = TRUE, minorpoints = TRUE,
                      ellipse = FALSE, col = NULL, labs = NULL, jitter = FALSE, alpha = 1, stroke = 1.5,
                      shape = "circle", size = 1, hline = NULL, vline = NULL,
                      xlim = NULL, ylim = NULL, xlab = NULL, ylab = NULL) {
@@ -329,3 +329,10 @@ powerPlot = function(ep, ip = NULL, type = 1, majorpoints = TRUE, minorpoints = 
   p
 }
 
+
+#' @rdname MPpowerPlot
+#' @export
+powerPlot = function(...) {
+  message("`powerPlot()` has been renamed to `MPpowerPlot()`")
+  MPpowerPlot(...)
+}
