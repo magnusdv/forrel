@@ -133,3 +133,6 @@ pow3
 }
 
 }
+\seealso{
+\code{\link[=LRpowerPlot]{LRpowerPlot()}}
+}

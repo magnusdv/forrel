@@ -1,64 +1,92 @@
 #' Plot LR distributions under two hypotheses
 #'
-#' Simulates the LR H1/H2 under each hypothesis and plots the two log10 LR
+#' Simulates the LR comparing two pedigree hypotheses and plots the two log10 LR
 #' distributions, including their density overlap.
 #'
-#' @param numeratorPed,denominatorPed Pedigrees describing H1 and H2.
+#' @param numeratorPed,denominatorPed Pedigrees describing H1 and H2. If `denominatorPed`
+#'   is NULL, an 'unrelated' hypothesis will be created as `singletons(ids)`.
 #' @param ids Individuals to simulate.
-#' @param markers Marker names or indices to include, or a named list of
-#'   frequency vectors defining new markers. By default all attached markers.
+#' @param markers Marker names or indices to include, or a named list of frequency vectors
+#'   defining new markers. By default all attached markers.
 #' @param nsim Number of simulations under each hypothesis.
 #' @param seed Integer seed for the random number generator.
-#' @param data Precomputed data, either output from `LRdistribPlot(...,
-#'   returnData = TRUE)` or a list of two `LRpowerResult` objects, with H1 true
-#'   first and H2 true second.
+#' @param threshold An LR threshold. If given, the plot includes exceedance probabilities.
+#' @param data Precomputed data, either output from `LRpowerPlot(..., returnData =
+#'   TRUE)` or a list of two `LRpowerResult` objects, with H1 true first and H2 true
+#'   second.
 #' @param returnData If TRUE, return the simulated log10 LRs instead of a plot.
 #' @param title Plot title.
-#' @param bw Density bandwidth on the log10 LR scale. By default it is estimated
-#'   from the pooled simulations. Increase `bw` for smoother curves and decrease
-#'   it to show more detail.
+#' @param bw Density bandwidth on the log10 LR scale. By default it is estimated from the
+#'   pooled simulations. Increase `bw` for smoother curves and decrease it to show more
+#'   detail.
 #' @param col Two colours for the H1-true and H2-true distributions.
 #' @param verbose A logical.
 #'
-#' @return A `ggplot` object, or if `returnData = TRUE`, a data frame with
-#'   columns `hypothesis`, `sim` and `log10LR`.
+#' @return A `ggplot` object, or if `returnData = TRUE`, a data frame with columns
+#'   `hypothesis`, `sim` and `log10LR`.
+#'
+#' @seealso [LRpower()]
 #'
 #' @examples
 #' if(requireNamespace("ggplot2", quietly = TRUE)) {
 #'
-#' db = NorwegianFrequencies[1:15]
+#' db = NorwegianFrequencies[1:10]
 #'
-#' # Example 1: Sibs vs unrelated (increase nsim for better results)
+#' # Example 1: Sibs vs unrelated (increase nsim!)
 #' ids = c("A", "B")
 #' H1 = nuclearPed(children = ids)
-#' H2 = singletons(ids)
-#' LRdistribPlot(H1, H2, ids = ids, markers = db, nsim = 10, seed = 123)
+#'
+#' LRpowerPlot(H1, ids = ids, markers = db, nsim = 50, seed = 123)
+#'
 #'
 #' # Example 2: Full sibs vs half sibs
 #' ids = c("A", "B")
 #' H1 = nuclearPed(children = ids)
 #' H2 = halfSibPed() |> relabel(old = 4:5, new = ids)
-#' LRdistribPlot(H1, H2, ids = ids, markers = db, nsim = 10, seed = 123,
-#'               title = "LR distributions for H1: Full sibs, H2: Half sibs")
+#'
+#' LRpowerPlot(H1, H2, ids = ids, markers = db, nsim = 10, seed = 123,
+#'               title = "H1: Full sibs, H2: Half sibs")
+#'
 #'
 #' # Example 3: Full sibs vs half sibs, including shared parent
 #' ids = c("A", "B", "C")
 #' H1 = nuclearPed(fa = ids[1], children = ids[2:3])
 #' H2 = halfSibPed() |> relabel(old = c(2,4:5), new = ids)
-#' LRdistribPlot(H1, H2, ids = ids, markers = db, nsim = 10, seed = 123,
+#'
+#' LRpowerPlot(H1, H2, ids = ids, markers = db, nsim = 10, seed = 123,
 #'               title = "Full vs. half sibs, when parent is available")
+#'
+#'
+#' # Example 4: Paternity case (requires mutation modelling!)
+#' H1 = nuclearPed() |>
+#'   setMarkers(locusAttributes = db) |>
+#'   setMutmod(model = "equal", rate = 0.01)
+#'
+#' LRpowerPlot(H1, ids = c(1,3), nsim = 50, threshold = 1e4, seed = 123)
 #' }
 #'
 #' @export
-LRdistribPlot = function(numeratorPed = NULL, denominatorPed = NULL, ids = NULL,
-                         markers = NULL, nsim = 500, seed = NULL, data = NULL,
-                         returnData = FALSE, title = "LR distributions", bw = NULL,
-                         col = c("#E69F00", "#0072B2"), verbose = TRUE) {
+LRpowerPlot = function(numeratorPed = NULL, denominatorPed = NULL, ids = NULL,
+                         markers = NULL, nsim = 500, seed = NULL, threshold = NULL,
+                         data = NULL, returnData = FALSE, title = NULL,
+                         bw = NULL, col = c("#E69F00", "#0072B2"), verbose = TRUE) {
   if(is.null(data)) {
+
+    if(is.list(ids))
+      stop2("`ids` must be a vector")
+
+    if(is.null(denominatorPed)) {
+      if(verbose)
+        message(paste("Creating H2: Unrelated singletons", toString(ids)))
+      denominatorPed = singletons(ids)
+    }
+
     # Simulate under each hyp
+    if(verbose) message("\n--- H1 ---")
     r1 = LRpower(numeratorPed, denominatorPed, truePed = numeratorPed,
                  ids = ids, markers = markers, source = "numerator",
                  nsim = nsim, seed = seed, verbose = verbose)
+    if(verbose) message("\n--- H2 ---")
     r2 = LRpower(numeratorPed, denominatorPed, truePed = denominatorPed,
                  ids = ids, markers = markers, source = "numerator",
                  nsim = nsim, verbose = verbose)
@@ -87,7 +115,7 @@ LRdistribPlot = function(numeratorPed = NULL, denominatorPed = NULL, ids = NULL,
   if(!all(c("hypothesis", "log10LR") %in% names(data)))
     stop2("Invalid `data` input")
 
-  # Estimate finite densities on the same grid
+  # Estimate both densities on the same grid
   x1 = data$log10LR[data$hypothesis == "H1"]
   x2 = data$log10LR[data$hypothesis == "H2"]
   if(any(!is.finite(c(x1, x2))))
@@ -105,13 +133,17 @@ LRdistribPlot = function(numeratorPed = NULL, denominatorPed = NULL, ids = NULL,
   nsim = table(data$hypothesis)
   nmark = attr(data, "nMarkers")
 
-  subtitParts = c(
-    sprintf("%s sims per hypothesis", if(nsim[1] == nsim[2]) nsim[1] else toString(nsim)),
-    sprintf("%d markers", attr(data, "nMarkers")),
-    sprintf("Distribution overlap: %.1f%%", 100 * ov)
-  )
-  subtitle = paste(subtitParts, collapse = " | ")
+  caption = sprintf("%d sims under each hypothesis  |  %d markers  |  Density overlap: %.1f%%",
+                    nsim[1], nmark, 100 * ov)
 
+  subtitle = NULL
+  if(!is.null(threshold)) {
+    thr = log10(threshold)
+    ep1 = mean(x1 >= thr)
+    ep2 = mean(x2 >= thr)
+    subtitle = sprintf("Exceedance of LR \u2265 %g: %.0f%% under H1; %.0f%% under H2",
+                       threshold, 100 * ep1, 100 * ep2)
+  }
   # Plot distributions and their overlap
   x = H1 = H2 = overlap = NULL
   p = ggplot2::ggplot(d, ggplot2::aes(x)) +
@@ -121,9 +153,16 @@ LRdistribPlot = function(numeratorPed = NULL, denominatorPed = NULL, ids = NULL,
     ggplot2::scale_fill_manual(values = c("H1 true" = col[1], "H2 true" = col[2]),
                                name = NULL) +
     ggplot2::geom_vline(xintercept = 0, linetype = 2) +
-    ggplot2::labs(title = title, subtitle = subtitle,
+    ggplot2::labs(title = title, subtitle = subtitle, caption = caption,
                   x = expression(log[10](LR)), y = "Density") +
-    ggplot2::theme_classic()
+    ggplot2::theme_classic() +
+    ggplot2::theme(
+      legend.position = "right",
+      plot.caption = ggplot2::element_text(size = 9, hjust = 0)
+    )
+
+  if(!is.null(threshold))
+    p = p + ggplot2::geom_vline(xintercept = log10(threshold), linetype = 2, col = "red")
 
   p
 }

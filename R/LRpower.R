@@ -43,6 +43,8 @@
 #'   * `params`: A list containing the input parameters `markers`, `nsim`,
 #'   `threshold` and `disableMutations`.
 #'
+#' @seealso [LRpowerPlot()]
+#'
 #' @examples
 #'
 #' # Paternity LR of siblings
