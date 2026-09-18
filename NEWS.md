@@ -1,10 +1,12 @@
 # forrel 1.9.1 (dev)
 
-* New function `LRdistribPlot()` for visualising simulated LR distributions under two competing hypotheses.
+* New function `LRpowerPlot()` for visualising simulated LR distributions under two competing hypotheses.
 
-* `LRpower()` and `exclusionPower()` (and the new `LRdistribPlot()`) now accept a list of frequency vectors in `markers`, similarly to `profileSim()`.
+* `LRpower()` and `exclusionPower()` (and the new `LRpowerPlot()`) now accept a list of frequency vectors in `markers`, similarly to `profileSim()`.
 
 * `kinshipLR()` and `LRpower()` now also return LRs on the log scale, reducing the risk of numerical overflow and underflow.
+
+* `powerPlot()` has been renamed to `MPpowerPlot()`, to avoid confusion with the new `LRpowerPlot()` and to reflect its connection with missing person (MP) applications. The old name is retained with a message for backwards compatibility.
 
 
 # forrel 1.9.0
