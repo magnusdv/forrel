@@ -11,9 +11,9 @@
 #' @param nsim Number of simulations under each hypothesis.
 #' @param seed Integer seed for the random number generator.
 #' @param threshold An LR threshold. If given, the plot includes exceedance probabilities.
-#' @param data Precomputed data, either output from `LRpowerPlot(..., returnData =
-#'   TRUE)` or a list of two `LRpowerResult` objects, with H1 true first and H2 true
-#'   second.
+#'   Default: 10000.
+#' @param data Precomputed data, either output from `LRpowerPlot(..., returnData = TRUE)`
+#'   or a list of two `LRpowerResult` objects, with H1 true first and H2 true second.
 #' @param returnData If TRUE, return the simulated log10 LRs instead of a plot.
 #' @param title Plot title.
 #' @param bw Density bandwidth on the log10 LR scale. By default it is estimated from the
@@ -32,29 +32,29 @@
 #'
 #' db = NorwegianFrequencies[1:10]
 #'
-#' # Example 1: Sibs vs unrelated (increase nsim!)
+#' ### Example 1: Sibs vs unrelated (increase nsim!)
 #' ids = c("A", "B")
 #' H1 = nuclearPed(children = ids)
 #'
 #' LRpowerPlot(H1, ids = ids, markers = db, nsim = 50, seed = 123)
 #'
 #'
-#' # Example 2: Full sibs vs half sibs
+#' ### Example 2: Full sibs vs half sibs
 #' ids = c("A", "B")
 #' H1 = nuclearPed(children = ids)
 #' H2 = halfSibPed() |> relabel(old = 4:5, new = ids)
 #'
 #' LRpowerPlot(H1, H2, ids = ids, markers = db, nsim = 10, seed = 123,
-#'               title = "H1: Full sibs, H2: Half sibs")
+#'             title = "H1: Full sibs, H2: Half sibs")
 #'
 #'
-#' # Example 3: Full sibs vs half sibs, including shared parent
+#' ### Example 3: Full sibs vs half sibs, including shared parent
 #' ids = c("A", "B", "C")
 #' H1 = nuclearPed(fa = ids[1], children = ids[2:3])
 #' H2 = halfSibPed() |> relabel(old = c(2,4:5), new = ids)
 #'
 #' LRpowerPlot(H1, H2, ids = ids, markers = db, nsim = 10, seed = 123,
-#'               title = "Full vs. half sibs, when parent is available")
+#'             title = "Full vs. half sibs, when parent is available")
 #'
 #'
 #' # Example 4: Paternity case (requires mutation modelling!)
@@ -62,12 +62,18 @@
 #'   setMarkers(locusAttributes = db) |>
 #'   setMutmod(model = "equal", rate = 0.01)
 #'
-#' LRpowerPlot(H1, ids = c(1,3), nsim = 50, threshold = 1e4, seed = 123)
+#' LRpowerPlot(H1, ids = c(1,3), nsim = 50, seed = 123)
+#'
+#' # Alternative syntax: With returnData = TRUE
+#' dat = LRpowerPlot(H1, ids = c(1,3), nsim = 50, returnData = TRUE)
+#'
+#' LRpowerPlot(data = dat, threshold = 1e6, col = 2:3)
+#'
 #' }
 #'
 #' @export
 LRpowerPlot = function(numeratorPed = NULL, denominatorPed = NULL, ids = NULL,
-                         markers = NULL, nsim = 500, seed = NULL, threshold = NULL,
+                         markers = NULL, nsim = 500, seed = NULL, threshold = 1e4,
                          data = NULL, returnData = FALSE, title = NULL,
                          bw = NULL, col = c("#E69F00", "#0072B2"), verbose = TRUE) {
   if(is.null(data)) {
@@ -141,7 +147,7 @@ LRpowerPlot = function(numeratorPed = NULL, denominatorPed = NULL, ids = NULL,
     thr = log10(threshold)
     ep1 = mean(x1 >= thr)
     ep2 = mean(x2 >= thr)
-    subtitle = sprintf("Exceedance of LR \u2265 %g: %.0f%% under H1; %.0f%% under H2",
+    subtitle = sprintf("Exceedance (LR \u2265 %g): %.0f%% under H1; %.0f%% under H2",
                        threshold, 100 * ep1, 100 * ep2)
   }
   # Plot distributions and their overlap
@@ -158,7 +164,7 @@ LRpowerPlot = function(numeratorPed = NULL, denominatorPed = NULL, ids = NULL,
     ggplot2::theme_classic() +
     ggplot2::theme(
       legend.position = "right",
-      plot.caption = ggplot2::element_text(size = 9, hjust = 0)
+      plot.caption = ggplot2::element_text(size = 10, hjust = 0)
     )
 
   if(!is.null(threshold))
