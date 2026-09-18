@@ -75,6 +75,7 @@ following entries:
 \itemize{
 \item \code{LRperSim}: A numeric vector of length \code{nsim} containing the total LR for
 each simulation.
+\item \code{log10LRperSim}: Corresponding log10 LRs, calculated before exponentiation.
 \item \code{meanLRperMarker}: The mean LR per marker, over all simulations.
 \item \code{meanLR}: The mean total LR over all simulations.
 \item \code{meanLogLR}: The mean total \code{log10(LR)} over all simulations.

@@ -68,6 +68,7 @@ corresponding to the reference will always be 1.
 marker-wise LR values comparing pedigree \code{i} to the reference. The product
 of all entries in a column should equal the corresponding entry in
 \code{LRtotal}.
+\item \code{lnLRtotal}, \code{lnLRperMarker}: Natural logarithms of the above outputs.
 \item \code{likelihoodsPerMarker} : A numerical matrix of the same dimensions as
 \code{LRperMarker}, but where the entries are likelihood of each pedigree for
 each marker.

@@ -42,7 +42,8 @@ test_that("kinshipLR() returns complete unlinked output", {
   res = kinshipLR(Hpat = Hpat, Hunrel = Hunrel, source = "Hpat", verbose = FALSE)
 
   expect_is(res, "LRresult")
-  expect_identical(names(res), c("LRtotal", "LRperMarker", "likelihoodsPerMarker", "time"))
+  expect_identical(names(res), c("LRtotal", "LRperMarker", "lnLRtotal", "lnLRperMarker",
+                                 "likelihoodsPerMarker", "time"))
   expect_identical(names(res$LRtotal), c("Hpat:Hunrel", "Hunrel:Hunrel"))
   expect_identical(rownames(res$LRperMarker), c("M1", "M2"))
   expect_identical(colnames(res$LRperMarker), names(res$LRtotal))

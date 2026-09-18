@@ -53,5 +53,7 @@ quickLR = function(x, ids = typedMembers(x), test = c("pat", "sib", "half", "cou
   res = kinshipLR(peds, ref = n, source = n)
   res$LRtotal = res$LRtotal[-n]
   res$LRperMarker = res$LRperMarker[, -n, drop = FALSE]
+  res$lnLRtotal = res$lnLRtotal[-n]
+  res$lnLRperMarker = res$lnLRperMarker[, -n, drop = FALSE]
   res
 }

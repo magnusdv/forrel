@@ -60,6 +60,8 @@
 #'   of all entries in a column should equal the corresponding entry in
 #'   `LRtotal`.
 #'
+#'   * `lnLRtotal`, `lnLRperMarker`: Natural logarithms of the above outputs.
+#'
 #'   * `likelihoodsPerMarker` : A numerical matrix of the same dimensions as
 #'   `LRperMarker`, but where the entries are likelihood of each pedigree for
 #'   each marker.
@@ -316,7 +318,8 @@ kinshipLR = function(..., ref = NULL, source = NULL, markers = NULL, likArgs = N
   LRtotal = exp(lnLRtotal)
   likelihoodsPerMarker = exp(lnLikPerMarker)
 
-  names(LRtotal) = colnames(LRperMarker) = paste0(hypnames, ":", hypnames[refIdx])
+  names(LRtotal) = names(lnLRtotal) = colnames(LRperMarker) =
+    paste0(hypnames, ":", hypnames[refIdx])
 
   # Use marker names in output
   markernames = name(x[[1]], markers)
@@ -324,10 +327,14 @@ kinshipLR = function(..., ref = NULL, source = NULL, markers = NULL, likArgs = N
     markernames[NAnames] = sprintf("<%d>", which(NAnames))
   rownames(likelihoodsPerMarker) = rownames(LRperMarker) = markernames
 
+  dimnames(lnLRperMarker) = dimnames(LRperMarker)
+
   # Output `LRresult` object
   structure(list(
     LRtotal = LRtotal,
     LRperMarker = LRperMarker,
+    lnLRtotal = lnLRtotal,
+    lnLRperMarker = lnLRperMarker,
     likelihoodsPerMarker = likelihoodsPerMarker,
     time = proc.time() - st),
     class = "LRresult")

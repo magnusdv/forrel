@@ -246,7 +246,7 @@ lrPowerCompute = function(sims, numeratorPed, denominatorPed, ids, params, verbo
     denomSim = transferMarkers(from = s, to = denominatorPed, ids = targetsIds)
     #print(numerSim);print(denomSim)
     lr = kinshipLR(list(numerSim, denomSim), ref = 2)
-    lr$LRperMarker[,1]
+    lr$lnLRperMarker[, 1] / log(10)
   }, FUN.VALUE = numeric(length(markers)))
 
   # Ensure matrix
@@ -259,17 +259,19 @@ lrPowerCompute = function(sims, numeratorPed, denominatorPed, ids, params, verbo
     message("done")
 
   # Results
-  LRperSim = apply(lrs, 2, prod)
-  meanLRperMarker = apply(lrs, 1, mean)
+  log10LRperSim = colSums(lrs)
+  LRperSim = 10^log10LRperSim
+  meanLRperMarker = rowMeans(10^lrs)
   meanLR = mean(LRperSim)
-  meanLogLR = mean(log10(LRperSim))
-  IP = sapply(threshold, function(thr) mean(LRperSim >= thr))
+  meanLogLR = mean(log10LRperSim)
+  IP = sapply(threshold, function(thr) mean(log10LRperSim >= log10(thr)))
   names(IP) = threshold
 
   params$ids = ids
   structure(list(LRperSim = LRperSim, meanLRperMarker = meanLRperMarker,
                  meanLR = meanLR, meanLogLR = meanLogLR, IP = IP,
-                 params = params), class = "LRpowerResult")
+                 params = params, log10LRperSim = log10LRperSim),
+            class = "LRpowerResult")
 
 }
 
