@@ -68,7 +68,7 @@ db = NorwegianFrequencies[1:10]
 ids = c("A", "B")
 H1 = nuclearPed(children = ids)
 
-LRpowerPlot(H1, ids = ids, markers = db, nsim = 50, seed = 123)
+LRpowerPlot(H1, ids = ids, markers = db, nsim = 10, seed = 123)
 
 
 ### Example 2: Full sibs vs half sibs
@@ -94,10 +94,10 @@ H1 = nuclearPed() |>
   setMarkers(locusAttributes = db) |>
   setMutmod(model = "equal", rate = 0.01)
 
-LRpowerPlot(H1, ids = c(1,3), nsim = 50, seed = 123)
+LRpowerPlot(H1, ids = c(1,3), nsim = 10, seed = 123)
 
 # Alternative syntax: With returnData = TRUE
-dat = LRpowerPlot(H1, ids = c(1,3), nsim = 50, returnData = TRUE)
+dat = LRpowerPlot(H1, ids = c(1,3), nsim = 10, returnData = TRUE)
 
 LRpowerPlot(data = dat, threshold = 1e6, col = 2:3)
 
