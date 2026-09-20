@@ -8,6 +8,8 @@
 
 * `powerPlot()` has been renamed to `MPpowerPlot()`, to avoid confusion with the new `LRpowerPlot()` and to reflect its connection with missing person (MP) applications. The old name is retained with a message for backwards compatibility.
 
+* `missingPersonIP()` has a new argument `true`, taking values `"missing"` (default, corresponding to the previous behaviour) or `"unrelated"`, for simulating LR distributions under either hypothesis.
+
 
 # forrel 1.9.0
 
