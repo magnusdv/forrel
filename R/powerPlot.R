@@ -58,6 +58,7 @@
 #'   drawn.
 #' @param xlim,ylim Axis limits; automatically chosen if NULL.
 #' @param xlab,ylab Axis labels; automatically chosen if NULL.
+#' @param ... Arguments passed on.
 #'
 #' @return A `ggplot2` plot object.
 #' @seealso [MPPsims()], [missingPersonEP()], [missingPersonEP()]

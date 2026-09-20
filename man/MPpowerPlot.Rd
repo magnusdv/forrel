@@ -71,6 +71,8 @@ drawn.}
 \item{xlim, ylim}{Axis limits; automatically chosen if NULL.}
 
 \item{xlab, ylab}{Axis labels; automatically chosen if NULL.}
+
+\item{...}{Arguments passed on.}
 }
 \value{
 A \code{ggplot2} plot object.
