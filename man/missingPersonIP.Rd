@@ -2,7 +2,7 @@
 % Please edit documentation in R/missingPersonIP.R
 \name{missingPersonIP}
 \alias{missingPersonIP}
-\title{Inclusion power for missing person cases}
+\title{LR simulation for missing person cases}
 \usage{
 missingPersonIP(
   reference,
@@ -12,6 +12,7 @@ missingPersonIP(
   threshold = NULL,
   disableMutations = NA,
   seed = NULL,
+  true = c("missing", "unrelated"),
   verbose = TRUE
 )
 }
@@ -31,8 +32,8 @@ Ignored if \code{alleles} or \code{afreq} is given.}
 
 \item{nsim}{A positive integer: the number of simulations}
 
-\item{threshold}{A numeric vector with one or more positive numbers used as
-the likelihood ratio thresholds for inclusion}
+\item{threshold}{A numeric vector with one or more positive numbers used as the
+likelihood ratio thresholds for inclusion}
 
 \item{disableMutations}{This parameter determines how mutation models are
 treated. Possible values are as follows:
@@ -50,11 +51,13 @@ mutations should be disabled.
 
 \item{seed}{An integer seed for the random number generator (optional).}
 
+\item{true}{Either "missing" (default) or "unrelated", indicating whether profiles are
+simulated for the true missing person or for an unrelated person.}
+
 \item{verbose}{A logical.}
 }
 \value{
-A \code{mpIP} object, which is essentially a list with the following
-entries:
+A \code{mpIP} object, which is essentially a list with the following entries:
 \itemize{
 \item \code{LRperSim}: A numeric vector of length \code{nsim} containing the total LR for
 each simulation.
@@ -62,32 +65,52 @@ each simulation.
 \item \code{meanLR}: The mean total LR over all simulations.
 \item \code{meanLogLR}: The mean total \code{log10(LR)} over all simulations.
 \item \code{IP}: A named numeric of the same length as \code{threshold}. For each element
-of \code{threshold}, the fraction of simulations resulting in a LR exceeding the
-given number.
+of \code{threshold}, the fraction of simulations resulting in an LR exceeding the given
+number. With \code{true = "missing"} this is the inclusion power; with \code{true =   "unrelated"} it is the corresponding fraction among unrelated persons.
 \item \code{params}: A list containing the input parameters \code{missing}, \code{markers},
-\code{nsim}, \code{threshold} and \code{disableMutations}
+\code{nsim}, \code{threshold}, \code{disableMutations} and \code{true}.
 }
 }
 \description{
-This function simulates the LR distribution for the true missing person in a
-reference family. The output contains both the total and marker-wise LR of
-each simulation, as well as various summary statistics. If a specific LR
-threshold is given, the \emph{inclusion power} is computed as the probability that
-LR exceeds the threshold.
+This function simulates the LR distribution in a missing person case, either for the
+true missing person or for an unrelated person. The output contains both the total and
+marker-wise LR of each simulation, as well as various summary statistics. If a specific
+LR threshold is given, the fraction of simulations exceeding the threshold is computed.
+When simulating the true missing person (the default), this fraction is referred to
+as the \emph{inclusion power} (Vigeland et al., 2020).
 }
 \examples{
 
-# Four siblings; the fourth is missing
-x = nuclearPed(4)
+# Two brothers are looking for their missing sibling.
+# They are typed with 5 triallelic markers.
+x = nuclearPed(3) |>
+  markerSim(N = 5, ids = 3:4, alleles = 1:3, seed = 123, verbose = FALSE)
 
-# Remaining sibs typed with 5 triallelic markers
-x = markerSim(x, N = 5, ids = 3:5, alleles = 1:3, seed = 123, verbose = FALSE)
+missingPersonPlot(x, missing = 5)
 
-# Compute inclusion power statistics
-ip = missingPersonIP(x, missing = 6, nsim = 5, threshold = c(10, 100))
+nsim = 20 # increase!
+
+# Inclusion power statistics
+ip = missingPersonIP(x, missing = 5, nsim = nsim, threshold = c(10, 100))
 ip
+head(ip$LRperSim)
 
-# LRs from each simulation
-ip$LRperSim
+# Simulate LRs for a random unrelated person
+ip2 = missingPersonIP(x, missing = 5, nsim = nsim, threshold = c(10, 100),
+                      true = "unrelated")
+ip2
+head(ip2$LRperSim)
 
+# Plot distributions
+LRpowerPlot(data = list(ip, ip2), threshold = 100)
+
+}
+\references{
+Vigeland MD, Marsico FL, Herrera Piñero M, Egeland T (2020).
+"Prioritising family members for genotyping in missing person cases:
+A general approach combining the statistical power of exclusion and inclusion."
+\emph{FSI: Genetics}, 49, 102376. \doi{10.1016/j.fsigen.2020.102376}
+}
+\seealso{
+\code{\link[=missingPersonEP]{missingPersonEP()}}, \code{\link[=missingPersonLR]{missingPersonLR()}}, \code{\link[=missingPersonPlot]{missingPersonPlot()}}
 }
