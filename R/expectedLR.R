@@ -8,8 +8,8 @@
 #' distribution for the available individuals, conditional on the known data, in
 #' each pedigree.
 #'
-#' @param numeratorPed A `ped` object.
-#' @param denominatorPed A `ped` object.
+#' @param numeratorPed A `ped` object or a list of such.
+#' @param denominatorPed A `ped` object or a list of such.
 #' @param truePed A `ped` object.
 #' @param ids A vector of ID labels corresponding to untyped pedigree members.
 #'   (These must be members of all three input pedigrees).
@@ -49,12 +49,12 @@
 #' @export
 expectedLR = function(numeratorPed, denominatorPed, truePed = numeratorPed, ids, marker) {
 
-  if(!is.ped(numeratorPed))
-    stop2("Argument `numeratorPed` must be a connected `ped` object")
-  if(!is.ped(denominatorPed))
-    stop2("Argument `denominatorPed` must be a connected `ped` object")
-  if(!is.ped(truePed))
-    stop2("Argument `truePed` must be a connected `ped` object")
+  # if(!is.ped(numeratorPed))
+  #   stop2("Argument `numeratorPed` must be a connected `ped` object")
+  # if(!is.ped(denominatorPed))
+  #   stop2("Argument `denominatorPed` must be a connected `ped` object")
+  # if(!is.ped(truePed))
+  #   stop2("Argument `truePed` must be a connected `ped` object")
 
   # Wrapper (for simpler code)
   OMD = function(ped) oneMarkerDistribution(ped, marker = 1, ids = ids, verbose = FALSE)

@@ -7,9 +7,9 @@
 expectedLR(numeratorPed, denominatorPed, truePed = numeratorPed, ids, marker)
 }
 \arguments{
-\item{numeratorPed}{A \code{ped} object.}
+\item{numeratorPed}{A \code{ped} object or a list of such.}
 
-\item{denominatorPed}{A \code{ped} object.}
+\item{denominatorPed}{A \code{ped} object or a list of such.}
 
 \item{truePed}{A \code{ped} object.}
 

@@ -10,6 +10,8 @@
 
 * `missingPersonIP()` has a new argument `true`, taking values `"missing"` (default, corresponding to the previous behaviour) or `"unrelated"`, for simulating LR distributions under either hypothesis.
 
+* `expectedLR()` no longer requires the input pedigree hypotheses to be connected.
+
 
 # forrel 1.9.0
 
