@@ -1,22 +1,21 @@
 #' Expected likelihood ratio
 #'
-#' This function computes the expected LR for a single marker, in a kinship test
-#' comparing two hypothesised relationships between a set of individuals. The
-#' true relationship may differ from both hypotheses. Some individuals may
-#' already be genotyped, while others are available for typing. The
-#' implementation uses `oneMarkerDistribution()` to find the joint genotype
-#' distribution for the available individuals, conditional on the known data, in
-#' each pedigree.
+#' This function computes the expected LR for a single marker, in a kinship test comparing
+#' two hypothesised relationships between a set of individuals. The true relationship may
+#' differ from both hypotheses. Some individuals may already be genotyped, while others
+#' are available for typing. The implementation uses `oneMarkerDistribution()` to find the
+#' joint genotype distribution for the available individuals, conditional on the known
+#' data, in each pedigree.
 #'
 #' @param numeratorPed A `ped` object or a list of such.
 #' @param denominatorPed A `ped` object or a list of such.
 #' @param truePed A `ped` object.
-#' @param ids A vector of ID labels corresponding to untyped pedigree members.
-#'   (These must be members of all three input pedigrees).
-#' @param marker either a marker object compatible with `numeratorPed`, or the
-#'   name or index of a marker attached to `numeratorPed`.
+#' @param ids A vector of ID labels corresponding to untyped pedigree members. (These must
+#'   be members of all three input pedigrees).
+#' @param marker The name or index of a marker attached to `numeratorPed`. Alternatively,
+#'   a standalone `marker` object compatible with `numeratorPed`.
 #'
-#' @return A positive number.
+#' @return A positive number; the expected LR.
 #'
 #' @examples
 #'
@@ -53,8 +52,11 @@ expectedLR = function(numeratorPed, denominatorPed, truePed = numeratorPed, ids,
   OMD = function(ped) oneMarkerDistribution(ped, marker = 1, ids = ids, verbose = FALSE)
 
   # Numerator
-  if(is.marker(marker))
+  if(is.marker(marker)) {
+    if(!is.ped(numeratorPed))
+      stop2("When `marker` is a standalone marker object, `numeratorPed` must be connected")
     numeratorPed = setMarkers(numeratorPed, marker)
+  }
   else
     numeratorPed = selectMarkers(numeratorPed, marker)
   num = OMD(numeratorPed)
