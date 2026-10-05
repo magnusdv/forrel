@@ -41,8 +41,8 @@ each pedigree.
 # Numerator ped
 numPed = nuclearPed(father = "fa", mother = "mo", child = "ch")
 
-# Denominator ped: fa, mo, ch are unrelated. (Hack!)
-denomPed = halfSibPed() |> relabel(old = 1:3, new = c("mo", "fa", "ch"))
+# Denominator ped: fa, mo, ch are unrelated
+denomPed = singletons(c("fa", "mo", "ch"), sex = c(1, 2, 1))
 
 # Scenario 1: Only mother is typed; genotype 1/2
 p = 0.9

@@ -28,8 +28,8 @@
 #' # Numerator ped
 #' numPed = nuclearPed(father = "fa", mother = "mo", child = "ch")
 #'
-#' # Denominator ped: fa, mo, ch are unrelated. (Hack!)
-#' denomPed = halfSibPed() |> relabel(old = 1:3, new = c("mo", "fa", "ch"))
+#' # Denominator ped: fa, mo, ch are unrelated
+#' denomPed = singletons(c("fa", "mo", "ch"), sex = c(1, 2, 1))
 #'
 #' # Scenario 1: Only mother is typed; genotype 1/2
 #' p = 0.9
@@ -49,13 +49,6 @@
 #' @export
 expectedLR = function(numeratorPed, denominatorPed, truePed = numeratorPed, ids, marker) {
 
-  # if(!is.ped(numeratorPed))
-  #   stop2("Argument `numeratorPed` must be a connected `ped` object")
-  # if(!is.ped(denominatorPed))
-  #   stop2("Argument `denominatorPed` must be a connected `ped` object")
-  # if(!is.ped(truePed))
-  #   stop2("Argument `truePed` must be a connected `ped` object")
-
   # Wrapper (for simpler code)
   OMD = function(ped) oneMarkerDistribution(ped, marker = 1, ids = ids, verbose = FALSE)
 
@@ -65,6 +58,14 @@ expectedLR = function(numeratorPed, denominatorPed, truePed = numeratorPed, ids,
   else
     numeratorPed = selectMarkers(numeratorPed, marker)
   num = OMD(numeratorPed)
+
+  # Check sex if X-linked
+  if(isXmarker(numeratorPed)) {
+    numSex = getSex(numeratorPed, ids)
+    denomSex = getSex(denominatorPed, ids)
+    if(!identical(numSex, denomSex))
+      stop2("Sex of `ids` must agree between pedigree hypotheses for X-linked markers")
+  }
 
   denominatorPed = transferMarkers(from = numeratorPed,
                                    to = denominatorPed,
