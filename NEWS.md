@@ -1,4 +1,4 @@
-# forrel 1.9.1 (dev)
+# forrel 1.10.0
 
 * New function `LRpowerPlot()` for visualising simulated LR distributions under two competing hypotheses.
 
@@ -11,6 +11,8 @@
 * `missingPersonIP()` has a new argument `true`, taking values `"missing"` (default, corresponding to the previous behaviour) or `"unrelated"`, for simulating LR distributions under either hypothesis.
 
 * `expectedLR()` no longer requires the input pedigree hypotheses to be connected.
+
+* `expectedLR()` now checks that, if the marker is X-linked, all individuals have the same sex in both hypotheses.
 
 
 # forrel 1.9.0
