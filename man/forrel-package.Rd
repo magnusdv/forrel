@@ -8,7 +8,7 @@
 \description{
 \if{html}{\figure{logo.png}{options: style='float: right' alt='logo' width='120'}}
 
-Forensic applications of pedigree analysis, including likelihood ratios for relationship testing, general relatedness inference, marker simulation, and power analysis. 'forrel' is part of the 'pedsuite', a collection of packages for pedigree analysis, further described in the book 'Pedigree Analysis in R' (Vigeland, 2021, ISBN:9780128244302). Several functions deal specifically with power analysis in missing person cases, implementing methods described in Vigeland et al. (2020) \doi{10.1016/j.fsigen.2020.102376}. Data import from the 'Familias' software (Egeland et al. (2000) \doi{10.1016/S0379-0738(00)00147-X}) is supported through the 'pedFamilias' package.
+Forensic applications of pedigree analysis, including likelihood ratios for relationship testing, general relatedness inference, marker simulation, and power analysis. 'forrel' is part of the 'pedsuite', a collection of packages for pedigree analysis, further described in the book 'Pedigree Analysis in R' (Vigeland, 2021, ISBN:9780128244302). Several functions deal specifically with power analysis in missing person cases, implementing methods described in Vigeland et al. (2020) \doi{10.1016/j.fsigen.2020.102376}. Methods for checking pairwise relationships are described in Egeland and Vigeland (2025) \doi{10.1016/j.fsigen.2025.103270}. Data exchange with the 'Familias' software (Egeland et al. (2000) \doi{10.1016/S0379-0738(00)00147-X}) is supported through the 'pedFamilias' package.
 }
 \seealso{
 Useful links:

@@ -65,7 +65,7 @@ the exceedance probabilities under each hypothesis.
 \examples{
 if(requireNamespace("ggplot2", quietly = TRUE)) {
 
-db = NorwegianFrequencies[1:10]
+db = NorwegianFrequencies[1:5]  # small example database
 
 ### Example 1: Sibs vs unrelated (increase nsim!)
 ids = c("A", "B")
