@@ -6,59 +6,56 @@
 #' of pedigree members, using maximum likelihood methods. Estimates of \eqn{\kappa} may be
 #' visualised with [ribd::showInTriangle()].
 #'
-#' It should be noted that this procedure estimates the *realised* identity
-#' coefficients of each pair, i.e., the actual fractions of the autosomes in
-#' each IBD state. These may deviate substantially from the theoretical pedigree
-#' coefficients.
+#' It should be noted that this procedure estimates the *realised* identity coefficients
+#' of each pair, i.e., the actual fractions of the autosomes in each IBD state. These may
+#' deviate substantially from the theoretical pedigree coefficients.
 #'
-#' Maximum likelihood estimation of relatedness coefficients originates with
-#' Thompson (1975). Optimisation of \eqn{\kappa} is done in the \eqn{(\kappa_0,
-#' \kappa_2)}{(k0, k2)}-plane and restricted to the triangle defined by
+#' Maximum likelihood estimation of relatedness coefficients originates with Thompson
+#' (1975). Optimisation of \eqn{\kappa} is done in the \eqn{(\kappa_0, \kappa_2)}{(k0,
+#' k2)}-plane and restricted to the triangle defined by
 #' \deqn{\kappa_0 \ge 0, \kappa_2 \ge 0, \kappa_0 + \kappa_2 \le 1}{k0 >= 0, k2
 #' >= 0, k0 + k2 <= 1.}
 #'
-#' Optimisation of \eqn{\Delta} is done in unit simplex of \eqn{R^8}, using the
-#' first 8 coefficients.
+#' Optimisation of \eqn{\Delta} is done in unit simplex of \eqn{R^8}, using the first 8
+#' coefficients.
 #'
-#' The implementation optimises the log-likelihood using a projected gradient
-#' descent algorithm, combined with a version of Armijo line search.
+#' The implementation optimises the log-likelihood using a projected gradient descent
+#' algorithm, combined with a version of Armijo line search.
 #'
 #' When `param = "kappa"`, the output may be fed directly to [ribd::showInTriangle()] for
 #' visualisation.
 #'
 #' @param x A `ped` object or a list of such.
-#' @param ids Either a vector with ID labels, or a data frame/matrix with two
-#'   columns, each row indicating a pair of individuals. The entries are coerced
-#'   to characters, and must match uniquely against the ID labels of `x`. By
-#'   default, all pairs of genotyped members of `x` are included.
-#' @param acrossComps A logical indicating if pairs of individuals in different
-#'   components should be included. Default: TRUE.
-#' @param markers A vector with names or indices of markers attached to x,
-#'   indicating which markers to include. By default, all markers are used.
-#' @param param Either "kappa" (default) or "delta"; indicating which set of
-#'   coefficients should be estimated.
-#' @param start A probability vector (i.e., with nonnegative entries and sum 1)
-#'   of length 3 (if `param = "kappa"`) or 9 (if `param = "delta"`), indicating
-#'   the initial value of for the optimisation. By default, `start` is set to
-#'   `(1/3, 1/3, 1/3)` if `param = "kappa"` and `(1/9, ..., 1/9)` if `param =
-#'   "delta"`.
-#' @param tol,beta,sigma Control parameters for the optimisation routine; can
-#'   usually be left untouched.
-#' @param contourPlot A logical. If TRUE, contours of the log-likelihood
-#'   function are plotted overlaying the IBD triangle.
-#' @param levels (Only relevant if `contourPlot = TRUE`.) A numeric vector of
-#'   levels at which to draw contour lines. If NULL (default), the levels are
-#'   chosen automatically.
-#' @param maxval A logical. If TRUE, the maximum log-likelihood value is
-#'   included in the output. Default: FALSE
+#' @param ids Either a vector with ID labels, or a data frame/matrix with two columns,
+#'   each row indicating a pair of individuals. The entries are coerced to characters, and
+#'   must match uniquely against the ID labels of `x`. By default, all pairs of genotyped
+#'   members of `x` are included.
+#' @param acrossComps A logical indicating if pairs of individuals in different components
+#'   should be included. Default: TRUE.
+#' @param markers A vector with names or indices of markers attached to x, indicating
+#'   which markers to include. By default, all markers are used.
+#' @param param Either "kappa" (default) or "delta"; indicating which set of coefficients
+#'   should be estimated.
+#' @param start A probability vector (i.e., with nonnegative entries and sum 1) of length
+#'   3 (if `param = "kappa"`) or 9 (if `param = "delta"`), indicating the initial value of
+#'   for the optimisation. By default, `start` is set to `(1/3, 1/3, 1/3)` if `param =
+#'   "kappa"` and `(1/9, ..., 1/9)` if `param = "delta"`.
+#' @param tol,beta,sigma Control parameters for the optimisation routine; can usually be
+#'   left untouched.
+#' @param contourPlot A logical. If TRUE, contours of the log-likelihood function are
+#'   plotted overlaying the IBD triangle.
+#' @param levels (Only relevant if `contourPlot = TRUE`.) A numeric vector of levels at
+#'   which to draw contour lines. If NULL (default), the levels are chosen automatically.
+#' @param maxval A logical. If TRUE, the maximum log-likelihood value is included in the
+#'   output. Default: FALSE
 #' @param verbose A logical.
 #'
-#' @return An object of class `ibdEst`, which is basically a data frame with
-#'   either 6 columns (if `param = "kappa"`) or 12 columns (if `param =
-#'   "delta"`). The first three columns are `id1` (label of first individual),
-#'   `id2` (label of second individual) and `N` (the number of markers with no
-#'   missing alleles). The remaining columns contain the coefficient estimates.
-#'   If `maxval = T`, a column named `maxloglik` is added at the end.
+#' @return An object of class `ibdEst`, which is basically a data frame with either 6
+#'   columns (if `param = "kappa"`) or 12 columns (if `param = "delta"`). The first three
+#'   columns are `id1` (label of first individual), `id2` (label of second individual) and
+#'   `N` (the number of markers with no missing alleles). The remaining columns contain
+#'   the coefficient estimates. If `maxval = T`, a column named `maxloglik` is added at
+#'   the end.
 #'
 #' @author Magnus Dehli Vigeland
 #'
@@ -66,12 +63,11 @@
 #'
 #' @references
 #'
-#' * E. A. Thompson (1975). _The estimation of pairwise relationships._ Annals
-#' of Human Genetics 39.
+#' * E. A. Thompson (1975). _The estimation of pairwise relationships._ Annals of Human
+#' Genetics 39.
 #'
-#' * E. A. Thompson (2000). _Statistical Inference from Genetic Data on
-#' Pedigrees._ NSF-CBMS Regional Conference Series in Probability and
-#' Statistics. Volume 6.
+#' * E. A. Thompson (2000). _Statistical Inference from Genetic Data on Pedigrees._
+#' NSF-CBMS Regional Conference Series in Probability and Statistics. Volume 6.
 #'
 #' @examples
 #'

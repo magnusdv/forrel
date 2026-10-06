@@ -7,7 +7,7 @@
 missingPersonIP(
   reference,
   missing,
-  markers,
+  markers = NULL,
   nsim = 1,
   threshold = NULL,
   disableMutations = NA,
@@ -21,19 +21,11 @@ missingPersonIP(
 
 \item{missing}{The ID label of the missing pedigree member.}
 
-\item{markers}{Marker input. Either:
-\itemize{
-\item \code{NULL} (default): Use all markers attached to the source pedigree.
-\item A vector of names or indices selecting attached markers.
-\item A named list of frequency vectors, replacing all existing marker data.
-}
-
-Ignored if \code{alleles} or \code{afreq} is given.}
+\item{markers}{Names or indices of attached markers to include. By default all markers.}
 
 \item{nsim}{A positive integer: the number of simulations}
 
-\item{threshold}{A numeric vector with one or more positive numbers used as the
-likelihood ratio thresholds for inclusion}
+\item{threshold}{A numeric vector with one or more positive LR thresholds.}
 
 \item{disableMutations}{This parameter determines how mutation models are
 treated. Possible values are as follows:
@@ -59,25 +51,26 @@ simulated for the true missing person or for an unrelated person.}
 \value{
 A \code{mpIP} object, which is essentially a list with the following entries:
 \itemize{
-\item \code{LRperSim}: A numeric vector of length \code{nsim} containing the total LR for
-each simulation.
+\item \code{LRperSim}: A numeric vector of length \code{nsim} containing the total LR for each
+simulation.
+\item \code{log10LRperSim}: The corresponding total LRs on the log10 scale.
 \item \code{meanLRperMarker}: The mean LR per marker, over all simulations.
 \item \code{meanLR}: The mean total LR over all simulations.
-\item \code{meanLogLR}: The mean total \code{log10(LR)} over all simulations.
-\item \code{IP}: A named numeric of the same length as \code{threshold}. For each element
-of \code{threshold}, the fraction of simulations resulting in an LR exceeding the given
+\item \code{meanLogLR}: The mean of \code{log10LRperSim}.
+\item \code{IP}: A named numeric of the same length as \code{threshold}. For each element of
+\code{threshold}, the fraction of simulations resulting in an LR exceeding the given
 number. With \code{true = "missing"} this is the inclusion power; with \code{true =   "unrelated"} it is the corresponding fraction among unrelated persons.
-\item \code{params}: A list containing the input parameters \code{missing}, \code{markers},
-\code{nsim}, \code{threshold}, \code{disableMutations} and \code{true}.
+\item \code{params}: A list containing the input parameters \code{missing}, \code{markers}, \code{nsim},
+\code{threshold}, \code{seed}, \code{disableMutations} and \code{true}.
 }
 }
 \description{
 This function simulates the LR distribution in a missing person case, either for the
-true missing person or for an unrelated person. The output contains both the total and
-marker-wise LR of each simulation, as well as various summary statistics. If a specific
-LR threshold is given, the fraction of simulations exceeding the threshold is computed.
-When simulating the true missing person (the default), this fraction is referred to
-as the \emph{inclusion power} (Vigeland et al., 2020).
+true missing person or for an unrelated person. The output contains the total LR and
+log10 LR of each simulation, and various summary statistics. If a specific LR threshold
+is given, the fraction of simulations exceeding the threshold is computed. When
+simulating the true missing person (the default), this fraction is referred to as the
+\emph{inclusion power} (Vigeland et al., 2020).
 }
 \examples{
 
@@ -106,9 +99,9 @@ LRpowerPlot(data = list(ip, ip2), threshold = 100)
 
 }
 \references{
-Vigeland MD, Marsico FL, Herrera Piñero M, Egeland T (2020).
-"Prioritising family members for genotyping in missing person cases:
-A general approach combining the statistical power of exclusion and inclusion."
+Vigeland MD, Marsico FL, Herrera Piñero M, Egeland T (2020). "Prioritising
+family members for genotyping in missing person cases: A general approach combining
+the statistical power of exclusion and inclusion."
 \emph{FSI: Genetics}, 49, 102376. \doi{10.1016/j.fsigen.2020.102376}
 }
 \seealso{

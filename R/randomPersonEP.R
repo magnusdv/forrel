@@ -7,6 +7,7 @@
 #'
 #' @param x A `ped` object with attached markers.
 #' @param id The ID label of a single pedigree member.
+#' @param markers Names or indices of attached markers to include. By default all markers.
 #' @param disableMutations This parameter determines how mutation models are
 #'   treated. Possible values are as follows:
 #'
@@ -43,6 +44,9 @@ randomPersonEP = function(x, id, markers = NULL, disableMutations = NA, verbose 
 
   if(!is.ped(x))
     stop2("Expecting a connected pedigree")
+
+  if(is.list(markers))
+    stop2("`markers` must indicate attached markers in this function (not a frequency database)")
 
   claimPed = relabel(x, old = id, new = "RAN")
   truePed = list(x, singleton("RAN", sex = getSex(x, id)))

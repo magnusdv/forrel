@@ -1,74 +1,65 @@
 #' Likelihood ratios for kinship testing
 #'
-#' This function computes likelihood ratios (LRs) for a list of pedigrees. One
-#' of the pedigrees (the last one, by default) is designated as 'reference', to
-#' be used in the denominator in all LR calculations. To ensure that all
-#' pedigrees use the same data set, one of the pedigrees may be chosen as
-#' 'source', from which data is transferred to all the other pedigrees.
+#' This function computes likelihood ratios (LRs) for a list of pedigrees. One of the
+#' pedigrees (the last one, by default) is designated as 'reference', to be used in the
+#' denominator in all LR calculations. To ensure that all pedigrees use the same data set,
+#' one of the pedigrees may be chosen as 'source', from which data is transferred to all
+#' the other pedigrees.
 #'
-#' By default, all markers are assumed to be unlinked. To accommodate linkage, a
-#' genetic map may be supplied with the argument `linkageMap`. This requires the
-#' software MERLIN to be installed.
+#' By default, all markers are assumed to be unlinked. To accommodate linkage, a genetic
+#' map may be supplied with the argument `linkageMap`. This requires the software MERLIN
+#' to be installed.
 #'
-#' @param ... Pedigree alternatives. Each argument should be either a single
-#'   `ped` object or a list of such. The pedigrees may be named; otherwise they
-#'   are assigned names "H1", "H2", ... automatically.
+#' @param ... Pedigree alternatives. Each argument should be either a single `ped` object
+#'   or a list of such. The pedigrees may be named; otherwise they are assigned names
+#'   "H1", "H2", ... automatically.
 #'
 #'   It is also possible to pass a single `list` containing all the pedigrees.
-#' @param ref An index or name indicating which of the input pedigrees should be
-#'   used as "reference pedigree", i.e., used in the denominator of each LR. If
-#'   NULL (the default), the last pedigree is used as reference.
-#' @param source An index or name designating one of the input pedigrees as
-#'   source for marker data. If given, marker data is transferred from this to
-#'   all the other pedigrees (replacing any existing markers). The default
-#'   action (`source = NULL`) is as follows: If all pedigree have attached
-#'   markers, no transfers are done. If exactly one of the pedigrees have
-#'   attached markers, these are transferred to the others. all other cases give
-#'   an error.
-#' @param markers A vector of marker names or indices indicating which markers
-#'   should be included. If NULL (the default) all markers are used.
-#' @param likArgs An optional list of arguments to be passed to
-#'   [pedprobr::likelihood()], e.g. `likArgs = list(special = TRUE)`.
-#' @param linkageMap If this is non-NULL, the markers are interpreted as being
-#'   linked, and likelihoods will be computed by an external call to MERLIN.
+#' @param ref An index or name indicating which of the input pedigrees should be used as
+#'   "reference pedigree", i.e., used in the denominator of each LR. If NULL (the
+#'   default), the last pedigree is used as reference.
+#' @param source An index or name designating one of the input pedigrees as source for
+#'   marker data. If given, marker data is transferred from this to all the other
+#'   pedigrees (replacing any existing markers). The default action (`source = NULL`) is
+#'   as follows: If all pedigree have attached markers, no transfers are done. If exactly
+#'   one of the pedigrees have attached markers, these are transferred to the others. all
+#'   other cases give an error.
+#' @param markers A vector of marker names or indices indicating which markers should be
+#'   included. If NULL (the default) all markers are used.
+#' @param likArgs An optional list of arguments to be passed to [pedprobr::likelihood()],
+#'   e.g. `likArgs = list(special = TRUE)`.
+#' @param linkageMap If this is non-NULL, the markers are interpreted as being linked, and
+#'   likelihoods will be computed by an external call to MERLIN. The supplied object
+#'   should be either:
 #'
-#'   The supplied object should be either:
+#'   * a data frame, whose first three columns must be (i) chromosome (ii) marker name
+#'   (iii) centiMorgan position, or
 #'
-#'   * a data frame, whose first three columns must be (i) chromosome (ii)
-#'   marker name (iii) centiMorgan position, or
+#'   * a map object created with `ibdsim2::uniformMap()` or `ibdsim2::loadMap()`. This
+#'   will internally be applied to the attached markers to produce a suitable data frame
+#'   as above.
 #'
-#'   * a map object created with `ibdsim2::uniformMap()` or
-#'   `ibdsim2::loadMap()`. This will internally be applied to the attached
-#'   markers to produce a suitable data frame as above.
-#'
-#' @param keepMerlin Either NULL (default) or the path to an existing folder. If
-#'   given, MERLIN files are stored here, typically for debugging purposes.
+#' @param keepMerlin Either NULL (default) or the path to an existing folder. If given,
+#'   MERLIN files are stored here, typically for debugging purposes.
 #' @param verbose A logical.
 #'
-#' @seealso [LRpower()], [pedprobr::likelihood()],
-#'   [pedprobr::likelihoodMerlin()]
+#' @seealso [LRpower()], [pedprobr::likelihood()], [pedprobr::likelihoodMerlin()]
 #'
-#' @return A `LRresult` object, which is essentially a list with entries
+#' @return A `LRresult` object containing `LRtotal`, the total LR for each pedigree
+#'   against the reference pedigree, and `time`, the elapsed time. The reference entry of
+#'   `LRtotal` is 1 (or `NaN` if the reference likelihood is zero).
 #'
-#'   * `LRtotal` : A vector of length `L`, where `L` is the number of input
-#'   pedigrees. The i'th entry is the total LR (i.e., the product over all
-#'   markers) comparing pedigree `i` to the reference pedigree. The entry
-#'   corresponding to the reference will always be 1.
+#'   For unlinked markers, the following entries are also included:
 #'
-#'   * `LRperMarker` : A numerical matrix, where the i'th column contains the
-#'   marker-wise LR values comparing pedigree `i` to the reference. The product
-#'   of all entries in a column should equal the corresponding entry in
-#'   `LRtotal`.
+#'   * `LRperMarker`: Marker-wise LRs for each pedigree.
+#'   * `lnLRtotal`, `lnLRperMarker`: Natural logarithms of `LRtotal` and `LRperMarker`.
+#'   * `likelihoodsPerMarker`: Marker-wise likelihoods for each pedigree.
 #'
-#'   * `lnLRtotal`, `lnLRperMarker`: Natural logarithms of the above outputs.
+#'   For linked markers, the additional entries are:
 #'
-#'   * `likelihoodsPerMarker` : A numerical matrix of the same dimensions as
-#'   `LRperMarker`, but where the entries are likelihood of each pedigree for
-#'   each marker.
-#'
-#'   * `time` : Elapsed time
-#'
-#' @author Magnus Dehli Vigeland and Thore Egeland
+#'   * `lnLik`: Total log-likelihood for each pedigree.
+#'   * `LRchrom`: LR for each chromosome and pedigree.
+#'   * `lnLikChrom`: Log-likelihood for each chromosome and pedigree.
 #'
 #' @examples
 #'

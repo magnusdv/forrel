@@ -186,5 +186,5 @@ MPpowerPlot(simData, type = 4)
 
 }
 \seealso{
-\code{\link[=MPPsims]{MPPsims()}}, \code{\link[=missingPersonEP]{missingPersonEP()}}, \code{\link[=missingPersonEP]{missingPersonEP()}}
+\code{\link[=MPPsims]{MPPsims()}}, \code{\link[=missingPersonIP]{missingPersonIP()}}, \code{\link[=missingPersonEP]{missingPersonEP()}}
 }

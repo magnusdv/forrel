@@ -224,11 +224,6 @@ exclusionPower = function(claimPed, truePed, ids, markers = NULL, source = "clai
         markers = 1:nmTot
     }
 
-    # Check for already typed members. TODO: Support for partially typed members
-    typed = typedMembers(sourcePed)
-    if(length(bad <- intersect(allids, typed)))
-      stop2("Individual is already genotyped: ", toString(bad))
-
     # Transfer marker data to the other pedigree
     switch(source,
            claim = {
@@ -239,6 +234,10 @@ exclusionPower = function(claimPed, truePed, ids, markers = NULL, source = "clai
              truePed = selectMarkers(truePed, markers)
              claimPed = transferMarkers(from = truePed, to = claimPed)
            })
+
+    typed = typedMembers(truePed)
+    if(length(bad <- intersect(allids, typed)))
+      stop2("Individual is already genotyped: ", bad)
   }
 
   # Plot

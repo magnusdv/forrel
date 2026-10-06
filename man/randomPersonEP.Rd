@@ -11,14 +11,7 @@ randomPersonEP(x, id, markers = NULL, disableMutations = NA, verbose = TRUE)
 
 \item{id}{The ID label of a single pedigree member.}
 
-\item{markers}{Marker input. Either:
-\itemize{
-\item \code{NULL} (default): Use all markers attached to the source pedigree.
-\item A vector of names or indices selecting attached markers.
-\item A named list of frequency vectors, replacing all existing marker data.
-}
-
-Ignored if \code{alleles} or \code{afreq} is given.}
+\item{markers}{Names or indices of attached markers to include. By default all markers.}
 
 \item{disableMutations}{This parameter determines how mutation models are
 treated. Possible values are as follows:

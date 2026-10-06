@@ -11,7 +11,7 @@ expectedLR(numeratorPed, denominatorPed, truePed = numeratorPed, ids, marker)
 
 \item{denominatorPed}{A \code{ped} object or a list of such.}
 
-\item{truePed}{A \code{ped} object.}
+\item{truePed}{A \code{ped} object or a list of such.}
 
 \item{ids}{A vector of ID labels corresponding to untyped pedigree members. (These must
 be members of all three input pedigrees).}
@@ -38,23 +38,22 @@ data, in each pedigree.
 #---------
 
 # Numerator ped
-numPed = nuclearPed(father = "fa", mother = "mo", child = "ch")
+num = nuclearPed(father = "fa", mother = "mo", child = "ch")
 
 # Denominator ped: fa, mo, ch are unrelated
-denomPed = singletons(c("fa", "mo", "ch"), sex = c(1, 2, 1))
+den = singletons(c("fa", "mo", "ch"), sex = c(1, 2, 1))
 
 # Scenario 1: Only mother is typed; genotype 1/2
 p = 0.9
-m1 = marker(numPed, mo = "1/2", afreq = c("1" = p, "2" = 1-p))
-expectedLR(numPed, denomPed, ids = "ch", marker = m1)
+m = marker(num, mo = "1/2", afreq = c("1" = p, "2" = 1-p))
+expectedLR(num, den, ids = "ch", marker = m)
 
-1/(8*p*(1-p)) + 1/2 # exact formula
+1/(8*p*(1-p)) + 1/2  # exact
 
 # Scenario 2: Include father, with genotype 1/1
-m2 = m1
-genotype(m2, id = "fa") = "1/1"
-expectedLR(numPed, denomPed, ids = "ch", marker = m2)
+genotype(m, id = "fa") = "1/1"
+expectedLR(num, den, ids = "ch", marker = m)
 
-1/(8*p*(1-p)) + 1/(4*p^2) # exact formula
+1/(8*p*(1-p)) + 1/(4*p^2)  # exact
 
 }

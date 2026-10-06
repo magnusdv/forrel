@@ -160,12 +160,6 @@ LRpower = function(numeratorPed, denominatorPed, truePed = numeratorPed, ids, ma
         markers = 1:nmTot
     }
 
-    # Check for already typed members.
-    # TODO (minor): Support for partially typed members
-    typed = typedMembers(sourcePed)
-    if(length(bad <- intersect(allids, typed)))
-      stop2("Individual is already genotyped: ", toString(bad))
-
     # Select markers from source and transfer to truePed (if necessary)
     truePed = switch(source,
        true = selectMarkers(truePed, markers),
@@ -173,6 +167,11 @@ LRpower = function(numeratorPed, denominatorPed, truePed = numeratorPed, ids, ma
                                    to = truePed),
        denominator = transferMarkers(from = selectMarkers(denominatorPed, markers),
                                      to = truePed))
+
+    # Check for already typed members
+    typed = typedMembers(truePed)
+    if(length(bad <- intersect(allids, typed)))
+      stop2("Individual is already genotyped: ", bad)
   }
 
   # Plot

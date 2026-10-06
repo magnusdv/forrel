@@ -16,76 +16,75 @@ kinshipLR(
 )
 }
 \arguments{
-\item{...}{Pedigree alternatives. Each argument should be either a single
-\code{ped} object or a list of such. The pedigrees may be named; otherwise they
-are assigned names "H1", "H2", ... automatically.
+\item{...}{Pedigree alternatives. Each argument should be either a single \code{ped} object
+or a list of such. The pedigrees may be named; otherwise they are assigned names
+"H1", "H2", ... automatically.
 
 It is also possible to pass a single \code{list} containing all the pedigrees.}
 
-\item{ref}{An index or name indicating which of the input pedigrees should be
-used as "reference pedigree", i.e., used in the denominator of each LR. If
-NULL (the default), the last pedigree is used as reference.}
+\item{ref}{An index or name indicating which of the input pedigrees should be used as
+"reference pedigree", i.e., used in the denominator of each LR. If NULL (the
+default), the last pedigree is used as reference.}
 
-\item{source}{An index or name designating one of the input pedigrees as
-source for marker data. If given, marker data is transferred from this to
-all the other pedigrees (replacing any existing markers). The default
-action (\code{source = NULL}) is as follows: If all pedigree have attached
-markers, no transfers are done. If exactly one of the pedigrees have
-attached markers, these are transferred to the others. all other cases give
-an error.}
+\item{source}{An index or name designating one of the input pedigrees as source for
+marker data. If given, marker data is transferred from this to all the other
+pedigrees (replacing any existing markers). The default action (\code{source = NULL}) is
+as follows: If all pedigree have attached markers, no transfers are done. If exactly
+one of the pedigrees have attached markers, these are transferred to the others. all
+other cases give an error.}
 
-\item{markers}{A vector of marker names or indices indicating which markers
-should be included. If NULL (the default) all markers are used.}
+\item{markers}{A vector of marker names or indices indicating which markers should be
+included. If NULL (the default) all markers are used.}
 
-\item{likArgs}{An optional list of arguments to be passed to
-\code{\link[pedprobr:likelihood]{pedprobr::likelihood()}}, e.g. \code{likArgs = list(special = TRUE)}.}
+\item{likArgs}{An optional list of arguments to be passed to \code{\link[pedprobr:likelihood]{pedprobr::likelihood()}},
+e.g. \code{likArgs = list(special = TRUE)}.}
 
-\item{linkageMap}{If this is non-NULL, the markers are interpreted as being
-linked, and likelihoods will be computed by an external call to MERLIN.
-
-The supplied object should be either:
+\item{linkageMap}{If this is non-NULL, the markers are interpreted as being linked, and
+likelihoods will be computed by an external call to MERLIN. The supplied object
+should be either:
 \itemize{
-\item a data frame, whose first three columns must be (i) chromosome (ii)
-marker name (iii) centiMorgan position, or
-\item a map object created with \code{ibdsim2::uniformMap()} or
-\code{ibdsim2::loadMap()}. This will internally be applied to the attached
-markers to produce a suitable data frame as above.
+\item a data frame, whose first three columns must be (i) chromosome (ii) marker name
+(iii) centiMorgan position, or
+\item a map object created with \code{ibdsim2::uniformMap()} or \code{ibdsim2::loadMap()}. This
+will internally be applied to the attached markers to produce a suitable data frame
+as above.
 }}
 
-\item{keepMerlin}{Either NULL (default) or the path to an existing folder. If
-given, MERLIN files are stored here, typically for debugging purposes.}
+\item{keepMerlin}{Either NULL (default) or the path to an existing folder. If given,
+MERLIN files are stored here, typically for debugging purposes.}
 
 \item{verbose}{A logical.}
 }
 \value{
-A \code{LRresult} object, which is essentially a list with entries
+A \code{LRresult} object containing \code{LRtotal}, the total LR for each pedigree
+against the reference pedigree, and \code{time}, the elapsed time. The reference entry of
+\code{LRtotal} is 1 (or \code{NaN} if the reference likelihood is zero).
+
+For unlinked markers, the following entries are also included:
 \itemize{
-\item \code{LRtotal} : A vector of length \code{L}, where \code{L} is the number of input
-pedigrees. The i'th entry is the total LR (i.e., the product over all
-markers) comparing pedigree \code{i} to the reference pedigree. The entry
-corresponding to the reference will always be 1.
-\item \code{LRperMarker} : A numerical matrix, where the i'th column contains the
-marker-wise LR values comparing pedigree \code{i} to the reference. The product
-of all entries in a column should equal the corresponding entry in
-\code{LRtotal}.
-\item \code{lnLRtotal}, \code{lnLRperMarker}: Natural logarithms of the above outputs.
-\item \code{likelihoodsPerMarker} : A numerical matrix of the same dimensions as
-\code{LRperMarker}, but where the entries are likelihood of each pedigree for
-each marker.
-\item \code{time} : Elapsed time
+\item \code{LRperMarker}: Marker-wise LRs for each pedigree.
+\item \code{lnLRtotal}, \code{lnLRperMarker}: Natural logarithms of \code{LRtotal} and \code{LRperMarker}.
+\item \code{likelihoodsPerMarker}: Marker-wise likelihoods for each pedigree.
+}
+
+For linked markers, the additional entries are:
+\itemize{
+\item \code{lnLik}: Total log-likelihood for each pedigree.
+\item \code{LRchrom}: LR for each chromosome and pedigree.
+\item \code{lnLikChrom}: Log-likelihood for each chromosome and pedigree.
 }
 }
 \description{
-This function computes likelihood ratios (LRs) for a list of pedigrees. One
-of the pedigrees (the last one, by default) is designated as 'reference', to
-be used in the denominator in all LR calculations. To ensure that all
-pedigrees use the same data set, one of the pedigrees may be chosen as
-'source', from which data is transferred to all the other pedigrees.
+This function computes likelihood ratios (LRs) for a list of pedigrees. One of the
+pedigrees (the last one, by default) is designated as 'reference', to be used in the
+denominator in all LR calculations. To ensure that all pedigrees use the same data set,
+one of the pedigrees may be chosen as 'source', from which data is transferred to all
+the other pedigrees.
 }
 \details{
-By default, all markers are assumed to be unlinked. To accommodate linkage, a
-genetic map may be supplied with the argument \code{linkageMap}. This requires the
-software MERLIN to be installed.
+By default, all markers are assumed to be unlinked. To accommodate linkage, a genetic
+map may be supplied with the argument \code{linkageMap}. This requires the software MERLIN
+to be installed.
 }
 \examples{
 
@@ -148,9 +147,5 @@ if(requireNamespace("ibdsim2", quietly = TRUE) && pedprobr::checkMerlin()) {
 
 }
 \seealso{
-\code{\link[=LRpower]{LRpower()}}, \code{\link[pedprobr:likelihood]{pedprobr::likelihood()}},
-\code{\link[pedprobr:likelihoodMerlin]{pedprobr::likelihoodMerlin()}}
-}
-\author{
-Magnus Dehli Vigeland and Thore Egeland
+\code{\link[=LRpower]{LRpower()}}, \code{\link[pedprobr:likelihood]{pedprobr::likelihood()}}, \code{\link[pedprobr:likelihoodMerlin]{pedprobr::likelihoodMerlin()}}
 }

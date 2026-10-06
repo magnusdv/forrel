@@ -22,7 +22,7 @@ LRpowerPlot(
 }
 \arguments{
 \item{numeratorPed, denominatorPed}{Pedigrees describing H1 and H2. If \code{denominatorPed}
-is NULL, an 'unrelated' hypothesis will be created as \code{singletons(ids)}.}
+is NULL, H2 is formed by treating all members of H1 as unrelated.}
 
 \item{ids}{Individuals to simulate.}
 
@@ -56,8 +56,11 @@ A \code{ggplot} object, or if \code{returnData = TRUE}, a data frame with column
 \code{hypothesis}, \code{sim} and \code{log10LR}.
 }
 \description{
-Simulates the LR comparing two pedigree hypotheses and plots the two log10 LR
-distributions, including their density overlap.
+Simulates genetic data under each of two pedigree hypotheses and calculates the
+LR comparing H1 against H2 for each simulation. The resulting log10 LR
+distributions are plotted together, illustrating how well the hypotheses can
+be distinguished. The plot also shows the density overlap and, if a threshold is given,
+the exceedance probabilities under each hypothesis.
 }
 \examples{
 if(requireNamespace("ggplot2", quietly = TRUE)) {

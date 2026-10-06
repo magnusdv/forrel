@@ -61,7 +61,7 @@
 #' @param ... Arguments passed on.
 #'
 #' @return A `ggplot2` plot object.
-#' @seealso [MPPsims()], [missingPersonEP()], [missingPersonEP()]
+#' @seealso [MPPsims()], [missingPersonIP()], [missingPersonEP()]
 #'
 #' @examples
 #'

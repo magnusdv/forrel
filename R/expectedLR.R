@@ -9,7 +9,7 @@
 #'
 #' @param numeratorPed A `ped` object or a list of such.
 #' @param denominatorPed A `ped` object or a list of such.
-#' @param truePed A `ped` object.
+#' @param truePed A `ped` object or a list of such.
 #' @param ids A vector of ID labels corresponding to untyped pedigree members. (These must
 #'   be members of all three input pedigrees).
 #' @param marker The name or index of a marker attached to `numeratorPed`. Alternatively,
@@ -25,24 +25,23 @@
 #' #---------
 #'
 #' # Numerator ped
-#' numPed = nuclearPed(father = "fa", mother = "mo", child = "ch")
+#' num = nuclearPed(father = "fa", mother = "mo", child = "ch")
 #'
 #' # Denominator ped: fa, mo, ch are unrelated
-#' denomPed = singletons(c("fa", "mo", "ch"), sex = c(1, 2, 1))
+#' den = singletons(c("fa", "mo", "ch"), sex = c(1, 2, 1))
 #'
 #' # Scenario 1: Only mother is typed; genotype 1/2
 #' p = 0.9
-#' m1 = marker(numPed, mo = "1/2", afreq = c("1" = p, "2" = 1-p))
-#' expectedLR(numPed, denomPed, ids = "ch", marker = m1)
+#' m = marker(num, mo = "1/2", afreq = c("1" = p, "2" = 1-p))
+#' expectedLR(num, den, ids = "ch", marker = m)
 #'
-#' 1/(8*p*(1-p)) + 1/2 # exact formula
+#' 1/(8*p*(1-p)) + 1/2  # exact
 #'
 #' # Scenario 2: Include father, with genotype 1/1
-#' m2 = m1
-#' genotype(m2, id = "fa") = "1/1"
-#' expectedLR(numPed, denomPed, ids = "ch", marker = m2)
+#' genotype(m, id = "fa") = "1/1"
+#' expectedLR(num, den, ids = "ch", marker = m)
 #'
-#' 1/(8*p*(1-p)) + 1/(4*p^2) # exact formula
+#' 1/(8*p*(1-p)) + 1/(4*p^2)  # exact
 #'
 #' @importFrom pedprobr oneMarkerDistribution
 #' @export
@@ -65,8 +64,9 @@ expectedLR = function(numeratorPed, denominatorPed, truePed = numeratorPed, ids,
   if(isXmarker(numeratorPed)) {
     numSex = getSex(numeratorPed, ids)
     denomSex = getSex(denominatorPed, ids)
-    if(!identical(numSex, denomSex))
-      stop2("Sex of `ids` must agree between pedigree hypotheses for X-linked markers")
+    trueSex = getSex(truePed, ids)
+    if(!identical(numSex, denomSex) || !identical(numSex, trueSex))
+      stop2("For an X-chromosomal marker, the sex of `ids` must agree between all hypotheses")
   }
 
   denominatorPed = transferMarkers(from = numeratorPed,
@@ -86,7 +86,10 @@ expectedLR = function(numeratorPed, denominatorPed, truePed = numeratorPed, ids,
     true = OMD(truePed)
   }
 
-  ELR = sum(true * num/den)
+  # Expected LR (avoid  0/0)
+  keep = true > 0
+  ELR = sum(true[keep] * num[keep]/den[keep])
+
   ELR
 }
 

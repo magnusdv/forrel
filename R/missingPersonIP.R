@@ -1,43 +1,43 @@
 #' LR simulation for missing person cases
 #'
 #' This function simulates the LR distribution in a missing person case, either for the
-#' true missing person or for an unrelated person. The output contains both the total and
-#' marker-wise LR of each simulation, as well as various summary statistics. If a specific
-#' LR threshold is given, the fraction of simulations exceeding the threshold is computed.
-#' When simulating the true missing person (the default), this fraction is referred to
-#' as the *inclusion power* (Vigeland et al., 2020).
+#' true missing person or for an unrelated person. The output contains the total LR and
+#' log10 LR of each simulation, and various summary statistics. If a specific LR threshold
+#' is given, the fraction of simulations exceeding the threshold is computed. When
+#' simulating the true missing person (the default), this fraction is referred to as the
+#' *inclusion power* (Vigeland et al., 2020).
 #'
 #' @inheritParams missingPersonEP
 #' @param nsim A positive integer: the number of simulations
-#' @param threshold A numeric vector with one or more positive numbers used as the
-#'   likelihood ratio thresholds for inclusion
+#' @param threshold A numeric vector with one or more positive LR thresholds.
 #' @param seed An integer seed for the random number generator (optional).
 #' @param true Either "missing" (default) or "unrelated", indicating whether profiles are
 #'   simulated for the true missing person or for an unrelated person.
 #'
 #' @return A `mpIP` object, which is essentially a list with the following entries:
 #'
-#'   * `LRperSim`: A numeric vector of length `nsim` containing the total LR for
-#'   each simulation.
+#'   * `LRperSim`: A numeric vector of length `nsim` containing the total LR for each
+#'   simulation.
+#'
+#'   * `log10LRperSim`: The corresponding total LRs on the log10 scale.
 #'
 #'   * `meanLRperMarker`: The mean LR per marker, over all simulations.
 #'
 #'   * `meanLR`: The mean total LR over all simulations.
 #'
-#'   * `meanLogLR`: The mean total `log10(LR)` over all simulations.
+#'   * `meanLogLR`: The mean of `log10LRperSim`.
 #'
-#'   * `IP`: A named numeric of the same length as `threshold`. For each element
-#'   of `threshold`, the fraction of simulations resulting in an LR exceeding the given
+#'   * `IP`: A named numeric of the same length as `threshold`. For each element of
+#'   `threshold`, the fraction of simulations resulting in an LR exceeding the given
 #'   number. With `true = "missing"` this is the inclusion power; with `true =
 #'   "unrelated"` it is the corresponding fraction among unrelated persons.
 #'
-#'   * `params`: A list containing the input parameters `missing`, `markers`,
-#'   `nsim`, `threshold`, `disableMutations` and `true`.
+#'   * `params`: A list containing the input parameters `missing`, `markers`, `nsim`,
+#'   `threshold`, `seed`, `disableMutations` and `true`.
 #'
-#' @references
-#' Vigeland MD, Marsico FL, Herrera Piñero M, Egeland T (2020).
-#' "Prioritising family members for genotyping in missing person cases:
-#' A general approach combining the statistical power of exclusion and inclusion."
+#' @references Vigeland MD, Marsico FL, Herrera Piñero M, Egeland T (2020). "Prioritising
+#'   family members for genotyping in missing person cases: A general approach combining
+#'   the statistical power of exclusion and inclusion."
 #' *FSI: Genetics*, 49, 102376. \doi{10.1016/j.fsigen.2020.102376}
 #'
 #' @seealso [missingPersonEP()], [missingPersonLR()], [missingPersonPlot()]
@@ -69,7 +69,7 @@
 #'
 #' @importFrom pedprobr likelihood
 #' @export
-missingPersonIP = function(reference, missing, markers, nsim = 1, threshold = NULL,
+missingPersonIP = function(reference, missing, markers = NULL, nsim = 1, threshold = NULL,
                            disableMutations = NA, seed = NULL,
                            true = c("missing", "unrelated"), verbose = TRUE) {
   st = Sys.time()
@@ -83,7 +83,7 @@ missingPersonIP = function(reference, missing, markers, nsim = 1, threshold = NU
   if(nmark == 0)
     stop2("No markers attached to the input reference")
 
-  if(missing(markers)) {
+  if(is.null(markers)) {
     if(verbose)
       message("Using all ", nmark, " attached markers")
     markers = name(reference, 1:nmark)
@@ -181,9 +181,8 @@ missingPersonIP = function(reference, missing, markers, nsim = 1, threshold = NU
   names(IP) = threshold
 
   # Timing
-  time = Sys.time() - st # included in output
   if(verbose)
-    message("Total time used: ", format(time, digits = 3))
+    message("Total time used: ", format(Sys.time() - st, digits = 3))
 
   # List of input parameters
   params = list(missing = missing, markers = markers,

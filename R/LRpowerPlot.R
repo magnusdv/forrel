@@ -1,10 +1,13 @@
 #' Plot LR distributions under two hypotheses
 #'
-#' Simulates the LR comparing two pedigree hypotheses and plots the two log10 LR
-#' distributions, including their density overlap.
+#' Simulates genetic data under each of two pedigree hypotheses and calculates the
+#' LR comparing H1 against H2 for each simulation. The resulting log10 LR
+#' distributions are plotted together, illustrating how well the hypotheses can
+#' be distinguished. The plot also shows the density overlap and, if a threshold is given,
+#' the exceedance probabilities under each hypothesis.
 #'
 #' @param numeratorPed,denominatorPed Pedigrees describing H1 and H2. If `denominatorPed`
-#'   is NULL, an 'unrelated' hypothesis will be created as `singletons(ids)`.
+#'   is NULL, H2 is formed by treating all members of H1 as unrelated.
 #' @param ids Individuals to simulate.
 #' @param markers Marker names or indices to include, or a named list of frequency vectors
 #'   defining new markers. By default all attached markers.
@@ -73,9 +76,10 @@
 #'
 #' @export
 LRpowerPlot = function(numeratorPed = NULL, denominatorPed = NULL, ids = NULL,
-                         markers = NULL, nsim = 500, seed = NULL, threshold = 1e4,
-                         data = NULL, returnData = FALSE, title = NULL,
-                         bw = NULL, col = c("#E69F00", "#0072B2"), verbose = TRUE) {
+                       markers = NULL, nsim = 500, seed = NULL, threshold = 1e4,
+                       data = NULL, returnData = FALSE, title = NULL,
+                       bw = NULL, col = c("#E69F00", "#0072B2"), verbose = TRUE) {
+
   if(is.null(data)) {
 
     if(is.list(ids))
@@ -83,8 +87,9 @@ LRpowerPlot = function(numeratorPed = NULL, denominatorPed = NULL, ids = NULL,
 
     if(is.null(denominatorPed)) {
       if(verbose)
-        message(paste("Creating H2: Unrelated singletons", toString(ids)))
-      denominatorPed = singletons(ids)
+        message("Creating H2: All individuals unrelated")
+      labs = labels(numeratorPed, unlist = TRUE)
+      denominatorPed = singletons(labs, sex = getSex(numeratorPed, labs))
     }
 
     # Simulate under each hyp
@@ -98,6 +103,9 @@ LRpowerPlot = function(numeratorPed = NULL, denominatorPed = NULL, ids = NULL,
                  nsim = nsim, verbose = verbose)
     data = list(r1, r2)
   }
+
+  if(!is.null(threshold) && !(isNumber(threshold) && is.finite(threshold) && threshold > 0))
+    stop2("`threshold` must be a single positive number: ", threshold)
 
   # Convert LRpower output to plotting data
   if(is.list(data) && !is.data.frame(data)) {

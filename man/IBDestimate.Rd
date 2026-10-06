@@ -23,46 +23,45 @@ ibdEstimate(
 \arguments{
 \item{x}{A \code{ped} object or a list of such.}
 
-\item{ids}{Either a vector with ID labels, or a data frame/matrix with two
-columns, each row indicating a pair of individuals. The entries are coerced
-to characters, and must match uniquely against the ID labels of \code{x}. By
-default, all pairs of genotyped members of \code{x} are included.}
+\item{ids}{Either a vector with ID labels, or a data frame/matrix with two columns,
+each row indicating a pair of individuals. The entries are coerced to characters, and
+must match uniquely against the ID labels of \code{x}. By default, all pairs of genotyped
+members of \code{x} are included.}
 
-\item{param}{Either "kappa" (default) or "delta"; indicating which set of
-coefficients should be estimated.}
+\item{param}{Either "kappa" (default) or "delta"; indicating which set of coefficients
+should be estimated.}
 
-\item{acrossComps}{A logical indicating if pairs of individuals in different
-components should be included. Default: TRUE.}
+\item{acrossComps}{A logical indicating if pairs of individuals in different components
+should be included. Default: TRUE.}
 
-\item{markers}{A vector with names or indices of markers attached to x,
-indicating which markers to include. By default, all markers are used.}
+\item{markers}{A vector with names or indices of markers attached to x, indicating
+which markers to include. By default, all markers are used.}
 
-\item{start}{A probability vector (i.e., with nonnegative entries and sum 1)
-of length 3 (if \code{param = "kappa"}) or 9 (if \code{param = "delta"}), indicating
-the initial value of for the optimisation. By default, \code{start} is set to
-\verb{(1/3, 1/3, 1/3)} if \code{param = "kappa"} and \verb{(1/9, ..., 1/9)} if \code{param = "delta"}.}
+\item{start}{A probability vector (i.e., with nonnegative entries and sum 1) of length
+3 (if \code{param = "kappa"}) or 9 (if \code{param = "delta"}), indicating the initial value of
+for the optimisation. By default, \code{start} is set to \verb{(1/3, 1/3, 1/3)} if \code{param = "kappa"} and \verb{(1/9, ..., 1/9)} if \code{param = "delta"}.}
 
-\item{tol, beta, sigma}{Control parameters for the optimisation routine; can
-usually be left untouched.}
+\item{tol, beta, sigma}{Control parameters for the optimisation routine; can usually be
+left untouched.}
 
-\item{contourPlot}{A logical. If TRUE, contours of the log-likelihood
-function are plotted overlaying the IBD triangle.}
+\item{contourPlot}{A logical. If TRUE, contours of the log-likelihood function are
+plotted overlaying the IBD triangle.}
 
-\item{levels}{(Only relevant if \code{contourPlot = TRUE}.) A numeric vector of
-levels at which to draw contour lines. If NULL (default), the levels are
-chosen automatically.}
+\item{levels}{(Only relevant if \code{contourPlot = TRUE}.) A numeric vector of levels at
+which to draw contour lines. If NULL (default), the levels are chosen automatically.}
 
-\item{maxval}{A logical. If TRUE, the maximum log-likelihood value is
-included in the output. Default: FALSE}
+\item{maxval}{A logical. If TRUE, the maximum log-likelihood value is included in the
+output. Default: FALSE}
 
 \item{verbose}{A logical.}
 }
 \value{
-An object of class \code{ibdEst}, which is basically a data frame with
-either 6 columns (if \code{param = "kappa"}) or 12 columns (if \code{param = "delta"}). The first three columns are \code{id1} (label of first individual),
-\code{id2} (label of second individual) and \code{N} (the number of markers with no
-missing alleles). The remaining columns contain the coefficient estimates.
-If \code{maxval = T}, a column named \code{maxloglik} is added at the end.
+An object of class \code{ibdEst}, which is basically a data frame with either 6
+columns (if \code{param = "kappa"}) or 12 columns (if \code{param = "delta"}). The first three
+columns are \code{id1} (label of first individual), \code{id2} (label of second individual) and
+\code{N} (the number of markers with no missing alleles). The remaining columns contain
+the coefficient estimates. If \code{maxval = T}, a column named \code{maxloglik} is added at
+the end.
 }
 \description{
 Estimate the IBD coefficients \eqn{\kappa = (\kappa_0, \kappa_1,
@@ -72,22 +71,21 @@ of pedigree members, using maximum likelihood methods. Estimates of \eqn{\kappa}
 visualised with \code{\link[ribd:showInTriangle]{ribd::showInTriangle()}}.
 }
 \details{
-It should be noted that this procedure estimates the \emph{realised} identity
-coefficients of each pair, i.e., the actual fractions of the autosomes in
-each IBD state. These may deviate substantially from the theoretical pedigree
-coefficients.
+It should be noted that this procedure estimates the \emph{realised} identity coefficients
+of each pair, i.e., the actual fractions of the autosomes in each IBD state. These may
+deviate substantially from the theoretical pedigree coefficients.
 
-Maximum likelihood estimation of relatedness coefficients originates with
-Thompson (1975). Optimisation of \eqn{\kappa} is done in the \eqn{(\kappa_0,
-\kappa_2)}{(k0, k2)}-plane and restricted to the triangle defined by
+Maximum likelihood estimation of relatedness coefficients originates with Thompson
+(1975). Optimisation of \eqn{\kappa} is done in the \eqn{(\kappa_0, \kappa_2)}{(k0,
+k2)}-plane and restricted to the triangle defined by
 \deqn{\kappa_0 \ge 0, \kappa_2 \ge 0, \kappa_0 + \kappa_2 \le 1}{k0 >= 0, k2
 >= 0, k0 + k2 <= 1.}
 
-Optimisation of \eqn{\Delta} is done in unit simplex of \eqn{R^8}, using the
-first 8 coefficients.
+Optimisation of \eqn{\Delta} is done in unit simplex of \eqn{R^8}, using the first 8
+coefficients.
 
-The implementation optimises the log-likelihood using a projected gradient
-descent algorithm, combined with a version of Armijo line search.
+The implementation optimises the log-likelihood using a projected gradient descent
+algorithm, combined with a version of Armijo line search.
 
 When \code{param = "kappa"}, the output may be fed directly to \code{\link[ribd:showInTriangle]{ribd::showInTriangle()}} for
 visualisation.
@@ -124,11 +122,10 @@ ribd::condensedIdentity(y, 5:6, simplify = FALSE)
 }
 \references{
 \itemize{
-\item E. A. Thompson (1975). \emph{The estimation of pairwise relationships.} Annals
-of Human Genetics 39.
-\item E. A. Thompson (2000). \emph{Statistical Inference from Genetic Data on
-Pedigrees.} NSF-CBMS Regional Conference Series in Probability and
-Statistics. Volume 6.
+\item E. A. Thompson (1975). \emph{The estimation of pairwise relationships.} Annals of Human
+Genetics 39.
+\item E. A. Thompson (2000). \emph{Statistical Inference from Genetic Data on Pedigrees.}
+NSF-CBMS Regional Conference Series in Probability and Statistics. Volume 6.
 }
 }
 \seealso{
