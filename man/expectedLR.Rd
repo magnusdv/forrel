@@ -13,23 +13,22 @@ expectedLR(numeratorPed, denominatorPed, truePed = numeratorPed, ids, marker)
 
 \item{truePed}{A \code{ped} object.}
 
-\item{ids}{A vector of ID labels corresponding to untyped pedigree members.
-(These must be members of all three input pedigrees).}
+\item{ids}{A vector of ID labels corresponding to untyped pedigree members. (These must
+be members of all three input pedigrees).}
 
-\item{marker}{either a marker object compatible with \code{numeratorPed}, or the
-name or index of a marker attached to \code{numeratorPed}.}
+\item{marker}{The name or index of a marker attached to \code{numeratorPed}. Alternatively,
+a standalone \code{marker} object compatible with \code{numeratorPed}.}
 }
 \value{
-A positive number.
+A positive number; the expected LR.
 }
 \description{
-This function computes the expected LR for a single marker, in a kinship test
-comparing two hypothesised relationships between a set of individuals. The
-true relationship may differ from both hypotheses. Some individuals may
-already be genotyped, while others are available for typing. The
-implementation uses \code{oneMarkerDistribution()} to find the joint genotype
-distribution for the available individuals, conditional on the known data, in
-each pedigree.
+This function computes the expected LR for a single marker, in a kinship test comparing
+two hypothesised relationships between a set of individuals. The true relationship may
+differ from both hypotheses. Some individuals may already be genotyped, while others
+are available for typing. The implementation uses \code{oneMarkerDistribution()} to find the
+joint genotype distribution for the available individuals, conditional on the known
+data, in each pedigree.
 }
 \examples{
 

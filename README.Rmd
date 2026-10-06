@@ -48,7 +48,7 @@ The most important analyses currently supported by **forrel** are:
     * `missingPersonEP()`
     * `missingPersonIP()`
     * `MPPsims()`
-    * `powerPlot()`
+    * `MPpowerPlot()`
 * Predict DNA profiles for untyped pedigree members
     * `rankProfiles()`
 

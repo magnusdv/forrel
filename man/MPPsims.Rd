@@ -21,21 +21,20 @@ MPPsims(
 )
 }
 \arguments{
-\item{reference}{A connected \code{ped} object, or a list of pedigrees. In the
-latter case, the list must have the same length as \code{selections}.}
+\item{reference}{A connected \code{ped} object, or a list of pedigrees. In the latter case,
+the list must have the same length as \code{selections}.}
 
 \item{missing}{The ID label of the missing pedigree member.}
 
-\item{selections}{A list of pedigree member subsets. In the special case that
-all subsets consist of a single individual, \code{selections} can be given as a
-simple vector.}
+\item{selections}{A list of pedigree member subsets. In the special case that all
+subsets consist of a single individual, \code{selections} can be given as a simple vector.}
 
 \item{ep}{A logical: Estimate the exclusion power? (Default: TRUE)}
 
 \item{ip}{A logical: Estimate the inclusion power? (Default: TRUE)}
 
-\item{addBaseline}{A logical. If TRUE (default) an \emph{empty} selection, named
-"Baseline", is added as the first element of \code{selection}.}
+\item{addBaseline}{A logical. If TRUE (default) an \emph{empty} selection, named "Baseline",
+is added as the first element of \code{selection}.}
 
 \item{nProfiles}{The number of profile simulations for each selection.}
 
@@ -62,27 +61,24 @@ mutations should be disabled.
 \item{verbose}{A logical.}
 }
 \value{
-An object of class "MPPsim", which is basically a list with one entry
-for each element of \code{selections}. Each entry has elements \code{ep} and \code{ip},
-each of which is a list of length \code{nProfiles}.
+An object of class "MPPsim", which is basically a list with one entry for each
+element of \code{selections}. Each entry has elements \code{ep} and \code{ip}, each of which is a
+list of length \code{nProfiles}.
 
-The output object has various attributes reflecting the input. Note that
-\code{reference} and \code{selection} may differ slightly from the original input,
-since they may be modified during the function run. (For instance, a
-"Baseline" entry is added to \code{selection} if \code{addBaseline} is TRUE.) The
-crucial point is that the output attributes correspond exactly to the
-output data.
+The output object has various attributes reflecting the input. Note that \code{reference}
+and \code{selection} may differ slightly from the original input, since they may be
+modified during the function run. (For instance, a "Baseline" entry is added to
+\code{selection} if \code{addBaseline} is TRUE.) The crucial point is that the output
+attributes correspond exactly to the output data.
 \itemize{
-\item \code{reference} (always a list, of the same length as the \code{selections}
-attribute
+\item \code{reference} (always a list, of the same length as the \code{selections} attribute)
 \item \code{selections}
 \item \code{nProfiles},\code{lrSims},\code{thresholdIP},\code{seed} (as in the input)
 \item \code{totalTime} (the total time used)
 }
 }
 \description{
-Estimate the exclusion/inclusion power for various selections of available
-individuals.
+Estimate the exclusion/inclusion power for various selections of available individuals.
 }
 \examples{
 x = nuclearPed(fa = "Gf", mo = "Gm", children = c("Uncle", "Mother"), sex = 1:2)
@@ -96,13 +92,13 @@ x = addMarker(x, S1 = "1/2", alleles = 1:4)
 # Alternatives for additional genotyping
 sel = list("Father", "S2", "HS", c("Gm", "Uncle"))
 
-plot(x, marker = 1, hatched = sel)
+# plot(x, marker = 1, hatched = sel)
 
 # Simulate
 simData = MPPsims(x, selections = sel, nProfiles = 2, lrSims = 2)
 
 # Power plot
-powerPlot(simData, type = 3)
+MPpowerPlot(simData, type = 3)
 
 \donttest{
 ### With  mutations

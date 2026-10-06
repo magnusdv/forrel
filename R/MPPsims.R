@@ -1,35 +1,31 @@
 #' Missing person power simulations
 #'
-#' Estimate the exclusion/inclusion power for various selections of available
-#' individuals.
+#' Estimate the exclusion/inclusion power for various selections of available individuals.
 #'
 #' @inheritParams missingPersonIP
-#' @param reference A connected `ped` object, or a list of pedigrees. In the
-#'   latter case, the list must have the same length as `selections`.
-#' @param selections A list of pedigree member subsets. In the special case that
-#'   all subsets consist of a single individual, `selections` can be given as a
-#'   simple vector.
+#' @param reference A connected `ped` object, or a list of pedigrees. In the latter case,
+#'   the list must have the same length as `selections`.
+#' @param selections A list of pedigree member subsets. In the special case that all
+#'   subsets consist of a single individual, `selections` can be given as a simple vector.
 #' @param ep A logical: Estimate the exclusion power? (Default: TRUE)
 #' @param ip A logical: Estimate the inclusion power? (Default: TRUE)
-#' @param addBaseline A logical. If TRUE (default) an *empty* selection, named
-#'   "Baseline", is added as the first element of `selection`.
+#' @param addBaseline A logical. If TRUE (default) an *empty* selection, named "Baseline",
+#'   is added as the first element of `selection`.
 #' @param nProfiles The number of profile simulations for each selection.
 #' @param lrSims,thresholdIP Parameters passed onto [missingPersonIP()].
 #' @param numCores Deprecated and ignored.
 #'
-#' @return An object of class "MPPsim", which is basically a list with one entry
-#'   for each element of `selections`. Each entry has elements `ep` and `ip`,
-#'   each of which is a list of length `nProfiles`.
+#' @return An object of class "MPPsim", which is basically a list with one entry for each
+#'   element of `selections`. Each entry has elements `ep` and `ip`, each of which is a
+#'   list of length `nProfiles`.
 #'
-#'   The output object has various attributes reflecting the input. Note that
-#'   `reference` and `selection` may differ slightly from the original input,
-#'   since they may be modified during the function run. (For instance, a
-#'   "Baseline" entry is added to `selection` if `addBaseline` is TRUE.) The
-#'   crucial point is that the output attributes correspond exactly to the
-#'   output data.
+#'   The output object has various attributes reflecting the input. Note that `reference`
+#'   and `selection` may differ slightly from the original input, since they may be
+#'   modified during the function run. (For instance, a "Baseline" entry is added to
+#'   `selection` if `addBaseline` is TRUE.) The crucial point is that the output
+#'   attributes correspond exactly to the output data.
 #'
-#'   * `reference` (always a list, of the same length as the `selections`
-#'   attribute
+#'   * `reference` (always a list, of the same length as the `selections` attribute)
 #'
 #'   * `selections`
 #'
@@ -49,13 +45,13 @@
 #' # Alternatives for additional genotyping
 #' sel = list("Father", "S2", "HS", c("Gm", "Uncle"))
 #'
-#' plot(x, marker = 1, hatched = sel)
+#' # plot(x, marker = 1, hatched = sel)
 #'
 #' # Simulate
 #' simData = MPPsims(x, selections = sel, nProfiles = 2, lrSims = 2)
 #'
 #' # Power plot
-#' powerPlot(simData, type = 3)
+#' MPpowerPlot(simData, type = 3)
 #'
 #' \donttest{
 #' ### With  mutations

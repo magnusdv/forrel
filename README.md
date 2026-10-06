@@ -43,7 +43,7 @@ The most important analyses currently supported by **forrel** are:
   - `missingPersonEP()`
   - `missingPersonIP()`
   - `MPPsims()`
-  - `powerPlot()`
+  - `MPpowerPlot()`
 - Predict DNA profiles for untyped pedigree members
   - `rankProfiles()`
 
@@ -102,7 +102,7 @@ x = nuclearPed(children = c("bro1", "bro2"))
 plot(x)
 ```
 
-<img src="man/figures/README-sibs-1.png" style="display: block; margin: auto;" />
+<img src="man/figures/README-sibs-1.png" alt="" style="display: block; margin: auto;" />
 
 **Marker simulation**
 
@@ -122,11 +122,11 @@ x = markerSim(x, N = 100, alleles = 1:2, seed = 1234)
 #> 
 #> Simulation finished.
 #> Calls to `likelihood()`: 0.
-#> Total time used: 0.07 seconds.
+#> Total time used: 0.14 seconds.
 ```
 
 Note 1: The `seed` argument is passed onto the random number generator.
-If you use the same seed, you should get exactly the same results.  
+If you use the same seed, you should get exactly the same results.\
 Note 2: To suppress the informative messages printed during simulation,
 add `verbose = FALSE` to the function call.
 
@@ -181,7 +181,7 @@ k = ibdEstimate(y, ids = c("bro1", "bro2"))
 #> Initial search value: (0.333, 0.333, 0.333)
 #> Pairs of individuals: 1
 #>   bro1 vs. bro2: estimate = (0.28, 0.54, 0.18), iterations = 10
-#> Total time: 0.00512 secs
+#> Total time: 0.00723 secs
 k
 #>    id1  id2   N      k0      k1      k2
 #> 1 bro1 bro2 100 0.28001 0.53998 0.18001
@@ -194,7 +194,7 @@ the IBD triangle:
 showInTriangle(k, labels = TRUE)
 ```
 
-<img src="man/figures/README-triangle-1.png" style="display: block; margin: auto;" />
+<img src="man/figures/README-triangle-1.png" alt="" style="display: block; margin: auto;" />
 
 Reassuringly, the estimate is close to the theoretical expectation for
 non-inbred full siblings,
