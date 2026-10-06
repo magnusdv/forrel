@@ -2,9 +2,9 @@
 
 * New function `LRpowerPlot()` for visualising simulated LR distributions under two competing hypotheses.
 
-* `LRpower()` and `exclusionPower()` (and the new `LRpowerPlot()`) now accept a list of frequency vectors in `markers`, similarly to `profileSim()`.
+* `LRpower()` and `exclusionPower()` (and the new `LRpowerPlot()`) now accept a named list of frequency vectors as `markers`, similarly to `profileSim()`.
 
-* `kinshipLR()` and `LRpower()` now also return LRs on the log scale, reducing the risk of numerical overflow and underflow.
+* For unlinked markers, `kinshipLR()` now also returns `lnLRtotal` and `lnLRperMarker`. Similarly the output of `LRpower()` now includes `log10LRperSim`. These reduce the risk of numerical overflow and underflow.
 
 * `powerPlot()` has been renamed to `MPpowerPlot()`, to avoid confusion with the new `LRpowerPlot()` and to reflect its connection with missing person (MP) applications. The old name is retained with a message for backwards compatibility.
 
@@ -12,7 +12,9 @@
 
 * `expectedLR()` no longer requires the input pedigree hypotheses to be connected.
 
-* `expectedLR()` now checks that, if the marker is X-linked, all individuals have the same sex in both hypotheses.
+* For X-chromosomal markers, `expectedLR()` now checks that the target individuals have the same sex in all hypotheses.
+
+* The re-exported `showInTriangle()` has been removed; use `ribd::showInTriangle()` directly.
 
 
 # forrel 1.9.0
