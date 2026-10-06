@@ -226,22 +226,6 @@ profileSim = function(x, N = 1, ids = NULL, markers = NULL, loopBreakers = NULL,
   sims
 }
 
-.checkFreqDB = function(db) {
-  nms = names(db)
-  if(is.null(nms) || anyNA(nms) || any(!nzchar(nms)))
-    stop2("Marker names are missing")
-  if(dup <- anyDuplicated(nms))
-    stop2("Duplicated marker name: ", nms[dup])
-
-  ok = vapply(db, function(m)
-    is.numeric(m) && all(is.finite(m)) && all(m >= 0) && abs(sum(m) - 1) < 1e-8,
-    logical(1))
-
-  if(!all(ok))
-    stop2("Invalid frequency vector: ", toString(nms[!ok]))
-
-  invisible(TRUE)
-}
 
 .profileSimMarker = function(j, x, N, ids, lb = NULL)
   markerSim(x, N, ids = ids, partialmarker = j, loopBreakers = lb, verbose = FALSE)
