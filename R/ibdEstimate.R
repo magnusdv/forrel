@@ -3,8 +3,8 @@
 #' Estimate the IBD coefficients \eqn{\kappa = (\kappa_0, \kappa_1,
 #' \kappa_2)}{(k0, k1, k2)} or the condensed identity coefficients \eqn{\Delta =
 #' (\Delta_1, ..., \Delta_9)}{(d1, ..., d9)} between a pair (or several pairs)
-#' of pedigree members, using maximum likelihood methods. Estimates of
-#' \eqn{\kappa} may be visualised with [showInTriangle()].
+#' of pedigree members, using maximum likelihood methods. Estimates of \eqn{\kappa} may be
+#' visualised with [ribd::showInTriangle()].
 #'
 #' It should be noted that this procedure estimates the *realised* identity
 #' coefficients of each pair, i.e., the actual fractions of the autosomes in
@@ -23,8 +23,8 @@
 #' The implementation optimises the log-likelihood using a projected gradient
 #' descent algorithm, combined with a version of Armijo line search.
 #'
-#' When `param = "kappa"`, the output may be fed directly to [showInTriangle()]
-#' for visualisation.
+#' When `param = "kappa"`, the output may be fed directly to [ribd::showInTriangle()] for
+#' visualisation.
 #'
 #' @param x A `ped` object or a list of such.
 #' @param ids Either a vector with ID labels, or a data frame/matrix with two
@@ -86,7 +86,7 @@
 #' k
 #'
 #' # Visualise estimate
-#' showInTriangle(k, labels = TRUE)
+#' ribd::showInTriangle(k, labels = TRUE)
 #'
 #' # Contour plot of the log-likelihood function
 #' ibdEstimate(x, ids = 3:4, contourPlot = TRUE)

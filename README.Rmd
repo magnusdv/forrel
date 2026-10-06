@@ -117,8 +117,6 @@ y = nuclearPed(children = c("bro1", "bro2")) |>
 y
 ```
 
-Note that the previous code also demonstrates how **pedsuite** is well adapted to the R pipe `|>`.
-
 **Estimation of IBD coefficients**  
 
 The `ibdEstimate()` function estimates the coefficients of _identity-by-descent_ (IBD) between pairs of individuals, from the available marker data. Let us try with the simulated genotypes we just generated:
@@ -129,7 +127,7 @@ k
 
 To get a visual sense of the estimate, it is instructive to plot it in the IBD triangle:
 ```{r triangle, fig.height=4, fig.width=4}
-showInTriangle(k, labels = TRUE)
+ribd::showInTriangle(k, labels = TRUE)
 ```
 
 Reassuringly, the estimate is close to the theoretical expectation for non-inbred full siblings, $(\kappa_0, \kappa_1, \kappa_2) = (0.25, 0.5, 0.25)$, corresponding to the point marked `S` in the triangle.

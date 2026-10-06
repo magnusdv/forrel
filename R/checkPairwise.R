@@ -240,7 +240,7 @@ checkPairwise = function(x, ids = typedMembers(x), includeInbred = FALSE, across
 # Plot methods ----------------------------------------------------------------
 
 #' @rdname checkPairwise
-#' @importFrom ribd ibdTriangle showInTriangle
+#' @importFrom ribd ibdTriangle
 #' @importFrom graphics legend points
 #' @importFrom grDevices palette
 #' @export

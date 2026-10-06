@@ -35,7 +35,6 @@ export(profileSimParametric)
 export(quickLR)
 export(randomPersonEP)
 export(rankProfiles)
-export(showInTriangle)
 export(simpleSim)
 import(pedprobr)
 import(pedtools)
@@ -52,8 +51,7 @@ importFrom(pedprobr,
 importFrom(ribd,
   ibdTriangle,
   inbreeding,
-  kappaIBD,
-  showInTriangle
+  kappaIBD
 )
 importFrom(stats,
   aggregate,

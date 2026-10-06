@@ -122,7 +122,7 @@ x = markerSim(x, N = 100, alleles = 1:2, seed = 1234)
 #> 
 #> Simulation finished.
 #> Calls to `likelihood()`: 0.
-#> Total time used: 0.14 seconds.
+#> Total time used: 0.05 seconds.
 ```
 
 Note 1: The `seed` argument is passed onto the random number generator.
@@ -165,9 +165,6 @@ y
 #> Only 5 (out of 100) markers are shown.
 ```
 
-Note that the previous code also demonstrates how **pedsuite** is well
-adapted to the R pipe `|>`.
-
 **Estimation of IBD coefficients**
 
 The `ibdEstimate()` function estimates the coefficients of
@@ -181,7 +178,7 @@ k = ibdEstimate(y, ids = c("bro1", "bro2"))
 #> Initial search value: (0.333, 0.333, 0.333)
 #> Pairs of individuals: 1
 #>   bro1 vs. bro2: estimate = (0.28, 0.54, 0.18), iterations = 10
-#> Total time: 0.00723 secs
+#> Total time: 0.00555 secs
 k
 #>    id1  id2   N      k0      k1      k2
 #> 1 bro1 bro2 100 0.28001 0.53998 0.18001
@@ -191,7 +188,7 @@ To get a visual sense of the estimate, it is instructive to plot it in
 the IBD triangle:
 
 ``` r
-showInTriangle(k, labels = TRUE)
+ribd::showInTriangle(k, labels = TRUE)
 ```
 
 <img src="man/figures/README-triangle-1.png" alt="" style="display: block; margin: auto;" />

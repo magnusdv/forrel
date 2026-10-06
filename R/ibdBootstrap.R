@@ -155,8 +155,8 @@ ibdBootstrap = function(x = NULL, ids = NULL, param = NULL, kappa = NULL, delta 
 
   # Plot
   if(plot && param == "kappa") {
-    showInTriangle(res, lwd = 1, pch = 1, col = 4)
-    showInTriangle(kappa, new = FALSE, col = "red", pch = 4, lwd = 4, cex = 2.2)
+    ribd::showInTriangle(res, lwd = 1, pch = 1, col = 4)
+    ribd::showInTriangle(kappa, new = FALSE, col = "red", pch = 4, lwd = 4, cex = 2.2)
   }
 
   res
